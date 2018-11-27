@@ -80,7 +80,7 @@ function {{genZshFuncName .}} {
 {{define "Main" -}}
 #compdef _{{.Name}} {{.Name}}
 
-{{.BashCompletionFunction}}
+{{.ZshCompletionFunction}}
 
 {{template "selectCmdTemplate" .}}
 {{end}}
@@ -122,7 +122,7 @@ func (c *Command) GenZshCompletion(w io.Writer) error {
 	return tmpl.Execute(w, c.Root())
 }
 
-// MarkZshCompPositionalArgumentFile marks the specified argument (first
+// MarkZshCompPositionalArgumentCustom marks the specified argument (first
 // argument is 1) as custom.
 func (c *Command) MarkZshCompPositionalArgumentCustom(argPosition int, function string) error {
 	if argPosition < 1 {

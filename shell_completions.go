@@ -34,8 +34,8 @@ func (c *Command) MarkFlagCustom(name string, f string) error {
 	return MarkFlagCustom(c.Flags(), name, f)
 }
 
-// MarkFlagCustom adds the BashCompCustom annotation to the named pflag, if it exists.
-// Generated bash autocompletion will call the bash function f for the flag.
+// MarkPFlagCustom adds the BashCompCustom annotation to the named pflag, if it exists.
+// Generated shell autocompletion will call the function f for the flag.
 func (c *Command) MarkPFlagCustom(name string, f string) error {
 	return MarkFlagCustom(c.PersistentFlags(), name, f)
 }

@@ -242,7 +242,7 @@ func TestGenZshCompletion(t *testing.T) {
 			tc.root.Root().SetArgs(tc.invocationArgs)
 			tc.root.Execute()
 			buf := new(bytes.Buffer)
-			if err := tc.root.GenZshCompletion(buf); err != nil {
+			if err := Wrap(tc.root).GenZshCompletion(buf); err != nil {
 				t.Error(err)
 			}
 			output := buf.Bytes()
@@ -316,7 +316,7 @@ func TestGenZshCompletionHidden(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.root.Execute()
 			buf := new(bytes.Buffer)
-			if err := tc.root.GenZshCompletion(buf); err != nil {
+			if err := Wrap(tc.root).GenZshCompletion(buf); err != nil {
 				t.Error(err)
 			}
 			output := buf.String()
@@ -391,7 +391,7 @@ func BenchmarkMediumSizeConstruct(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		buf := new(bytes.Buffer)
-		err := root.GenZshCompletion(buf)
+		err := Wrap(root).GenZshCompletion(buf)
 		if err != nil {
 			b.Error(err)
 		}

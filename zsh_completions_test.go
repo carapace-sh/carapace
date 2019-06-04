@@ -5,7 +5,10 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"github.com/spf13/cobra"
 )
+
+func emptyRun(*cobra.Command, []string) {} // from command_test.go (cobra)
 
 func TestGenZshCompletion(t *testing.T) {
 	var debug bool
@@ -13,15 +16,15 @@ func TestGenZshCompletion(t *testing.T) {
 
 	tcs := []struct {
 		name                string
-		root                *Command
+		root                *cobra.Command
 		expectedExpressions []string
 		invocationArgs      []string
 		skip                string
 	}{
 		{
 			name: "simple command",
-			root: func() *Command {
-				r := &Command{
+			root: func() *cobra.Command {
+				r := &cobra.Command{
 					Use:  "mycommand",
 					Long: "My Command long description",
 					Run:  emptyRun,
@@ -36,8 +39,8 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "flags with both long and short flags",
-			root: func() *Command {
-				r := &Command{
+			root: func() *cobra.Command {
+				r := &cobra.Command{
 					Use:  "testcmd",
 					Long: "long description",
 					Run:  emptyRun,
@@ -51,17 +54,17 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "command with subcommands and flags with values",
-			root: func() *Command {
-				r := &Command{
+			root: func() *cobra.Command {
+				r := &cobra.Command{
 					Use:  "rootcmd",
 					Long: "Long rootcmd description",
 				}
-				d := &Command{
+				d := &cobra.Command{
 					Use:   "subcmd1",
 					Short: "Subcmd1 short description",
 					Run:   emptyRun,
 				}
-				e := &Command{
+				e := &cobra.Command{
 					Use:  "subcmd2",
 					Long: "Subcmd2 short description",
 					Run:  emptyRun,
@@ -82,9 +85,9 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "filename completion with and without globs",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				var file string
-				r := &Command{
+				r := &cobra.Command{
 					Use:   "mycmd",
 					Short: "my command short description",
 					Run:   emptyRun,
@@ -102,7 +105,7 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "repeated variables both with and without value",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("mycmd", true)
 				_ = r.Flags().BoolSliceP("debug", "d", []bool{}, "debug usage")
 				_ = r.Flags().StringArray("option", []string{}, "options")
@@ -115,8 +118,8 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "generated flags --help and --version should be created even when not executing root cmd",
-			root: func() *Command {
-				r := &Command{
+			root: func() *cobra.Command {
+				r := &cobra.Command{
 					Use:     "mycmd",
 					Short:   "mycmd short description",
 					Version: "myversion",
@@ -136,7 +139,7 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "zsh generation should run on root command",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", false)
 				s := genTestCommand("sub1", true)
 				r.AddCommand(s)
@@ -148,7 +151,7 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "flag description with single quote (') shouldn't break quotes in completion file",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
 				r.Flags().Bool("private", false, "Don't show public info")
 				return r
@@ -159,10 +162,10 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "argument completion for file with and without patterns",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
-				r.MarkZshCompPositionalArgumentFile(1, "*.log")
-				r.MarkZshCompPositionalArgumentFile(2)
+				Wrap(r).MarkZshCompPositionalArgumentFile(1, "*.log")
+				Wrap(r).MarkZshCompPositionalArgumentFile(2)
 				return r
 			}(),
 			expectedExpressions: []string{
@@ -171,9 +174,9 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "argument zsh completion for words",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
-				r.MarkZshCompPositionalArgumentWords(1, "word1", "word2")
+				Wrap(r).MarkZshCompPositionalArgumentWords(1, "word1", "word2")
 				return r
 			}(),
 			expectedExpressions: []string{
@@ -182,9 +185,9 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "argument completion for words with spaces",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
-				r.MarkZshCompPositionalArgumentWords(1, "single", "multiple words")
+				Wrap(r).MarkZshCompPositionalArgumentWords(1, "single", "multiple words")
 				return r
 			}(),
 			expectedExpressions: []string{
@@ -193,7 +196,7 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "argument completion when command has ValidArgs and no annotation for argument completion",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
 				r.ValidArgs = []string{"word1", "word2"}
 				return r
@@ -204,10 +207,10 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "argument completion when command has ValidArgs and no annotation for argument at argPosition 1",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
 				r.ValidArgs = []string{"word1", "word2"}
-				r.MarkZshCompPositionalArgumentFile(2)
+				Wrap(r).MarkZshCompPositionalArgumentFile(2)
 				return r
 			}(),
 			expectedExpressions: []string{
@@ -216,12 +219,12 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "directory completion for flag",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
 				r.Flags().String("test", "", "test")
 				r.PersistentFlags().String("ptest", "", "ptest")
-				r.MarkFlagDirname("test")
-				r.MarkPersistentFlagDirname("ptest")
+				Wrap(r).MarkFlagDirname("test")
+				Wrap(r).MarkPersistentFlagDirname("ptest")
 				return r
 			}(),
 			expectedExpressions: []string{
@@ -260,22 +263,22 @@ func TestGenZshCompletion(t *testing.T) {
 func TestGenZshCompletionHidden(t *testing.T) {
 	tcs := []struct {
 		name                string
-		root                *Command
+		root                *cobra.Command
 		expectedExpressions []string
 	}{
 		{
 			name: "hidden commands",
-			root: func() *Command {
-				r := &Command{
+			root: func() *cobra.Command {
+				r := &cobra.Command{
 					Use:   "main",
 					Short: "main short description",
 				}
-				s1 := &Command{
+				s1 := &cobra.Command{
 					Use:    "sub1",
 					Hidden: true,
 					Run:    emptyRun,
 				}
-				s2 := &Command{
+				s2 := &cobra.Command{
 					Use:   "sub2",
 					Short: "short sub2 description",
 					Run:   emptyRun,
@@ -290,9 +293,9 @@ func TestGenZshCompletionHidden(t *testing.T) {
 		},
 		{
 			name: "hidden flags",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				var hidden string
-				r := &Command{
+				r := &cobra.Command{
 					Use:   "root",
 					Short: "root short description",
 					Run:   emptyRun,
@@ -329,18 +332,18 @@ func TestGenZshCompletionHidden(t *testing.T) {
 
 func TestMarkZshCompPositionalArgumentFile(t *testing.T) {
 	t.Run("Doesn't allow overwriting existing positional argument", func(t *testing.T) {
-		c := &Command{}
-		if err := c.MarkZshCompPositionalArgumentFile(1, "*.log"); err != nil {
+		c := &cobra.Command{}
+		if err := Wrap(c).MarkZshCompPositionalArgumentFile(1, "*.log"); err != nil {
 			t.Errorf("Received error when we shouldn't have: %v\n", err)
 		}
-		if err := c.MarkZshCompPositionalArgumentFile(1); err == nil {
+		if err := Wrap(c).MarkZshCompPositionalArgumentFile(1); err == nil {
 			t.Error("Didn't receive an error when trying to overwrite argument position")
 		}
 	})
 
 	t.Run("Refuses to accept argPosition less then 1", func(t *testing.T) {
-		c := &Command{}
-		err := c.MarkZshCompPositionalArgumentFile(0, "*")
+		c := &cobra.Command{}
+		err := Wrap(c).MarkZshCompPositionalArgumentFile(0, "*")
 		if err == nil {
 			t.Fatal("Error was not thrown when indicating argument position 0")
 		}
@@ -352,25 +355,25 @@ func TestMarkZshCompPositionalArgumentFile(t *testing.T) {
 
 func TestMarkZshCompPositionalArgumentWords(t *testing.T) {
 	t.Run("Doesn't allow overwriting existing positional argument", func(t *testing.T) {
-		c := &Command{}
-		if err := c.MarkZshCompPositionalArgumentFile(1, "*.log"); err != nil {
+		c := &cobra.Command{}
+		if err := Wrap(c).MarkZshCompPositionalArgumentFile(1, "*.log"); err != nil {
 			t.Errorf("Received error when we shouldn't have: %v\n", err)
 		}
-		if err := c.MarkZshCompPositionalArgumentWords(1, "hello"); err == nil {
+		if err := Wrap(c).MarkZshCompPositionalArgumentWords(1, "hello"); err == nil {
 			t.Error("Didn't receive an error when trying to overwrite argument position")
 		}
 	})
 
 	t.Run("Doesn't allow calling without words", func(t *testing.T) {
-		c := &Command{}
-		if err := c.MarkZshCompPositionalArgumentWords(0); err == nil {
+		c := &cobra.Command{}
+		if err := Wrap(c).MarkZshCompPositionalArgumentWords(0); err == nil {
 			t.Error("Should not allow saving empty word list for annotation")
 		}
 	})
 
 	t.Run("Refuses to accept argPosition less then 1", func(t *testing.T) {
-		c := &Command{}
-		err := c.MarkZshCompPositionalArgumentWords(0, "word")
+		c := &cobra.Command{}
+		err := Wrap(c).MarkZshCompPositionalArgumentWords(0, "word")
 		if err == nil {
 			t.Fatal("Should not allow setting argument position less then 1")
 		}
@@ -397,13 +400,13 @@ func BenchmarkMediumSizeConstruct(b *testing.B) {
 
 func TestExtractFlags(t *testing.T) {
 	var debug, cmdc, cmdd bool
-	c := &Command{
+	c := &cobra.Command{
 		Use:  "cmdC",
 		Long: "Command C",
 	}
 	c.PersistentFlags().BoolVarP(&debug, "debug", "d", debug, "debug mode")
 	c.Flags().BoolVar(&cmdc, "cmd-c", cmdc, "Command C")
-	d := &Command{
+	d := &cobra.Command{
 		Use:  "CmdD",
 		Long: "Command D",
 	}
@@ -421,7 +424,7 @@ func TestExtractFlags(t *testing.T) {
 	}
 }
 
-func constructLargeCommandHierarchy() *Command {
+func constructLargeCommandHierarchy() *cobra.Command {
 	var config, st1, st2 string
 	var long, debug bool
 	var in1, in2 int
@@ -461,8 +464,8 @@ func constructLargeCommandHierarchy() *Command {
 	return r
 }
 
-func genTestCommand(name string, withRun bool) *Command {
-	r := &Command{
+func genTestCommand(name string, withRun bool) *cobra.Command {
+	r := &cobra.Command{
 		Use:   name,
 		Short: name + " short description",
 		Long:  "Long description for " + name,

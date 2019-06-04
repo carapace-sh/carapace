@@ -2,42 +2,43 @@ package cobra
 
 import (
 	"github.com/spf13/pflag"
+	"github.com/spf13/cobra"
 )
 
 // MarkFlagRequired adds the BashCompOneRequiredFlag annotation to the named flag if it exists,
 // and causes your command to report an error if invoked without the flag.
-func (c *Command) MarkFlagRequired(name string) error {
-	return MarkFlagRequired(c.Flags(), name)
+func (c *ZshCommand) MarkFlagRequired(name string) error {
+	return MarkFlagRequired(c.Command.Flags(), name)
 }
 
 // MarkPersistentFlagRequired adds the BashCompOneRequiredFlag annotation to the named persistent flag if it exists,
 // and causes your command to report an error if invoked without the flag.
-func (c *Command) MarkPersistentFlagRequired(name string) error {
-	return MarkFlagRequired(c.PersistentFlags(), name)
+func (c *ZshCommand) MarkPersistentFlagRequired(name string) error {
+	return MarkFlagRequired(c.Command.PersistentFlags(), name)
 }
 
 // MarkFlagRequired adds the BashCompOneRequiredFlag annotation to the named flag if it exists,
 // and causes your command to report an error if invoked without the flag.
 func MarkFlagRequired(flags *pflag.FlagSet, name string) error {
-	return flags.SetAnnotation(name, BashCompOneRequiredFlag, []string{"true"})
+	return flags.SetAnnotation(name, cobra.BashCompOneRequiredFlag, []string{"true"})
 }
 
 // MarkFlagFilename adds the BashCompFilenameExt annotation to the named flag, if it exists.
 // Generated bash autocompletion will select filenames for the flag, limiting to named extensions if provided.
-func (c *Command) MarkFlagFilename(name string, extensions ...string) error {
-	return MarkFlagFilename(c.Flags(), name, extensions...)
+func (c *ZshCommand) MarkFlagFilename(name string, extensions ...string) error {
+	return MarkFlagFilename(c.Command.Flags(), name, extensions...)
 }
 
 // MarkFlagCustom adds the BashCompCustom annotation to the named flag, if it exists.
 // Generated bash autocompletion will call the bash function f for the flag.
-func (c *Command) MarkFlagCustom(name string, f string) error {
-	return MarkFlagCustom(c.Flags(), name, f)
+func (c *ZshCommand) MarkFlagCustom(name string, f string) error {
+	return MarkFlagCustom(c.Command.Flags(), name, f)
 }
 
 // MarkPFlagCustom adds the BashCompCustom annotation to the named pflag, if it exists.
 // Generated shell autocompletion will call the function f for the flag.
-func (c *Command) MarkPFlagCustom(name string, f string) error {
-	return MarkFlagCustom(c.PersistentFlags(), name, f)
+func (c *ZshCommand) MarkPFlagCustom(name string, f string) error {
+	return MarkFlagCustom(c.Command.PersistentFlags(), name, f)
 }
 
 // MarkPersistentFlagFilename instructs the various shell completion
@@ -45,8 +46,8 @@ func (c *Command) MarkPFlagCustom(name string, f string) error {
 // specified extensions (patterns).
 //
 // Shell Completion compatibility matrix: bash, zsh
-func (c *Command) MarkPersistentFlagFilename(name string, extensions ...string) error {
-	return MarkFlagFilename(c.PersistentFlags(), name, extensions...)
+func (c *ZshCommand) MarkPersistentFlagFilename(name string, extensions ...string) error {
+	return MarkFlagFilename(c.Command.PersistentFlags(), name, extensions...)
 }
 
 // MarkFlagFilename instructs the various shell completion implementations to
@@ -54,7 +55,7 @@ func (c *Command) MarkPersistentFlagFilename(name string, extensions ...string) 
 //
 // Shell Completion compatibility matrix: bash, zsh
 func MarkFlagFilename(flags *pflag.FlagSet, name string, extensions ...string) error {
-	return flags.SetAnnotation(name, BashCompFilenameExt, extensions)
+	return flags.SetAnnotation(name, cobra.BashCompFilenameExt, extensions)
 }
 
 // MarkFlagCustom instructs the various shell completion implementations to
@@ -62,23 +63,23 @@ func MarkFlagFilename(flags *pflag.FlagSet, name string, extensions ...string) e
 //
 // Shell Completion compatibility matrix: bash, zsh
 func MarkFlagCustom(flags *pflag.FlagSet, name string, f string) error {
-	return flags.SetAnnotation(name, BashCompCustom, []string{f})
+	return flags.SetAnnotation(name, cobra.BashCompCustom, []string{f})
 }
 
 // MarkFlagDirname instructs the various shell completion implementations to
 // complete only directories with this named flag.
 //
 // Shell Completion compatibility matrix: zsh
-func (c *Command) MarkFlagDirname(name string) error {
-	return MarkFlagDirname(c.Flags(), name)
+func (c *ZshCommand) MarkFlagDirname(name string) error {
+	return MarkFlagDirname(c.Command.Flags(), name)
 }
 
 // MarkPersistentFlagDirname instructs the various shell completion
 // implementations to complete only directories with this persistent named flag.
 //
 // Shell Completion compatibility matrix: zsh
-func (c *Command) MarkPersistentFlagDirname(name string) error {
-	return MarkFlagDirname(c.PersistentFlags(), name)
+func (c *ZshCommand) MarkPersistentFlagDirname(name string) error {
+	return MarkFlagDirname(c.Command.PersistentFlags(), name)
 }
 
 // MarkFlagDirname instructs the various shell completion implementations to

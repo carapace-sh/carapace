@@ -81,7 +81,7 @@ function {{genZshFuncName .}} {
 {{define "Main" -}}
 #compdef _{{.Name}} {{.Name}}
 
-{{.ZshCompletionFunction}}
+{{.BashCompletionFunction}}
 
 {{template "selectCmdTemplate" .}}
 {{end}}
@@ -89,7 +89,11 @@ function {{genZshFuncName .}} {
 )
 
 type ZshCommand struct {
-	Command cobra.Command
+	Command *cobra.Command
+}
+
+func Wrap(c *cobra.Command) *ZshCommand {
+	return &ZshCommand{ Command: c }
 }
 
 // zshCompArgsAnnotation is used to encode/decode zsh completion for
@@ -193,9 +197,9 @@ func (c *ZshCommand) MarkZshCompPositionalArgumentWords(argPosition int, words .
 	return c.zshCompSetArgsAnnotations(annotation)
 }
 
-func zshCompExtractArgumentCompletionHintsForRendering(c *ZshCommand) ([]string, error) {
+func zshCompExtractArgumentCompletionHintsForRendering(c *cobra.Command) ([]string, error) {
 	var result []string
-	annotation, err := c.zshCompGetArgsAnnotations()
+	annotation, err := Wrap(c).zshCompGetArgsAnnotations()
 	if err != nil {
 		return nil, err
 	}
@@ -206,11 +210,11 @@ func zshCompExtractArgumentCompletionHintsForRendering(c *ZshCommand) ([]string,
 		}
 		result = append(result, s)
 	}
-	if len(c.Command.ValidArgs) > 0 {
+	if len(c.ValidArgs) > 0 {
 		if _, positionOneExists := annotation[1]; !positionOneExists {
 			s, err := zshCompRenderZshCompArgHint(1, zshCompArgHint{
 				Tipe:    zshCompArgumentWordComp,
-				Options: c.Command.ValidArgs,
+				Options: c.ValidArgs,
 			})
 			if err != nil {
 				return nil, err
@@ -280,14 +284,14 @@ func zshCompGenFuncName(c *cobra.Command) string {
 	return "_" + c.Name()
 }
 
-func zshCompExtractFlag(c *ZshCommand) []*pflag.Flag {
+func zshCompExtractFlag(c *cobra.Command) []*pflag.Flag {
 	var flags []*pflag.Flag
-	c.Command.LocalFlags().VisitAll(func(f *pflag.Flag) {
+	c.LocalFlags().VisitAll(func(f *pflag.Flag) {
 		if !f.Hidden {
 			flags = append(flags, f)
 		}
 	})
-	c.Command.InheritedFlags().VisitAll(func(f *pflag.Flag) {
+	c.InheritedFlags().VisitAll(func(f *pflag.Flag) {
 		if !f.Hidden {
 			flags = append(flags, f)
 		}

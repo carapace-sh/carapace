@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
@@ -87,6 +88,10 @@ function {{genZshFuncName .}} {
 `
 )
 
+type ZshCommand struct {
+	Command cobra.Command
+}
+
 // zshCompArgsAnnotation is used to encode/decode zsh completion for
 // arguments to/from Command.Annotations.
 type zshCompArgsAnnotation map[int]zshCompArgHint
@@ -101,7 +106,7 @@ type zshCompArgHint struct {
 }
 
 // GenZshCompletionFile generates zsh completion file.
-func (c *Command) GenZshCompletionFile(filename string) error {
+func (c *ZshCommand) GenZshCompletionFile(filename string) error {
 	outFile, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -114,17 +119,17 @@ func (c *Command) GenZshCompletionFile(filename string) error {
 // GenZshCompletion generates a zsh completion file and writes to the passed
 // writer. The completion always run on the root command regardless of the
 // command it was called from.
-func (c *Command) GenZshCompletion(w io.Writer) error {
+func (c *ZshCommand) GenZshCompletion(w io.Writer) error {
 	tmpl, err := template.New("Main").Funcs(zshCompFuncMap).Parse(zshCompletionText)
 	if err != nil {
 		return fmt.Errorf("error creating zsh completion template: %v", err)
 	}
-	return tmpl.Execute(w, c.Root())
+	return tmpl.Execute(w, c.Command.Root())
 }
 
 // MarkZshCompPositionalArgumentCustom marks the specified argument (first
 // argument is 1) as custom.
-func (c *Command) MarkZshCompPositionalArgumentCustom(argPosition int, function string) error {
+func (c *ZshCommand) MarkZshCompPositionalArgumentCustom(argPosition int, function string) error {
 	if argPosition < 1 {
 		return fmt.Errorf("Invalid argument position (%d)", argPosition)
 	}
@@ -145,7 +150,7 @@ func (c *Command) MarkZshCompPositionalArgumentCustom(argPosition int, function 
 // MarkZshCompPositionalArgumentFile marks the specified argument (first
 // argument is 1) as completed by file selection. patterns (e.g. "*.txt") are
 // optional - if not provided the completion will search for all files.
-func (c *Command) MarkZshCompPositionalArgumentFile(argPosition int, patterns ...string) error {
+func (c *ZshCommand) MarkZshCompPositionalArgumentFile(argPosition int, patterns ...string) error {
 	if argPosition < 1 {
 		return fmt.Errorf("Invalid argument position (%d)", argPosition)
 	}
@@ -167,7 +172,7 @@ func (c *Command) MarkZshCompPositionalArgumentFile(argPosition int, patterns ..
 // (first argument is 1) as completed by the provided words. At east one word
 // must be provided, spaces within words will be offered completion with
 // "word\ word".
-func (c *Command) MarkZshCompPositionalArgumentWords(argPosition int, words ...string) error {
+func (c *ZshCommand) MarkZshCompPositionalArgumentWords(argPosition int, words ...string) error {
 	if argPosition < 1 {
 		return fmt.Errorf("Invalid argument position (%d)", argPosition)
 	}
@@ -188,7 +193,7 @@ func (c *Command) MarkZshCompPositionalArgumentWords(argPosition int, words ...s
 	return c.zshCompSetArgsAnnotations(annotation)
 }
 
-func zshCompExtractArgumentCompletionHintsForRendering(c *Command) ([]string, error) {
+func zshCompExtractArgumentCompletionHintsForRendering(c *ZshCommand) ([]string, error) {
 	var result []string
 	annotation, err := c.zshCompGetArgsAnnotations()
 	if err != nil {
@@ -201,11 +206,11 @@ func zshCompExtractArgumentCompletionHintsForRendering(c *Command) ([]string, er
 		}
 		result = append(result, s)
 	}
-	if len(c.ValidArgs) > 0 {
+	if len(c.Command.ValidArgs) > 0 {
 		if _, positionOneExists := annotation[1]; !positionOneExists {
 			s, err := zshCompRenderZshCompArgHint(1, zshCompArgHint{
 				Tipe:    zshCompArgumentWordComp,
-				Options: c.ValidArgs,
+				Options: c.Command.ValidArgs,
 			})
 			if err != nil {
 				return nil, err
@@ -238,14 +243,14 @@ func zshCompRenderZshCompArgHint(i int, z zshCompArgHint) (string, error) {
 	}
 }
 
-func (c *Command) zshcompArgsAnnotationnIsDuplicatePosition(annotation zshCompArgsAnnotation, position int) bool {
+func (c *ZshCommand) zshcompArgsAnnotationnIsDuplicatePosition(annotation zshCompArgsAnnotation, position int) bool {
 	_, dup := annotation[position]
 	return dup
 }
 
-func (c *Command) zshCompGetArgsAnnotations() (zshCompArgsAnnotation, error) {
+func (c *ZshCommand) zshCompGetArgsAnnotations() (zshCompArgsAnnotation, error) {
 	annotation := make(zshCompArgsAnnotation)
-	annotationString, ok := c.Annotations[zshCompArgumentAnnotation]
+	annotationString, ok := c.Command.Annotations[zshCompArgumentAnnotation]
 	if !ok {
 		return annotation, nil
 	}
@@ -256,33 +261,33 @@ func (c *Command) zshCompGetArgsAnnotations() (zshCompArgsAnnotation, error) {
 	return annotation, nil
 }
 
-func (c *Command) zshCompSetArgsAnnotations(annotation zshCompArgsAnnotation) error {
+func (c *ZshCommand) zshCompSetArgsAnnotations(annotation zshCompArgsAnnotation) error {
 	jsn, err := json.Marshal(annotation)
 	if err != nil {
 		return fmt.Errorf("Error marshaling zsh argument annotation: %v", err)
 	}
-	if c.Annotations == nil {
-		c.Annotations = make(map[string]string)
+	if c.Command.Annotations == nil {
+		c.Command.Annotations = make(map[string]string)
 	}
-	c.Annotations[zshCompArgumentAnnotation] = string(jsn)
+	c.Command.Annotations[zshCompArgumentAnnotation] = string(jsn)
 	return nil
 }
 
-func zshCompGenFuncName(c *Command) string {
+func zshCompGenFuncName(c *cobra.Command) string {
 	if c.HasParent() {
 		return zshCompGenFuncName(c.Parent()) + "_" + c.Name()
 	}
 	return "_" + c.Name()
 }
 
-func zshCompExtractFlag(c *Command) []*pflag.Flag {
+func zshCompExtractFlag(c *ZshCommand) []*pflag.Flag {
 	var flags []*pflag.Flag
-	c.LocalFlags().VisitAll(func(f *pflag.Flag) {
+	c.Command.LocalFlags().VisitAll(func(f *pflag.Flag) {
 		if !f.Hidden {
 			flags = append(flags, f)
 		}
 	})
-	c.InheritedFlags().VisitAll(func(f *pflag.Flag) {
+	c.Command.InheritedFlags().VisitAll(func(f *pflag.Flag) {
 		if !f.Hidden {
 			flags = append(flags, f)
 		}
@@ -340,12 +345,12 @@ func zshCompGenFlagEntryExtras(f *pflag.Flag) string {
 		switch key {
 		case zshCompDirname:
 			extras = fmt.Sprintf(":filename:_files -g %q", values[0])
-		case BashCompFilenameExt:
+		case cobra.BashCompFilenameExt:
 			extras = ":filename:_files"
 			for _, pattern := range values {
 				extras = extras + fmt.Sprintf(` -g "%s"`, pattern)
 			}
-		case BashCompCustom:
+		case cobra.BashCompCustom:
 			extras = ": :" + values[0]
 		}
 	}

@@ -84,6 +84,7 @@ function {{genZshFuncName .}} {
 {{.BashCompletionFunction}}
 
 {{template "selectCmdTemplate" .}}
+compdef _{{.Name}} {{.Name}}
 {{end}}
 `
 )

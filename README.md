@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/rsteube/cobra-zsh-gen.svg?branch=master)](https://travis-ci.org/rsteube/cobra-zsh-gen)
 [![CircleCI](https://circleci.com/gh/rsteube/cobra-zsh-gen.svg?style=svg)](https://circleci.com/gh/rsteube/cobra-zsh-gen)
 
-This is essentially the content of [spf13/cobra#646](https://github.com/spf13/cobra/pull/646) which improves the generation of [zsh-completion](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) scripts. This provides temporary access to that changes until the PR is merged.
+This is essentially the content of [spf13/cobra#646](https://github.com/spf13/cobra/pull/646) which improved the generation of [zsh-completion](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) scripts extracted as separated module.
 
 ## Usage
 
-A wrapper struct named `ZshCommand` and the util function `Wrap` were added to enable execution from a different package while keeping the code close to the PR. So instead of calling the additional zsh related functions directly on `Command` it has to be wrapped first:
+Use the util function `Wrap` to call zsh related functions on a `cobra.Command`. Then execute `GenZshCompletion` to generate the completion script. This can then either be added to [fpath](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#telling-zsh-which-function-to-use-for-completing-a-command) (recommended, lazy loading) or directly sourced (performance impact).
 
 ```go
 import (
@@ -18,12 +18,6 @@ zsh.Wrap(issueListCmd).MarkZshCompPositionalArgumentCustom(1, "__lab_completion_
 zsh.Wrap(ciCreateCmd).MarkZshCompPositionalArgumentCustom(1, "__lab_completion_remote_branches origin")
 zsh.Wrap(RootCmd).GenZshCompletion(os.Stdout)
 ```
-
-## Generating Zsh Completion for your cobra.Command
-
-Cobra supports native Zsh completion generated from the root `cobra.Command`.
-The generated completion script should be put somewhere in your `$fpath` named
-`_<YOUR COMMAND>`.
 
 ### What's Supported
 

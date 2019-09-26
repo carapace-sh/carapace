@@ -1,6 +1,7 @@
 # cobra-zsh-gen
 
 [![Build Status](https://travis-ci.org/rsteube/cobra-zsh-gen.svg?branch=master)](https://travis-ci.org/rsteube/cobra-zsh-gen)
+[![CircleCI](https://circleci.com/gh/rsteube/cobra-zsh-gen.svg?style=svg)](https://circleci.com/gh/rsteube/cobra-zsh-gen)
 
 This is essentially the content of [spf13/cobra#646](https://github.com/spf13/cobra/pull/646) which improves the generation of [zsh-completion](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) scripts. This provides temporary access to that changes until the PR is merged.
 

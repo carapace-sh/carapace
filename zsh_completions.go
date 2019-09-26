@@ -94,7 +94,7 @@ type ZshCommand struct {
 }
 
 func Wrap(c *cobra.Command) *ZshCommand {
-	return &ZshCommand{ Command: c }
+	return &ZshCommand{Command: c}
 }
 
 // zshCompArgsAnnotation is used to encode/decode zsh completion for

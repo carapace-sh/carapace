@@ -2,10 +2,10 @@ package cobra
 
 import (
 	"bytes"
+	"github.com/spf13/cobra"
 	"regexp"
 	"strings"
 	"testing"
-	"github.com/spf13/cobra"
 )
 
 func emptyRun(*cobra.Command, []string) {} // from command_test.go (cobra)
@@ -162,7 +162,7 @@ func TestGenZshCompletion(t *testing.T) {
 		},
 		{
 			name: "flag description with brackets ([]) shouldn't break the completion file",
-			root: func() *Command {
+			root: func() *cobra.Command {
 				r := genTestCommand("root", true)
 				r.Flags().Bool("level", false, "[ALERT]")
 				return r

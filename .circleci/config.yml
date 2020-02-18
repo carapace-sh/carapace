@@ -14,9 +14,10 @@ references:
         go get -t -v ./...
         PATH=$PATH:$PWD/bin go test -v ./...
         go build
-        if [ -z $NOVET ]; then
-          diff -u <(echo -n) <(go vet . 2>&1 | grep -vE 'ExampleCommand|bash_completions.*Fprint');
-        fi
+        go vet
+        cd example
+        go build .
+        shellcheck -e SC2148,SC2154 <(./example _zsh_completion)
 
 jobs:
   go-current:

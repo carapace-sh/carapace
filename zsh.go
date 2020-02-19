@@ -51,9 +51,9 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
     %v
 }
 `
-	binary := ""
+	inheritedArgs := ""
 	if !cmd.HasParent() {
-		binary = "local -x executable=${words[1]}"
+		inheritedArgs = "local -a -x os_args=(${words})"
 	}
 
 	flags := make([]string, 0)
@@ -84,7 +84,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	}
 
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), binary, strings.Join(flags, ""), strings.Join(positionals, ""), subcommands(cmd)))
+	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), inheritedArgs, strings.Join(flags, ""), strings.Join(positionals, ""), subcommands(cmd)))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateFunctions(subcmd))

@@ -43,7 +43,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	}
 
 	function_pattern := `function %v {
-  local -a commands
+  %v
   %v
 
   _arguments -C \
@@ -51,19 +51,25 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
     %v
 }
 `
+
+	commandsVar := ""
+	if cmd.HasSubCommands() {
+		commandsVar = "local -a commands"
+	}
+
 	inheritedArgs := ""
 	if !cmd.HasParent() {
-		inheritedArgs = "local -a -x os_args=(${words})"
+		inheritedArgs = "# shellcheck disable=SC2206\n  local -a -x os_args=(${words})"
 	}
 
 	flags := make([]string, 0)
 	for _, flag := range zshCompExtractFlag(cmd) {
 		var s string
 		if action, ok := c.actions[uidFlag(cmd, flag)]; ok {
-		  s = "    " + snippetFlagCompletion(flag, &action) + " \\\n"
+			s = "    " + snippetFlagCompletion(flag, &action) + " \\\n"
 		} else {
-		  s = "    " + snippetFlagCompletion(flag, nil) + " \\\n"
-        }
+			s = "    " + snippetFlagCompletion(flag, nil) + " \\\n"
+		}
 
 		flags = append(flags, s)
 	}
@@ -84,7 +90,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	}
 
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), inheritedArgs, strings.Join(flags, ""), strings.Join(positionals, ""), subcommands(cmd)))
+	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), commandsVar, inheritedArgs, strings.Join(flags, ""), strings.Join(positionals, ""), subcommands(cmd)))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateFunctions(subcmd))
@@ -99,8 +105,10 @@ func subcommands(cmd *cobra.Command) string {
 		return ""
 	}
 	templ := `
+  # shellcheck disable=SC2154
   case $state in
     cmnds)
+      # shellcheck disable=SC2034
       commands=(
 {{range .Commands}}{{if not .Hidden}}        "{{.Name}}:{{if .Short}}{{.Short}}{{end}}"
 {{end}}{{end}}      )
@@ -177,10 +185,10 @@ func addCompletionCommand(cmd *cobra.Command) {
 			if len(args) <= 0 {
 				fmt.Println(completions.Generate(cmd.Root()))
 			} else {
-                c, _, _ := cmd.Root().Find(parse(args[0])[1:]) // TODO check for errors
+				c, _, _ := cmd.Root().Find(parse(args[0])[1:]) // TODO check for errors
 
 				cb := args[0]
-                // TODO error on callback for flag without value (./example callback --callback)
+				// TODO error on callback for flag without value (./example callback --callback)
 				c.Run = func(cmd *cobra.Command, args []string) { // TODO flag parsing should be possible using Command.Traverse() instead of replacing the Run function
 					if len(args) > 1 {
 						fmt.Println(completions.invokeCallback(cb, args[1:]).Value)
@@ -189,7 +197,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 					}
 				}
 
-                origArg := parse(args[0]) // TODO messy
+				origArg := parse(args[0]) // TODO messy
 				if len(os.Args) > 3 {
 					origArg = append(origArg, os.Args[3:]...)
 				}

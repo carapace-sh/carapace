@@ -17,7 +17,7 @@ type CompletionCallback func(args []string) Action
 // replaces value if a callback function is set
 func (a Action) finalize(uid string) Action {
 	if a.Callback != nil {
-      a.Value = ActionExecute(fmt.Sprintf("${os_args[1]} _zsh_completion '%v' ${os_args:1}", uid)).Value
+		a.Value = ActionExecute(fmt.Sprintf("${os_args[1]} _zsh_completion '%v' ${os_args:1}", uid)).Value
 	}
 	return a
 }
@@ -82,9 +82,9 @@ func ActionOptions() Action {
 
 // used to complete arbitrary keywords (values)
 func ActionValues(values ...string) Action {
-    if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
-        return ActionMessage("no values to complete")
-    }
+	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
 
 	vals := make([]string, len(values))
 	for index, val := range values {
@@ -96,14 +96,14 @@ func ActionValues(values ...string) Action {
 
 // Like ActionValues but with a list of value, description pairs
 func ActionValuesDescribed(values ...string) Action {
-    // TODO verify length (description always exists)
+	// TODO verify length (description always exists)
 	vals := make([]string, len(values))
 	for index, val := range values {
-      if index % 2 == 0 {
-        vals[index/2] = fmt.Sprintf("'%v[%v]'", val, values[index+1])
-      }
+		if index%2 == 0 {
+			vals[index/2] = fmt.Sprintf("'%v[%v]'", val, values[index+1])
+		}
 	}
-    return ActionValues(vals...)
+	return ActionValues(vals...)
 }
 
 // Used for displaying help messages in places where no completions can be generated.

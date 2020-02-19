@@ -9,7 +9,7 @@ func TestActionCallback(t *testing.T) {
 		return ActionMessage("ActionCallback test")
 	}).finalize("someId")
 
-	if a.Value != ` eval \$($executable _zsh_completion 'someId' $words)` {
+	if a.Value != ` eval \$(${os_args[1]} _zsh_completion 'someId' ${os_args:1})` {
 		t.Error(highlight(a.Value))
 	}
 }

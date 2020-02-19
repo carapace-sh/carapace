@@ -31,7 +31,7 @@ func uidCommand(cmd *cobra.Command) string {
 func uidFlag(cmd *cobra.Command, flag *pflag.Flag) string {
 	// TODO ensure flag acually belongs to command (force error)
 	// TODO handel unknown flag nil error
-	return fmt.Sprintf("%v##%v",uidCommand(cmd), flag.Name)
+	return fmt.Sprintf("%v##%v", uidCommand(cmd), flag.Name)
 }
 
 func uidPositional(cmd *cobra.Command, position int) string {
@@ -40,21 +40,21 @@ func uidPositional(cmd *cobra.Command, position int) string {
 }
 
 func parse(uid string) []string {
-  var splitted []string
-  if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
-    return nil
-  }
-  return strings.Split(splitted[0], "__")
+	var splitted []string
+	if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
+		return nil
+	}
+	return strings.Split(splitted[0], "__")
 }
 
 func find(cmd *cobra.Command, uid string) *cobra.Command {
-  var splitted []string
-  if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
-    return nil
-  }
-  c, _, err := cmd.Root().Find(strings.Split(splitted[0], "__")[1:]) // TODO root if jut one arg
-  if err != nil {
-      log.Fatal(err)
-  }
-  return c
+	var splitted []string
+	if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
+		return nil
+	}
+	c, _, err := cmd.Root().Find(strings.Split(splitted[0], "__")[1:]) // TODO root if jut one arg
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c
 }

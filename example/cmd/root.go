@@ -6,22 +6,22 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-  Use:   "example",
-  Short: "example completion",
+	Use:   "example",
+	Short: "example completion",
 }
 
 func Execute() error {
-    return rootCmd.Execute()
+	return rootCmd.Execute()
 }
 
 func init() {
-   rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-   rootCmd.PersistentFlags().StringP("persistentFlag", "p", "", "Help message for persistentFlag")
-   rootCmd.Flag("persistentFlag").NoOptDefVal = "defaultValue" // no argument required
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringP("persistentFlag", "p", "", "Help message for persistentFlag")
+	rootCmd.Flag("persistentFlag").NoOptDefVal = "defaultValue" // no argument required
 
-   rootCmd.Flags().StringArrayP("array", "a", []string{}, "mulitflag")
+	rootCmd.Flags().StringArrayP("array", "a", []string{}, "mulitflag")
 
-   zsh.Gen(rootCmd).FlagCompletion(zsh.ActionMap{
-        "toggle": zsh.ActionBool(),
-   })
+	zsh.Gen(rootCmd).FlagCompletion(zsh.ActionMap{
+		"toggle": zsh.ActionBool(),
+	})
 }

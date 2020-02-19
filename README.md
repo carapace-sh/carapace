@@ -1,9 +1,8 @@
 # cobra-zsh-gen
 
-[![Build Status](https://travis-ci.org/rsteube/cobra-zsh-gen.svg?branch=master)](https://travis-ci.org/rsteube/cobra-zsh-gen)
 [![CircleCI](https://circleci.com/gh/rsteube/cobra-zsh-gen.svg?style=svg)](https://circleci.com/gh/rsteube/cobra-zsh-gen)
 
-[ZSH completions](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) script generator for [cobra] (based on [spf13/cobra#646](https://github.com/spf13/cobra/pull/646)).
+[ZSH completion](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) script generator for [cobra] (based on [spf13/cobra#646](https://github.com/spf13/cobra/pull/646)).
 
 
 ## Status
@@ -48,7 +47,7 @@ zsh.Gen(callbackCmd).PositionalCompletion(
 
 ## Hidden Command
 
-When `zsh.Gen(myCmd)` is invoked a hidden command (`_zsh_completion`) is added to the root command unless it already exists. This handles zsh completion script generation (when invoked without args: `./executable _zsh_completion`) and [callbacks](#actioncallback).
+When `zsh.Gen(myCmd)` is invoked a hidden command (`_zsh_completion`) is added to the root command unless it already exists. This handles zsh completion script generation (when invoked without args) and [callbacks](#actioncallback).
 
 
 ### Uid

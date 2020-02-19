@@ -110,3 +110,7 @@ func ActionValuesDescribed(values ...string) Action {
 func ActionMessage(msg string) Action {
 	return Action{Value: fmt.Sprintf(" _message -r '%v'", msg)} // space before _message is necessary
 }
+
+func ActionMultiParts(separator rune, values ...string) Action {
+	return Action{Value: fmt.Sprintf("_multi_parts %v '(%v)'", string(separator), strings.Join(values, " "))}
+}

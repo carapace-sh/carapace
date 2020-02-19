@@ -17,7 +17,7 @@ type CompletionCallback func(args []string) Action
 // replaces value if a callback function is set
 func (a Action) finalize(uid string) Action {
 	if a.Callback != nil {
-		a.Value = ActionExecute(fmt.Sprintf("$executable _zsh_completion '%v' $words", uid)).Value
+      a.Value = ActionExecute(fmt.Sprintf("${os_args[1]} _zsh_completion '%v' ${os_args:1}", uid)).Value
 	}
 	return a
 }
@@ -82,6 +82,10 @@ func ActionOptions() Action {
 
 // used to complete arbitrary keywords (values)
 func ActionValues(values ...string) Action {
+    if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+        return ActionMessage("no values to complete")
+    }
+
 	vals := make([]string, len(values))
 	for index, val := range values {
 		// TODO escape special characters

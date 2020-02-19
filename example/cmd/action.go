@@ -24,6 +24,7 @@ func init() {
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
 	actionCmd.Flags().StringP("custom", "c", "", "custom flag")
+	actionCmd.Flags().String("multi_parts", "", "multi_parts flag")
 
 	zsh.Gen(actionCmd).FlagCompletion(zsh.ActionMap{
 		"files":            zsh.ActionFiles("*.go"),
@@ -37,5 +38,6 @@ func init() {
 		"values":           zsh.ActionValues("values", "example"),
 		"values_described": zsh.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
 		"custom":           zsh.Action{Value: "_most_recent_file 2"},
+		"multi_parts":      zsh.ActionMultiParts('/', "multi/parts", "multi/parts/example", "multi/parts/test", "example/parts"),
 	})
 }

@@ -17,7 +17,7 @@ type CompletionCallback func(args []string) Action
 // replaces value if a callback function is set
 func (a Action) finalize(uid string) Action {
 	if a.Callback != nil {
-		a.Value = ActionExecute(fmt.Sprintf("${os_args[1]} _zsh_completion '%v' ${os_args:1}", uid)).Value
+		a.Value = ActionExecute(fmt.Sprintf(`${os_args[1]} _zsh_completion '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid)).Value
 	}
 	return a
 }

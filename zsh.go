@@ -19,11 +19,7 @@ type Completions struct {
 func (c Completions) invokeCallback(uid string, args []string) Action {
 	if action, ok := c.actions[uid]; ok {
 		if action.Callback != nil {
-			if len(args) > 1 {
-				return action.Callback(args[1:]) // TODO 1:0 with len check
-			} else {
-				return action.Callback([]string{})
-			}
+			return action.Callback(args)
 		}
 	}
 	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
@@ -185,11 +181,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 				fmt.Println(completions.Generate(cmd.Root()))
 			} else {
 				callback := args[0]
-				origArg := splitUid(callback)
+				origArg := []string{}
 				if len(os.Args) > 3 {
-					origArg = append(origArg, os.Args[3:]...)
+					origArg = os.Args[4:]
 				}
-				targetArgs := traverse(cmd, origArg[1:])
+				targetArgs := traverse(cmd, origArg)
 				fmt.Println(completions.invokeCallback(callback, targetArgs).Value)
 			}
 		},

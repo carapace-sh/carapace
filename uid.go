@@ -29,13 +29,13 @@ func uidCommand(cmd *cobra.Command) string {
 }
 
 func uidFlag(cmd *cobra.Command, flag *pflag.Flag) string {
-    c := cmd
-    for c.HasParent() {
-      if c.LocalFlags().Lookup(flag.Name) != nil {
-        break
-      }
-      c = c.Parent()
-    }
+	c := cmd
+	for c.HasParent() {
+		if c.LocalFlags().Lookup(flag.Name) != nil {
+			break
+		}
+		c = c.Parent()
+	}
 	// TODO ensure flag acually belongs to command (force error)
 	// TODO handle unknown flag error
 	return fmt.Sprintf("%v##%v", uidCommand(c), flag.Name)

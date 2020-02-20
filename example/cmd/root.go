@@ -19,7 +19,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("persistentFlag", "p", "", "Help message for persistentFlag")
 	rootCmd.Flag("persistentFlag").NoOptDefVal = "defaultValue" // no argument required
 
-	rootCmd.Flags().StringArrayP("array", "a", []string{}, "mulitflag")
+	rootCmd.Flags().StringArrayP("array", "a", []string{}, "multiflag")
 
 	zsh.Gen(rootCmd).FlagCompletion(zsh.ActionMap{
 		"toggle": zsh.ActionBool(),

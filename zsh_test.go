@@ -86,3 +86,36 @@ func TestSubcommandsSnippet(t *testing.T) {
 
 	t.Log(completions.actions)
 }
+
+func TestTraverse(t *testing.T) {
+	root := &cobra.Command{
+		Use: "test",
+	}
+	sub1 := &cobra.Command{
+		Use: "sub1",
+	}
+	sub2 := &cobra.Command{
+		Use: "sub2",
+	}
+
+	sub2.Flags()
+
+	root.AddCommand(sub1)
+	sub1.AddCommand(sub2)
+
+	root.PersistentFlags().String("license", "", "name of license for the project")
+	sub2.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
+
+	args := []string{"--license", "MIT", "sub1", "sub2", "positionalARG", "--author", "bob"}
+	targetArgs := traverse(sub1, args)
+
+	if len(targetArgs) != 1 || targetArgs[0] != "positionalARG" {
+		t.Error("traverse should return positionalARG")
+	}
+	if sub2.Flag("license").Value.String() != "MIT" {
+		t.Error("flag license should be MIT")
+	}
+	if sub2.Flag("author").Value.String() != "bob" {
+		t.Error("flag author should be bob")
+	}
+}

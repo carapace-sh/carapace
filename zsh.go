@@ -122,7 +122,6 @@ func subcommands(cmd *cobra.Command) string {
       ;;
 {{end}}{{end}}  esac
 `
-	cmd.Usage()
 	buf := bytes.NewBufferString("")
 	t, _ := template.New("subcommands").Funcs(template.FuncMap{"uid": uidCommand}).Parse(templ)
 	t.Execute(buf, cmd)
@@ -185,29 +184,24 @@ func addCompletionCommand(cmd *cobra.Command) {
 			if len(args) <= 0 {
 				fmt.Println(completions.Generate(cmd.Root()))
 			} else {
-				c, _, _ := cmd.Root().Find(parse(args[0])[1:]) // TODO check for errors
-
-				cb := args[0]
-				// TODO error on callback for flag without value (./example callback --callback)
-				c.Run = func(cmd *cobra.Command, args []string) { // TODO flag parsing should be possible using Command.Traverse() instead of replacing the Run function
-					if len(args) > 1 {
-						fmt.Println(completions.invokeCallback(cb, args[1:]).Value)
-					} else {
-						fmt.Println(completions.invokeCallback(cb, []string{}).Value)
-					}
-				}
-
-				origArg := parse(args[0]) // TODO messy
+				callback := args[0]
+				origArg := splitUid(callback)
 				if len(os.Args) > 3 {
 					origArg = append(origArg, os.Args[3:]...)
 				}
-
-				os.Args = origArg
-				cmd.Root().Execute()
+				targetArgs := traverse(cmd, origArg[1:])
+				fmt.Println(completions.invokeCallback(callback, targetArgs).Value)
 			}
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,
 		},
 	})
+}
+
+func traverse(cmd *cobra.Command, args []string) []string {
+	// ignore flag parse errors (like a missing argument for the flag currently being completed)
+	targetCmd, targetArgs, _ := cmd.Root().Traverse(args)
+	targetCmd.ParseFlags(targetArgs)
+	return targetCmd.Flags().Args() // TODO check length
 }

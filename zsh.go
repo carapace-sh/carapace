@@ -192,6 +192,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,
 		},
+		DisableFlagParsing: true,
 	})
 }
 

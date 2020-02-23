@@ -60,6 +60,10 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 
 	flags := make([]string, 0)
 	for _, flag := range zshCompExtractFlag(cmd) {
+		if flagAlreadySet(cmd, flag) {
+			continue
+		}
+
 		var s string
 		if action, ok := c.actions[uidFlag(cmd, flag)]; ok {
 			s = "    " + snippetFlagCompletion(flag, &action) + " \\\n"
@@ -94,6 +98,14 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	}
 
 	return strings.Join(result, "\n")
+}
+
+func flagAlreadySet(cmd *cobra.Command, flag *pflag.Flag) bool {
+	if cmd.LocalFlags().Lookup(flag.Name) != nil {
+		return false
+	}
+	// TODO since it is an inherited flag check for parent command that is not hidden
+	return true
 }
 
 func subcommands(cmd *cobra.Command) string {

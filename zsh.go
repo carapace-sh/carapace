@@ -34,10 +34,6 @@ func (c Completions) Generate(cmd *cobra.Command) string {
 }
 
 func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
-	if !cmd.HasSubCommands() && !cmd.HasFlags() {
-		return fmt.Sprintf("function %v {\n  true\n}\n", uidCommand(cmd))
-	}
-
 	function_pattern := `function %v {
   %v%v  _arguments -C \
 %v%v
@@ -82,6 +78,9 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 			} else {
 				break // TODO only consisten entriess for now
 			}
+		}
+		if len(positionals) == 0 {
+			positionals = []string{`    "*::arg:->args"`}
 		}
 	}
 

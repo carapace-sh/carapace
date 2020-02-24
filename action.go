@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Action indicates how to complete the corresponding argument
 // https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
 // http://zsh.sourceforge.net/Doc/Release/Completion-System.html
 type Action struct {
@@ -14,7 +15,7 @@ type Action struct {
 type ActionMap map[string]Action
 type CompletionCallback func(args []string) Action
 
-// replaces value if a callback function is set
+// finalize replaces value if a callback function is set
 func (a Action) finalize(uid string) Action {
 	if a.Callback != nil {
 		a.Value = ActionExecute(fmt.Sprintf(`${os_args[1]} _zsh_completion '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid)).Value
@@ -22,20 +23,22 @@ func (a Action) finalize(uid string) Action {
 	return a
 }
 
+// ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{Callback: callback}
 }
 
-// Wraps given command as command substitution and evaluates the output as zsh expression
+// ActionExecute uses command substitution to invoke a command and evalues it's result as Action
 func ActionExecute(command string) Action {
 	return Action{Value: fmt.Sprintf(` eval \$(%v)`, command)} // {EVAL-STRING} action did not handle space escaping ('\ ') as expected (separate arguments), this one works
 }
 
+// ActionBool completes true/false
 func ActionBool() Action {
 	return ActionValues("true", "false")
 }
 
-// Used to complete filepaths.
+// ActionPathFiles completes filepaths
 // [http://zsh.sourceforge.net/Doc/Release/Completion-System.html#index-_005fpath_005ffiles]
 func ActionPathFiles(pattern string) Action { // TODO support additional options
 	if pattern == "" {
@@ -45,7 +48,7 @@ func ActionPathFiles(pattern string) Action { // TODO support additional options
 	}
 }
 
-// Calls _path_files with all options except -g and -/. These options depend on file-patterns style setting.
+// ActionFiles _path_files with all options except -g and -/. These options depend on file-patterns style setting. // TODO fix doc
 // [http://zsh.sourceforge.net/Doc/Release/Completion-System.html#index-_005ffiles]
 func ActionFiles(pattern string) Action {
 	if pattern == "" {
@@ -55,32 +58,32 @@ func ActionFiles(pattern string) Action {
 	}
 }
 
-// Used for completing network interface names
+// ActionNetInterfaces completes network interface names
 func ActionNetInterfaces() Action {
 	return Action{Value: "_net_interfaces"}
 }
 
-// Used for completing user names
+// ActionUsers completes user names
 func ActionUsers() Action {
 	return Action{Value: "_users"}
 }
 
-// Used for completing group names
+// ActionGroups completes group names
 func ActionGroups() Action {
 	return Action{Value: "_groups"}
 }
 
-// Used for completing hosst names
+// ActionHosts completes host names
 func ActionHosts() Action {
 	return Action{Value: "_hosts"}
 }
 
-// Used for completing the names of shell options.
+// ActionOptions completes the names of shell options
 func ActionOptions() Action {
 	return Action{Value: "_options"}
 }
 
-// used to complete arbitrary keywords (values)
+// ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
 	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
 		return ActionMessage("no values to complete")
@@ -94,7 +97,7 @@ func ActionValues(values ...string) Action {
 	return Action{Value: fmt.Sprintf(`_values '' %v`, strings.Join(vals, " "))}
 }
 
-// Like ActionValues but with a list of value, description pairs
+// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
 	// TODO verify length (description always exists)
 	vals := make([]string, len(values))
@@ -106,11 +109,12 @@ func ActionValuesDescribed(values ...string) Action {
 	return ActionValues(vals...)
 }
 
-// Used for displaying help messages in places where no completions can be generated.
+// ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
 	return Action{Value: fmt.Sprintf(" _message -r '%v'", msg)} // space before _message is necessary
 }
 
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char
 func ActionMultiParts(separator rune, values ...string) Action {
 	return Action{Value: fmt.Sprintf("_multi_parts %v '(%v)'", string(separator), strings.Join(values, " "))}
 }

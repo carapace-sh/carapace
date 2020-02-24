@@ -30,7 +30,6 @@ func snippetFlagCompletion(flag *pflag.Flag, action *Action) (snippet string) {
 		multimarkEscaped = "\\*"
 	}
 
-	// TODO flag without value (without ": :%v") -> flag.NoOptDefaultVal - when nothing configured annd empty flag requires an value
 	if flag.Shorthand == "" { // no shorthannd
 		snippet = fmt.Sprintf(`"%v--%v[%v]%v"`, multimark, flag.Name, replacer.Replace(flag.Usage), suffix)
 	} else {

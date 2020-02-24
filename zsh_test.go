@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/alecthomas/chroma/quick"
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +17,16 @@ func highlight(s string) string {
 		log.Fatal(err)
 	}
 	return buf.String()
+}
+
+func assertEqual(t *testing.T, expected string, actual string) {
+	if expected == actual {
+		t.Log(highlight(actual))
+	} else {
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(expected, actual, false)
+		t.Errorf("\nexpected: %v\nactual  : %v", expected, dmp.DiffPrettyText(diffs))
+	}
 }
 
 func TestZshComp(t *testing.T) {

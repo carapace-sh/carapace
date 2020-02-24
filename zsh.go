@@ -41,7 +41,6 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	function_pattern := `function %v {
   %v%v  _arguments -C \
 %v%v
-    %v
 }
 `
 
@@ -63,9 +62,9 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 
 		var s string
 		if action, ok := c.actions[uidFlag(cmd, flag)]; ok {
-			s = "    " + snippetFlagCompletion(flag, &action) + " \\\n"
+			s = "    " + snippetFlagCompletion(flag, &action)
 		} else {
-			s = "    " + snippetFlagCompletion(flag, nil) + " \\\n"
+			s = "    " + snippetFlagCompletion(flag, nil)
 		}
 
 		flags = append(flags, s)
@@ -73,7 +72,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 
 	positionals := make([]string, 0)
 	if cmd.HasSubCommands() {
-		positionals = []string{`    "1: :->cmnds" \` + "\n", `    "*::arg:->args"`}
+		positionals = []string{`    "1: :->cmnds"`, `    "*::arg:->args"`}
 	} else {
 		pos := 1
 		for {
@@ -86,8 +85,10 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 		}
 	}
 
+	arguments := append(flags, positionals...)
+
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), commandsVar, inheritedArgs, strings.Join(flags, ""), strings.Join(positionals, ""), subcommands(cmd)))
+	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), commandsVar, inheritedArgs, strings.Join(arguments, " \\\n"), subcommands(cmd)))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateFunctions(subcmd))
@@ -110,6 +111,7 @@ func subcommands(cmd *cobra.Command) string {
 		return ""
 	}
 	templ := `
+
   # shellcheck disable=SC2154
   case $state in
     cmnds)
@@ -125,8 +127,7 @@ func subcommands(cmd *cobra.Command) string {
 {{range .Commands}}{{if not .Hidden}}    {{.Name}})
       {{uid .}}
       ;;
-{{end}}{{end}}  esac
-`
+{{end}}{{end}}  esac`
 	buf := bytes.NewBufferString("")
 	t, _ := template.New("subcommands").Funcs(template.FuncMap{"uid": uidCommand}).Parse(templ)
 	t.Execute(buf, cmd)

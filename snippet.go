@@ -39,7 +39,7 @@ func snippetFlagCompletion(flag *pflag.Flag, action *Action) (snippet string) {
 }
 
 func snippetPositionalCompletion(position int, action Action) string {
-	return fmt.Sprintf(`"%v:: :%v" \`+"\n", position, action.Value)
+	return fmt.Sprintf(`"%v:: :%v"`, position, action.Value)
 }
 
 func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {

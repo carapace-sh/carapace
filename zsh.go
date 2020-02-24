@@ -39,10 +39,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	}
 
 	function_pattern := `function %v {
-  %v
-  %v
-
-  _arguments -C \
+  %v%v  _arguments -C \
 %v%v
     %v
 }
@@ -50,12 +47,12 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 
 	commandsVar := ""
 	if cmd.HasSubCommands() {
-		commandsVar = "local -a commands"
+		commandsVar = "local -a commands\n"
 	}
 
 	inheritedArgs := ""
 	if !cmd.HasParent() {
-		inheritedArgs = "# shellcheck disable=SC2206\n  local -a -x os_args=(${words})"
+		inheritedArgs = "  # shellcheck disable=SC2206\n  local -a -x os_args=(${words})\n\n"
 	}
 
 	flags := make([]string, 0)

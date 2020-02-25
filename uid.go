@@ -46,14 +46,6 @@ func uidPositional(cmd *cobra.Command, position int) string {
 	return fmt.Sprintf("%v#%v", uidCommand(cmd), position)
 }
 
-func splitUid(uid string) []string {
-	var splitted []string
-	if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
-		return nil
-	}
-	return strings.Split(splitted[0], "__")
-}
-
 func find(cmd *cobra.Command, uid string) *cobra.Command {
 	var splitted []string
 	if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string

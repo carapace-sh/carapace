@@ -29,7 +29,7 @@ func (c Completions) Generate(cmd *cobra.Command) string {
 	result := fmt.Sprintf("#compdef %v\n", cmd.Name())
 	result += c.GenerateFunctions(cmd)
 
-	result += fmt.Sprintf("compquote '' 2>/dev/null && _%v || compdef _%v %v\n", cmd.Name(), cmd.Name(), cmd.Name()) // check if withing completion function and enable direct sourcing
+	result += fmt.Sprintf("if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi\n", cmd.Name(), cmd.Name(), cmd.Name()) // check if withing completion function and enable direct sourcing
 	return result
 }
 

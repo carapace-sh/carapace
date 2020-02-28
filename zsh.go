@@ -80,7 +80,10 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 			}
 		}
 		if len(positionals) == 0 {
-			positionals = []string{`    "*::arg:->args"`}
+			if cmd.ValidArgs != nil {
+				positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
+			}
+			positionals = append(positionals, `    "*::arg:->args"`)
 		}
 	}
 

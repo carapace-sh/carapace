@@ -6,8 +6,9 @@ import (
 )
 
 var actionCmd = &cobra.Command{
-	Use:   "action",
-	Short: "action example",
+	Use:     "action",
+	Short:   "action example",
+	Aliases: []string{"alias"},
 }
 
 func init() {

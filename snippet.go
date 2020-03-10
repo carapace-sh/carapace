@@ -61,6 +61,13 @@ func snippetSubcommands(cmd *cobra.Command) string {
 			functions = append(functions, fmt.Sprintf(`    %v)
       %v
       ;;`, c.Name(), uidCommand(c)))
+
+			for _, alias := range c.Aliases {
+				cmnds = append(cmnds, fmt.Sprintf(`        "%v:%v"`, alias, c.Short))
+				functions = append(functions, fmt.Sprintf(`    %v)
+      %v
+      ;;`, alias, uidCommand(c)))
+			}
 		}
 	}
 

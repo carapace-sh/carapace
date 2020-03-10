@@ -40,7 +40,8 @@ func TestSnippetSubcommands(t *testing.T) {
 		Use: "root",
 	}
 	sub1 := &cobra.Command{
-		Use: "sub1",
+		Use:     "sub1",
+		Aliases: []string{"alias1", "alias2"},
 	}
 	sub2 := &cobra.Command{
 		Use:   "sub2",
@@ -62,6 +63,8 @@ func TestSnippetSubcommands(t *testing.T) {
       # shellcheck disable=SC2034
       commands=(
         "sub1:"
+        "alias1:"
+        "alias2:"
         "sub2:short description"
       )
       _describe "command" commands
@@ -70,6 +73,12 @@ func TestSnippetSubcommands(t *testing.T) {
   
   case "${words[1]}" in
     sub1)
+      _root__sub1
+      ;;
+    alias1)
+      _root__sub1
+      ;;
+    alias2)
       _root__sub1
       ;;
     sub2)

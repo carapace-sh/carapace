@@ -2,8 +2,10 @@ package zsh
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var replacer = strings.NewReplacer(
@@ -45,4 +47,39 @@ func snippetPositionalCompletion(position int, action Action) string {
 func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
 	return strings.Contains(f.Value.Type(), "Slice") ||
 		strings.Contains(f.Value.Type(), "Array")
+}
+
+func snippetSubcommands(cmd *cobra.Command) string {
+	if !cmd.HasSubCommands() {
+		return ""
+	}
+	cmnds := make([]string, 0)
+	functions := make([]string, 0)
+	for _, c := range cmd.Commands() {
+		if !c.Hidden {
+			cmnds = append(cmnds, fmt.Sprintf(`        "%v:%v"`, c.Name(), c.Short))
+			functions = append(functions, fmt.Sprintf(`    %v)
+      %v
+      ;;`, c.Name(), uidCommand(c)))
+		}
+	}
+
+	templ := `
+
+  # shellcheck disable=SC2154
+  case $state in
+    cmnds)
+      # shellcheck disable=SC2034
+      commands=(
+%v
+      )
+      _describe "command" commands
+      ;;
+  esac
+  
+  case "${words[1]}" in
+%v
+  esac`
+
+	return fmt.Sprintf(templ, strings.Join(cmnds, "\n"), strings.Join(functions, "\n"))
 }

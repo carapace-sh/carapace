@@ -34,3 +34,47 @@ func TestSnippetPositionalCompletion(t *testing.T) {
 	pos2 := snippetPositionalCompletion(2, ActionMessage("test"))
 	assertEqual(t, `"2:: : _message -r 'test'"`, pos2)
 }
+
+func TestSnippetSubcommands(t *testing.T) {
+	root := &cobra.Command{
+		Use: "root",
+	}
+	sub1 := &cobra.Command{
+		Use: "sub1",
+	}
+	sub2 := &cobra.Command{
+		Use:   "sub2",
+		Short: "short description",
+	}
+	hidden := &cobra.Command{
+		Use:    "hidden",
+		Hidden: true,
+	}
+	root.AddCommand(sub1)
+	root.AddCommand(sub2)
+	root.AddCommand(hidden)
+
+	expected := `
+
+  # shellcheck disable=SC2154
+  case $state in
+    cmnds)
+      # shellcheck disable=SC2034
+      commands=(
+        "sub1:"
+        "sub2:short description"
+      )
+      _describe "command" commands
+      ;;
+  esac
+  
+  case "${words[1]}" in
+    sub1)
+      _root__sub1
+      ;;
+    sub2)
+      _root__sub2
+      ;;
+  esac`
+	assertEqual(t, expected, snippetSubcommands(root))
+}

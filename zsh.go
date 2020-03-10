@@ -1,15 +1,12 @@
 package zsh
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-
-	"text/template"
 )
 
 type Completions struct {
@@ -87,7 +84,7 @@ func (c Completions) GenerateFunctions(cmd *cobra.Command) string {
 	arguments := append(flags, positionals...)
 
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), commandsVar, inheritedArgs, strings.Join(arguments, " \\\n"), subcommands(cmd)))
+	result = append(result, fmt.Sprintf(function_pattern, uidCommand(cmd), commandsVar, inheritedArgs, strings.Join(arguments, " \\\n"), snippetSubcommands(cmd)))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateFunctions(subcmd))
@@ -103,34 +100,6 @@ func flagAlreadySet(cmd *cobra.Command, flag *pflag.Flag) bool {
 	}
 	// TODO since it is an inherited flag check for parent command that is not hidden
 	return true
-}
-
-func subcommands(cmd *cobra.Command) string {
-	if !cmd.HasSubCommands() {
-		return ""
-	}
-	templ := `
-
-  # shellcheck disable=SC2154
-  case $state in
-    cmnds)
-      # shellcheck disable=SC2034
-      commands=(
-{{range .Commands}}{{if not .Hidden}}        "{{.Name}}:{{if .Short}}{{.Short}}{{end}}"
-{{end}}{{end}}      )
-      _describe "command" commands
-      ;;
-  esac
-  
-  case "${words[1]}" in
-{{range .Commands}}{{if not .Hidden}}    {{.Name}})
-      {{uid .}}
-      ;;
-{{end}}{{end}}  esac`
-	buf := bytes.NewBufferString("")
-	t, _ := template.New("subcommands").Funcs(template.FuncMap{"uid": uidCommand}).Parse(templ)
-	t.Execute(buf, cmd)
-	return buf.String()
 }
 
 func zshCompExtractFlag(c *cobra.Command) []*pflag.Flag {

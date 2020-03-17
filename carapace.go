@@ -100,7 +100,6 @@ func (c Completions) GenerateZshFunctions(cmd *cobra.Command) string {
 	return strings.Join(result, "\n")
 }
 
-
 //fish
 func (c Completions) GenerateFish(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`function _state
@@ -126,7 +125,7 @@ complete -c %v -f
 }
 
 func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
-  // TODO ensure state is only called oncy per LINE
+	// TODO ensure state is only called oncy per LINE
 	function_pattern := `
 %v
 `
@@ -151,7 +150,7 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 	if cmd.HasSubCommands() {
 		positionals = []string{}
 		for _, subcmd := range cmd.Commands() {
-          positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_state %v ' -a %v -d '%v'`, cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
+			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_state %v ' -a %v -d '%v'`, cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
 			// TODO repeat for aliases
 			// TODO filter hidden
 		}
@@ -167,7 +166,7 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 	arguments := append(flags, positionals...)
 
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern,  strings.Join(arguments, "\n")))
+	result = append(result, fmt.Sprintf(function_pattern, strings.Join(arguments, "\n")))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateFishFunctions(subcmd))
@@ -175,8 +174,8 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 	}
 	return strings.Join(result, "\n")
 }
-//fish
 
+//fish
 
 func flagAlreadySet(cmd *cobra.Command, flag *pflag.Flag) bool {
 	if cmd.LocalFlags().Lookup(flag.Name) != nil {
@@ -240,55 +239,55 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-              fmt.Println("zsh/fish argument missing")
-            } else {
-              if args[0] == "zsh" {
-			if len(args) <= 1 {
-				fmt.Println(completions.GenerateZsh(cmd.Root()))
+				fmt.Println("zsh/fish argument missing")
 			} else {
-				callback := args[1]
-				origArg := []string{}
-				if len(os.Args) > 4 {
-					origArg = os.Args[5:]
-				}
-				_, targetArgs := traverse(cmd, origArg)
-				fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
-			}
-
-              } else { // fish
-// fish
-if len(args) <= 1 {
-				fmt.Println(completions.GenerateFish(cmd.Root()))
-			} else {
-				callback := args[1]
-				origArg := []string{}
-				if len(os.Args) > 5 {
-					origArg = os.Args[5:]
-				}
-				targetCmd, targetArgs := traverse(cmd, origArg)
-				if callback == "_" {
-					if len(targetArgs) == 0 {
-						callback = uid.Positional(targetCmd, 1)
+				if args[0] == "zsh" {
+					if len(args) <= 1 {
+						fmt.Println(completions.GenerateZsh(cmd.Root()))
 					} else {
-						lastArg := targetArgs[len(targetArgs)-1]
-						if strings.HasSuffix(lastArg, " ") {
-							callback = uid.Positional(targetCmd, len(targetArgs)+1)
-						} else {
-							callback = uid.Positional(targetCmd, len(targetArgs))
+						callback := args[1]
+						origArg := []string{}
+						if len(os.Args) > 4 {
+							origArg = os.Args[5:]
 						}
+						_, targetArgs := traverse(cmd, origArg)
+						fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
 					}
-	                if _, ok := completions.actions[callback]; !ok {
-                      os.Exit(0) // ensure no message for missing action on positional completion
-                    }
-				} else if callback == "state" {
-					 fmt.Println(uid.Command(targetCmd))
-                     os.Exit(0) // TODO
+
+				} else { // fish
+					// fish
+					if len(args) <= 1 {
+						fmt.Println(completions.GenerateFish(cmd.Root()))
+					} else {
+						callback := args[1]
+						origArg := []string{}
+						if len(os.Args) > 5 {
+							origArg = os.Args[5:]
+						}
+						targetCmd, targetArgs := traverse(cmd, origArg)
+						if callback == "_" {
+							if len(targetArgs) == 0 {
+								callback = uid.Positional(targetCmd, 1)
+							} else {
+								lastArg := targetArgs[len(targetArgs)-1]
+								if strings.HasSuffix(lastArg, " ") {
+									callback = uid.Positional(targetCmd, len(targetArgs)+1)
+								} else {
+									callback = uid.Positional(targetCmd, len(targetArgs))
+								}
+							}
+							if _, ok := completions.actions[callback]; !ok {
+								os.Exit(0) // ensure no message for missing action on positional completion
+							}
+						} else if callback == "state" {
+							fmt.Println(uid.Command(targetCmd))
+							os.Exit(0) // TODO
+						}
+						fmt.Println(completions.invokeCallback(callback, targetArgs).Fish)
+					}
+					//fish
 				}
-				fmt.Println(completions.invokeCallback(callback, targetArgs).Fish)
 			}
-//fish
-              }
-            }
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,

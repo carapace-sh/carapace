@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-    "github.com/rsteube/carapace/uid"
+	"github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -14,7 +14,7 @@ var replacer = strings.NewReplacer(
 	`"`, `\"`,
 	`[`, `\[`,
 	`]`, `\]`,
-    `'`, `\"`,
+	`'`, `\"`,
 )
 
 func SnippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string) (snippet string) {

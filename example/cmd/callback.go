@@ -20,13 +20,13 @@ func init() {
 	callbackCmd.Flags().StringP("callback", "c", "", "Help message for callback")
 
 	carapace.Gen(callbackCmd).FlagCompletion(carapace.ActionMap{
-      "callback": carapace.ActionCallback(func(args []string) carapace.Action {
+		"callback": carapace.ActionCallback(func(args []string) carapace.Action {
 			return carapace.ActionValues("cb1", "cb2", "cb3")
 		}),
 	})
 
 	carapace.Gen(callbackCmd).PositionalCompletion(
-      carapace.ActionCallback(func(args []string) carapace.Action {
+		carapace.ActionCallback(func(args []string) carapace.Action {
 			return carapace.ActionValues("callback1", "callback2")
 		}),
 	)

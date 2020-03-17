@@ -6,7 +6,7 @@ import (
 )
 
 func Callback(uid string) string {
-    return ActionExecute(fmt.Sprintf(`_callback %v`, uid))
+	return ActionExecute(fmt.Sprintf(`_callback %v`, uid))
 }
 
 func ActionExecute(command string) string {
@@ -34,7 +34,7 @@ func ActionUsers() string {
 }
 
 func ActionGroups() string {
-    return ActionExecute("__fish_complete_groups")
+	return ActionExecute("__fish_complete_groups")
 }
 
 func ActionHosts() string {
@@ -71,7 +71,7 @@ func ActionValuesDescribed(values ...string) string {
 }
 
 func ActionMessage(msg string) string {
-  return ActionValuesDescribed("ERR", msg, "_", "")
+	return ActionValuesDescribed("ERR", msg, "_", "")
 }
 
 func ActionMultiParts(separator rune, values ...string) string {

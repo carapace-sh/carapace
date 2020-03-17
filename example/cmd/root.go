@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/rsteube/cobra-zsh-gen"
+	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ func init() {
 
 	rootCmd.Flags().StringArrayP("array", "a", []string{}, "multiflag")
 
-	zsh.Gen(rootCmd).FlagCompletion(zsh.ActionMap{
-		"toggle": zsh.ActionBool(),
+	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
+		"toggle": carapace.ActionBool(),
 	})
 }

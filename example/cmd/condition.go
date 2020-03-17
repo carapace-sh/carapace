@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	zsh "github.com/rsteube/cobra-zsh-gen"
+	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )
 
@@ -16,15 +16,15 @@ func init() {
 
 	conditionCmd.Flags().StringP("required", "r", "", "required flag")
 
-	zsh.Gen(conditionCmd).FlagCompletion(zsh.ActionMap{
-		"required": zsh.ActionValues("valid", "invalid"),
+	carapace.Gen(conditionCmd).FlagCompletion(carapace.ActionMap{
+		"required": carapace.ActionValues("valid", "invalid"),
 	})
 
-	zsh.Gen(conditionCmd).PositionalCompletion(zsh.ActionCallback(func(args []string) zsh.Action {
+	carapace.Gen(conditionCmd).PositionalCompletion(carapace.ActionCallback(func(args []string) carapace.Action {
 		if conditionCmd.Flag("required").Value.String() == "valid" {
-			return zsh.ActionValues("condition fulfilled")
+			return carapace.ActionValues("condition fulfilled")
 		} else {
-			return zsh.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
+			return carapace.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
 		}
 	}))
 }

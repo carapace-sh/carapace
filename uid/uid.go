@@ -1,4 +1,4 @@
-package zsh
+package uid
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func uidCommand(cmd *cobra.Command) string {
+func Command(cmd *cobra.Command) string {
 	names := make([]string, 0)
 	current := cmd
 	for {
@@ -28,7 +28,7 @@ func uidCommand(cmd *cobra.Command) string {
 	return "_" + strings.Join(reverse, "__")
 }
 
-func uidFlag(cmd *cobra.Command, flag *pflag.Flag) string {
+func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
 	c := cmd
 	for c.HasParent() {
 		if c.LocalFlags().Lookup(flag.Name) != nil {
@@ -38,12 +38,12 @@ func uidFlag(cmd *cobra.Command, flag *pflag.Flag) string {
 	}
 	// TODO ensure flag acually belongs to command (force error)
 	// TODO handle unknown flag error
-	return fmt.Sprintf("%v##%v", uidCommand(c), flag.Name)
+	return fmt.Sprintf("%v##%v", Command(c), flag.Name)
 }
 
-func uidPositional(cmd *cobra.Command, position int) string {
+func Positional(cmd *cobra.Command, position int) string {
 	// TODO complete function
-	return fmt.Sprintf("%v#%v", uidCommand(cmd), position)
+	return fmt.Sprintf("%v#%v", Command(cmd), position)
 }
 
 func find(cmd *cobra.Command, uid string) *cobra.Command {

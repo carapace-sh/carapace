@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	zsh "github.com/rsteube/cobra-zsh-gen"
+    "github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )
 
@@ -27,18 +27,18 @@ func init() {
 	actionCmd.Flags().StringP("custom", "c", "", "custom flag")
 	actionCmd.Flags().String("multi_parts", "", "multi_parts flag")
 
-	zsh.Gen(actionCmd).FlagCompletion(zsh.ActionMap{
-		"files":            zsh.ActionFiles("*.go"),
-		"groups":           zsh.ActionGroups(),
-		"hosts":            zsh.ActionHosts(),
-		"message":          zsh.ActionMessage("message example"),
-		"net_interfaces":   zsh.ActionNetInterfaces(),
-		"options":          zsh.ActionOptions(),
-		"path_files":       zsh.ActionPathFiles(""),
-		"users":            zsh.ActionUsers(),
-		"values":           zsh.ActionValues("values", "example"),
-		"values_described": zsh.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
-		"custom":           zsh.Action{Value: "_most_recent_file 2"},
-		"multi_parts":      zsh.ActionMultiParts('/', "multi/parts", "multi/parts/example", "multi/parts/test", "example/parts"),
+	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
+		"files":            carapace.ActionFiles(".go"),
+		"groups":           carapace.ActionGroups(),
+		"hosts":            carapace.ActionHosts(),
+		"message":          carapace.ActionMessage("message example"),
+		"net_interfaces":   carapace.ActionNetInterfaces(),
+		"options":          carapace.ActionOptions(),
+		"path_files":       carapace.ActionPathFiles(""),
+		"users":            carapace.ActionUsers(),
+		"values":           carapace.ActionValues("values", "example"),
+		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
+		"custom":           carapace.Action{Zsh: "_most_recent_file 2"},
+		"multi_parts":      carapace.ActionMultiParts('/', "multi/parts", "multi/parts/example", "multi/parts/test", "example/parts"),
 	})
 }

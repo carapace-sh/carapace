@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/rsteube/cobra-zsh-gen"
+	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )
 
@@ -19,15 +19,15 @@ func init() {
 	rootCmd.AddCommand(callbackCmd)
 	callbackCmd.Flags().StringP("callback", "c", "", "Help message for callback")
 
-	zsh.Gen(callbackCmd).FlagCompletion(zsh.ActionMap{
-		"callback": zsh.ActionCallback(func(args []string) zsh.Action {
-			return zsh.ActionValues("cb1", "cb2", "cb3")
+	carapace.Gen(callbackCmd).FlagCompletion(carapace.ActionMap{
+      "callback": carapace.ActionCallback(func(args []string) carapace.Action {
+			return carapace.ActionValues("cb1", "cb2", "cb3")
 		}),
 	})
 
-	zsh.Gen(callbackCmd).PositionalCompletion(
-		zsh.ActionCallback(func(args []string) zsh.Action {
-			return zsh.ActionValues("callback1", "callback2")
+	carapace.Gen(callbackCmd).PositionalCompletion(
+      carapace.ActionCallback(func(args []string) carapace.Action {
+			return carapace.ActionValues("callback1", "callback2")
 		}),
 	)
 }

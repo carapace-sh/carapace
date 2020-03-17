@@ -1,6 +1,6 @@
 package main
 
-import "github.com/rsteube/cobra-zsh-gen/example/cmd"
+import "github.com/rsteube/carapace/example/cmd"
 
 func main() {
 	cmd.Execute()

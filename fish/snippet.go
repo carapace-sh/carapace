@@ -1,9 +1,10 @@
-package zsh
+package fish
 
 import (
 	"fmt"
 	"strings"
 
+    "github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -13,35 +14,31 @@ var replacer = strings.NewReplacer(
 	`"`, `\"`,
 	`[`, `\[`,
 	`]`, `\]`,
+    `'`, `\"`,
 )
 
-func snippetFlagCompletion(flag *pflag.Flag, action *Action) (snippet string) {
-	var suffix, multimark, multimarkEscaped string
+func SnippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string) (snippet string) {
+	var suffix string
 	if action == nil {
 		if flag.NoOptDefVal != "" {
 			suffix = "" // no argument required for flag
 		} else {
-			suffix = ": :" // require a value
+			suffix = " -r" // require a value
 		}
 	} else {
-		suffix = fmt.Sprintf(": :%v", action.Value)
-	}
-
-	if zshCompFlagCouldBeSpecifiedMoreThenOnce(flag) {
-		multimark = "*"
-		multimarkEscaped = "\\*"
+		suffix = fmt.Sprintf(" -a '(%v)' -r", *action)
 	}
 
 	if flag.Shorthand == "" { // no shorthannd
-		snippet = fmt.Sprintf(`"%v--%v[%v]%v"`, multimark, flag.Name, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`complete -c %v -f -n '_state %v' -l %v -d '%v'%v`, cmd.Root().Name(), uid.Command(cmd), flag.Name, replacer.Replace(flag.Usage), suffix)
 	} else {
-		snippet = fmt.Sprintf(`"(%v-%v %v--%v)"{%v-%v,%v--%v}"[%v]%v"`, multimark, flag.Shorthand, multimark, flag.Name, multimarkEscaped, flag.Shorthand, multimarkEscaped, flag.Name, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`complete -c %v -f -n '_state %v' -l %v -s %v -d '%v'%v`, cmd.Root().Name(), uid.Command(cmd), flag.Name, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
 	}
 	return
 }
 
-func snippetPositionalCompletion(position int, action Action) string {
-	return fmt.Sprintf(`"%v:: :%v"`, position, action.Value)
+func SnippetPositionalCompletion(position int, action string) string {
+	return fmt.Sprintf(`"%v:: :%v"`, position, action)
 }
 
 func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
@@ -49,7 +46,7 @@ func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
 		strings.Contains(f.Value.Type(), "Array")
 }
 
-func snippetSubcommands(cmd *cobra.Command) string {
+func SnippetSubcommands(cmd *cobra.Command) string {
 	if !cmd.HasSubCommands() {
 		return ""
 	}
@@ -60,13 +57,13 @@ func snippetSubcommands(cmd *cobra.Command) string {
 			cmnds = append(cmnds, fmt.Sprintf(`        "%v:%v"`, c.Name(), c.Short))
 			functions = append(functions, fmt.Sprintf(`    %v)
       %v
-      ;;`, c.Name(), uidCommand(c)))
+      ;;`, c.Name(), uid.Command(c)))
 
 			for _, alias := range c.Aliases {
 				cmnds = append(cmnds, fmt.Sprintf(`        "%v:%v"`, alias, c.Short))
 				functions = append(functions, fmt.Sprintf(`    %v)
       %v
-      ;;`, alias, uidCommand(c)))
+      ;;`, alias, uid.Command(c)))
 			}
 		}
 	}

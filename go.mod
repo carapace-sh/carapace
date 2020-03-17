@@ -1,10 +1,11 @@
-module github.com/rsteube/cobra-zsh-gen
+module github.com/rsteube/carapace
 
 go 1.12
 
 require (
 	github.com/alecthomas/chroma v0.7.1
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/rsteube/cobra-zsh-gen v1.2.10
 	github.com/sergi/go-diff v1.0.0
 	github.com/sourcegraph/go-diff v0.5.1
 	github.com/spf13/cobra v0.0.4

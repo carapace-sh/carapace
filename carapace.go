@@ -102,7 +102,9 @@ func (c Completions) GenerateZshFunctions(cmd *cobra.Command) string {
 
 //fish
 func (c Completions) GenerateFish(cmd *cobra.Command) string {
-	result := fmt.Sprintf(`function _state
+	result := fmt.Sprintf(`# shellcheck disable=SC1073
+function _state
+  # shellcheck disable=SC1064,SC1064
   set -lx CURRENT (commandline -cp)
   if [ "$LINE" != "$CURRENT" ]
     set -gx LINE (commandline -cp)

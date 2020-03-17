@@ -48,14 +48,14 @@ func ActionBool() Action {
 func ActionPathFiles(suffix string) Action {
 	return Action{
 		Fish: fish.ActionPathFiles(suffix),
-		Zsh:  zsh.ActionPathFiles(suffix),
+		Zsh:  zsh.ActionPathFiles("*" + suffix),
 	}
 }
 
 func ActionFiles(suffix string) Action {
 	return Action{
 		Fish: fish.ActionFiles(suffix),
-		Zsh:  zsh.ActionFiles(suffix),
+		Zsh:  zsh.ActionFiles("*" + suffix),
 	}
 }
 

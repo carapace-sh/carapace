@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/uid"
 	"github.com/rsteube/carapace/zsh"
@@ -177,6 +178,75 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 
 //fish
 
+// bash
+func (c Completions) GenerateBash(cmd *cobra.Command) string {
+	result := fmt.Sprintf(`#!/bin/bash
+
+_callback() {
+  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
+}
+
+_completions() {
+  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
+  local last="${COMP_WORDS[${COMP_CWORD}]}"
+  local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+
+  case $state in
+%v
+  esac
+}
+
+complete -F _completions %v
+`, cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name())
+
+	return result
+}
+
+func (c Completions) GenerateBashFunctions(cmd *cobra.Command) string {
+	// TODO ensure state is only called oncy per LINE
+	function_pattern := `
+    '%v' )
+      if [[ $last == -* ]]; then
+        COMPREPLY=($(%v))
+      else
+        case $previous in
+%v
+          *)
+            COMPREPLY=($(%v))
+            ;;
+        esac
+      fi
+      ;;
+`
+
+	flags := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		if !f.Hidden {
+			var s string
+			if action, ok := c.actions[uid.Flag(cmd, f)]; ok {
+				s = bash.SnippetFlagCompletion(f, action.Bash)
+			} else {
+				s = bash.SnippetFlagCompletion(f, "")
+			}
+			flags = append(flags, s)
+		}
+	})
+
+	result := make([]string, 0)
+	// uid.Command, flagList, genflagcompletions, commandargumentcompletion
+	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), bash.SnippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), bash.Callback("_")))
+	for _, subcmd := range cmd.Commands() {
+		if !subcmd.Hidden {
+			result = append(result, c.GenerateBashFunctions(subcmd))
+		}
+	}
+	return strings.Join(result, "\n")
+}
+
+// bash
+
 func flagAlreadySet(cmd *cobra.Command, flag *pflag.Flag) bool {
 	if cmd.LocalFlags().Lookup(flag.Name) != nil {
 		return false
@@ -253,7 +323,43 @@ func addCompletionCommand(cmd *cobra.Command) {
 						_, targetArgs := traverse(cmd, origArg)
 						fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
 					}
-
+				} else if args[0] == "bash" {
+					if len(args) <= 1 {
+						fmt.Println(completions.GenerateBash(cmd.Root()))
+					} else {
+						callback := args[1]
+						origArg := []string{}
+						if len(os.Args) > 5 {
+							origArg = os.Args[5:]
+						}
+						targetCmd, targetArgs := traverse(cmd, origArg)
+						if callback == "_" {
+							if len(targetArgs) == 0 {
+								callback = uid.Positional(targetCmd, 1)
+							} else {
+								lastArg := targetArgs[len(targetArgs)-1]
+								if strings.HasSuffix(lastArg, " ") {
+									callback = uid.Positional(targetCmd, len(targetArgs)+1)
+								} else {
+									callback = uid.Positional(targetCmd, len(targetArgs))
+								}
+							}
+							if _, ok := completions.actions[callback]; !ok {
+								if targetCmd.HasSubCommands() && len(targetArgs) <= 1 {
+									subcommands := make([]string, len(targetCmd.Commands()))
+									for i, c := range targetCmd.Commands() {
+										subcommands[i] = c.Name() // TODO alias
+									}
+									fmt.Println(bash.ActionValues(subcommands...))
+								}
+								os.Exit(0) // ensure no message for missing action on positional completion
+							}
+						} else if callback == "state" {
+							fmt.Println(uid.Command(targetCmd))
+							os.Exit(0) // TODO
+						}
+						fmt.Println(completions.invokeCallback(callback, targetArgs).Bash)
+					}
 				} else { // fish
 					// fish
 					if len(args) <= 1 {

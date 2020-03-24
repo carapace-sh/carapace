@@ -107,9 +107,14 @@ carapace.ActionCallback(func(args []string) carapace.Action {
 Since callbacks are simply invocations of the program they can be tested directly.
 
 ```sh
-./example _carapace zsh '_example__condition#1' condition --required invalid
+./example _carapace bash '_example__condition#1' condition --required invalid
+#compgen -W "ERR flag_--required_must_be_set_to_valid:_" -- $last
 
-# _message -r 'flag --required must be set to valid: invalid'
+./example _carapace fish '_example__condition#1' condition --required invalid
+#echo -e ERR\tflag --required must be set to valid: \n_\t\n\n
+
+./example _carapace zsh '_example__condition#1' condition --required invalid
+# _message -r 'flag --required must be set to valid: '
 ```
 
 ### Custom Action

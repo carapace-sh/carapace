@@ -2,7 +2,11 @@
 
 [![CircleCI](https://circleci.com/gh/rsteube/carapace.svg?style=svg)](https://circleci.com/gh/rsteube/carapace)
 
-[ZSH completion](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) and [Fish completion](https://fishshell.com/docs/current/#writing-your-own-completions) script generator for [cobra] (based on [spf13/cobra#646](https://github.com/spf13/cobra/pull/646)).
+Completion script generator for [cobra] with support for:
+
+- Bash
+- [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
+- [ZSH](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 
 ## Status

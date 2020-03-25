@@ -14,11 +14,6 @@ func ActionExecute(command string) string {
 	return fmt.Sprintf(` eval \$(%v)`, command) // {EVAL-STRING} action did not handle space escaping ('\ ') as expected (separate arguments), this one works
 }
 
-// ActionBool completes true/false
-func ActionBool() string {
-	return ActionValues("true", "false")
-}
-
 // ActionPathFiles completes filepaths
 // [http://zsh.sourceforge.net/Doc/Release/Completion-System.html#index-_005fpath_005ffiles]
 func ActionPathFiles(pattern string) string { // TODO support additional options

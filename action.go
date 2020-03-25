@@ -42,11 +42,7 @@ func ActionExecute(command string) Action {
 
 // ActionBool completes true/false
 func ActionBool() Action {
-	return Action{
-		Bash: bash.ActionBool(),
-		Fish: fish.ActionBool(),
-		Zsh:  zsh.ActionBool(),
-	}
+	return ActionValues("true", "false")
 }
 
 // ActionPathFiles completes filepaths

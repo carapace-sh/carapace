@@ -13,10 +13,6 @@ func ActionExecute(command string) string {
 	return fmt.Sprintf(`%v`, command)
 }
 
-func ActionBool() string {
-	return ActionValues("true", "false")
-}
-
 func ActionPathFiles(suffix string) string {
 	return ActionExecute(fmt.Sprintf(`__fish_complete_suffix "%v"`, suffix))
 }

@@ -181,13 +181,12 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 // bash
 func (c Completions) GenerateBash(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
+_%v_completions() {
+  _callback() {
+    local compline="${COMP_LINE:0:${COMP_POINT}}"
+    echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
+  }
 
-_callback() {
-  local compline="${COMP_LINE:0:${COMP_POINT}}"
-  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
-}
-
-_completions() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
   local last="${COMP_WORDS[${COMP_CWORD}]}"
@@ -198,8 +197,8 @@ _completions() {
   esac
 }
 
-complete -F _completions %v
-`, cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name())
+complete -F _%v_completions %v
+`, cmd.Name(), cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name(), cmd.Name())
 
 	return result
 }

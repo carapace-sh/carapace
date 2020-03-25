@@ -67,7 +67,7 @@ func ActionValuesDescribed(values ...string) string {
 }
 
 func ActionMessage(msg string) string {
-	return ActionValues("ERR", strings.ReplaceAll(msg, " ", "_")) // TODO escape characters
+	return ActionValues("ERR", strings.Replace(msg, " ", "_", -1)) // TODO escape characters
 }
 
 func ActionMultiParts(separator rune, values ...string) string {

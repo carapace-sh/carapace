@@ -34,7 +34,7 @@ func ActionGroups() string {
 }
 
 func ActionHosts() string {
-	return ""
+	return ActionValues(ActionExecute(`cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1`))
 }
 
 func ActionOptions() string {

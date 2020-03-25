@@ -294,15 +294,15 @@ func (zsh Carapace) FlagCompletion(actions ActionMap) {
 }
 
 func (zsh Carapace) Bash() string {
-  return completions.GenerateBash(zsh.cmd.Root())
+	return completions.GenerateBash(zsh.cmd.Root())
 }
 
 func (zsh Carapace) Fish() string {
-  return completions.GenerateFish(zsh.cmd.Root())
+	return completions.GenerateFish(zsh.cmd.Root())
 }
 
 func (zsh Carapace) Zsh() string {
-  return completions.GenerateZsh(zsh.cmd.Root())
+	return completions.GenerateZsh(zsh.cmd.Root())
 }
 
 var completions = Completions{

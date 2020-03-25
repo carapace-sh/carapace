@@ -94,15 +94,6 @@ func ActionHosts() Action {
 	}
 }
 
-// ActionOptions completes the names of shell options
-func ActionOptions() Action {
-	return Action{
-		Bash: bash.ActionOptions(),
-		Fish: fish.ActionOptions(),
-		Zsh:  zsh.ActionOptions(),
-	}
-}
-
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
 	return Action{

@@ -33,10 +33,6 @@ func ActionHosts() string {
 	return ActionExecute("__fish_print_hostnames")
 }
 
-func ActionOptions() string {
-	return ""
-}
-
 func ActionValues(values ...string) string {
 	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
 		return ActionMessage("no values to complete")

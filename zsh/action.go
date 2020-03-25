@@ -44,11 +44,6 @@ func ActionHosts() string {
 	return "_hosts"
 }
 
-// ActionOptions completes the names of shell options
-func ActionOptions() string {
-	return "_options"
-}
-
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) string {
 	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {

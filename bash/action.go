@@ -33,10 +33,6 @@ func ActionHosts() string {
 	return ActionValues(ActionExecute(`cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1`))
 }
 
-func ActionOptions() string {
-	return ""
-}
-
 func ActionValues(values ...string) string {
 	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
 		return ActionMessage("no values to complete")

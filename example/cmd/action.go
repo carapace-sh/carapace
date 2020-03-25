@@ -19,8 +19,6 @@ func init() {
 	actionCmd.Flags().String("hosts", "", "hosts flag")
 	actionCmd.Flags().StringP("message", "m", "", "message flag")
 	actionCmd.Flags().StringP("net_interfaces", "n", "", "net_interfaces flag")
-	actionCmd.Flags().StringP("options", "o", "", "options flag")
-	actionCmd.Flags().String("path_files", "", "path_files flag")
 	actionCmd.Flags().StringP("users", "u", "", "users flag")
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
@@ -33,8 +31,6 @@ func init() {
 		"hosts":            carapace.ActionHosts(),
 		"message":          carapace.ActionMessage("message example"),
 		"net_interfaces":   carapace.ActionNetInterfaces(),
-		"options":          carapace.ActionOptions(),
-		"path_files":       carapace.ActionPathFiles(""),
 		"users":            carapace.ActionUsers(),
 		"values":           carapace.ActionValues("values", "example"),
 		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),

@@ -293,6 +293,18 @@ func (zsh Carapace) FlagCompletion(actions ActionMap) {
 	}
 }
 
+func (zsh Carapace) Bash() string {
+  return completions.GenerateBash(zsh.cmd.Root())
+}
+
+func (zsh Carapace) Fish() string {
+  return completions.GenerateFish(zsh.cmd.Root())
+}
+
+func (zsh Carapace) Zsh() string {
+  return completions.GenerateZsh(zsh.cmd.Root())
+}
+
 var completions = Completions{
 	actions: make(map[string]Action),
 }
@@ -312,7 +324,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			} else {
 				if args[0] == "zsh" {
 					if len(args) <= 1 {
-						fmt.Println(completions.GenerateZsh(cmd.Root()))
+						fmt.Println(Gen(cmd).Zsh())
 					} else {
 						callback := args[1]
 						origArg := []string{}
@@ -325,6 +337,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 				} else if args[0] == "bash" {
 					if len(args) <= 1 {
 						fmt.Println(completions.GenerateBash(cmd.Root()))
+						fmt.Println(Gen(cmd).Bash())
 					} else {
 						callback := args[1]
 						origArg := []string{}
@@ -362,7 +375,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 				} else { // fish
 					// fish
 					if len(args) <= 1 {
-						fmt.Println(completions.GenerateFish(cmd.Root()))
+						fmt.Println(Gen(cmd).Fish())
 					} else {
 						callback := args[1]
 						origArg := []string{}

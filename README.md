@@ -4,7 +4,7 @@
 
 Completion script generator for [cobra] with support for:
 
-- Bash
+- [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
 - [ZSH](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
@@ -122,7 +122,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 For [actions](#action) that aren't implemented or missing required options, a custom action can be defined.
 
 ```go
-carapace.Action{Value: "_most_recent_file 2"}
+carapace.Action{Zsh: "_most_recent_file 2"}
 
 // #./example action --custom <TAB>
 ```
@@ -134,8 +134,20 @@ An example implementation can be found in the [example](./example/) folder.
 ```sh
 cd example
 go build .
-source <(./example _carapace zsh)
-./example <TAB>
+
+# bash
+PATH=$PATH:$(pwd)
+source <(example _carapace bash)
+
+# fish
+set PATH $PATH (pwd) 
+example _carapace fish | source
+
+# zsh
+PATH=$PATH:$(pwd)
+source <(example _carapace zsh)
+
+example <TAB>
 ```
 
 [cobra]:https://github.com/spf13/cobra

@@ -22,7 +22,7 @@ func ActionFiles(suffix string) string {
 }
 
 func ActionNetInterfaces() string {
-	return ""
+	return ActionValues(ActionExecute(`ifconfig -a | grep -o '^[^ :]\+' | tr '\n' ' '`))
 }
 
 func ActionUsers() string {

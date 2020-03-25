@@ -18,15 +18,15 @@ type CompletionCallback func(args []string) Action
 // finalize replaces value if a callback function is set
 func (a Action) finalize(uid string) Action {
 	if a.Callback != nil {
-        if a.Bash == "" {
-		  a.Bash = bash.Callback(uid)
-        }
-        if a.Fish == "" {
-		  a.Fish = fish.Callback(uid)
-        }
-        if a.Zsh == "" {
-		  a.Zsh = zsh.Callback(uid)
-        }
+		if a.Bash == "" {
+			a.Bash = bash.Callback(uid)
+		}
+		if a.Fish == "" {
+			a.Fish = fish.Callback(uid)
+		}
+		if a.Zsh == "" {
+			a.Zsh = zsh.Callback(uid)
+		}
 	}
 	return a
 }

@@ -13,10 +13,6 @@ func ActionExecute(command string) string {
 	return fmt.Sprintf(`$(%v)`, command)
 }
 
-func ActionPathFiles(suffix string) string {
-	return ""
-}
-
 func ActionFiles(suffix string) string {
 	return fmt.Sprintf(`compgen -f -o plusdirs -X "!*%v" -- $last`, suffix)
 }

@@ -50,15 +50,6 @@ func ActionBool() Action {
 	return ActionValues("true", "false")
 }
 
-// ActionPathFiles completes filepaths
-func ActionPathFiles(suffix string) Action {
-	return Action{
-		Bash: bash.ActionPathFiles(suffix),
-		Fish: fish.ActionPathFiles(suffix),
-		Zsh:  zsh.ActionPathFiles("*" + suffix),
-	}
-}
-
 func ActionFiles(suffix string) Action {
 	return Action{
 		Bash: bash.ActionFiles(suffix),

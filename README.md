@@ -51,7 +51,7 @@ carapace.Gen(callbackCmd).PositionalCompletion(
 
 ## Hidden Command
 
-When `carapace.Gen(myCmd)` is invoked a hidden command (`_carapace`) is added to the root command unless it already exists. This handles completion script generation (when invoked with arg `zsh` or `fish`) and [callbacks](#actioncallback).
+When `carapace.Gen(myCmd)` is invoked a hidden command (`_carapace`) is added to the root command unless it already exists. This handles completion script generation and [callbacks](#actioncallback).
 
 
 ### Uid
@@ -63,8 +63,6 @@ Uids are generated to identify corresponding completions:
 
 ## Action
 An [action](#action) indicates how to complete a flag or a positional argument. See [action.go](./action.go) and the examples below for current implementations.
-
-Additional information can be found at [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and the [official documentation](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
 
 ### ActionMessage
 
@@ -126,6 +124,12 @@ carapace.Action{Zsh: "_most_recent_file 2"}
 
 // #./example action --custom <TAB>
 ```
+
+Additional information can be found at:
+- Bash: [bash-programmable-completion-tutorial](https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial) and [Programmable-Completion-Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins)
+- Fish: [fish-shell/share/functions](https://github.com/fish-shell/fish-shell/tree/master/share/functions) and [writing your own completions](https://fishshell.com/docs/current/#writing-your-own-completions)
+- Zsh: [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and [Completion-System](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
+
 
 ## Example
 

@@ -2,11 +2,77 @@ package bash
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/rsteube/carapace/uid"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
-func SnippetFlagList(flags *pflag.FlagSet) string {
+func Snippet(cmd *cobra.Command, actions map[string]string) string {
+	result := fmt.Sprintf(`#!/bin/bash
+_%v_callback() {
+  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
+}
+
+_%v_completions() {
+  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
+  local last="${COMP_WORDS[${COMP_CWORD}]}"
+  local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+
+  case $state in
+%v
+  esac
+}
+
+complete -F _%v_completions %v
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), snippetFunctions(cmd, actions), cmd.Name(), cmd.Name())
+
+	return result
+}
+
+func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
+	function_pattern := `
+    '%v' )
+      if [[ $last == -* ]]; then
+        COMPREPLY=($(%v))
+      else
+        case $previous in
+%v
+          *)
+            COMPREPLY=($(%v))
+            ;;
+        esac
+      fi
+      ;;
+`
+
+	flags := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		if !f.Hidden {
+			var s string
+			if action, ok := actions[uid.Flag(cmd, f)]; ok {
+				s = snippetFlagCompletion(f, action)
+			} else {
+				s = snippetFlagCompletion(f, "")
+			}
+			flags = append(flags, s)
+		}
+	})
+
+	result := make([]string, 0)
+	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), snippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), Callback(cmd.Root().Name(), "_")))
+	for _, subcmd := range cmd.Commands() {
+		if !subcmd.Hidden {
+			result = append(result, snippetFunctions(subcmd, actions))
+		}
+	}
+	return strings.Join(result, "\n")
+}
+
+func snippetFlagList(flags *pflag.FlagSet) string {
 	flagValues := make([]string, 0)
 
 	flags.VisitAll(func(flag *pflag.Flag) {
@@ -20,7 +86,7 @@ func SnippetFlagList(flags *pflag.FlagSet) string {
 	return ActionValues(flagValues...)
 }
 
-func SnippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
+func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 	if flag.NoOptDefVal != "" {
 		return ""
 	}

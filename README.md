@@ -6,7 +6,7 @@ Completion script generator for [cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
-- [ZSH](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
+- [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 
 ## Status
@@ -17,7 +17,7 @@ Completion script generator for [cobra] with support for:
 
 Calling `carapace.Gen` on any command is enough for adding completion script generation using the [hidden command](#hidden-command).
 
-> Invocations to `carapace.Gen` must be **after** the command was to the parent command so that the [uids](#uid) are correct.
+> Invocations to `carapace.Gen` must be **after** the command was added to the parent command so that the [uids](#uid) are correct.
 
 ```go
 import (

@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func Callback(uid string) string {
-	return fmt.Sprintf(`eval $(_callback '%v')`, uid) // TODO update and use ActionExecute for eval?
+func Callback(prefix string, uid string) string {
+	return fmt.Sprintf(`eval $(_%v_callback '%v')`, prefix, uid)
 }
 
 func ActionExecute(command string) string {

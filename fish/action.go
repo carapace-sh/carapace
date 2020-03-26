@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func Callback(uid string) string {
-	return ActionExecute(fmt.Sprintf(`_callback %v`, uid))
+func Callback(prefix string, uid string) string {
+	return ActionExecute(fmt.Sprintf(`_%v_callback %v`, prefix, uid))
 }
 
 func ActionExecute(command string) string {

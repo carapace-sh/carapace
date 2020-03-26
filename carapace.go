@@ -103,7 +103,7 @@ func (c Completions) GenerateZshFunctions(cmd *cobra.Command) string {
 
 //fish
 func (c Completions) GenerateFish(cmd *cobra.Command) string {
-	result := fmt.Sprintf(`function _state
+	result := fmt.Sprintf(`function _%v_state
   set -lx CURRENT (commandline -cp)
   if [ "$LINE" != "$CURRENT" ]
     set -gx LINE (commandline -cp)
@@ -113,13 +113,13 @@ func (c Completions) GenerateFish(cmd *cobra.Command) string {
   [ "$STATE" = "$argv" ]
 end
 
-function _callback
+function _%v_callback
   set -lx CALLBACK (commandline -cp | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
   eval "$CALLBACK"
 end
 
 complete -c %v -f
-`, cmd.Name(), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
 	result += c.GenerateFishFunctions(cmd)
 
 	return result
@@ -151,7 +151,7 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 	if cmd.HasSubCommands() {
 		positionals = []string{}
 		for _, subcmd := range cmd.Commands() {
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_state %v ' -a %v -d '%v'`, cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
+			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a %v -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
 			// TODO repeat for aliases
 			// TODO filter hidden
 		}
@@ -160,7 +160,7 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 			if cmd.ValidArgs != nil {
 				//positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
 			}
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_state %v' -a '(_callback _)'`, cmd.Root().Name(), uid.Command(cmd)))
+			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -a '(_%v_callback _)'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), cmd.Root().Name()))
 		}
 	}
 
@@ -181,12 +181,12 @@ func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
 // bash
 func (c Completions) GenerateBash(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
-_%v_completions() {
-  _callback() {
-    local compline="${COMP_LINE:0:${COMP_POINT}}"
-    echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
-  }
+_%v_callback() {
+  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
+}
 
+_%v_completions() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
   local last="${COMP_WORDS[${COMP_CWORD}]}"
@@ -198,7 +198,7 @@ _%v_completions() {
 }
 
 complete -F _%v_completions %v
-`, cmd.Name(), cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name(), cmd.Name())
 
 	return result
 }
@@ -235,7 +235,7 @@ func (c Completions) GenerateBashFunctions(cmd *cobra.Command) string {
 
 	result := make([]string, 0)
 	// uid.Command, flagList, genflagcompletions, commandargumentcompletion
-	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), bash.SnippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), bash.Callback("_")))
+	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), bash.SnippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), bash.Callback(cmd.Root().Name(), "_")))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, c.GenerateBashFunctions(subcmd))
@@ -282,14 +282,14 @@ func Gen(cmd *cobra.Command) *Carapace {
 
 func (zsh Carapace) PositionalCompletion(action ...Action) {
 	for index, a := range action {
-		completions.actions[uid.Positional(zsh.cmd, index+1)] = a.finalize(uid.Positional(zsh.cmd, index+1))
+		completions.actions[uid.Positional(zsh.cmd, index+1)] = a.finalize(zsh.cmd, uid.Positional(zsh.cmd, index+1))
 	}
 }
 
 func (zsh Carapace) FlagCompletion(actions ActionMap) {
 	for name, action := range actions {
 		flag := zsh.cmd.Flag(name) // TODO only allowed for local flags
-		completions.actions[uid.Flag(zsh.cmd, flag)] = action.finalize(uid.Flag(zsh.cmd, flag))
+		completions.actions[uid.Flag(zsh.cmd, flag)] = action.finalize(zsh.cmd, uid.Flag(zsh.cmd, flag))
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/zsh"
+	"github.com/spf13/cobra"
 )
 
 type Action struct {
@@ -16,13 +17,13 @@ type ActionMap map[string]Action
 type CompletionCallback func(args []string) Action
 
 // finalize replaces value if a callback function is set
-func (a Action) finalize(uid string) Action {
+func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	if a.Callback != nil {
 		if a.Bash == "" {
-			a.Bash = bash.Callback(uid)
+			a.Bash = bash.Callback(cmd.Root().Name(), uid)
 		}
 		if a.Fish == "" {
-			a.Fish = fish.Callback(uid)
+			a.Fish = fish.Callback(cmd.Root().Name(), uid)
 		}
 		if a.Zsh == "" {
 			a.Zsh = zsh.Callback(uid)

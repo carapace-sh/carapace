@@ -322,88 +322,57 @@ func addCompletionCommand(cmd *cobra.Command) {
 			if len(args) == 0 {
 				fmt.Println("zsh/fish argument missing")
 			} else {
-				if args[0] == "zsh" {
-					if len(args) <= 1 {
-						fmt.Println(Gen(cmd).Zsh())
-					} else {
-						callback := args[1]
-						origArg := []string{}
-						if len(os.Args) > 4 {
-							origArg = os.Args[5:]
-						}
-						_, targetArgs := traverse(cmd, origArg)
-						fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
-					}
-				} else if args[0] == "bash" {
-					if len(args) <= 1 {
-						fmt.Println(completions.GenerateBash(cmd.Root()))
+				if len(args) == 1 {
+					switch args[0] {
+					case "bash":
 						fmt.Println(Gen(cmd).Bash())
-					} else {
-						callback := args[1]
-						origArg := []string{}
-						if len(os.Args) > 5 {
-							origArg = os.Args[5:]
-						}
-						targetCmd, targetArgs := traverse(cmd, origArg)
-						if callback == "_" {
-							if len(targetArgs) == 0 {
-								callback = uid.Positional(targetCmd, 1)
+					case "fish":
+						fmt.Println(Gen(cmd).Fish())
+					case "zsh":
+						fmt.Println(Gen(cmd).Zsh())
+					}
+				} else {
+					callback := args[1]
+					origArg := []string{}
+					if len(os.Args) > 5 {
+						origArg = os.Args[5:]
+					}
+					targetCmd, targetArgs := traverse(cmd, origArg)
+					if callback == "_" {
+						if len(targetArgs) == 0 {
+							callback = uid.Positional(targetCmd, 1)
+						} else {
+							lastArg := targetArgs[len(targetArgs)-1]
+							if strings.HasSuffix(lastArg, " ") {
+								callback = uid.Positional(targetCmd, len(targetArgs)+1)
 							} else {
-								lastArg := targetArgs[len(targetArgs)-1]
-								if strings.HasSuffix(lastArg, " ") {
-									callback = uid.Positional(targetCmd, len(targetArgs)+1)
-								} else {
-									callback = uid.Positional(targetCmd, len(targetArgs))
-								}
+								callback = uid.Positional(targetCmd, len(targetArgs))
 							}
-							if _, ok := completions.actions[callback]; !ok {
-								if targetCmd.HasSubCommands() && len(targetArgs) <= 1 {
+						}
+						if _, ok := completions.actions[callback]; !ok {
+							if targetCmd.HasSubCommands() && len(targetArgs) <= 1 {
+								if args[0] == "bash" { // TODO print for other shells as well?
 									subcommands := make([]string, len(targetCmd.Commands()))
 									for i, c := range targetCmd.Commands() {
 										subcommands[i] = c.Name() // TODO alias
 									}
 									fmt.Println(bash.ActionValues(subcommands...))
 								}
-								os.Exit(0) // ensure no message for missing action on positional completion
 							}
-						} else if callback == "state" {
-							fmt.Println(uid.Command(targetCmd))
-							os.Exit(0) // TODO
+							os.Exit(0) // ensure no message for missing action on positional completion // TODO this was only for bash, maybe enable for other shells?
 						}
+					} else if callback == "state" {
+						fmt.Println(uid.Command(targetCmd))
+						os.Exit(0) // TODO
+					}
+					switch args[0] {
+					case "bash":
 						fmt.Println(completions.invokeCallback(callback, targetArgs).Bash)
-					}
-				} else { // fish
-					// fish
-					if len(args) <= 1 {
-						fmt.Println(Gen(cmd).Fish())
-					} else {
-						callback := args[1]
-						origArg := []string{}
-						if len(os.Args) > 5 {
-							origArg = os.Args[5:]
-						}
-						targetCmd, targetArgs := traverse(cmd, origArg)
-						if callback == "_" {
-							if len(targetArgs) == 0 {
-								callback = uid.Positional(targetCmd, 1)
-							} else {
-								lastArg := targetArgs[len(targetArgs)-1]
-								if strings.HasSuffix(lastArg, " ") {
-									callback = uid.Positional(targetCmd, len(targetArgs)+1)
-								} else {
-									callback = uid.Positional(targetCmd, len(targetArgs))
-								}
-							}
-							if _, ok := completions.actions[callback]; !ok {
-								os.Exit(0) // ensure no message for missing action on positional completion
-							}
-						} else if callback == "state" {
-							fmt.Println(uid.Command(targetCmd))
-							os.Exit(0) // TODO
-						}
+					case "fish":
 						fmt.Println(completions.invokeCallback(callback, targetArgs).Fish)
+					case "zsh":
+						fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
 					}
-					//fish
 				}
 			}
 		},

@@ -10,7 +10,6 @@ import (
 	"github.com/rsteube/carapace/uid"
 	"github.com/rsteube/carapace/zsh"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type Completions struct {
@@ -26,249 +25,6 @@ func (c Completions) invokeCallback(uid string, args []string) Action {
 	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
 }
 
-func (c Completions) GenerateZsh(cmd *cobra.Command) string {
-	result := fmt.Sprintf("#compdef %v\n", cmd.Name())
-	result += c.GenerateZshFunctions(cmd)
-
-	result += fmt.Sprintf("if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi\n", cmd.Name(), cmd.Name(), cmd.Name()) // check if withing completion function and enable direct sourcing
-	return result
-}
-
-func (c Completions) GenerateZshFunctions(cmd *cobra.Command) string {
-	function_pattern := `function %v {
-  %v%v  _arguments -C \
-%v%v
-}
-`
-
-	commandsVar := ""
-	if cmd.HasSubCommands() {
-		commandsVar = "local -a commands\n"
-	}
-
-	inheritedArgs := ""
-	if !cmd.HasParent() {
-		inheritedArgs = "  # shellcheck disable=SC2206\n  local -a -x os_args=(${words})\n\n"
-	}
-
-	flags := make([]string, 0)
-	for _, flag := range zshCompExtractFlag(cmd) {
-		if flagAlreadySet(cmd, flag) {
-			continue
-		}
-
-		var s string
-		if action, ok := c.actions[uid.Flag(cmd, flag)]; ok {
-			s = "    " + zsh.SnippetFlagCompletion(flag, &action.Zsh)
-		} else {
-			s = "    " + zsh.SnippetFlagCompletion(flag, nil)
-		}
-
-		flags = append(flags, s)
-	}
-
-	positionals := make([]string, 0)
-	if cmd.HasSubCommands() {
-		positionals = []string{`    "1: :->cmnds"`, `    "*::arg:->args"`}
-	} else {
-		pos := 1
-		for {
-			if action, ok := c.actions[uid.Positional(cmd, pos)]; ok {
-				positionals = append(positionals, "    "+zsh.SnippetPositionalCompletion(pos, action.Zsh))
-				pos++
-			} else {
-				break // TODO only consisten entriess for now
-			}
-		}
-		if len(positionals) == 0 {
-			if cmd.ValidArgs != nil {
-				positionals = []string{"    " + zsh.SnippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...).Zsh)}
-			}
-			positionals = append(positionals, `    "*::arg:->args"`)
-		}
-	}
-
-	arguments := append(flags, positionals...)
-
-	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), commandsVar, inheritedArgs, strings.Join(arguments, " \\\n"), zsh.SnippetSubcommands(cmd)))
-	for _, subcmd := range cmd.Commands() {
-		if !subcmd.Hidden {
-			result = append(result, c.GenerateZshFunctions(subcmd))
-		}
-	}
-
-	return strings.Join(result, "\n")
-}
-
-//fish
-func (c Completions) GenerateFish(cmd *cobra.Command) string {
-	result := fmt.Sprintf(`function _%v_state
-  set -lx CURRENT (commandline -cp)
-  if [ "$LINE" != "$CURRENT" ]
-    set -gx LINE (commandline -cp)
-    set -gx STATE (commandline -cp | xargs %v _carapace fish state)
-  end
-
-  [ "$STATE" = "$argv" ]
-end
-
-function _%v_callback
-  set -lx CALLBACK (commandline -cp | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
-  eval "$CALLBACK"
-end
-
-complete -c %v -f
-`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
-	result += c.GenerateFishFunctions(cmd)
-
-	return result
-}
-
-func (c Completions) GenerateFishFunctions(cmd *cobra.Command) string {
-	// TODO ensure state is only called oncy per LINE
-	function_pattern := `
-%v
-`
-
-	flags := make([]string, 0)
-	for _, flag := range zshCompExtractFlag(cmd) {
-		if flagAlreadySet(cmd, flag) {
-			continue
-		}
-
-		var s string
-		if action, ok := c.actions[uid.Flag(cmd, flag)]; ok {
-			s = fish.SnippetFlagCompletion(cmd, flag, &action.Fish)
-		} else {
-			s = fish.SnippetFlagCompletion(cmd, flag, nil)
-		}
-
-		flags = append(flags, s)
-	}
-
-	positionals := make([]string, 0)
-	if cmd.HasSubCommands() {
-		positionals = []string{}
-		for _, subcmd := range cmd.Commands() {
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a %v -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
-			// TODO repeat for aliases
-			// TODO filter hidden
-		}
-	} else {
-		if len(positionals) == 0 {
-			if cmd.ValidArgs != nil {
-				//positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
-			}
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -a '(_%v_callback _)'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), cmd.Root().Name()))
-		}
-	}
-
-	arguments := append(flags, positionals...)
-
-	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, strings.Join(arguments, "\n")))
-	for _, subcmd := range cmd.Commands() {
-		if !subcmd.Hidden {
-			result = append(result, c.GenerateFishFunctions(subcmd))
-		}
-	}
-	return strings.Join(result, "\n")
-}
-
-//fish
-
-// bash
-func (c Completions) GenerateBash(cmd *cobra.Command) string {
-	result := fmt.Sprintf(`#!/bin/bash
-_%v_callback() {
-  local compline="${COMP_LINE:0:${COMP_POINT}}"
-  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
-}
-
-_%v_completions() {
-  local compline="${COMP_LINE:0:${COMP_POINT}}"
-  local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
-  local last="${COMP_WORDS[${COMP_CWORD}]}"
-  local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
-
-  case $state in
-%v
-  esac
-}
-
-complete -F _%v_completions %v
-`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), c.GenerateBashFunctions(cmd), cmd.Name(), cmd.Name())
-
-	return result
-}
-
-func (c Completions) GenerateBashFunctions(cmd *cobra.Command) string {
-	// TODO ensure state is only called oncy per LINE
-	function_pattern := `
-    '%v' )
-      if [[ $last == -* ]]; then
-        COMPREPLY=($(%v))
-      else
-        case $previous in
-%v
-          *)
-            COMPREPLY=($(%v))
-            ;;
-        esac
-      fi
-      ;;
-`
-
-	flags := make([]string, 0)
-	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
-		if !f.Hidden {
-			var s string
-			if action, ok := c.actions[uid.Flag(cmd, f)]; ok {
-				s = bash.SnippetFlagCompletion(f, action.Bash)
-			} else {
-				s = bash.SnippetFlagCompletion(f, "")
-			}
-			flags = append(flags, s)
-		}
-	})
-
-	result := make([]string, 0)
-	// uid.Command, flagList, genflagcompletions, commandargumentcompletion
-	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), bash.SnippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), bash.Callback(cmd.Root().Name(), "_")))
-	for _, subcmd := range cmd.Commands() {
-		if !subcmd.Hidden {
-			result = append(result, c.GenerateBashFunctions(subcmd))
-		}
-	}
-	return strings.Join(result, "\n")
-}
-
-// bash
-
-func flagAlreadySet(cmd *cobra.Command, flag *pflag.Flag) bool {
-	if cmd.LocalFlags().Lookup(flag.Name) != nil {
-		return false
-	}
-	// TODO since it is an inherited flag check for parent command that is not hidden
-	return true
-}
-
-func zshCompExtractFlag(c *cobra.Command) []*pflag.Flag {
-	var flags []*pflag.Flag
-	c.LocalFlags().VisitAll(func(f *pflag.Flag) {
-		if !f.Hidden {
-			flags = append(flags, f)
-		}
-	})
-	c.InheritedFlags().VisitAll(func(f *pflag.Flag) {
-		if !f.Hidden {
-			flags = append(flags, f)
-		}
-	})
-	return flags
-}
-
 type Carapace struct {
 	cmd *cobra.Command
 }
@@ -280,29 +36,41 @@ func Gen(cmd *cobra.Command) *Carapace {
 	}
 }
 
-func (zsh Carapace) PositionalCompletion(action ...Action) {
+func (c Carapace) PositionalCompletion(action ...Action) {
 	for index, a := range action {
-		completions.actions[uid.Positional(zsh.cmd, index+1)] = a.finalize(zsh.cmd, uid.Positional(zsh.cmd, index+1))
+		completions.actions[uid.Positional(c.cmd, index+1)] = a.finalize(c.cmd, uid.Positional(c.cmd, index+1))
 	}
 }
 
-func (zsh Carapace) FlagCompletion(actions ActionMap) {
+func (c Carapace) FlagCompletion(actions ActionMap) {
 	for name, action := range actions {
-		flag := zsh.cmd.Flag(name) // TODO only allowed for local flags
-		completions.actions[uid.Flag(zsh.cmd, flag)] = action.finalize(zsh.cmd, uid.Flag(zsh.cmd, flag))
+		flag := c.cmd.Flag(name) // TODO only allowed for local flags
+		completions.actions[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
 	}
 }
 
-func (zsh Carapace) Bash() string {
-	return completions.GenerateBash(zsh.cmd.Root())
+func (c Carapace) Bash() string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Bash
+	}
+	return bash.Snippet(c.cmd.Root(), actions)
 }
 
-func (zsh Carapace) Fish() string {
-	return completions.GenerateFish(zsh.cmd.Root())
+func (c Carapace) Fish() string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Fish
+	}
+	return fish.Snippet(c.cmd.Root(), actions)
 }
 
-func (zsh Carapace) Zsh() string {
-	return completions.GenerateZsh(zsh.cmd.Root())
+func (c Carapace) Zsh() string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Zsh
+	}
+	return zsh.Snippet(c.cmd.Root(), actions)
 }
 
 var completions = Completions{
@@ -356,7 +124,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 									for i, c := range targetCmd.Commands() {
 										subcommands[i] = c.Name() // TODO alias
 									}
-									fmt.Println(bash.ActionValues(subcommands...))
+									fmt.Println(ActionValues(subcommands...).Bash)
 								}
 							}
 							os.Exit(0) // ensure no message for missing action on positional completion // TODO this was only for bash, maybe enable for other shells?

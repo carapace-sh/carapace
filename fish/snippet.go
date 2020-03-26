@@ -17,7 +17,78 @@ var replacer = strings.NewReplacer(
 	`'`, `\"`,
 )
 
-func SnippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string) (snippet string) {
+func Snippet(cmd *cobra.Command, actions map[string]string) string {
+	result := fmt.Sprintf(`function _%v_state
+  set -lx CURRENT (commandline -cp)
+  if [ "$LINE" != "$CURRENT" ]
+    set -gx LINE (commandline -cp)
+    set -gx STATE (commandline -cp | xargs %v _carapace fish state)
+  end
+
+  [ "$STATE" = "$argv" ]
+end
+
+function _%v_callback
+  set -lx CALLBACK (commandline -cp | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
+  eval "$CALLBACK"
+end
+
+complete -c %v -f
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+	result += snippetFunctions(cmd, actions)
+
+	return result
+}
+
+func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
+	function_pattern := `
+%v
+`
+
+	flags := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
+		if !flag.Hidden {
+			var s string
+			if action, ok := actions[uid.Flag(cmd, flag)]; ok {
+				s = snippetFlagCompletion(cmd, flag, &action)
+			} else {
+				s = snippetFlagCompletion(cmd, flag, nil)
+			}
+
+			flags = append(flags, s)
+		}
+	})
+
+	positionals := make([]string, 0)
+	if cmd.HasSubCommands() {
+		positionals = []string{}
+		for _, subcmd := range cmd.Commands() {
+			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a %v -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name(), subcmd.Short))
+			// TODO repeat for aliases
+			// TODO filter hidden
+		}
+	} else {
+		if len(positionals) == 0 {
+			if cmd.ValidArgs != nil {
+				//positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
+			}
+			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -a '(_%v_callback _)'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), cmd.Root().Name()))
+		}
+	}
+
+	arguments := append(flags, positionals...)
+
+	result := make([]string, 0)
+	result = append(result, fmt.Sprintf(function_pattern, strings.Join(arguments, "\n")))
+	for _, subcmd := range cmd.Commands() {
+		if !subcmd.Hidden {
+			result = append(result, snippetFunctions(subcmd, actions))
+		}
+	}
+	return strings.Join(result, "\n")
+}
+
+func snippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string) (snippet string) {
 	var suffix string
 	if action == nil {
 		if flag.NoOptDefVal != "" {
@@ -37,7 +108,7 @@ func SnippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string)
 	return
 }
 
-func SnippetPositionalCompletion(position int, action string) string {
+func snippetPositionalCompletion(position int, action string) string {
 	return fmt.Sprintf(`"%v:: :%v"`, position, action)
 }
 
@@ -46,7 +117,7 @@ func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
 		strings.Contains(f.Value.Type(), "Array")
 }
 
-func SnippetSubcommands(cmd *cobra.Command) string {
+func snippetSubcommands(cmd *cobra.Command) string {
 	if !cmd.HasSubCommands() {
 		return ""
 	}

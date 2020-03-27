@@ -8,7 +8,7 @@ import (
 )
 
 func TestBash(t *testing.T) {
-  expected :=`#!/bin/bash
+	expected := `#!/bin/bash
 _example_callback() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   echo "$compline" | sed "s/ \$/ _/" | xargs example _carapace bash "$1"
@@ -132,11 +132,11 @@ _example_completions() {
 
 complete -F _example_completions example
 `
-   assert.Equal(t, expected, carapace.Gen(rootCmd).Bash())
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Bash())
 }
 
 func TestFish(t *testing.T) {
-expected :=`function _example_state
+	expected := `function _example_state
   set -lx CURRENT (commandline -cp)
   if [ "$LINE" != "$CURRENT" ]
     set -gx LINE (commandline -cp)
@@ -182,12 +182,11 @@ complete -c example -f -n '_example_state _example__callback' -a '(_example_call
 complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e valid\ninvalid)' -r
 complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
 `
-   assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
 }
 
-
 func TestZsh(t *testing.T) {
-expected :=`#compdef example
+	expected := `#compdef example
 function _example {
   local -a commands
   # shellcheck disable=SC2206
@@ -258,5 +257,5 @@ function _example__condition {
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `
-   assert.Equal(t, expected, carapace.Gen(rootCmd).Zsh())
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Zsh())
 }

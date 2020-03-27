@@ -34,7 +34,7 @@ _example_completions() {
 
 
           *)
-            COMPREPLY=($(eval $(_example_callback '_')))
+            COMPREPLY=($(compgen -W "action alias callback condition" -- $last))
             ;;
         esac
       fi

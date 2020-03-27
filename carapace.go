@@ -73,6 +73,19 @@ func (c Carapace) Zsh() string {
 	return zsh.Snippet(c.cmd.Root(), actions)
 }
 
+func (c Carapace) Snippet(shell string) string {
+	switch shell {
+	case "bash":
+		return c.Bash()
+	case "fish":
+		return c.Fish()
+	case "zsh":
+		return c.Zsh()
+	default:
+		return fmt.Sprintf("expected 'bash', 'fish' or 'zsh' [was: %v]", shell)
+	}
+}
+
 var completions = Completions{
 	actions: make(map[string]Action),
 }
@@ -118,20 +131,6 @@ func addCompletionCommand(cmd *cobra.Command) {
 							}
 						}
 						if _, ok := completions.actions[callback]; !ok {
-							if targetCmd.HasSubCommands() && len(targetArgs) <= 1 {
-								if args[0] == "bash" { // TODO print for other shells as well?
-									subcommands := make([]string, 0)
-									for _, c := range targetCmd.Commands() {
-										if !c.Hidden {
-											subcommands = append(subcommands, c.Name())
-											for _, alias := range c.Aliases {
-												subcommands = append(subcommands, alias)
-											}
-										}
-									}
-									fmt.Println(ActionValues(subcommands...).Bash)
-								}
-							}
 							os.Exit(0) // ensure no message for missing action on positional completion // TODO this was only for bash, maybe enable for other shells?
 						}
 					} else if callback == "state" {
@@ -161,4 +160,8 @@ func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
 	targetCmd, targetArgs, _ := cmd.Root().Traverse(args)
 	targetCmd.ParseFlags(targetArgs)
 	return targetCmd, targetCmd.Flags().Args() // TODO check length
+}
+
+func IsCallback() bool {
+	return len(os.Args) > 3 && os.Args[1] == "_carapace" && os.Args[3] != "state"
 }

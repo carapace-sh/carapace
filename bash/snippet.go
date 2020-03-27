@@ -62,8 +62,24 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		}
 	})
 
+	var positionalAction string
+	if cmd.HasSubCommands() {
+		subcommands := make([]string, 0)
+		for _, c := range cmd.Commands() {
+			if !c.Hidden {
+				subcommands = append(subcommands, c.Name())
+				for _, alias := range c.Aliases {
+					subcommands = append(subcommands, alias)
+				}
+			}
+		}
+		positionalAction = ActionValues(subcommands...)
+	} else {
+		positionalAction = Callback(cmd.Root().Name(), "_")
+	}
+
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), snippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), Callback(cmd.Root().Name(), "_")))
+	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), snippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), positionalAction))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, snippetFunctions(subcmd, actions))

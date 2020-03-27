@@ -99,7 +99,11 @@ func snippetFlagList(flags *pflag.FlagSet) string {
 			}
 		}
 	})
-	return ActionValues(flagValues...)
+	if len(flagValues) > 0 {
+		return ActionValues(flagValues...)
+	} else {
+		return ""
+	}
 }
 
 func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {

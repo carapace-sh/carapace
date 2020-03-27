@@ -63,8 +63,9 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	if cmd.HasSubCommands() {
 		positionals = []string{}
 		for _, subcmd := range cmd.Commands() {
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name() + " " + strings.Join(subcmd.Aliases, " "), subcmd.Short))
-			// TODO filter hidden
+			if !subcmd.Hidden {
+				positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name()+" "+strings.Join(subcmd.Aliases, " "), subcmd.Short))
+			}
 		}
 	} else {
 		if len(positionals) == 0 {

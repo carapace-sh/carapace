@@ -120,9 +120,12 @@ func addCompletionCommand(cmd *cobra.Command) {
 						if _, ok := completions.actions[callback]; !ok {
 							if targetCmd.HasSubCommands() && len(targetArgs) <= 1 {
 								if args[0] == "bash" { // TODO print for other shells as well?
-									subcommands := make([]string, len(targetCmd.Commands()))
-									for i, c := range targetCmd.Commands() {
-										subcommands[i] = c.Name() // TODO alias
+									subcommands := make([]string, 0)
+									for _, c := range targetCmd.Commands() {
+										subcommands = append(subcommands, c.Name())
+										for _, alias := range c.Aliases {
+											subcommands = append(subcommands, alias)
+										}
 									}
 									fmt.Println(ActionValues(subcommands...).Bash)
 								}

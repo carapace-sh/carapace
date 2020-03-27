@@ -156,10 +156,10 @@ complete -c example -f
 complete -c example -f -n '_example_state _example' -l array -s a -d 'multiflag' -r
 complete -c example -f -n '_example_state _example' -l persistentFlag -s p -d 'Help message for persistentFlag'
 complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e true\nfalse)' -r
-complete -c example -f -n '_example_state _example ' -a _carapace -d ''
-complete -c example -f -n '_example_state _example ' -a action -d 'action example'
-complete -c example -f -n '_example_state _example ' -a callback -d 'callback example'
-complete -c example -f -n '_example_state _example ' -a condition -d 'condition example'
+complete -c example -f -n '_example_state _example ' -a '_carapace ' -d ''
+complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
+complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
+complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
 
 
 complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'custom flag' -a '()' -r

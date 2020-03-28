@@ -32,6 +32,19 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	return a
 }
 
+func (a Action) Value(shell string) string {
+	switch shell {
+	case "bash":
+		return a.Bash
+	case "fish":
+		return a.Fish
+	case "zsh":
+		return a.Zsh
+	default:
+		return ""
+	}
+}
+
 // ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{Callback: callback}

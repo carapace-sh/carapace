@@ -37,4 +37,9 @@ func init() {
 		"custom":           carapace.Action{Zsh: "_most_recent_file 2"},
 		"multi_parts":      carapace.ActionMultiParts('/', "multi/parts", "multi/parts/example", "multi/parts/test", "example/parts"),
 	})
+
+	carapace.Gen(actionCmd).PositionalCompletion(
+		carapace.ActionValues("positional1", "p1"),
+		carapace.ActionValues("positional2", "p2"),
+	)
 }

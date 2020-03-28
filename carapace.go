@@ -111,6 +111,10 @@ func addCompletionCommand(cmd *cobra.Command) {
 						fmt.Println(Gen(cmd).Fish())
 					case "zsh":
 						fmt.Println(Gen(cmd).Zsh())
+					case "debug":
+						for uid, action := range completions.actions {
+							fmt.Printf("%v:\t%v\n", uid, action)
+						}
 					}
 				} else {
 					callback := args[1]
@@ -130,21 +134,19 @@ func addCompletionCommand(cmd *cobra.Command) {
 								callback = uid.Positional(targetCmd, len(targetArgs))
 							}
 						}
-						if _, ok := completions.actions[callback]; !ok {
+						if action, ok := completions.actions[callback]; !ok {
 							os.Exit(0) // ensure no message for missing action on positional completion // TODO this was only for bash, maybe enable for other shells?
+						} else {
+							if action.Callback == nil {
+								fmt.Println(action.Value(args[0]))
+								os.Exit(0)
+							}
 						}
 					} else if callback == "state" {
 						fmt.Println(uid.Command(targetCmd))
 						os.Exit(0) // TODO
 					}
-					switch args[0] {
-					case "bash":
-						fmt.Println(completions.invokeCallback(callback, targetArgs).Bash)
-					case "fish":
-						fmt.Println(completions.invokeCallback(callback, targetArgs).Fish)
-					case "zsh":
-						fmt.Println(completions.invokeCallback(callback, targetArgs).Zsh)
-					}
+					fmt.Println(completions.invokeCallback(callback, targetArgs).Value(args[0]))
 				}
 			}
 		},

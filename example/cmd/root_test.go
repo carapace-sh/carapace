@@ -240,7 +240,8 @@ function _example__action {
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \
     "(-d --values_described)"{-d,--values_described}"[values with description flag]: :_values '' 'values[valueDescription]' 'example[exampleDescription]'  " \
-    "*::arg:->args"
+    "1:: :_values '' positional1 p1" \
+    "2:: :_values '' positional2 p2"
 }
 
 function _example__callback {

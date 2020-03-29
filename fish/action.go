@@ -5,6 +5,23 @@ import (
 	"strings"
 )
 
+var sanitizer = strings.NewReplacer(
+	`$`, ``,
+	"`", ``,
+	`\`, ``,
+	`"`, `'`,
+	`(`, `[`,
+	`)`, `]`,
+)
+
+func Sanitize(values ...string) []string {
+	sanitized := make([]string, len(values))
+	for index, value := range values {
+		sanitized[index] = sanitizer.Replace(value)
+	}
+	return sanitized
+}
+
 func Callback(prefix string, uid string) string {
 	return ActionExecute(fmt.Sprintf(`_%v_callback %v`, prefix, uid))
 }
@@ -34,32 +51,34 @@ func ActionHosts() string {
 }
 
 func ActionValues(values ...string) string {
-	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}
 
-	vals := make([]string, len(values))
-	for index, val := range values {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		// TODO escape special characters
 		//vals[index] = strings.Replace(val, " ", `\ `, -1)
 		vals[index] = val
 	}
-	return ActionExecute(fmt.Sprintf(`echo -e %v`, strings.Join(vals, `\n`)))
+	return ActionExecute(fmt.Sprintf(`echo -e "%v"`, strings.Join(vals, `\n`)))
 }
 
 func ActionValuesDescribed(values ...string) string {
+	sanitized := Sanitize(values...)
 	// TODO verify length (description always exists)
-	vals := make([]string, len(values))
-	for index, val := range values {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		if index%2 == 0 {
 			vals[index/2] = fmt.Sprintf(`%v\t%v`, val, values[index+1])
 		}
 	}
-	return ActionValues(vals...)
+	return ActionExecute(fmt.Sprintf(`echo -e "%v"`, strings.Join(vals, `\n`)))
 }
 
 func ActionMessage(msg string) string {
-	return ActionValuesDescribed("ERR", msg, "_", "")
+	return ActionExecute(fmt.Sprintf(`echo -e "ERR\t%v\n_"`, Sanitize(msg)[0]))
 }
 
 func ActionMultiParts(separator rune, values ...string) string {

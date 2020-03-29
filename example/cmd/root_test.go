@@ -34,7 +34,7 @@ _example_completions() {
 
 
           *)
-            COMPREPLY=($(compgen -W "action alias callback condition" -- $last))
+            COMPREPLY=($(compgen -W "action alias callback condition injection" -- $last))
             ;;
         esac
       fi
@@ -127,6 +127,20 @@ _example_completions() {
       fi
       ;;
 
+
+    '_example__injection' )
+      if [[ $last == -* ]]; then
+        COMPREPLY=($())
+      else
+        case $previous in
+
+          *)
+            COMPREPLY=($(eval $(_example_callback '_')))
+            ;;
+        esac
+      fi
+      ;;
+
   esac
 }
 
@@ -155,22 +169,23 @@ complete -c example -f
 
 complete -c example -f -n '_example_state _example' -l array -s a -d 'multiflag' -r
 complete -c example -f -n '_example_state _example' -l persistentFlag -s p -d 'Help message for persistentFlag'
-complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e true\nfalse)' -r
+complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e "true\nfalse")' -r
 complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
 complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
 complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
+complete -c example -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
 
 
 complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'custom flag' -a '()' -r
 complete -c example -f -n '_example_state _example__action' -l files -s f -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
 complete -c example -f -n '_example_state _example__action' -l groups -s g -d 'groups flag' -a '(__fish_complete_groups)' -r
 complete -c example -f -n '_example_state _example__action' -l hosts -d 'hosts flag' -a '(__fish_print_hostnames)' -r
-complete -c example -f -n '_example_state _example__action' -l message -s m -d 'message flag' -a '(echo -e ERR\tmessage example\n_\t\n\n)' -r
-complete -c example -f -n '_example_state _example__action' -l multi_parts -d 'multi_parts flag' -a '(echo -e multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts)' -r
+complete -c example -f -n '_example_state _example__action' -l message -s m -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
+complete -c example -f -n '_example_state _example__action' -l multi_parts -d 'multi_parts flag' -a '(echo -e "multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts")' -r
 complete -c example -f -n '_example_state _example__action' -l net_interfaces -s n -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
 complete -c example -f -n '_example_state _example__action' -l users -s u -d 'users flag' -a '(__fish_complete_users)' -r
-complete -c example -f -n '_example_state _example__action' -l values -s v -d 'values flag' -a '(echo -e values\nexample)' -r
-complete -c example -f -n '_example_state _example__action' -l values_described -s d -d 'values with description flag' -a '(echo -e values\tvalueDescription\nexample\texampleDescription\n\n)' -r
+complete -c example -f -n '_example_state _example__action' -l values -s v -d 'values flag' -a '(echo -e "values\nexample")' -r
+complete -c example -f -n '_example_state _example__action' -l values_described -s d -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
 complete -c example -f -n '_example_state _example__action' -a '(_example_callback _)'
 
 
@@ -178,8 +193,11 @@ complete -c example -f -n '_example_state _example__callback' -l callback -s c -
 complete -c example -f -n '_example_state _example__callback' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e valid\ninvalid)' -r
+complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e "valid\ninvalid")' -r
 complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
+
+
+complete -c example -f -n '_example_state _example__injection' -a '(_example_callback _)'
 `
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
 }
@@ -207,6 +225,7 @@ function _example {
         "alias:action example"
         "callback:callback example"
         "condition:condition example"
+        "injection:just trying to break things"
       )
       _describe "command" commands
       ;;
@@ -224,6 +243,9 @@ function _example {
       ;;
     condition)
       _example__condition
+      ;;
+    injection)
+      _example__injection
       ;;
   esac
 }
@@ -254,6 +276,19 @@ function _example__condition {
     _arguments -C \
     "(-r --required)"{-r,--required}"[required flag]: :_values '' valid invalid" \
     "1:: : eval \$(${os_args[1]} _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+}
+
+function _example__injection {
+    _arguments -C \
+    "1:: :_values '' echo\ fail" \
+    "2:: :_values '' echo\ fail" \
+    "3:: :_values '' echo\ fail" \
+    "4:: :_values '' \ echo\ fail\ " \
+    "5:: :_values '' \ echo\ fail\ " \
+    "6:: :_values '' \ echo\ fail\ " \
+    "7:: :_values '' echo\ fail" \
+    "8:: : _message -r 'no values to complete'" \
+    "9:: :_values '' LAST\ POSITIONAL\ VALUE"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `

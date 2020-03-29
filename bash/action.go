@@ -9,7 +9,16 @@ var sanitizer = strings.NewReplacer(
 	`$`, ``,
 	"`", ``,
 	`\`, ``,
-	`"`, `'`,
+	`"`, ``,
+	`'`, ``,
+	`|`, ``,
+	`>`, ``,
+	`<`, ``,
+	`&`, ``,
+	`(`, ``,
+	`)`, ``,
+	`;`, ``,
+	`#`, ``,
 )
 
 func Sanitize(values ...string) []string {
@@ -33,7 +42,7 @@ func ActionFiles(suffix string) string {
 }
 
 func ActionNetInterfaces() string {
-	return `compgen -W "$(ifconfig -a | grep -o '^[^ :]\+' | tr '\n' ' ')" -- $last`
+	return `compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- $last`
 }
 
 func ActionUsers() string {
@@ -49,17 +58,18 @@ func ActionHosts() string {
 }
 
 func ActionValues(values ...string) string {
-	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}
 
-	vals := make([]string, len(values))
-	for index, val := range Sanitize(values...) {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		// TODO escape special characters
 		//vals[index] = strings.Replace(val, " ", `\ `, -1)
-		vals[index] = val
+		vals[index] = strings.Replace(val, ` `, `\\\ `, -1)
 	}
-	return fmt.Sprintf(`compgen -W "%v" -- $last`, strings.Join(vals, ` `))
+	return fmt.Sprintf(`compgen -W $'%v' -- $last`, strings.Join(vals, `\n`))
 }
 
 func ActionValuesDescribed(values ...string) string {
@@ -74,7 +84,7 @@ func ActionValuesDescribed(values ...string) string {
 }
 
 func ActionMessage(msg string) string {
-	return ActionValues("ERR", strings.Replace(Sanitize(msg)[0], " ", "_", -1)) // TODO escape characters
+	return ActionValues("ERR", Sanitize(msg)[0])
 }
 
 func ActionMultiParts(separator rune, values ...string) string {

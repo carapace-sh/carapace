@@ -16,8 +16,8 @@ references:
         go build .
         curl -Lso shellcheck https://github.com/caarlos0/shellcheck-docker/releases/download/v0.4.6/shellcheck
         chmod +x shellcheck
-        #        ./shellcheck -e SC2148,SC2154 <(./example _carapace zsh)
-        #./shellcheck -e SC1064,SC1072,SC1073 <(./example _carapace fish)
+        ./shellcheck -e SC2148,SC2154 <(./example _carapace zsh)
+        ./shellcheck -e SC1064,SC1072,SC1073 <(./example _carapace fish)
 
 jobs:
   go-current:

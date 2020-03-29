@@ -280,14 +280,14 @@ function _example__condition {
 
 function _example__injection {
     _arguments -C \
-    "1:: :_values '' $(echo\ fail)" \
-    "2:: :_values '' \$(echo\ fail)" \
-    "3:: :_values '' ` + "`" + `echo\ fail` + "`" + `" \
-    "4:: :_values '' ";\ echo\ fail\ #" \
-    "5:: :_values '' "|\ echo\ fail\ #" \
-    "6:: :_values '' "&&\ echo\ fail\ #" \
-    "7:: :_values '' \$(echo\ fail)" \
-    "8:: :_values '' \" \
+    "1:: :_values '' echo\ fail" \
+    "2:: :_values '' echo\ fail" \
+    "3:: :_values '' echo\ fail" \
+    "4:: :_values '' \ echo\ fail\ " \
+    "5:: :_values '' \ echo\ fail\ " \
+    "6:: :_values '' \ echo\ fail\ " \
+    "7:: :_values '' echo\ fail" \
+    "8:: : _message -r 'no values to complete'" \
     "9:: :_values '' LAST\ POSITIONAL\ VALUE"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi

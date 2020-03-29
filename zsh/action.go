@@ -5,6 +5,30 @@ import (
 	"strings"
 )
 
+var sanitizer = strings.NewReplacer(
+	`$`, ``,
+	"`", ``,
+	`\`, ``,
+	`"`, ``,
+	`'`, ``,
+	`|`, ``,
+	`>`, ``,
+	`<`, ``,
+	`&`, ``,
+	`(`, ``,
+	`)`, ``,
+	`;`, ``,
+	`#`, ``,
+)
+
+func Sanitize(values ...string) []string {
+	sanitized := make([]string, len(values))
+	for index, value := range values {
+		sanitized[index] = sanitizer.Replace(value)
+	}
+	return sanitized
+}
+
 func Callback(uid string) string {
 	return ActionExecute(fmt.Sprintf(`${os_args[1]} _carapace zsh '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid))
 }
@@ -46,12 +70,13 @@ func ActionHosts() string {
 
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) string {
-	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}
 
-	vals := make([]string, len(values))
-	for index, val := range values {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		// TODO escape special characters
 		vals[index] = strings.Replace(val, " ", `\ `, -1)
 	}
@@ -60,14 +85,19 @@ func ActionValues(values ...string) string {
 
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
 	// TODO verify length (description always exists)
-	vals := make([]string, len(values))
-	for index, val := range values {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf("'%v[%v]'", val, values[index+1])
+			vals[index/2] = fmt.Sprintf("'%v[%v]'", strings.Replace(val, " ", `\ `, -1), strings.Replace(values[index+1], " ", `\ `, -1))
 		}
 	}
-	return ActionValues(vals...)
+	return fmt.Sprintf(`_values '' %v`, strings.Join(vals, " "))
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated

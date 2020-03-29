@@ -24,17 +24,20 @@ _example_completions() {
 
     '_example' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W "--array -a --persistentFlag -p --toggle -t" -- $last))
+        local IFS=$'\n'
+        COMPREPLY=($(compgen -W $'--array\n-a\n--persistentFlag\n-p\n--toggle\n-t' -- $last))
       else
         case $previous in
           -a | --array)
+            local IFS=$'\n'
             COMPREPLY=($())
             ;;
 
 
 
           *)
-            COMPREPLY=($(compgen -W "action alias callback condition injection" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\ninjection' -- $last))
             ;;
         esac
       fi
@@ -43,50 +46,62 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W "--custom -c --files -f --groups -g --hosts --message -m --multi_parts --net_interfaces -n --users -u --values -v --values_described -d" -- $last))
+        local IFS=$'\n'
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- $last))
       else
         case $previous in
           -c | --custom)
+            local IFS=$'\n'
             COMPREPLY=($())
             ;;
 
           -f | --files)
+            local IFS=$'\n'
             COMPREPLY=($(compgen -f -o plusdirs -X "!*.go" -- $last))
             ;;
 
           -g | --groups)
+            local IFS=$'\n'
             COMPREPLY=($(compgen -g -- $last))
             ;;
 
           --hosts)
+            local IFS=$'\n'
             COMPREPLY=($(compgen -W "$(cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1)" -- $last))
             ;;
 
           -m | --message)
-            COMPREPLY=($(compgen -W "ERR message_example" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- $last))
             ;;
 
           --multi_parts)
-            COMPREPLY=($(compgen -W "multi/parts multi/parts/example multi/parts/test example/parts" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts' -- $last))
             ;;
 
           -n | --net_interfaces)
-            COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+' | tr '\n' ' ')" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- $last))
             ;;
 
           -u | --users)
+            local IFS=$'\n'
             COMPREPLY=($(compgen -u -- $last))
             ;;
 
           -v | --values)
-            COMPREPLY=($(compgen -W "values example" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'values\nexample' -- $last))
             ;;
 
           -d | --values_described)
-            COMPREPLY=($(compgen -W "values example  " -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'values\nexample\n\n' -- $last))
             ;;
 
           *)
+            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -96,14 +111,17 @@ _example_completions() {
 
     '_example__callback' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W "--callback -c" -- $last))
+        local IFS=$'\n'
+        COMPREPLY=($(compgen -W $'--callback\n-c' -- $last))
       else
         case $previous in
           -c | --callback)
+            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_example__callback##callback')))
             ;;
 
           *)
+            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -113,14 +131,17 @@ _example_completions() {
 
     '_example__condition' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W "--required -r" -- $last))
+        local IFS=$'\n'
+        COMPREPLY=($(compgen -W $'--required\n-r' -- $last))
       else
         case $previous in
           -r | --required)
-            COMPREPLY=($(compgen -W "valid invalid" -- $last))
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -W $'valid\ninvalid' -- $last))
             ;;
 
           *)
+            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -130,11 +151,13 @@ _example_completions() {
 
     '_example__injection' )
       if [[ $last == -* ]]; then
+        local IFS=$'\n'
         COMPREPLY=($())
       else
         case $previous in
 
           *)
+            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac

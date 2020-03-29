@@ -6,10 +6,19 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-	`$`, ``,
+    `$`, ``,
 	"`", ``,
 	`\`, ``,
-	`"`, `'`,
+	`"`, ``,
+	`'`, ``,
+	`|`, ``,
+	`>`, ``,
+	`<`, ``,
+	`&`, ``,
+	`(`, ``,
+	`)`, ``,
+	`;`, ``,
+	`#`, ``,
 )
 
 func Sanitize(values ...string) []string {
@@ -49,12 +58,13 @@ func ActionHosts() string {
 }
 
 func ActionValues(values ...string) string {
-	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+    sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}
 
-	vals := make([]string, len(values))
-	for index, val := range Sanitize(values...) {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		// TODO escape special characters
 		//vals[index] = strings.Replace(val, " ", `\ `, -1)
 		vals[index] = strings.Replace(val, ` `, `\\\ `, -1)

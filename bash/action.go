@@ -6,7 +6,7 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-    `$`, ``,
+	`$`, ``,
 	"`", ``,
 	`\`, ``,
 	`"`, ``,
@@ -58,7 +58,7 @@ func ActionHosts() string {
 }
 
 func ActionValues(values ...string) string {
-    sanitized := Sanitize(values...)
+	sanitized := Sanitize(values...)
 	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}

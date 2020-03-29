@@ -15,6 +15,7 @@ func init() {
 
 	carapace.Gen(injectionCmd).PositionalCompletion(
 		carapace.ActionValues("$(echo fail)"),
+		carapace.ActionValues(`\$(echo fail)`),
 		carapace.ActionValues("`echo fail`"),
 		carapace.ActionValues(`"; echo fail #`),
 		carapace.ActionValues(`"| echo fail #`),

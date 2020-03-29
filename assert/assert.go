@@ -3,6 +3,7 @@ package assert
 import (
 	"bytes"
 	"log"
+	"strings"
 	"testing"
 
 	"github.com/alecthomas/chroma/quick"
@@ -23,6 +24,11 @@ func Equal(t *testing.T, expected string, actual string) {
 	} else {
 		dmp := diffmatchpatch.New()
 		diffs := dmp.DiffMain(expected, actual, false)
-		t.Errorf("\nexpected: %v\nactual  : %v", expected, dmp.DiffPrettyText(diffs))
+
+		replacer := strings.NewReplacer(
+			`[31m`, `[2;30;41m`,
+		)
+
+		t.Errorf("\nexpected: %v\nactual  : %v", expected, replacer.Replace(dmp.DiffPrettyText(diffs)))
 	}
 }

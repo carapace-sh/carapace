@@ -34,7 +34,7 @@ _example_completions() {
 
 
           *)
-            COMPREPLY=($(compgen -W "action alias callback condition" -- $last))
+            COMPREPLY=($(compgen -W "action alias callback condition injection" -- $last))
             ;;
         esac
       fi
@@ -127,6 +127,20 @@ _example_completions() {
       fi
       ;;
 
+
+    '_example__injection' )
+      if [[ $last == -* ]]; then
+        COMPREPLY=($())
+      else
+        case $previous in
+
+          *)
+            COMPREPLY=($(eval $(_example_callback '_')))
+            ;;
+        esac
+      fi
+      ;;
+
   esac
 }
 
@@ -159,6 +173,7 @@ complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help mess
 complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
 complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
 complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
+complete -c example -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
 
 
 complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'custom flag' -a '()' -r
@@ -180,6 +195,9 @@ complete -c example -f -n '_example_state _example__callback' -a '(_example_call
 
 complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e valid\ninvalid)' -r
 complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
+
+
+complete -c example -f -n '_example_state _example__injection' -a '(_example_callback _)'
 `
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
 }
@@ -207,6 +225,7 @@ function _example {
         "alias:action example"
         "callback:callback example"
         "condition:condition example"
+        "injection:just trying to break things"
       )
       _describe "command" commands
       ;;
@@ -224,6 +243,9 @@ function _example {
       ;;
     condition)
       _example__condition
+      ;;
+    injection)
+      _example__injection
       ;;
   esac
 }
@@ -254,6 +276,18 @@ function _example__condition {
     _arguments -C \
     "(-r --required)"{-r,--required}"[required flag]: :_values '' valid invalid" \
     "1:: : eval \$(${os_args[1]} _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+}
+
+function _example__injection {
+    _arguments -C \
+    "1:: :_values '' $(echo\ fail)" \
+    "2:: :_values '' ` + "`" + `echo\ fail` + "`" + `" \
+    "3:: :_values '' ";\ echo\ fail\ #" \
+    "4:: :_values '' "|\ echo\ fail\ #" \
+    "5:: :_values '' "&&\ echo\ fail\ #" \
+    "6:: :_values '' \$(echo\ fail)" \
+    "7:: :_values '' \" \
+    "8:: :_values '' LAST\ POSITIONAL\ VALUE"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `

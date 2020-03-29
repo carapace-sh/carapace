@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var replacer = strings.NewReplacer(
+var sanitizer = strings.NewReplacer(
 	`$`, ``,
 	"`", ``,
 	`\`, ``,
@@ -15,7 +15,7 @@ var replacer = strings.NewReplacer(
 func Sanitize(values ...string) []string {
 	sanitized := make([]string, len(values))
 	for index, value := range values {
-		sanitized[index] = replacer.Replace(value)
+		sanitized[index] = sanitizer.Replace(value)
 	}
 	return sanitized
 }

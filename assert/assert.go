@@ -27,6 +27,7 @@ func Equal(t *testing.T, expected string, actual string) {
 
 		replacer := strings.NewReplacer(
 			`[31m`, `[2;30;41m`,
+			`[32m`, `[2;30;42m`,
 		)
 
 		t.Errorf("\nexpected: %v\nactual  : %v", expected, replacer.Replace(dmp.DiffPrettyText(diffs)))

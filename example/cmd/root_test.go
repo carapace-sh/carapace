@@ -169,7 +169,7 @@ complete -c example -f
 
 complete -c example -f -n '_example_state _example' -l array -s a -d 'multiflag' -r
 complete -c example -f -n '_example_state _example' -l persistentFlag -s p -d 'Help message for persistentFlag'
-complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e true\nfalse)' -r
+complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e "true\nfalse")' -r
 complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
 complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
 complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
@@ -180,12 +180,12 @@ complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'c
 complete -c example -f -n '_example_state _example__action' -l files -s f -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
 complete -c example -f -n '_example_state _example__action' -l groups -s g -d 'groups flag' -a '(__fish_complete_groups)' -r
 complete -c example -f -n '_example_state _example__action' -l hosts -d 'hosts flag' -a '(__fish_print_hostnames)' -r
-complete -c example -f -n '_example_state _example__action' -l message -s m -d 'message flag' -a '(echo -e ERR\tmessage example\n_\t\n\n)' -r
-complete -c example -f -n '_example_state _example__action' -l multi_parts -d 'multi_parts flag' -a '(echo -e multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts)' -r
+complete -c example -f -n '_example_state _example__action' -l message -s m -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
+complete -c example -f -n '_example_state _example__action' -l multi_parts -d 'multi_parts flag' -a '(echo -e "multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts")' -r
 complete -c example -f -n '_example_state _example__action' -l net_interfaces -s n -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
 complete -c example -f -n '_example_state _example__action' -l users -s u -d 'users flag' -a '(__fish_complete_users)' -r
-complete -c example -f -n '_example_state _example__action' -l values -s v -d 'values flag' -a '(echo -e values\nexample)' -r
-complete -c example -f -n '_example_state _example__action' -l values_described -s d -d 'values with description flag' -a '(echo -e values\tvalueDescription\nexample\texampleDescription\n\n)' -r
+complete -c example -f -n '_example_state _example__action' -l values -s v -d 'values flag' -a '(echo -e "values\nexample")' -r
+complete -c example -f -n '_example_state _example__action' -l values_described -s d -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
 complete -c example -f -n '_example_state _example__action' -a '(_example_callback _)'
 
 
@@ -193,7 +193,7 @@ complete -c example -f -n '_example_state _example__callback' -l callback -s c -
 complete -c example -f -n '_example_state _example__callback' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e valid\ninvalid)' -r
+complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e "valid\ninvalid")' -r
 complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
 
 

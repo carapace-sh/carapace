@@ -57,7 +57,7 @@ _example_completions() {
 
           -f | --files)
             local IFS=$'\n'
-            COMPREPLY=($(compgen -f -o plusdirs -X "!*.go" -- $last))
+            COMPREPLY=($(compgen -S / -d -- $last; compgen -f -X '!*.go' -- $last))
             ;;
 
           -g | --groups)
@@ -165,6 +165,8 @@ _example_completions() {
       ;;
 
   esac
+
+  [[ $COMPREPLY == */ ]] && compopt -o nospace
 }
 
 complete -F _example_completions example

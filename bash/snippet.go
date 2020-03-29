@@ -25,6 +25,8 @@ _%v_completions() {
   case $state in
 %v
   esac
+
+  [[ $COMPREPLY == */ ]] && compopt -o nospace
 }
 
 complete -F _%v_completions %v

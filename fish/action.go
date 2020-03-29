@@ -51,12 +51,13 @@ func ActionHosts() string {
 }
 
 func ActionValues(values ...string) string {
-	if len(strings.TrimSpace(strings.Join(values, ""))) == 0 {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
 		return ActionMessage("no values to complete")
 	}
 
-	vals := make([]string, len(values))
-	for index, val := range Sanitize(values...) {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		// TODO escape special characters
 		//vals[index] = strings.Replace(val, " ", `\ `, -1)
 		vals[index] = val
@@ -65,9 +66,10 @@ func ActionValues(values ...string) string {
 }
 
 func ActionValuesDescribed(values ...string) string {
+	sanitized := Sanitize(values...)
 	// TODO verify length (description always exists)
-	vals := make([]string, len(values))
-	for index, val := range Sanitize(values...) {
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
 		if index%2 == 0 {
 			vals[index/2] = fmt.Sprintf(`%v\t%v`, val, values[index+1])
 		}

@@ -47,12 +47,17 @@ _example_completions() {
     '_example__action' )
       if [[ $last == -* ]]; then
         local IFS=$'\n'
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- $last))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- $last))
       else
         case $previous in
           -c | --custom)
             local IFS=$'\n'
             COMPREPLY=($())
+            ;;
+
+          --directories)
+            local IFS=$'\n'
+            COMPREPLY=($(compgen -S / -d -- $last))
             ;;
 
           -f | --files)
@@ -202,6 +207,7 @@ complete -c example -f -n '_example_state _example ' -a 'injection ' -d 'just tr
 
 
 complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'custom flag' -a '()' -r
+complete -c example -f -n '_example_state _example__action' -l directories -d 'files flag' -a '(__fish_complete_directories)' -r
 complete -c example -f -n '_example_state _example__action' -l files -s f -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
 complete -c example -f -n '_example_state _example__action' -l groups -s g -d 'groups flag' -a '(__fish_complete_groups)' -r
 complete -c example -f -n '_example_state _example__action' -l hosts -d 'hosts flag' -a '(__fish_print_hostnames)' -r
@@ -278,6 +284,7 @@ function _example {
 function _example__action {
     _arguments -C \
     "(-c --custom)"{-c,--custom}"[custom flag]: :_most_recent_file 2" \
+    "--directories[files flag]: :_files -/" \
     "(-f --files)"{-f,--files}"[files flag]: :_files -g '*.go'" \
     "(-g --groups)"{-g,--groups}"[groups flag]: :_groups" \
     "--hosts[hosts flag]: :_hosts" \

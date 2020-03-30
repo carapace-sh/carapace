@@ -15,6 +15,7 @@ func init() {
 	rootCmd.AddCommand(actionCmd)
 
 	actionCmd.Flags().StringP("files", "f", "", "files flag")
+	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("groups", "g", "", "groups flag")
 	actionCmd.Flags().String("hosts", "", "hosts flag")
 	actionCmd.Flags().StringP("message", "m", "", "message flag")
@@ -27,6 +28,7 @@ func init() {
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files":            carapace.ActionFiles(".go"),
+		"directories":      carapace.ActionDirectories(),
 		"groups":           carapace.ActionGroups(),
 		"hosts":            carapace.ActionHosts(),
 		"message":          carapace.ActionMessage("message example"),

@@ -30,6 +30,10 @@ func ActionExecute(command string) string {
 	return fmt.Sprintf(`%v`, command)
 }
 
+func ActionDirectories() string {
+	return `__fish_complete_directories`
+}
+
 func ActionFiles(suffix string) string {
 	return ActionExecute(fmt.Sprintf(`__fish_complete_suffix "%v"`, suffix))
 }

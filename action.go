@@ -64,6 +64,14 @@ func ActionBool() Action {
 	return ActionValues("true", "false")
 }
 
+func ActionDirectories() Action {
+	return Action{
+		Bash: bash.ActionDirectories(),
+		Fish: fish.ActionDirectories(),
+		Zsh:  zsh.ActionDirectories(),
+	}
+}
+
 func ActionFiles(suffix string) Action {
 	return Action{
 		Bash: bash.ActionFiles(suffix),

@@ -37,6 +37,10 @@ func ActionExecute(command string) string {
 	return fmt.Sprintf(`$(%v)`, command)
 }
 
+func ActionDirectories() string {
+	return `compgen -S / -d -- $last`
+}
+
 func ActionFiles(suffix string) string {
 	return fmt.Sprintf(`compgen -S / -d -- $last; compgen -f -X '!*%v' -- $last`, suffix)
 }

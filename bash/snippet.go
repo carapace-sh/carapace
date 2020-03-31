@@ -21,6 +21,7 @@ _%v_completions() {
   local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
   local last="${COMP_WORDS[${COMP_CWORD}]}"
   local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+  local IFS=$'\n'
 
   case $state in
 %v
@@ -39,13 +40,11 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	function_pattern := `
     '%v' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($(%v))
       else
         case $previous in
 %v
           *)
-            local IFS=$'\n'
             COMPREPLY=($(%v))
             ;;
         esac
@@ -123,7 +122,6 @@ func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 	}
 
 	return fmt.Sprintf(`          %v)
-            local IFS=$'\n'
             COMPREPLY=($(%v))
             ;;
 `, names, action)

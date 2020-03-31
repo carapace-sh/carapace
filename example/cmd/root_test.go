@@ -19,24 +19,22 @@ _example_completions() {
   local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs example _carapace bash state)
   local last="${COMP_WORDS[${COMP_CWORD}]}"
   local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+  local IFS=$'\n'
 
   case $state in
 
     '_example' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($(compgen -W $'--array\n-a\n--persistentFlag\n-p\n--toggle\n-t' -- $last))
       else
         case $previous in
           -a | --array)
-            local IFS=$'\n'
             COMPREPLY=($())
             ;;
 
 
 
           *)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\ninjection' -- $last))
             ;;
         esac
@@ -46,67 +44,54 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- $last))
       else
         case $previous in
           -c | --custom)
-            local IFS=$'\n'
             COMPREPLY=($())
             ;;
 
           --directories)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -S / -d -- $last))
             ;;
 
           -f | --files)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -S / -d -- $last; compgen -f -X '!*.go' -- $last))
             ;;
 
           -g | --groups)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -g -- $last))
             ;;
 
           --hosts)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W "$(cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1)" -- $last))
             ;;
 
           -m | --message)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- $last))
             ;;
 
           --multi_parts)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts' -- $last))
             ;;
 
           -n | --net_interfaces)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- $last))
             ;;
 
           -u | --users)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -u -- $last))
             ;;
 
           -v | --values)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'values\nexample' -- $last))
             ;;
 
           -d | --values_described)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'values\nexample\n\n' -- $last))
             ;;
 
           *)
-            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -116,17 +101,14 @@ _example_completions() {
 
     '_example__callback' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($(compgen -W $'--callback\n-c' -- $last))
       else
         case $previous in
           -c | --callback)
-            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_example__callback##callback')))
             ;;
 
           *)
-            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -136,17 +118,14 @@ _example_completions() {
 
     '_example__condition' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($(compgen -W $'--required\n-r' -- $last))
       else
         case $previous in
           -r | --required)
-            local IFS=$'\n'
             COMPREPLY=($(compgen -W $'valid\ninvalid' -- $last))
             ;;
 
           *)
-            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac
@@ -156,13 +135,11 @@ _example_completions() {
 
     '_example__injection' )
       if [[ $last == -* ]]; then
-        local IFS=$'\n'
         COMPREPLY=($())
       else
         case $previous in
 
           *)
-            local IFS=$'\n'
             COMPREPLY=($(eval $(_example_callback '_')))
             ;;
         esac

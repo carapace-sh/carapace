@@ -12,8 +12,8 @@ func TestBash(t *testing.T) {
 _example_callback() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local last="${COMP_WORDS[${COMP_CWORD}]}"
-  if [[ $last == \"* ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
-      compline="${compline}\""
+  if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+      compline="${compline}${last:0:1}"
       last="${last/ /\\\\ }" 
   fi
 
@@ -24,12 +24,13 @@ _example_completions() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local last="${COMP_WORDS[${COMP_CWORD}]}"
   
-  if [[ $last == \"* ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
-      compline="${compline}\""
+  if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+      compline="${compline}${last:0:1}"
       last="${last/ /\\\\ }" 
   else
       last="${last/ /\\\ }" 
   fi
+
   local state=$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs example _carapace bash state)
   local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
   local IFS=$'\n'
@@ -161,7 +162,7 @@ _example_completions() {
 
   esac
 
-  [[ $last == \"* ]] && COMPREPLY=("${COMPREPLY[@]/\\ /\ }")
+  [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]/\\ /\ }")
   [[ $COMPREPLY == */ ]] && compopt -o nospace
 }
 

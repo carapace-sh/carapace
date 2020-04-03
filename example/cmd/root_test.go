@@ -14,7 +14,7 @@ _example_callback() {
   local last="${COMP_WORDS[${COMP_CWORD}]}"
   if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
       compline="${compline}${last:0:1}"
-      last="${last/ /\\\\ }" 
+      last="${last// /\\\\ }" 
   fi
 
   echo "$compline" | sed -e 's/ $/ _/' -e 's/"/\"/g' | xargs example _carapace bash "$1"
@@ -26,9 +26,9 @@ _example_completions() {
   
   if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
       compline="${compline}${last:0:1}"
-      last="${last/ /\\\\ }" 
+      last="${last// /\\\\ }" 
   else
-      last="${last/ /\\\ }" 
+      last="${last// /\\\ }" 
   fi
 
   local state=$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs example _carapace bash state)
@@ -162,7 +162,7 @@ _example_completions() {
 
   esac
 
-  [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]/\\ /\ }")
+  [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
   [[ $COMPREPLY == */ ]] && compopt -o nospace
 }
 

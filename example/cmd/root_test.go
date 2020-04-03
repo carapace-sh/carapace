@@ -172,18 +172,30 @@ complete -F _example_completions example
 }
 
 func TestFish(t *testing.T) {
-	expected := `function _example_state
+	expected := `function _example_quote_suffix
+  if not commandline -cp | xargs echo 2>/dev/null >/dev/null
+    if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null
+      echo '"'
+    else if commandline -cp | sed "s/\$/'/"| xargs echo 2>/dev/null >/dev/null
+      echo "'"
+    end
+  else 
+    echo ""
+  end
+end
+
+function _example_state
   set -lx CURRENT (commandline -cp)
   if [ "$LINE" != "$CURRENT" ]
     set -gx LINE (commandline -cp)
-    set -gx STATE (commandline -cp | xargs example _carapace fish state)
+    set -gx STATE (commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | xargs example _carapace fish state)
   end
 
   [ "$STATE" = "$argv" ]
 end
 
 function _example_callback
-  set -lx CALLBACK (commandline -cp | sed "s/ \$/ _/" | xargs example _carapace fish $argv )
+  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ _/" | xargs example _carapace fish $argv )
   eval "$CALLBACK"
 end
 

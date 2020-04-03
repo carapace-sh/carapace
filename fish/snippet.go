@@ -18,23 +18,35 @@ var replacer = strings.NewReplacer(
 )
 
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
-	result := fmt.Sprintf(`function _%v_state
+	result := fmt.Sprintf(`function _%v_quote_suffix
+  if not commandline -cp | xargs echo 2>/dev/null >/dev/null
+    if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null
+      echo '"'
+    else if commandline -cp | sed "s/\$/'/"| xargs echo 2>/dev/null >/dev/null
+      echo "'"
+    end
+  else 
+    echo ""
+  end
+end
+
+function _%v_state
   set -lx CURRENT (commandline -cp)
   if [ "$LINE" != "$CURRENT" ]
     set -gx LINE (commandline -cp)
-    set -gx STATE (commandline -cp | xargs %v _carapace fish state)
+    set -gx STATE (commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | xargs %v _carapace fish state)
   end
 
   [ "$STATE" = "$argv" ]
 end
 
 function _%v_callback
-  set -lx CALLBACK (commandline -cp | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
+  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
   eval "$CALLBACK"
 end
 
 complete -c %v -f
-`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
 	result += snippetFunctions(cmd, actions)
 
 	return result

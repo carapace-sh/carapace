@@ -74,7 +74,7 @@ _example_completions() {
             ;;
 
           -g | --groups)
-            COMPREPLY=($(compgen -g -- $last))
+            COMPREPLY=($(compgen -g -- "${last//[\"\|\']/}"))
             ;;
 
           --hosts)
@@ -94,7 +94,7 @@ _example_completions() {
             ;;
 
           -u | --users)
-            COMPREPLY=($(compgen -u -- $last))
+            COMPREPLY=($(compgen -u -- "${last//[\"\|\']/}"))
             ;;
 
           -v | --values)

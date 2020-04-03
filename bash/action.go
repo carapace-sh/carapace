@@ -50,11 +50,11 @@ func ActionNetInterfaces() string {
 }
 
 func ActionUsers() string {
-	return `compgen -u -- $last`
+	return `compgen -u -- "${last//[\"\|\']/}"`
 }
 
 func ActionGroups() string {
-	return `compgen -g -- $last`
+	return `compgen -g -- "${last//[\"\|\']/}"`
 }
 
 func ActionHosts() string {

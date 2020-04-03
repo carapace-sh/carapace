@@ -13,13 +13,26 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_callback() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
-  echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash "$1"
+  local last="${COMP_WORDS[${COMP_CWORD}]}"
+  if [[ $last == \"* ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+      compline="${compline}\""
+      last="${last/ /\\\\ }" 
+  fi
+
+  echo "$compline" | sed -e 's/ $/ _/' -e 's/"/\"/g' | xargs %v _carapace bash "$1"
 }
 
 _%v_completions() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
-  local state=$(echo "$compline" | sed "s/ \$/ _/" | xargs %v _carapace bash state)
   local last="${COMP_WORDS[${COMP_CWORD}]}"
+  
+  if [[ $last == \"* ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+      compline="${compline}\""
+      last="${last/ /\\\\ }" 
+  else
+      last="${last/ /\\\ }" 
+  fi
+  local state=$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs %v _carapace bash state)
   local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
   local IFS=$'\n'
 
@@ -27,6 +40,7 @@ _%v_completions() {
 %v
   esac
 
+  [[ $last == \"* ]] && COMPREPLY=("${COMPREPLY[@]/\\ /\ }")
   [[ $COMPREPLY == */ ]] && compopt -o nospace
 }
 

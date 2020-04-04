@@ -34,24 +34,19 @@ Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
         Sort-Object -Property ListItemText
 }`
 
-func nonCompletableFlag(flag *pflag.Flag) bool {
-	return flag.Hidden || len(flag.Deprecated) > 0
-}
-
 func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previousCommandName string) {
 	var cmdName = fmt.Sprintf("%v", uid.Command(cmd))
 
 	fmt.Fprintf(out, "\n        '%s' {", cmdName)
 
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if nonCompletableFlag(flag) {
-			return
+	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
+		if !flag.Hidden {
+			usage := escapeStringForPowerShell(flag.Usage)
+			if len(flag.Shorthand) > 0 {
+				fmt.Fprintf(out, "\n            [CompletionResult]::new('-%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
+			}
+			fmt.Fprintf(out, "\n            [CompletionResult]::new('--%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
 		}
-		usage := escapeStringForPowerShell(flag.Usage)
-		if len(flag.Shorthand) > 0 {
-			fmt.Fprintf(out, "\n            [CompletionResult]::new('-%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
-		}
-		fmt.Fprintf(out, "\n            [CompletionResult]::new('--%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
 	})
 
 	for _, subCmd := range cmd.Commands() {

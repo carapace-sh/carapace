@@ -7,6 +7,7 @@ import (
 
 	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/fish"
+	"github.com/rsteube/carapace/powershell"
 	"github.com/rsteube/carapace/uid"
 	"github.com/rsteube/carapace/zsh"
 	"github.com/spf13/cobra"
@@ -65,6 +66,14 @@ func (c Carapace) Fish() string {
 	return fish.Snippet(c.cmd.Root(), actions)
 }
 
+func (c Carapace) Powershell() string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Powershell
+	}
+	return powershell.Snippet(c.cmd.Root(), actions)
+}
+
 func (c Carapace) Zsh() string {
 	actions := make(map[string]string, len(completions.actions))
 	for key, value := range completions.actions {
@@ -79,10 +88,12 @@ func (c Carapace) Snippet(shell string) string {
 		return c.Bash()
 	case "fish":
 		return c.Fish()
+	case "powershell":
+		return c.Powershell()
 	case "zsh":
 		return c.Zsh()
 	default:
-		return fmt.Sprintf("expected 'bash', 'fish' or 'zsh' [was: %v]", shell)
+		return fmt.Sprintf("expected 'bash', 'fish', 'powershell' or 'zsh' [was: %v]", shell)
 	}
 }
 
@@ -109,6 +120,8 @@ func addCompletionCommand(cmd *cobra.Command) {
 						fmt.Println(Gen(cmd).Bash())
 					case "fish":
 						fmt.Println(Gen(cmd).Fish())
+					case "powershell":
+						fmt.Println(Gen(cmd).Powershell())
 					case "zsh":
 						fmt.Println(Gen(cmd).Zsh())
 					case "debug":

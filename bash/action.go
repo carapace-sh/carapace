@@ -38,15 +38,15 @@ func ActionExecute(command string) string {
 }
 
 func ActionDirectories() string {
-	return `compgen -S / -d -- $last`
+	return `compgen -S / -d -- "$last"`
 }
 
 func ActionFiles(suffix string) string {
-	return fmt.Sprintf(`compgen -S / -d -- $last; compgen -f -X '!*%v' -- $last`, suffix)
+	return fmt.Sprintf(`compgen -S / -d -- "$last"; compgen -f -X '!*%v' -- "$last"`, suffix)
 }
 
 func ActionNetInterfaces() string {
-	return `compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- $last`
+	return `compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"`
 }
 
 func ActionUsers() string {
@@ -58,7 +58,7 @@ func ActionGroups() string {
 }
 
 func ActionHosts() string {
-	return `compgen -W "$(cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1)" -- $last`
+	return `compgen -W "$(cut -d ' ' -f1 < ~/.ssh/known_hosts | cut -d ',' -f1)" -- "$last"`
 }
 
 func ActionValues(values ...string) string {
@@ -73,7 +73,7 @@ func ActionValues(values ...string) string {
 		//vals[index] = strings.Replace(val, " ", `\ `, -1)
 		vals[index] = strings.Replace(val, ` `, `\\\ `, -1)
 	}
-	return fmt.Sprintf(`compgen -W $'%v' -- $last`, strings.Join(vals, `\n`))
+	return fmt.Sprintf(`compgen -W $'%v' -- "$last"`, strings.Join(vals, `\n`))
 }
 
 func ActionValuesDescribed(values ...string) string {

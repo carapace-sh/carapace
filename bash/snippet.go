@@ -33,8 +33,9 @@ _%v_completions() {
       last="${last// /\\\ }" 
   fi
 
-  local state=$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs %v _carapace bash state)
-  local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+  local state
+  state="$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs %v _carapace bash state)"
+  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
   local IFS=$'\n'
 
   case $state in
@@ -42,7 +43,7 @@ _%v_completions() {
   esac
 
   [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ $COMPREPLY == */ ]] && compopt -o nospace
+  [[ ${COMPREPLY[0]} == */ ]] && compopt -o nospace
 }
 
 complete -F _%v_completions %v

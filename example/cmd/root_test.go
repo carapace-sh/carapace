@@ -278,8 +278,6 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             [CompletionResult]::new('--multi_parts', 'multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
             [CompletionResult]::new('-n', 'n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
             [CompletionResult]::new('--net_interfaces', 'net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('-u', 'u', [CompletionResultType]::ParameterName, 'users flag')
             [CompletionResult]::new('--users', 'users', [CompletionResultType]::ParameterName, 'users flag')
             [CompletionResult]::new('-v', 'v', [CompletionResultType]::ParameterName, 'values flag')
@@ -291,20 +289,14 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
         '_example__callback' {
             [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'Help message for callback')
             [CompletionResult]::new('--callback', 'callback', [CompletionResultType]::ParameterName, 'Help message for callback')
-            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             break
         }
         '_example__condition' {
-            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'required flag')
             [CompletionResult]::new('--required', 'required', [CompletionResultType]::ParameterName, 'required flag')
             break
         }
         '_example__injection' {
-            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             break
         }
     })

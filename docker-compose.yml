@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  powershell:
+    image: mcr.microsoft.com/powershell
+    working_dir: /carapace/example
+    volumes:
+      - '.:/carapace/'

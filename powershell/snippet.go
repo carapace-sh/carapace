@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -25,19 +26,9 @@ using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $command = @(
-        '%s'
-        for ($i = 1; $i -lt $commandElements.Count; $i++) {
-            $element = $commandElements[$i]
-            if ($element -isnot [StringConstantExpressionAst] -or
-                $element.StringConstantType -ne [StringConstantType]::BareWord -or
-                $element.Value.StartsWith('-')) {
-                break
-            }
-            $element.Value
-        }
-    ) -join ';'
-    $completions = @(switch ($command) {%s
+    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Value})
+    
+    $completions = @(switch ($state) {%s
     })
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
@@ -48,12 +39,7 @@ func nonCompletableFlag(flag *pflag.Flag) bool {
 }
 
 func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previousCommandName string) {
-	var cmdName string
-	if previousCommandName == "" {
-		cmdName = cmd.Name()
-	} else {
-		cmdName = fmt.Sprintf("%s;%s", previousCommandName, cmd.Name())
-	}
+	var cmdName = fmt.Sprintf("%v", uid.Command(cmd))
 
 	fmt.Fprintf(out, "\n        '%s' {", cmdName)
 

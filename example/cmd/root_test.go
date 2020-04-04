@@ -31,15 +31,16 @@ _example_completions() {
       last="${last// /\\\ }" 
   fi
 
-  local state=$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs example _carapace bash state)
-  local previous="${COMP_WORDS[$((${COMP_CWORD}-1))]}"
+  local state
+  state="$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs example _carapace bash state)"
+  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
   local IFS=$'\n'
 
   case $state in
 
     '_example' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--array\n-a\n--persistentFlag\n-p\n--toggle\n-t' -- $last))
+        COMPREPLY=($(compgen -W $'--array\n-a\n--persistentFlag\n-p\n--toggle\n-t' -- "$last"))
       else
         case $previous in
           -a | --array)
@@ -49,7 +50,7 @@ _example_completions() {
 
 
           *)
-            COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\ninjection' -- $last))
+            COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\ninjection' -- "$last"))
             ;;
         esac
       fi
@@ -58,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- $last))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -66,11 +67,11 @@ _example_completions() {
             ;;
 
           --directories)
-            COMPREPLY=($(compgen -S / -d -- $last))
+            COMPREPLY=($(compgen -S / -d -- "$last"))
             ;;
 
           -f | --files)
-            COMPREPLY=($(compgen -S / -d -- $last; compgen -f -X '!*.go' -- $last))
+            COMPREPLY=($(compgen -S / -d -- "$last"; compgen -f -X '!*.go' -- "$last"))
             ;;
 
           -g | --groups)
@@ -78,19 +79,19 @@ _example_completions() {
             ;;
 
           --hosts)
-            COMPREPLY=($(compgen -W "$(cat ~/.ssh/known_hosts | cut -d ' ' -f1 | cut -d ',' -f1)" -- $last))
+            COMPREPLY=($(compgen -W "$(cut -d ' ' -f1 < ~/.ssh/known_hosts | cut -d ',' -f1)" -- "$last"))
             ;;
 
           -m | --message)
-            COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- $last))
+            COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- "$last"))
             ;;
 
           --multi_parts)
-            COMPREPLY=($(compgen -W $'multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts' -- $last))
+            COMPREPLY=($(compgen -W $'multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts' -- "$last"))
             ;;
 
           -n | --net_interfaces)
-            COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- $last))
+            COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"))
             ;;
 
           -u | --users)
@@ -98,11 +99,11 @@ _example_completions() {
             ;;
 
           -v | --values)
-            COMPREPLY=($(compgen -W $'values\nexample' -- $last))
+            COMPREPLY=($(compgen -W $'values\nexample' -- "$last"))
             ;;
 
           -d | --values_described)
-            COMPREPLY=($(compgen -W $'values\nexample\n\n' -- $last))
+            COMPREPLY=($(compgen -W $'values\nexample\n\n' -- "$last"))
             ;;
 
           *)
@@ -115,7 +116,7 @@ _example_completions() {
 
     '_example__callback' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--callback\n-c' -- $last))
+        COMPREPLY=($(compgen -W $'--callback\n-c' -- "$last"))
       else
         case $previous in
           -c | --callback)
@@ -132,11 +133,11 @@ _example_completions() {
 
     '_example__condition' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--required\n-r' -- $last))
+        COMPREPLY=($(compgen -W $'--required\n-r' -- "$last"))
       else
         case $previous in
           -r | --required)
-            COMPREPLY=($(compgen -W $'valid\ninvalid' -- $last))
+            COMPREPLY=($(compgen -W $'valid\ninvalid' -- "$last"))
             ;;
 
           *)
@@ -163,7 +164,7 @@ _example_completions() {
   esac
 
   [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ $COMPREPLY == */ ]] && compopt -o nospace
+  [[ ${COMPREPLY[0]} == */ ]] && compopt -o nospace
 }
 
 complete -F _example_completions example

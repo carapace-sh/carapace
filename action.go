@@ -3,15 +3,17 @@ package carapace
 import (
 	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/fish"
+	"github.com/rsteube/carapace/powershell"
 	"github.com/rsteube/carapace/zsh"
 	"github.com/spf13/cobra"
 )
 
 type Action struct {
-	Bash     string
-	Fish     string
-	Zsh      string
-	Callback CompletionCallback
+	Bash       string
+	Fish       string
+	Zsh        string
+	Powershell string
+	Callback   CompletionCallback
 }
 type ActionMap map[string]Action
 type CompletionCallback func(args []string) Action
@@ -24,6 +26,9 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 		}
 		if a.Fish == "" {
 			a.Fish = fish.Callback(cmd.Root().Name(), uid)
+		}
+		if a.Powershell == "" {
+			a.Powershell = powershell.Callback(cmd.Root().Name(), uid)
 		}
 		if a.Zsh == "" {
 			a.Zsh = zsh.Callback(uid)
@@ -38,6 +43,8 @@ func (a Action) Value(shell string) string {
 		return a.Bash
 	case "fish":
 		return a.Fish
+	case "powershell":
+		return a.Powershell
 	case "zsh":
 		return a.Zsh
 	default:

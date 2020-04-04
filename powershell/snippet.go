@@ -1,20 +1,24 @@
-// PowerShell completions are based on the amazing work from clap:
-// https://github.com/clap-rs/clap/blob/3294d18efe5f264d12c9035f404c7d189d4824e1/src/completions/powershell.rs
-//
-// The generated scripts require PowerShell v5.0+ (which comes Windows 10, but
-// can be downloaded separately for windows 7 or 8.1).
-
-package cobra
+package powershell
 
 import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
+
+func Snippet(cmd *cobra.Command, actions map[string]string) string {
+	buf := new(bytes.Buffer)
+
+	var subCommandCases bytes.Buffer
+	generatePowerShellSubcommandCases(&subCommandCases, cmd, "")
+	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), cmd.Name(), subCommandCases.String())
+
+	return buf.String()
+}
 
 var powerShellCompletionTemplate = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
@@ -39,7 +43,11 @@ Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
         Sort-Object -Property ListItemText
 }`
 
-func generatePowerShellSubcommandCases(out io.Writer, cmd *Command, previousCommandName string) {
+func nonCompletableFlag(flag *pflag.Flag) bool {
+	return flag.Hidden || len(flag.Deprecated) > 0
+}
+
+func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previousCommandName string) {
 	var cmdName string
 	if previousCommandName == "" {
 		cmdName = cmd.Name()
@@ -74,27 +82,4 @@ func generatePowerShellSubcommandCases(out io.Writer, cmd *Command, previousComm
 
 func escapeStringForPowerShell(s string) string {
 	return strings.Replace(s, "'", "''", -1)
-}
-
-// GenPowerShellCompletion generates PowerShell completion file and writes to the passed writer.
-func (c *Command) GenPowerShellCompletion(w io.Writer) error {
-	buf := new(bytes.Buffer)
-
-	var subCommandCases bytes.Buffer
-	generatePowerShellSubcommandCases(&subCommandCases, c, "")
-	fmt.Fprintf(buf, powerShellCompletionTemplate, c.Name(), c.Name(), subCommandCases.String())
-
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-// GenPowerShellCompletionFile generates PowerShell completion file.
-func (c *Command) GenPowerShellCompletionFile(filename string) error {
-	outFile, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer outFile.Close()
-
-	return c.GenPowerShellCompletion(outFile)
 }

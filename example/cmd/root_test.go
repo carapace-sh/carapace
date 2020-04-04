@@ -238,6 +238,92 @@ complete -c example -f -n '_example_state _example__injection' -a '(_example_cal
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
 }
 
+func TestPowershell(t *testing.T) {
+	expected := `using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    $commandElements = $commandAst.CommandElements
+    $command = @(
+        'example'
+        for ($i = 1; $i -lt $commandElements.Count; $i++) {
+            $element = $commandElements[$i]
+            if ($element -isnot [StringConstantExpressionAst] -or
+                $element.StringConstantType -ne [StringConstantType]::BareWord -or
+                $element.Value.StartsWith('-')) {
+                break
+            }
+            $element.Value
+        }
+    ) -join ';'
+    $completions = @(switch ($command) {
+        'example' {
+            [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'multiflag')
+            [CompletionResult]::new('--array', 'array', [CompletionResultType]::ParameterName, 'multiflag')
+            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Help message for toggle')
+            [CompletionResult]::new('--toggle', 'toggle', [CompletionResultType]::ParameterName, 'Help message for toggle')
+            [CompletionResult]::new('_carapace', '_carapace', [CompletionResultType]::ParameterValue, '')
+            [CompletionResult]::new('action', 'action', [CompletionResultType]::ParameterValue, 'action example')
+            [CompletionResult]::new('callback', 'callback', [CompletionResultType]::ParameterValue, 'callback example')
+            [CompletionResult]::new('condition', 'condition', [CompletionResultType]::ParameterValue, 'condition example')
+            [CompletionResult]::new('injection', 'injection', [CompletionResultType]::ParameterValue, 'just trying to break things')
+            break
+        }
+        'example;_carapace' {
+            break
+        }
+        'example;action' {
+            [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'custom flag')
+            [CompletionResult]::new('--custom', 'custom', [CompletionResultType]::ParameterName, 'custom flag')
+            [CompletionResult]::new('--directories', 'directories', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('-f', 'f', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('--files', 'files', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('-g', 'g', [CompletionResultType]::ParameterName, 'groups flag')
+            [CompletionResult]::new('--groups', 'groups', [CompletionResultType]::ParameterName, 'groups flag')
+            [CompletionResult]::new('--hosts', 'hosts', [CompletionResultType]::ParameterName, 'hosts flag')
+            [CompletionResult]::new('-m', 'm', [CompletionResultType]::ParameterName, 'message flag')
+            [CompletionResult]::new('--message', 'message', [CompletionResultType]::ParameterName, 'message flag')
+            [CompletionResult]::new('--multi_parts', 'multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
+            [CompletionResult]::new('-n', 'n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+            [CompletionResult]::new('--net_interfaces', 'net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('-u', 'u', [CompletionResultType]::ParameterName, 'users flag')
+            [CompletionResult]::new('--users', 'users', [CompletionResultType]::ParameterName, 'users flag')
+            [CompletionResult]::new('-v', 'v', [CompletionResultType]::ParameterName, 'values flag')
+            [CompletionResult]::new('--values', 'values', [CompletionResultType]::ParameterName, 'values flag')
+            [CompletionResult]::new('-d', 'd', [CompletionResultType]::ParameterName, 'values with description flag')
+            [CompletionResult]::new('--values_described', 'values_described', [CompletionResultType]::ParameterName, 'values with description flag')
+            break
+        }
+        'example;callback' {
+            [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'Help message for callback')
+            [CompletionResult]::new('--callback', 'callback', [CompletionResultType]::ParameterName, 'Help message for callback')
+            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            break
+        }
+        'example;condition' {
+            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'required flag')
+            [CompletionResult]::new('--required', 'required', [CompletionResultType]::ParameterName, 'required flag')
+            break
+        }
+        'example;injection' {
+            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            break
+        }
+    })
+    $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
+        Sort-Object -Property ListItemText
+}`
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Powershell())
+}
+
 func TestZsh(t *testing.T) {
 	expected := `#compdef example
 function _example {

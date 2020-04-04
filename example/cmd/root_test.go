@@ -244,20 +244,10 @@ using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $command = @(
-        'example'
-        for ($i = 1; $i -lt $commandElements.Count; $i++) {
-            $element = $commandElements[$i]
-            if ($element -isnot [StringConstantExpressionAst] -or
-                $element.StringConstantType -ne [StringConstantType]::BareWord -or
-                $element.Value.StartsWith('-')) {
-                break
-            }
-            $element.Value
-        }
-    ) -join ';'
-    $completions = @(switch ($command) {
-        'example' {
+    $state = example _carapace powershell state $($commandElements| Foreach {$_.Value})
+    
+    $completions = @(switch ($state) {
+        '_example' {
             [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'multiflag')
             [CompletionResult]::new('--array', 'array', [CompletionResultType]::ParameterName, 'multiflag')
             [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
@@ -271,10 +261,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             [CompletionResult]::new('injection', 'injection', [CompletionResultType]::ParameterValue, 'just trying to break things')
             break
         }
-        'example;_carapace' {
+        '_example___carapace' {
             break
         }
-        'example;action' {
+        '_example__action' {
             [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'custom flag')
             [CompletionResult]::new('--custom', 'custom', [CompletionResultType]::ParameterName, 'custom flag')
             [CompletionResult]::new('--directories', 'directories', [CompletionResultType]::ParameterName, 'files flag')
@@ -298,21 +288,21 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             [CompletionResult]::new('--values_described', 'values_described', [CompletionResultType]::ParameterName, 'values with description flag')
             break
         }
-        'example;callback' {
+        '_example__callback' {
             [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'Help message for callback')
             [CompletionResult]::new('--callback', 'callback', [CompletionResultType]::ParameterName, 'Help message for callback')
             [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             break
         }
-        'example;condition' {
+        '_example__condition' {
             [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'required flag')
             [CompletionResult]::new('--required', 'required', [CompletionResultType]::ParameterName, 'required flag')
             break
         }
-        'example;injection' {
+        '_example__injection' {
             [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
             break

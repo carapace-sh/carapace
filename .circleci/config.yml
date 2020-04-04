@@ -1,24 +1,35 @@
-version: 2
+version: 2.1
 
 references:
   workspace: &workspace
     /go/src/github.com/rsteube/carapace
 
-  run_tests: &run_tests
-    run:
-      name: "All Commands"
-      command: |
-        go get -t -v ./...
-        PATH=$PATH:$PWD/bin go test -v ./...
-        go build
-        go vet
-        cd example
-        go build .
-        curl -Lso shellcheck https://github.com/caarlos0/shellcheck-docker/releases/download/v0.4.6/shellcheck
-        chmod +x shellcheck
-        ./shellcheck -e SC2046,SC2207 <(./example _carapace bash)
-        ./shellcheck -e SC1064,SC1072,SC1073 <(./example _carapace fish)
-        ./shellcheck -e SC2148,SC2154 <(./example _carapace zsh)
+commands:
+  run_tests:
+    steps:
+      - run:
+          name: "build"
+          command: |
+            go get -t -v ./...
+            PATH=$PATH:$PWD/bin go test -v ./...
+            go build
+            go vet
+            cd example
+            go build .
+      - run:
+          name: "install shellcheck"
+          command: |
+            curl -Lso shellcheck https://github.com/caarlos0/shellcheck-docker/releases/download/v0.4.6/shellcheck
+            chmod +x shellcheck
+      - run:
+          name: "shellcheck bash"
+          command: ./shellcheck -e SC2046,SC2207 <(./example/example _carapace bash)
+      - run:
+          name: "shellcheck fish"
+          command: ./shellcheck -e SC1064,SC1072,SC1073 <(./example/example _carapace fish)
+      - run:
+          name: "shellcheck zsh"
+          command: ./shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
 
 jobs:
   go-current:
@@ -27,7 +38,7 @@ jobs:
     working_directory: *workspace
     steps:
       - checkout
-      - *run_tests
+      - run_tests
       - run:
           name: "Check formatting"
           command: diff -u <(echo -n) <(gofmt -d -s .)
@@ -37,14 +48,14 @@ jobs:
     working_directory: *workspace
     steps:
       - checkout
-      - *run_tests
+      - run_tests
   go-latest:
     docker:
       - image: circleci/golang:latest
     working_directory: *workspace
     steps:
       - checkout
-      - *run_tests
+      - run_tests
 
 workflows:
   version: 2

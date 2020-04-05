@@ -6,6 +6,7 @@ Completion script generator for [cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
+- [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter) _(in progress)_
 - [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 
@@ -128,6 +129,7 @@ carapace.Action{Zsh: "_most_recent_file 2"}
 Additional information can be found at:
 - Bash: [bash-programmable-completion-tutorial](https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial) and [Programmable-Completion-Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins)
 - Fish: [fish-shell/share/functions](https://github.com/fish-shell/fish-shell/tree/master/share/functions) and [writing your own completions](https://fishshell.com/docs/current/#writing-your-own-completions)
+- Powershell: [Dynamic Tab Completion](https://adamtheautomator.com/powershell-parameters-argumentcompleter/) and [Register-ArgumentCompleter](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
 - Zsh: [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and [Completion-System](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
 
 
@@ -146,6 +148,11 @@ source <(example _carapace bash)
 # fish
 set PATH $PATH (pwd) 
 example _carapace fish | source
+
+# powershell
+docker-compose run --rm powershell
+$env:PATH += ":$pwd"
+example _carapace powershell | out-string | Invoke-Expression
 
 # zsh
 PATH=$PATH:$(pwd)

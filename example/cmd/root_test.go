@@ -248,52 +248,52 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     
     $completions = @(switch ($state) {
         '_example' {
-            [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'multiflag')
-            [CompletionResult]::new('--array', 'array', [CompletionResultType]::ParameterName, 'multiflag')
-            [CompletionResult]::new('-p', 'p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', 'persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('-t', 't', [CompletionResultType]::ParameterName, 'Help message for toggle')
-            [CompletionResult]::new('--toggle', 'toggle', [CompletionResultType]::ParameterName, 'Help message for toggle')
-            [CompletionResult]::new('_carapace', '_carapace', [CompletionResultType]::ParameterValue, '')
-            [CompletionResult]::new('action', 'action', [CompletionResultType]::ParameterValue, 'action example')
-            [CompletionResult]::new('callback', 'callback', [CompletionResultType]::ParameterValue, 'callback example')
-            [CompletionResult]::new('condition', 'condition', [CompletionResultType]::ParameterValue, 'condition example')
-            [CompletionResult]::new('injection', 'injection', [CompletionResultType]::ParameterValue, 'just trying to break things')
+            [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'multiflag')
+            [CompletionResult]::new('--array', '--array', [CompletionResultType]::ParameterName, 'multiflag')
+            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('--persistentFlag', '--persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+            [CompletionResult]::new('-t', '-t', [CompletionResultType]::ParameterName, 'Help message for toggle')
+            [CompletionResult]::new('--toggle', '--toggle', [CompletionResultType]::ParameterName, 'Help message for toggle')
+            [CompletionResult]::new('_carapace', '_carapace', [CompletionResultType]::Command, ' ')
+            [CompletionResult]::new('action', 'action', [CompletionResultType]::Command, 'action example')
+            [CompletionResult]::new('callback', 'callback', [CompletionResultType]::Command, 'callback example')
+            [CompletionResult]::new('condition', 'condition', [CompletionResultType]::Command, 'condition example')
+            [CompletionResult]::new('injection', 'injection', [CompletionResultType]::Command, 'just trying to break things')
             break
         }
         '_example___carapace' {
             break
         }
         '_example__action' {
-            [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'custom flag')
-            [CompletionResult]::new('--custom', 'custom', [CompletionResultType]::ParameterName, 'custom flag')
-            [CompletionResult]::new('--directories', 'directories', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('-f', 'f', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('--files', 'files', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('-g', 'g', [CompletionResultType]::ParameterName, 'groups flag')
-            [CompletionResult]::new('--groups', 'groups', [CompletionResultType]::ParameterName, 'groups flag')
-            [CompletionResult]::new('--hosts', 'hosts', [CompletionResultType]::ParameterName, 'hosts flag')
-            [CompletionResult]::new('-m', 'm', [CompletionResultType]::ParameterName, 'message flag')
-            [CompletionResult]::new('--message', 'message', [CompletionResultType]::ParameterName, 'message flag')
-            [CompletionResult]::new('--multi_parts', 'multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
-            [CompletionResult]::new('-n', 'n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-            [CompletionResult]::new('--net_interfaces', 'net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-            [CompletionResult]::new('-u', 'u', [CompletionResultType]::ParameterName, 'users flag')
-            [CompletionResult]::new('--users', 'users', [CompletionResultType]::ParameterName, 'users flag')
-            [CompletionResult]::new('-v', 'v', [CompletionResultType]::ParameterName, 'values flag')
-            [CompletionResult]::new('--values', 'values', [CompletionResultType]::ParameterName, 'values flag')
-            [CompletionResult]::new('-d', 'd', [CompletionResultType]::ParameterName, 'values with description flag')
-            [CompletionResult]::new('--values_described', 'values_described', [CompletionResultType]::ParameterName, 'values with description flag')
+            [CompletionResult]::new('-c', '-c', [CompletionResultType]::ParameterName, 'custom flag')
+            [CompletionResult]::new('--custom', '--custom', [CompletionResultType]::ParameterName, 'custom flag')
+            [CompletionResult]::new('--directories', '--directories', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('-f', '-f', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('--files', '--files', [CompletionResultType]::ParameterName, 'files flag')
+            [CompletionResult]::new('-g', '-g', [CompletionResultType]::ParameterName, 'groups flag')
+            [CompletionResult]::new('--groups', '--groups', [CompletionResultType]::ParameterName, 'groups flag')
+            [CompletionResult]::new('--hosts', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
+            [CompletionResult]::new('-m', '-m', [CompletionResultType]::ParameterName, 'message flag')
+            [CompletionResult]::new('--message', '--message', [CompletionResultType]::ParameterName, 'message flag')
+            [CompletionResult]::new('--multi_parts', '--multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
+            [CompletionResult]::new('-n', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+            [CompletionResult]::new('--net_interfaces', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+            [CompletionResult]::new('-u', '-u', [CompletionResultType]::ParameterName, 'users flag')
+            [CompletionResult]::new('--users', '--users', [CompletionResultType]::ParameterName, 'users flag')
+            [CompletionResult]::new('-v', '-v', [CompletionResultType]::ParameterName, 'values flag')
+            [CompletionResult]::new('--values', '--values', [CompletionResultType]::ParameterName, 'values flag')
+            [CompletionResult]::new('-d', '-d', [CompletionResultType]::ParameterName, 'values with description flag')
+            [CompletionResult]::new('--values_described', '--values_described', [CompletionResultType]::ParameterName, 'values with description flag')
             break
         }
         '_example__callback' {
-            [CompletionResult]::new('-c', 'c', [CompletionResultType]::ParameterName, 'Help message for callback')
-            [CompletionResult]::new('--callback', 'callback', [CompletionResultType]::ParameterName, 'Help message for callback')
+            [CompletionResult]::new('-c', '-c', [CompletionResultType]::ParameterName, 'Help message for callback')
+            [CompletionResult]::new('--callback', '--callback', [CompletionResultType]::ParameterName, 'Help message for callback')
             break
         }
         '_example__condition' {
-            [CompletionResult]::new('-r', 'r', [CompletionResultType]::ParameterName, 'required flag')
-            [CompletionResult]::new('--required', 'required', [CompletionResultType]::ParameterName, 'required flag')
+            [CompletionResult]::new('-r', '-r', [CompletionResultType]::ParameterName, 'required flag')
+            [CompletionResult]::new('--required', '--required', [CompletionResultType]::ParameterName, 'required flag')
             break
         }
         '_example__injection' {

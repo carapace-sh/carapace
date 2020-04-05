@@ -21,6 +21,9 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	return buf.String()
 }
 
+// TODO only show flag completions when current entry starts with '-', else try powitional completion
+// TODO try positional completion if no subcommands
+// TODO add empty completion when $completions is empty to prevent fallback to file completion
 var powerShellCompletionTemplate = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
@@ -43,15 +46,15 @@ func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previo
 		if !flag.Hidden {
 			usage := escapeStringForPowerShell(flag.Usage)
 			if len(flag.Shorthand) > 0 {
-				fmt.Fprintf(out, "\n            [CompletionResult]::new('-%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
+				fmt.Fprintf(out, "\n            [CompletionResult]::new('-%s', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
 			}
-			fmt.Fprintf(out, "\n            [CompletionResult]::new('--%s', '%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			fmt.Fprintf(out, "\n            [CompletionResult]::new('--%s', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
 		}
 	})
 
 	for _, subCmd := range cmd.Commands() {
 		usage := escapeStringForPowerShell(subCmd.Short)
-		fmt.Fprintf(out, "\n            [CompletionResult]::new('%s', '%s', [CompletionResultType]::ParameterValue, '%s')", subCmd.Name(), subCmd.Name(), usage)
+		fmt.Fprintf(out, "\n            [CompletionResult]::new('%s', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), usage)
 	}
 
 	fmt.Fprint(out, "\n            break\n        }")
@@ -62,5 +65,8 @@ func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previo
 }
 
 func escapeStringForPowerShell(s string) string {
+	if s == "" {
+		return " " // completion fails if empty (fallback to file completion)
+	}
 	return strings.Replace(s, "'", "''", -1)
 }

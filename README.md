@@ -165,10 +165,9 @@ source <(example _carapace zsh)
 example <TAB>
 ```
 
-or use the preconfigured docker containers (on linux):
+or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
-cd example
-go build .
+docker-compose run build
 docker-compose run --rm [bash|fish|powershell|zsh]
 
 example <TAB>

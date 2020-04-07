@@ -15,7 +15,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	buf := new(bytes.Buffer)
 
 	var subCommandCases bytes.Buffer
-	generatePowerShellSubcommandCases(&subCommandCases, cmd, "")
+	generatePowerShellSubcommandCases(&subCommandCases, cmd, actions)
 	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), cmd.Name(), subCommandCases.String())
 
 	return buf.String()
@@ -29,39 +29,90 @@ using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
+    $previous = $commandElements[-1].Value
+    if ($wordToComplete) {
+        $previous = $commandElements[-2].Value
+    }
     $state = %v _carapace powershell state $($commandElements| Foreach {$_.Value})
     
     $completions = @(switch ($state) {%s
     })
+
+    if ($completions.count -eq 0) {
+      return "" # prevent default file completion
+    }
+
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }`
 
-func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, previousCommandName string) {
+func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, actions map[string]string) {
 	var cmdName = fmt.Sprintf("%v", uid.Command(cmd))
 
 	fmt.Fprintf(out, "\n        '%s' {", cmdName)
+	fmt.Fprintf(out, `
+            switch -regex ($previous) {
+%v
+                default {
+%v
+                }
+            }
+`, snippetFlagActions(cmd, actions), snippetTODO(cmd))
+
+	for _, subCmd := range cmd.Commands() {
+		if !subCmd.Hidden {
+			generatePowerShellSubcommandCases(out, subCmd, actions)
+		}
+	}
+}
+
+func snippetFlagActions(cmd *cobra.Command, actions map[string]string) string {
+	flagActions := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
+		if flag.NoOptDefVal != "" {
+			return
+		}
+
+		match := fmt.Sprintf(`--%v`, flag.Name)
+		if flag.Shorthand != "" {
+			match = fmt.Sprintf(`-%v|--%v`, flag.Shorthand, flag.Name)
+		}
+		var action = ""
+		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
+			action = a
+		}
+		flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
+                        %v 
+                        break
+                      }`, match, strings.Replace(action, "\n", "\n                        ", -1)))
+	})
+	return strings.Join(flagActions, "\n")
+}
+
+func snippetTODO(cmd *cobra.Command) string {
+	result := ""
+	result += fmt.Sprint("\n            if ($wordToComplete -like \"-*\") {")
 
 	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
 		if !flag.Hidden {
 			usage := escapeStringForPowerShell(flag.Usage)
 			if len(flag.Shorthand) > 0 {
-				fmt.Fprintf(out, "\n            [CompletionResult]::new('-%s', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
+				result += fmt.Sprintf("\n                [CompletionResult]::new('-%s ', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
 			}
-			fmt.Fprintf(out, "\n            [CompletionResult]::new('--%s', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
 		}
 	})
 
+	result += fmt.Sprint("\n            } else {")
 	for _, subCmd := range cmd.Commands() {
-		usage := escapeStringForPowerShell(subCmd.Short)
-		fmt.Fprintf(out, "\n            [CompletionResult]::new('%s', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), usage)
+		if !subCmd.Hidden {
+			usage := escapeStringForPowerShell(subCmd.Short)
+			result += fmt.Sprintf("\n                [CompletionResult]::new('%s ', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), usage)
+		}
 	}
-
-	fmt.Fprint(out, "\n            break\n        }")
-
-	for _, subCmd := range cmd.Commands() {
-		generatePowerShellSubcommandCases(out, subCmd, cmdName)
-	}
+	result += fmt.Sprint("\n            }")
+	result += fmt.Sprint("\n            break\n        }")
+	return result
 }
 
 func escapeStringForPowerShell(s string) string {

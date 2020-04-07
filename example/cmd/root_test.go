@@ -244,62 +244,180 @@ using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
+    $previous = $commandElements[-1].Value
+    if ($wordToComplete) {
+        $previous = $commandElements[-2].Value
+    }
     $state = example _carapace powershell state $($commandElements| Foreach {$_.Value})
     
     $completions = @(switch ($state) {
         '_example' {
-            [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'multiflag')
-            [CompletionResult]::new('--array', '--array', [CompletionResultType]::ParameterName, 'multiflag')
-            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('--persistentFlag', '--persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
-            [CompletionResult]::new('-t', '-t', [CompletionResultType]::ParameterName, 'Help message for toggle')
-            [CompletionResult]::new('--toggle', '--toggle', [CompletionResultType]::ParameterName, 'Help message for toggle')
-            [CompletionResult]::new('_carapace', '_carapace', [CompletionResultType]::Command, ' ')
-            [CompletionResult]::new('action', 'action', [CompletionResultType]::Command, 'action example')
-            [CompletionResult]::new('callback', 'callback', [CompletionResultType]::Command, 'callback example')
-            [CompletionResult]::new('condition', 'condition', [CompletionResultType]::Command, 'condition example')
-            [CompletionResult]::new('injection', 'injection', [CompletionResultType]::Command, 'just trying to break things')
+            switch -regex ($previous) {
+                '-a|--array' {
+                         
+                        break
+                      }
+                default {
+
+            if ($wordToComplete -like "-*") {
+                [CompletionResult]::new('-a ', '-a', [CompletionResultType]::ParameterName, 'multiflag')
+                [CompletionResult]::new('--array ', '--array', [CompletionResultType]::ParameterName, 'multiflag')
+                [CompletionResult]::new('-p ', '-p', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+                [CompletionResult]::new('--persistentFlag ', '--persistentFlag', [CompletionResultType]::ParameterName, 'Help message for persistentFlag')
+                [CompletionResult]::new('-t ', '-t', [CompletionResultType]::ParameterName, 'Help message for toggle')
+                [CompletionResult]::new('--toggle ', '--toggle', [CompletionResultType]::ParameterName, 'Help message for toggle')
+            } else {
+                [CompletionResult]::new('action ', 'action', [CompletionResultType]::Command, 'action example')
+                [CompletionResult]::new('callback ', 'callback', [CompletionResultType]::Command, 'callback example')
+                [CompletionResult]::new('condition ', 'condition', [CompletionResultType]::Command, 'condition example')
+                [CompletionResult]::new('injection ', 'injection', [CompletionResultType]::Command, 'just trying to break things')
+            }
             break
         }
-        '_example___carapace' {
-            break
-        }
+                }
+            }
+
         '_example__action' {
-            [CompletionResult]::new('-c', '-c', [CompletionResultType]::ParameterName, 'custom flag')
-            [CompletionResult]::new('--custom', '--custom', [CompletionResultType]::ParameterName, 'custom flag')
-            [CompletionResult]::new('--directories', '--directories', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('-f', '-f', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('--files', '--files', [CompletionResultType]::ParameterName, 'files flag')
-            [CompletionResult]::new('-g', '-g', [CompletionResultType]::ParameterName, 'groups flag')
-            [CompletionResult]::new('--groups', '--groups', [CompletionResultType]::ParameterName, 'groups flag')
-            [CompletionResult]::new('--hosts', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
-            [CompletionResult]::new('-m', '-m', [CompletionResultType]::ParameterName, 'message flag')
-            [CompletionResult]::new('--message', '--message', [CompletionResultType]::ParameterName, 'message flag')
-            [CompletionResult]::new('--multi_parts', '--multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
-            [CompletionResult]::new('-n', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-            [CompletionResult]::new('--net_interfaces', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-            [CompletionResult]::new('-u', '-u', [CompletionResultType]::ParameterName, 'users flag')
-            [CompletionResult]::new('--users', '--users', [CompletionResultType]::ParameterName, 'users flag')
-            [CompletionResult]::new('-v', '-v', [CompletionResultType]::ParameterName, 'values flag')
-            [CompletionResult]::new('--values', '--values', [CompletionResultType]::ParameterName, 'values flag')
-            [CompletionResult]::new('-d', '-d', [CompletionResultType]::ParameterName, 'values with description flag')
-            [CompletionResult]::new('--values_described', '--values_described', [CompletionResultType]::ParameterName, 'values with description flag')
+            switch -regex ($previous) {
+                '-c|--custom' {
+                         
+                        break
+                      }
+                '--directories' {
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('no values to complete ', 'no values to complete', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                '-f|--files' {
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('no values to complete ', 'no values to complete', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                '-g|--groups' {
+                        $(Get-Localgroup).Name 
+                        break
+                      }
+                '--hosts' {
+                         
+                        break
+                      }
+                '-m|--message' {
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('message example ', 'message example', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                '--multi_parts' {
+                        [CompletionResult]::new('multi/parts ', 'multi/parts', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('multi/parts/example ', 'multi/parts/example', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('multi/parts/test ', 'multi/parts/test', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('example/parts ', 'example/parts', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                '-n|--net_interfaces' {
+                        $(Get-NetAdapter).Name 
+                        break
+                      }
+                '-u|--users' {
+                        $(Get-LocalUser).Name 
+                        break
+                      }
+                '-v|--values' {
+                        [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                '-d|--values_described' {
+                        [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, 'valueDescription')
+                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription')
+                        
+                         
+                        break
+                      }
+                default {
+
+            if ($wordToComplete -like "-*") {
+                [CompletionResult]::new('-c ', '-c', [CompletionResultType]::ParameterName, 'custom flag')
+                [CompletionResult]::new('--custom ', '--custom', [CompletionResultType]::ParameterName, 'custom flag')
+                [CompletionResult]::new('--directories ', '--directories', [CompletionResultType]::ParameterName, 'files flag')
+                [CompletionResult]::new('-f ', '-f', [CompletionResultType]::ParameterName, 'files flag')
+                [CompletionResult]::new('--files ', '--files', [CompletionResultType]::ParameterName, 'files flag')
+                [CompletionResult]::new('-g ', '-g', [CompletionResultType]::ParameterName, 'groups flag')
+                [CompletionResult]::new('--groups ', '--groups', [CompletionResultType]::ParameterName, 'groups flag')
+                [CompletionResult]::new('--hosts ', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
+                [CompletionResult]::new('-m ', '-m', [CompletionResultType]::ParameterName, 'message flag')
+                [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
+                [CompletionResult]::new('--multi_parts ', '--multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
+                [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+                [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+                [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
+                [CompletionResult]::new('--users ', '--users', [CompletionResultType]::ParameterName, 'users flag')
+                [CompletionResult]::new('-v ', '-v', [CompletionResultType]::ParameterName, 'values flag')
+                [CompletionResult]::new('--values ', '--values', [CompletionResultType]::ParameterName, 'values flag')
+                [CompletionResult]::new('-d ', '-d', [CompletionResultType]::ParameterName, 'values with description flag')
+                [CompletionResult]::new('--values_described ', '--values_described', [CompletionResultType]::ParameterName, 'values with description flag')
+            } else {
+            }
             break
         }
+                }
+            }
+
         '_example__callback' {
-            [CompletionResult]::new('-c', '-c', [CompletionResultType]::ParameterName, 'Help message for callback')
-            [CompletionResult]::new('--callback', '--callback', [CompletionResultType]::ParameterName, 'Help message for callback')
+            switch -regex ($previous) {
+                '-c|--callback' {
+                        _example_callback '_example__callback##callback' 
+                        break
+                      }
+                default {
+
+            if ($wordToComplete -like "-*") {
+                [CompletionResult]::new('-c ', '-c', [CompletionResultType]::ParameterName, 'Help message for callback')
+                [CompletionResult]::new('--callback ', '--callback', [CompletionResultType]::ParameterName, 'Help message for callback')
+            } else {
+            }
             break
         }
+                }
+            }
+
         '_example__condition' {
-            [CompletionResult]::new('-r', '-r', [CompletionResultType]::ParameterName, 'required flag')
-            [CompletionResult]::new('--required', '--required', [CompletionResultType]::ParameterName, 'required flag')
+            switch -regex ($previous) {
+                '-r|--required' {
+                        [CompletionResult]::new('valid ', 'valid', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('invalid ', 'invalid', [CompletionResultType]::ParameterValue, ' ') 
+                        break
+                      }
+                default {
+
+            if ($wordToComplete -like "-*") {
+                [CompletionResult]::new('-r ', '-r', [CompletionResultType]::ParameterName, 'required flag')
+                [CompletionResult]::new('--required ', '--required', [CompletionResultType]::ParameterName, 'required flag')
+            } else {
+            }
             break
         }
+                }
+            }
+
         '_example__injection' {
+            switch -regex ($previous) {
+
+                default {
+
+            if ($wordToComplete -like "-*") {
+            } else {
+            }
             break
         }
+                }
+            }
+
     })
+
+    if ($completions.count -eq 0) {
+      return "" # prevent default file completion
+    }
+
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }`

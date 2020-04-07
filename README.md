@@ -112,6 +112,10 @@ Since callbacks are simply invocations of the program they can be tested directl
 ./example _carapace fish '_example__condition#1' example condition --required invalid
 #echo -e ERR\tflag --required must be set to valid: invalid\n_\t\n\n
 
+./example _carapace powershell '_example__condition#1' example condition --required invalid
+#[CompletionResult]::new('ERR', 'ERR', [CompletionResultType]::ParameterValue, ' ')
+#[CompletionResult]::new('flag --required must be set to valid: invalid', 'flag --required must be set to valid: invalid', [CompletionResultType]::ParameterValue, ' ')
+
 ./example _carapace zsh '_example__condition#1' example condition --required invalid
 # _message -r 'flag --required must be set to valid: invalid'
 ```
@@ -151,6 +155,7 @@ example _carapace fish | source
 
 # powershell
 docker-compose run --rm powershell
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 $env:PATH += ":$pwd"
 example _carapace powershell | out-string | Invoke-Expression
 

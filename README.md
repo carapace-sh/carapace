@@ -154,7 +154,6 @@ set PATH $PATH (pwd)
 example _carapace fish | source
 
 # powershell
-docker-compose run --rm powershell
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 $env:PATH += ":$pwd"
 example _carapace powershell | out-string | Invoke-Expression
@@ -162,6 +161,15 @@ example _carapace powershell | out-string | Invoke-Expression
 # zsh
 PATH=$PATH:$(pwd)
 source <(example _carapace zsh)
+
+example <TAB>
+```
+
+or use the preconfigured docker containers (on linux):
+```sh
+cd example
+go build .
+docker-compose run --rm [bash|fish|powershell|zsh]
 
 example <TAB>
 ```

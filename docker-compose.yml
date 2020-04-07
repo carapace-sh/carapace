@@ -1,6 +1,13 @@
 version: '3'
 
 services:
+  build:
+    image: golang
+    command: sh -c 'cd /carapace/example && go build .'
+    volumes:
+      - '.:/carapace/'
+      - 'go:/go/'
+
   bash:
     build:
       context: .
@@ -28,3 +35,6 @@ services:
       dockerfile: Dockerfile.zsh
     volumes:
       - '.:/carapace/'
+
+volumes:
+  go:

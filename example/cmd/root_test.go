@@ -244,16 +244,26 @@ using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $previous = $commandElements[-1].Value
+    $previous = $commandElements[-1].Extent
     if ($wordToComplete) {
-        $previous = $commandElements[-2].Value
+        $previous = $commandElements[-2].Extent
     }
-    $state = example _carapace powershell state $($commandElements| Foreach {$_.Value})
+
+    $state = example _carapace powershell state $($commandElements| Foreach {$_.Extent})
+    
+    Function _example_callback {
+      param($uid)
+      if (!$wordToComplete) {
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) _ | Out-String | Invoke-Expression
+      } else {
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
+      }
+    }
     
     $completions = @(switch ($state) {
         '_example' {
             switch -regex ($previous) {
-                '-a|--array' {
+                '^(-a|--array)$' {
                          
                         break
                       }
@@ -279,54 +289,52 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
 
         '_example__action' {
             switch -regex ($previous) {
-                '-c|--custom' {
+                '^(-c|--custom)$' {
                          
                         break
                       }
-                '--directories' {
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('no values to complete ', 'no values to complete', [CompletionResultType]::ParameterValue, ' ') 
+                '^(--directories)$' {
+                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '') 
                         break
                       }
-                '-f|--files' {
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('no values to complete ', 'no values to complete', [CompletionResultType]::ParameterValue, ' ') 
+                '^(-f|--files)$' {
+                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '') 
                         break
                       }
-                '-g|--groups' {
+                '^(-g|--groups)$' {
                         $(Get-Localgroup).Name 
                         break
                       }
-                '--hosts' {
+                '^(--hosts)$' {
                          
                         break
                       }
-                '-m|--message' {
+                '^(-m|--message)$' {
                         [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('message example ', 'message example', [CompletionResultType]::ParameterValue, ' ') 
+                        [CompletionResult]::new('message` + "`" + ` example ', 'message example', [CompletionResultType]::ParameterValue, ' ') 
                         break
                       }
-                '--multi_parts' {
+                '^(--multi_parts)$' {
                         [CompletionResult]::new('multi/parts ', 'multi/parts', [CompletionResultType]::ParameterValue, ' ')
                         [CompletionResult]::new('multi/parts/example ', 'multi/parts/example', [CompletionResultType]::ParameterValue, ' ')
                         [CompletionResult]::new('multi/parts/test ', 'multi/parts/test', [CompletionResultType]::ParameterValue, ' ')
                         [CompletionResult]::new('example/parts ', 'example/parts', [CompletionResultType]::ParameterValue, ' ') 
                         break
                       }
-                '-n|--net_interfaces' {
+                '^(-n|--net_interfaces)$' {
                         $(Get-NetAdapter).Name 
                         break
                       }
-                '-u|--users' {
+                '^(-u|--users)$' {
                         $(Get-LocalUser).Name 
                         break
                       }
-                '-v|--values' {
+                '^(-v|--values)$' {
                         [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, ' ')
                         [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, ' ') 
                         break
                       }
-                '-d|--values_described' {
+                '^(-d|--values_described)$' {
                         [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, 'valueDescription')
                         [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription')
                         
@@ -356,6 +364,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('-d ', '-d', [CompletionResultType]::ParameterName, 'values with description flag')
                 [CompletionResult]::new('--values_described ', '--values_described', [CompletionResultType]::ParameterName, 'values with description flag')
             } else {
+                _example_callback '_'
             }
             break
         }
@@ -364,7 +373,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
 
         '_example__callback' {
             switch -regex ($previous) {
-                '-c|--callback' {
+                '^(-c|--callback)$' {
                         _example_callback '_example__callback##callback' 
                         break
                       }
@@ -374,6 +383,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('-c ', '-c', [CompletionResultType]::ParameterName, 'Help message for callback')
                 [CompletionResult]::new('--callback ', '--callback', [CompletionResultType]::ParameterName, 'Help message for callback')
             } else {
+                _example_callback '_'
             }
             break
         }
@@ -382,7 +392,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
 
         '_example__condition' {
             switch -regex ($previous) {
-                '-r|--required' {
+                '^(-r|--required)$' {
                         [CompletionResult]::new('valid ', 'valid', [CompletionResultType]::ParameterValue, ' ')
                         [CompletionResult]::new('invalid ', 'invalid', [CompletionResultType]::ParameterValue, ' ') 
                         break
@@ -393,6 +403,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('-r ', '-r', [CompletionResultType]::ParameterName, 'required flag')
                 [CompletionResult]::new('--required ', '--required', [CompletionResultType]::ParameterName, 'required flag')
             } else {
+                _example_callback '_'
             }
             break
         }
@@ -406,6 +417,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
 
             if ($wordToComplete -like "-*") {
             } else {
+                _example_callback '_'
             }
             break
         }

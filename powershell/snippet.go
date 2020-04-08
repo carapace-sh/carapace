@@ -16,24 +16,31 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 
 	var subCommandCases bytes.Buffer
 	generatePowerShellSubcommandCases(&subCommandCases, cmd, actions)
-	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), cmd.Name(), subCommandCases.String())
+	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), subCommandCases.String())
 
 	return buf.String()
 }
 
-// TODO only show flag completions when current entry starts with '-', else try powitional completion
-// TODO try positional completion if no subcommands
-// TODO add empty completion when $completions is empty to prevent fallback to file completion
 var powerShellCompletionTemplate = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $previous = $commandElements[-1].Value
+    $previous = $commandElements[-1].Extent
     if ($wordToComplete) {
-        $previous = $commandElements[-2].Value
+        $previous = $commandElements[-2].Extent
     }
-    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Value})
+
+    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Extent})
+    
+    Function _%v_callback {
+      param($uid)
+      if (!$wordToComplete) {
+        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) _ | Out-String | Invoke-Expression
+      } else {
+        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
+      }
+    }
     
     $completions = @(switch ($state) {%s
     })
@@ -73,9 +80,9 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string) string {
 			return
 		}
 
-		match := fmt.Sprintf(`--%v`, flag.Name)
+		match := fmt.Sprintf(`^(--%v)$`, flag.Name)
 		if flag.Shorthand != "" {
-			match = fmt.Sprintf(`-%v|--%v`, flag.Shorthand, flag.Name)
+			match = fmt.Sprintf(`^(-%v|--%v)$`, flag.Shorthand, flag.Name)
 		}
 		var action = ""
 		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
@@ -109,6 +116,10 @@ func snippetTODO(cmd *cobra.Command) string {
 			usage := escapeStringForPowerShell(subCmd.Short)
 			result += fmt.Sprintf("\n                [CompletionResult]::new('%s ', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), usage)
 		}
+	}
+
+	if !cmd.HasSubCommands() {
+		result += fmt.Sprintf("\n                _%v_callback '_'", cmd.Root().Name())
 	}
 	result += fmt.Sprint("\n            }")
 	result += fmt.Sprint("\n            break\n        }")

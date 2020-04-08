@@ -167,7 +167,7 @@ example <TAB>
 
 or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
-docker-compose run build
+docker-compose run --rm build
 docker-compose run --rm [bash|fish|powershell|zsh]
 
 example <TAB>

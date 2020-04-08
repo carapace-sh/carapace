@@ -29,6 +29,10 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
+func EscapeSpace(value string) string {
+	return strings.Replace(value, " ", "` ", -1)
+}
+
 func Callback(prefix string, uid string) string {
 	return fmt.Sprintf("_%v_callback '%v'", prefix, uid)
 }
@@ -38,11 +42,11 @@ func ActionExecute(command string) string {
 }
 
 func ActionDirectories() string {
-	return ActionValues("") // TODO
+	return `[CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')`
 }
 
 func ActionFiles(suffix string) string {
-	return ActionValues("") // TODO
+	return `[CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')`
 }
 
 func ActionNetInterfaces() string {
@@ -69,7 +73,7 @@ func ActionValues(values ...string) string {
 
 	vals := make([]string, len(sanitized))
 	for index, val := range sanitized {
-		vals[index] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, ' ')`, val, val)
+		vals[index] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, ' ')`, EscapeSpace(val), val)
 	}
 	return strings.Join(vals, "\n")
 }
@@ -80,7 +84,7 @@ func ActionValuesDescribed(values ...string) string {
 	vals := make([]string, len(sanitized))
 	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, '%v')`, val, val, values[index+1])
+			vals[index/2] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, '%v')`, EscapeSpace(val), val, values[index+1])
 		}
 	}
 	return strings.Join(vals, "\n")

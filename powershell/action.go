@@ -38,7 +38,7 @@ func Callback(prefix string, uid string) string {
 }
 
 func ActionExecute(command string) string {
-	return ActionMessage("TODO") // TODO
+	return fmt.Sprintf(`"%v" | Out-String | InvokeExpression`, strings.Replace(command, "\n", "`n", -1))
 }
 
 func ActionDirectories() string {
@@ -54,11 +54,11 @@ func ActionNetInterfaces() string {
 }
 
 func ActionUsers() string {
-	return `$(Get-LocalUser).Name` // TODO
+	return `$(Get-LocalUser).Name`
 }
 
 func ActionGroups() string {
-	return `$(Get-Localgroup).Name` // TODO
+	return `$(Get-Localgroup).Name`
 }
 
 func ActionHosts() string {

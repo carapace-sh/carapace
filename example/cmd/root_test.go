@@ -310,8 +310,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 '^(-m|--message)$' {
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('message` + "`" + ` example ', 'message example', [CompletionResultType]::ParameterValue, ' ') 
+                        [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example')
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example')
+                        
+                         
                         break
                       }
                 '^(--multi_parts)$' {

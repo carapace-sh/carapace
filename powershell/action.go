@@ -50,15 +50,15 @@ func ActionFiles(suffix string) string {
 }
 
 func ActionNetInterfaces() string {
-	return `$(Get-NetAdapter).Name`
+	return `$(Get-NetAdapter).Name` // TODO test this
 }
 
 func ActionUsers() string {
-	return `$(Get-LocalUser).Name`
+	return `$(Get-LocalUser).Name` // TODO test this
 }
 
 func ActionGroups() string {
-	return `$(Get-Localgroup).Name`
+	return `$(Get-Localgroup).Name` // TODO test this
 }
 
 func ActionHosts() string {
@@ -91,7 +91,7 @@ func ActionValuesDescribed(values ...string) string {
 }
 
 func ActionMessage(msg string) string {
-	return ActionValues("ERR", msg)
+	return ActionValuesDescribed("_", msg, "ERR", msg)
 }
 
 func ActionMultiParts(separator rune, values ...string) string {

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/bash"
+	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/powershell"
 	"github.com/rsteube/carapace/uid"
@@ -58,6 +59,14 @@ func (c Carapace) Bash() string {
 	return bash.Snippet(c.cmd.Root(), actions)
 }
 
+func (c Carapace) Elvish() string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Elvish
+	}
+	return elvish.Snippet(c.cmd.Root(), actions)
+}
+
 func (c Carapace) Fish() string {
 	actions := make(map[string]string, len(completions.actions))
 	for key, value := range completions.actions {
@@ -86,6 +95,8 @@ func (c Carapace) Snippet(shell string) string {
 	switch shell {
 	case "bash":
 		return c.Bash()
+	case "elvish":
+		return c.Elvish()
 	case "fish":
 		return c.Fish()
 	case "powershell":
@@ -116,18 +127,12 @@ func addCompletionCommand(cmd *cobra.Command) {
 			} else {
 				if len(args) == 1 {
 					switch args[0] {
-					case "bash":
-						fmt.Println(Gen(cmd).Bash())
-					case "fish":
-						fmt.Println(Gen(cmd).Fish())
-					case "powershell":
-						fmt.Println(Gen(cmd).Powershell())
-					case "zsh":
-						fmt.Println(Gen(cmd).Zsh())
 					case "debug":
 						for uid, action := range completions.actions {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
+					default:
+						fmt.Println(Gen(cmd).Snippet(args[0]))
 					}
 				} else {
 					callback := args[1]

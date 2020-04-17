@@ -50,7 +50,7 @@ _example_completions() {
 
 
           *)
-            COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\ninjection' -- "$last"))
+            COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\nhelp\ninjection' -- "$last"))
             ;;
         esac
       fi
@@ -148,6 +148,20 @@ _example_completions() {
       ;;
 
 
+    '_example__help' )
+      if [[ $last == -* ]]; then
+        COMPREPLY=($())
+      else
+        case $previous in
+
+          *)
+            COMPREPLY=($(eval $(_example_callback '_')))
+            ;;
+        esac
+      fi
+      ;;
+
+
     '_example__injection' )
       if [[ $last == -* ]]; then
         COMPREPLY=($())
@@ -169,7 +183,141 @@ _example_completions() {
 
 complete -F _example_completions example
 `
+	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Bash())
+}
+
+func TestElvish(t *testing.T) {
+	expected := `edit:completion:arg-completer[example] = [@arg]{
+  fn _example_callback [uid]{
+    # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
+    mkdir -p ~/.elvish/_carapace
+    echo (joins ' ' $arg) | xargs example _carapace elvish $uid > ~/.elvish/_carapace/_example_callback.elv
+    -source ~/.elvish/_carapace/_example_callback.elv
+    rm ~/.elvish/_carapace/_example_callback.elv
+  }
+
+  fn subindex [subcommand]{
+    # TODO 'edit:complete-getopt' needs the arguments shortened for subcommmands - pretty optimistic here
+    index=1
+    for x $arg { if (eq $x $subcommand) { break } else { index = (+ $index 1) } } 
+    echo $index
+  }
+  
+  state=(echo (joins ' ' $arg) | xargs example _carapace elvish state)
+  if (eq 1 0) {
+  }  elif (eq $state '_example') {
+    opt-specs = [
+        [&long=array &desc='multiflag' &short=a &arg-required=$true &completer=[_]{  }]
+        [&long=persistentFlag &desc='Help message for persistentFlag' &short=p]
+        [&long=toggle &desc='Help message for toggle' &short=t]
+    ]
+    arg-handlers = [
+        [_]{ edit:complex-candidate action &display-suffix=' (action example)'
+edit:complex-candidate alias &display-suffix=' (action example)'
+edit:complex-candidate callback &display-suffix=' (callback example)'
+edit:complex-candidate condition &display-suffix=' (condition example)'
+edit:complex-candidate help &display-suffix=' (Help about any command)'
+edit:complex-candidate injection &display-suffix=' (just trying to break things)'
+
+
+
+
+
+ }
+    ]
+    subargs = $arg[(subindex example):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }  elif (eq $state '_example__action') {
+    opt-specs = [
+        [&long=custom &desc='custom flag' &short=c &arg-required=$true &completer=[_]{  }]
+        [&long=directories &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
+        [&long=files &desc='files flag' &short=f &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
+        [&long=groups &desc='groups flag' &short=g &arg-required=$true &completer=[_]{  }]
+        [&long=hosts &desc='hosts flag' &arg-required=$true &completer=[_]{  }]
+        [&long=message &desc='message flag' &short=m &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display-suffix=' (message example)'
+edit:complex-candidate _ &display-suffix=' ()'
+
+ }]
+        [&long=multi_parts &desc='multi_parts flag' &arg-required=$true &completer=[_]{ put multi/parts multi/parts/example multi/parts/test example/parts }]
+        [&long=net_interfaces &desc='net_interfaces flag' &short=n &arg-required=$true &completer=[_]{  }]
+        [&long=users &desc='users flag' &short=u &arg-required=$true &completer=[_]{  }]
+        [&long=values &desc='values flag' &short=v &arg-required=$true &completer=[_]{ put values example }]
+        [&long=values_described &desc='values with description flag' &short=d &arg-required=$true &completer=[_]{ edit:complex-candidate values &display-suffix=' (valueDescription)'
+edit:complex-candidate example &display-suffix=' (exampleDescription)'
+
+ }]
+    ]
+    arg-handlers = [
+      [_]{ put positional1 p1 }
+      [_]{ put positional2 p2 }
+    ]
+    subargs = $arg[(subindex action):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }  elif (eq $state '_example__callback') {
+    opt-specs = [
+        [&long=callback &desc='Help message for callback' &short=c &arg-required=$true &completer=[_]{ _example_callback '_example__callback##callback' }]
+    ]
+    arg-handlers = [
+      [_]{ _example_callback '_example__callback#1' }
+    ]
+    subargs = $arg[(subindex callback):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }  elif (eq $state '_example__condition') {
+    opt-specs = [
+        [&long=required &desc='required flag' &short=r &arg-required=$true &completer=[_]{ put valid invalid }]
+    ]
+    arg-handlers = [
+      [_]{ _example_callback '_example__condition#1' }
+    ]
+    subargs = $arg[(subindex condition):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }  elif (eq $state '_example__help') {
+    opt-specs = [
+
+    ]
+    arg-handlers = [
+
+    ]
+    subargs = $arg[(subindex help):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }  elif (eq $state '_example__injection') {
+    opt-specs = [
+
+    ]
+    arg-handlers = [
+      [_]{ put echo fail }
+      [_]{ put echo fail }
+      [_]{ put echo fail }
+      [_]{ put  echo fail  }
+      [_]{ put  echo fail  }
+      [_]{ put  echo fail  }
+      [_]{ put echo fail }
+      [_]{ edit:complex-candidate ERR &display-suffix=' (no values to complete)'
+edit:complex-candidate _ &display-suffix=' ()'
+
+ }
+      [_]{ put LAST POSITIONAL VALUE }
+    ]
+    subargs = $arg[(subindex injection):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
+  }
+}
+`
+	rootCmd.InitDefaultHelpCmd()
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Elvish())
 }
 
 func TestFish(t *testing.T) {
@@ -208,6 +356,7 @@ complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help mess
 complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
 complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
 complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
+complete -c example -f -n '_example_state _example ' -a 'help ' -d 'Help about any command'
 complete -c example -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
 
 
@@ -233,8 +382,12 @@ complete -c example -f -n '_example_state _example__condition' -l required -s r 
 complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
 
 
+complete -c example -f -n '_example_state _example__help' -a '(_example_callback _)'
+
+
 complete -c example -f -n '_example_state _example__injection' -a '(_example_callback _)'
 `
+	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
 }
 
@@ -280,6 +433,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('action ', 'action', [CompletionResultType]::Command, 'action example')
                 [CompletionResult]::new('callback ', 'callback', [CompletionResultType]::Command, 'callback example')
                 [CompletionResult]::new('condition ', 'condition', [CompletionResultType]::Command, 'condition example')
+                [CompletionResult]::new('help ', 'help', [CompletionResultType]::Command, 'Help about any command')
                 [CompletionResult]::new('injection ', 'injection', [CompletionResultType]::Command, 'just trying to break things')
             }
             break
@@ -412,6 +566,20 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 }
             }
 
+        '_example__help' {
+            switch -regex ($previous) {
+
+                default {
+
+            if ($wordToComplete -like "-*") {
+            } else {
+                _example_callback '_'
+            }
+            break
+        }
+                }
+            }
+
         '_example__injection' {
             switch -regex ($previous) {
 
@@ -435,6 +603,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }`
+	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Powershell())
 }
 
@@ -461,6 +630,7 @@ function _example {
         "alias:action example"
         "callback:callback example"
         "condition:condition example"
+        "help:Help about any command"
         "injection:just trying to break things"
       )
       _describe "command" commands
@@ -479,6 +649,9 @@ function _example {
       ;;
     condition)
       _example__condition
+      ;;
+    help)
+      _example__help
       ;;
     injection)
       _example__injection
@@ -515,6 +688,11 @@ function _example__condition {
     "1:: : eval \$(${os_args[1]} _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 
+function _example__help {
+    _arguments -C \
+    "*::arg:->args"
+}
+
 function _example__injection {
     _arguments -C \
     "1:: :_values '' echo\ fail" \
@@ -529,5 +707,6 @@ function _example__injection {
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `
+	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Zsh())
 }

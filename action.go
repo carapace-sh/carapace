@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"github.com/rsteube/carapace/bash"
+	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/powershell"
 	"github.com/rsteube/carapace/zsh"
@@ -10,6 +11,7 @@ import (
 
 type Action struct {
 	Bash       string
+	Elvish     string
 	Fish       string
 	Zsh        string
 	Powershell string
@@ -23,6 +25,9 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	if a.Callback != nil {
 		if a.Bash == "" {
 			a.Bash = bash.Callback(cmd.Root().Name(), uid)
+		}
+		if a.Elvish == "" {
+			a.Elvish = elvish.Callback(cmd.Root().Name(), uid)
 		}
 		if a.Fish == "" {
 			a.Fish = fish.Callback(cmd.Root().Name(), uid)
@@ -43,6 +48,8 @@ func (a Action) Value(shell string) string {
 		return a.Bash
 	case "fish":
 		return a.Fish
+	case "elvish":
+		return a.Elvish
 	case "powershell":
 		return a.Powershell
 	case "zsh":
@@ -61,6 +68,7 @@ func ActionCallback(callback CompletionCallback) Action {
 func ActionExecute(command string) Action {
 	return Action{
 		Bash:       bash.ActionExecute(command),
+		Elvish:     elvish.ActionExecute(command),
 		Fish:       fish.ActionExecute(command),
 		Powershell: powershell.ActionExecute(command),
 		Zsh:        zsh.ActionExecute(command),
@@ -75,6 +83,7 @@ func ActionBool() Action {
 func ActionDirectories() Action {
 	return Action{
 		Bash:       bash.ActionDirectories(),
+		Elvish:     elvish.ActionDirectories(),
 		Fish:       fish.ActionDirectories(),
 		Powershell: powershell.ActionDirectories(),
 		Zsh:        zsh.ActionDirectories(),
@@ -84,6 +93,7 @@ func ActionDirectories() Action {
 func ActionFiles(suffix string) Action {
 	return Action{
 		Bash:       bash.ActionFiles(suffix),
+		Elvish:     elvish.ActionFiles(suffix),
 		Fish:       fish.ActionFiles(suffix),
 		Powershell: powershell.ActionFiles(suffix),
 		Zsh:        zsh.ActionFiles("*" + suffix),
@@ -94,6 +104,7 @@ func ActionFiles(suffix string) Action {
 func ActionNetInterfaces() Action {
 	return Action{
 		Bash:       bash.ActionNetInterfaces(),
+		Elvish:     elvish.ActionNetInterfaces(),
 		Fish:       fish.ActionNetInterfaces(),
 		Powershell: powershell.ActionNetInterfaces(),
 		Zsh:        zsh.ActionNetInterfaces(),
@@ -104,6 +115,7 @@ func ActionNetInterfaces() Action {
 func ActionUsers() Action {
 	return Action{
 		Bash:       bash.ActionUsers(),
+		Elvish:     elvish.ActionUsers(),
 		Fish:       fish.ActionUsers(),
 		Powershell: powershell.ActionUsers(),
 		Zsh:        zsh.ActionUsers(),
@@ -114,6 +126,7 @@ func ActionUsers() Action {
 func ActionGroups() Action {
 	return Action{
 		Bash:       bash.ActionGroups(),
+		Elvish:     elvish.ActionGroups(),
 		Fish:       fish.ActionGroups(),
 		Powershell: powershell.ActionGroups(),
 		Zsh:        zsh.ActionGroups(),
@@ -124,6 +137,7 @@ func ActionGroups() Action {
 func ActionHosts() Action {
 	return Action{
 		Bash:       bash.ActionHosts(),
+		Elvish:     elvish.ActionHosts(),
 		Fish:       fish.ActionHosts(),
 		Powershell: powershell.ActionHosts(),
 		Zsh:        zsh.ActionHosts(),
@@ -134,6 +148,7 @@ func ActionHosts() Action {
 func ActionValues(values ...string) Action {
 	return Action{
 		Bash:       bash.ActionValues(values...),
+		Elvish:     elvish.ActionValues(values...),
 		Fish:       fish.ActionValues(values...),
 		Powershell: powershell.ActionValues(values...),
 		Zsh:        zsh.ActionValues(values...),
@@ -144,6 +159,7 @@ func ActionValues(values ...string) Action {
 func ActionValuesDescribed(values ...string) Action {
 	return Action{
 		Bash:       bash.ActionValuesDescribed(values...),
+		Elvish:     elvish.ActionValuesDescribed(values...),
 		Fish:       fish.ActionValuesDescribed(values...),
 		Powershell: powershell.ActionValuesDescribed(values...),
 		Zsh:        zsh.ActionValuesDescribed(values...),
@@ -154,6 +170,7 @@ func ActionValuesDescribed(values ...string) Action {
 func ActionMessage(msg string) Action {
 	return Action{
 		Bash:       bash.ActionMessage(msg),
+		Elvish:     elvish.ActionMessage(msg),
 		Fish:       fish.ActionMessage(msg),
 		Powershell: powershell.ActionMessage(msg),
 		Zsh:        zsh.ActionMessage(msg),
@@ -164,6 +181,7 @@ func ActionMessage(msg string) Action {
 func ActionMultiParts(separator rune, values ...string) Action {
 	return Action{
 		Bash:       bash.ActionMultiParts(separator, values...),
+		Elvish:     elvish.ActionMultiParts(separator, values...),
 		Fish:       fish.ActionMultiParts(separator, values...),
 		Powershell: powershell.ActionMultiParts(separator, values...),
 		Zsh:        zsh.ActionMultiParts(separator, values...),

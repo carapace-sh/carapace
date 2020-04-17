@@ -15,6 +15,13 @@ services:
     volumes:
       - '.:/carapace/'
 
+  elvish:
+    build:
+      context: .
+      dockerfile: Dockerfile.elvish
+    volumes:
+      - '.:/carapace/'
+
   fish:
     build:
       context: .

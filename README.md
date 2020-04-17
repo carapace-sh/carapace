@@ -5,8 +5,9 @@
 Completion script generator for [cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
+- [Elvish](https://elv.sh/ref/edit.html#editcompletionarg-completer)
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
-- [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter) _(in progress)_
+- [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
 - [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 
@@ -109,6 +110,10 @@ Since callbacks are simply invocations of the program they can be tested directl
 ./example _carapace bash '_example__condition#1' example condition --required invalid
 #compgen -W "ERR flag_--required_must_be_set_to_valid:_invalid" -- $last
 
+./example _carapace elvish '_example__condition#1' example condition --required invalid
+#edit:complex-candidate ERR &display-suffix=' (flag --required must be set to valid: invalid)'
+#edit:complex-candidate _ &display-suffix=' ()'
+
 ./example _carapace fish '_example__condition#1' example condition --required invalid
 #echo -e ERR\tflag --required must be set to valid: invalid\n_\t\n\n
 
@@ -132,6 +137,7 @@ carapace.Action{Zsh: "_most_recent_file 2"}
 
 Additional information can be found at:
 - Bash: [bash-programmable-completion-tutorial](https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial) and [Programmable-Completion-Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins)
+- Elvish: [using-and-writing-completions-in-elvish](https://zzamboni.org/post/using-and-writing-completions-in-elvish/) and [argument-completer](https://elv.sh/ref/edit.html#argument-completer)
 - Fish: [fish-shell/share/functions](https://github.com/fish-shell/fish-shell/tree/master/share/functions) and [writing your own completions](https://fishshell.com/docs/current/#writing-your-own-completions)
 - Powershell: [Dynamic Tab Completion](https://adamtheautomator.com/powershell-parameters-argumentcompleter/) and [Register-ArgumentCompleter](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
 - Zsh: [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and [Completion-System](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
@@ -148,6 +154,11 @@ go build .
 # bash
 PATH=$PATH:$(pwd)
 source <(example _carapace bash)
+
+# elvish
+paths=[$@paths (pwd)]
+example _carapace elvish > example.elv
+-source example.elv
 
 # fish
 set PATH $PATH (pwd) 
@@ -168,7 +179,7 @@ example <TAB>
 or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
 docker-compose run --rm build
-docker-compose run --rm [bash|fish|powershell|zsh]
+docker-compose run --rm [bash|elvish|fish|powershell|zsh]
 
 example <TAB>
 ```

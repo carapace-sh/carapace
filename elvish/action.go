@@ -78,10 +78,11 @@ func ActionValues(values ...string) string {
 
 func ActionValuesDescribed(values ...string) string {
 	// TODO verify length (description always exists)
+	sanitized := Sanitize(values...)
 	vals := make([]string, len(values))
-	for index, val := range values {
+	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf(`edit:complex-candidate %v &display-suffix=' (%v)'`, val, values[index+1])
+			vals[index/2] = fmt.Sprintf(`edit:complex-candidate %v &display-suffix=' (%v)'`, val, sanitized[index+1])
 		}
 	}
 	return strings.Join(vals, "\n")

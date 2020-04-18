@@ -116,7 +116,7 @@ func snippetPositionalCompletion(action string) string {
 func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 	spec := []string{
 		fmt.Sprintf(`&long=%v`, flag.Name),
-		fmt.Sprintf(`&desc='%v'`, flag.Usage),
+		fmt.Sprintf(`&desc='%v'`, replacer.Replace(flag.Usage)),
 	}
 	if flag.Shorthand != "" {
 		spec = append(spec, fmt.Sprintf(`&short=%v`, flag.Shorthand))

@@ -678,14 +678,14 @@ function _example__action {
 
 function _example__callback {
     _arguments -C \
-    "(-c --callback)"{-c,--callback}"[Help message for callback]: : eval \$(${os_args[1]} _carapace zsh '_example__callback##callback' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
-    "1:: : eval \$(${os_args[1]} _carapace zsh '_example__callback#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+    "(-c --callback)"{-c,--callback}"[Help message for callback]: : eval \$(example _carapace zsh '_example__callback##callback' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
+    "1:: : eval \$(example _carapace zsh '_example__callback#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 
 function _example__condition {
     _arguments -C \
     "(-r --required)"{-r,--required}"[required flag]: :_values '' valid invalid" \
-    "1:: : eval \$(${os_args[1]} _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+    "1:: : eval \$(example _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 
 function _example__help {

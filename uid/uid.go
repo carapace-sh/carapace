@@ -3,6 +3,8 @@ package uid
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -56,4 +58,14 @@ func find(cmd *cobra.Command, uid string) *cobra.Command {
 		log.Fatal(err)
 	}
 	return c
+}
+
+func Executable() string {
+	if executable, err := os.Executable(); err != nil {
+		return "echo" // safe fallback that should never happen
+	} else if filepath.Base(executable) == "cmd.test" {
+		return "example" // for `go test -v ./...`
+	} else {
+		return filepath.Base(executable)
+	}
 }

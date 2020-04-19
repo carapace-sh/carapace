@@ -91,6 +91,15 @@ func (c Carapace) Zsh() string {
 	return zsh.Snippet(c.cmd.Root(), actions)
 }
 
+func (c Carapace) Standalone() {
+	// TODO probably needs to be done for each subcommand
+	if c.cmd.Root().Flag("help") != nil {
+		c.cmd.Root().Flags().Bool("help", false, "skip")
+		c.cmd.Root().Flag("help").Hidden = true
+	}
+	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
+}
+
 func (c Carapace) Snippet(shell string) string {
 	switch shell {
 	case "bash":

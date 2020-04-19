@@ -32,7 +32,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 `
 
 	commandsVar := ""
-	if cmd.HasSubCommands() {
+	if cmd.HasAvailableSubCommands() {
 		commandsVar = "local -a commands\n"
 	}
 
@@ -56,7 +56,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	})
 
 	positionals := make([]string, 0)
-	if cmd.HasSubCommands() {
+	if cmd.HasAvailableSubCommands() {
 		positionals = []string{`    "1: :->cmnds"`, `    "*::arg:->args"`}
 	} else {
 		pos := 1
@@ -124,7 +124,7 @@ func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
 }
 
 func snippetSubcommands(cmd *cobra.Command) string {
-	if !cmd.HasSubCommands() {
+	if !cmd.HasAvailableSubCommands() {
 		return ""
 	}
 	cmnds := make([]string, 0)

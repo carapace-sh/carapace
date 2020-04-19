@@ -39,17 +39,21 @@ func TestSnippetPositionalCompletion(t *testing.T) {
 func TestSnippetSubcommands(t *testing.T) {
 	root := &cobra.Command{
 		Use: "root",
+		Run: func(cmd *cobra.Command, args []string) {},
 	}
 	sub1 := &cobra.Command{
 		Use:     "sub1",
+		Run:     func(cmd *cobra.Command, args []string) {},
 		Aliases: []string{"alias1", "alias2"},
 	}
 	sub2 := &cobra.Command{
 		Use:   "sub2",
+		Run:   func(cmd *cobra.Command, args []string) {},
 		Short: "short description",
 	}
 	hidden := &cobra.Command{
 		Use:    "hidden",
+		Run:    func(cmd *cobra.Command, args []string) {},
 		Hidden: true,
 	}
 	root.AddCommand(sub1)

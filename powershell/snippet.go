@@ -16,7 +16,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 
 	var subCommandCases bytes.Buffer
 	generatePowerShellSubcommandCases(&subCommandCases, cmd, actions)
-	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), subCommandCases.String())
+	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), uid.Executable(), subCommandCases.String())
 
 	return buf.String()
 }
@@ -118,7 +118,7 @@ func snippetTODO(cmd *cobra.Command) string {
 		}
 	}
 
-	if !cmd.HasSubCommands() {
+	if !cmd.HasAvailableSubCommands() {
 		result += fmt.Sprintf("\n                _%v_callback '_'", cmd.Root().Name())
 	}
 	result += fmt.Sprint("\n            }")

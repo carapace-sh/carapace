@@ -47,7 +47,7 @@ _%v_completions() {
 }
 
 complete -F _%v_completions %v
-`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), snippetFunctions(cmd, actions), cmd.Name(), cmd.Name())
+`, cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), snippetFunctions(cmd, actions), cmd.Name(), cmd.Name())
 
 	return result
 }
@@ -82,7 +82,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	})
 
 	var positionalAction string
-	if cmd.HasSubCommands() {
+	if cmd.HasAvailableSubCommands() {
 		subcommands := make([]string, 0)
 		for _, c := range cmd.Commands() {
 			if !c.Hidden {

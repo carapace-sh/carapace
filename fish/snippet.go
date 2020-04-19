@@ -46,7 +46,7 @@ function _%v_callback
 end
 
 complete -c %v -f
-`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name())
 	result += snippetFunctions(cmd, actions)
 
 	return result
@@ -72,11 +72,11 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	})
 
 	positionals := make([]string, 0)
-	if cmd.HasSubCommands() {
+	if cmd.HasAvailableSubCommands() {
 		positionals = []string{}
 		for _, subcmd := range cmd.Commands() {
 			if !subcmd.Hidden {
-				positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name()+" "+strings.Join(subcmd.Aliases, " "), subcmd.Short))
+				positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name()+" "+strings.Join(subcmd.Aliases, " "), replacer.Replace(subcmd.Short)))
 			}
 		}
 	} else {
@@ -130,7 +130,7 @@ func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {
 }
 
 func snippetSubcommands(cmd *cobra.Command) string {
-	if !cmd.HasSubCommands() {
+	if !cmd.HasAvailableSubCommands() {
 		return ""
 	}
 	cmnds := make([]string, 0)

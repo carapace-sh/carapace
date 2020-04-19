@@ -2,6 +2,7 @@ package zsh
 
 import (
 	"fmt"
+	"github.com/rsteube/carapace/uid"
 	"strings"
 )
 
@@ -29,8 +30,8 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func Callback(uid string) string {
-	return ActionExecute(fmt.Sprintf(`${os_args[1]} _carapace zsh '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid))
+func Callback(cuid string) string {
+	return ActionExecute(fmt.Sprintf(`%v _carapace zsh '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid.Executable(), cuid))
 }
 
 // ActionExecute uses command substitution to invoke a command and evalues it's result as Action

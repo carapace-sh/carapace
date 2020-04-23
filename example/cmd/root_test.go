@@ -191,10 +191,10 @@ func TestElvish(t *testing.T) {
 	expected := `edit:completion:arg-completer[example] = [@arg]{
   fn _example_callback [uid]{
     # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
-    mkdir -p ~/.elvish/_carapace
-    echo (joins ' ' $arg) | xargs example _carapace elvish $uid > ~/.elvish/_carapace/_example_callback.elv
-    -source ~/.elvish/_carapace/_example_callback.elv
-    rm ~/.elvish/_carapace/_example_callback.elv
+    tmpfile=(mktemp -t carapace_example_callback-XXXXX.elv)
+    echo (joins ' ' $arg) | xargs example _carapace elvish $uid > $tmpfile
+    -source $tmpfile
+    rm $tmpfile
   }
 
   fn subindex [subcommand]{

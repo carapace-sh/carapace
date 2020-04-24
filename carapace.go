@@ -46,8 +46,11 @@ func (c Carapace) PositionalCompletion(action ...Action) {
 
 func (c Carapace) FlagCompletion(actions ActionMap) {
 	for name, action := range actions {
-		flag := c.cmd.Flag(name) // TODO only allowed for local flags
-		completions.actions[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
+		if flag := c.cmd.LocalFlags().Lookup(name); flag == nil {
+			fmt.Fprintf(os.Stderr, "unknown flag: %v\n", name)
+		} else {
+			completions.actions[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
+		}
 	}
 }
 

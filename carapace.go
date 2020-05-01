@@ -44,6 +44,10 @@ func (c Carapace) PositionalCompletion(action ...Action) {
 	}
 }
 
+func (c Carapace) PositionalAnyCompletion(action Action) {
+	completions.actions[uid.Positional(c.cmd, 0)] = action.finalize(c.cmd, uid.Positional(c.cmd, 0))
+}
+
 func (c Carapace) FlagCompletion(actions ActionMap) {
 	for name, action := range actions {
 		if flag := c.cmd.LocalFlags().Lookup(name); flag == nil {
@@ -147,36 +151,25 @@ func addCompletionCommand(cmd *cobra.Command) {
 						fmt.Println(Gen(cmd).Snippet(args[0]))
 					}
 				} else {
-					callback := args[1]
-					origArg := []string{}
-					if len(os.Args) > 5 {
-						origArg = os.Args[5:]
-					}
-					targetCmd, targetArgs := traverse(cmd, origArg)
-					if callback == "_" {
-						if len(targetArgs) == 0 {
-							callback = uid.Positional(targetCmd, 1)
-						} else {
-							lastArg := targetArgs[len(targetArgs)-1]
-							if strings.HasSuffix(lastArg, " ") {
-								callback = uid.Positional(targetCmd, len(targetArgs)+1)
-							} else {
-								callback = uid.Positional(targetCmd, len(targetArgs))
-							}
-						}
-						if action, ok := completions.actions[callback]; !ok {
-							os.Exit(0) // ensure no message for missing action on positional completion // TODO this was only for bash, maybe enable for other shells?
-						} else {
+					targetCmd, targetArgs := findTarget(cmd)
+
+					shell := args[0]
+					id := args[1]
+
+					switch id {
+					case "_":
+						if action, ok := findAction(targetCmd, targetArgs); ok {
 							if action.Callback == nil {
-								fmt.Println(action.Value(args[0]))
-								os.Exit(0)
+								fmt.Println(action.Value(shell))
+							} else {
+								fmt.Println(action.Callback(targetArgs).Value(shell))
 							}
 						}
-					} else if callback == "state" {
+					case "state":
 						fmt.Println(uid.Command(targetCmd))
-						os.Exit(0) // TODO
+					default:
+						fmt.Println(completions.invokeCallback(id, targetArgs).Value(shell))
 					}
-					fmt.Println(completions.invokeCallback(callback, targetArgs).Value(args[0]))
 				}
 			}
 		},
@@ -185,6 +178,33 @@ func addCompletionCommand(cmd *cobra.Command) {
 		},
 		DisableFlagParsing: true,
 	})
+}
+
+func findAction(targetCmd *cobra.Command, targetArgs []string) (action Action, ok bool) {
+	var id string
+	if len(targetArgs) == 0 {
+		id = uid.Positional(targetCmd, 1)
+	} else {
+		lastArg := targetArgs[len(targetArgs)-1]
+		if strings.HasSuffix(lastArg, " ") {
+			id = uid.Positional(targetCmd, len(targetArgs)+1)
+		} else {
+			id = uid.Positional(targetCmd, len(targetArgs))
+		}
+	}
+	if action, ok = completions.actions[id]; !ok {
+		id = uid.Positional(targetCmd, 0)
+		action, ok = completions.actions[id]
+	}
+	return
+}
+
+func findTarget(cmd *cobra.Command) (*cobra.Command, []string) {
+	origArg := []string{}
+	if len(os.Args) > 5 {
+		origArg = os.Args[5:]
+	}
+	return traverse(cmd, origArg)
 }
 
 func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {

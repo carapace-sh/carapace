@@ -65,6 +65,9 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 				positionals = append(positionals, "    "+snippetPositionalCompletion(pos, action))
 				pos++
 			} else {
+				if action, ok := actions[uid.Positional(cmd, 0)]; ok {
+					positionals = append(positionals, "    "+snippetPositionalAnyCompletion(action))
+				}
 				break // TODO only consisten entriess for now
 			}
 		}
@@ -115,7 +118,11 @@ func snippetFlagCompletion(flag *pflag.Flag, action *string) (snippet string) {
 }
 
 func snippetPositionalCompletion(position int, action string) string {
-	return fmt.Sprintf(`"%v:: :%v"`, position, action)
+	return fmt.Sprintf(`"%v: :%v"`, position, action)
+}
+
+func snippetPositionalAnyCompletion(action string) string {
+	return fmt.Sprintf(`"*: :%v"`, action)
 }
 
 func zshCompFlagCouldBeSpecifiedMoreThenOnce(f *pflag.Flag) bool {

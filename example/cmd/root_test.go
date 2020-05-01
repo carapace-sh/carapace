@@ -264,6 +264,8 @@ edit:complex-candidate example &display-suffix=' (exampleDescription)'
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__callback#1' }
+      [_]{ _example_callback '_example__callback#0' }
+      ...
     ]
     subargs = $arg[(subindex callback):] 
     if (> (count $subargs) 0) {
@@ -672,20 +674,21 @@ function _example__action {
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \
     "(-d --values_described)"{-d,--values_described}"[values with description flag]: :_values '' 'values[valueDescription]' 'example[exampleDescription]'  " \
-    "1:: :_values '' positional1 p1" \
-    "2:: :_values '' positional2 p2"
+    "1: :_values '' positional1 p1" \
+    "2: :_values '' positional2 p2"
 }
 
 function _example__callback {
     _arguments -C \
     "(-c --callback)"{-c,--callback}"[Help message for callback]: : eval \$(example _carapace zsh '_example__callback##callback' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
-    "1:: : eval \$(example _carapace zsh '_example__callback#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+    "1: : eval \$(example _carapace zsh '_example__callback#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
+    "*: : eval \$(example _carapace zsh '_example__callback#0' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 
 function _example__condition {
     _arguments -C \
     "(-r --required)"{-r,--required}"[required flag]: :_values '' valid invalid" \
-    "1:: : eval \$(example _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
+    "1: : eval \$(example _carapace zsh '_example__condition#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 
 function _example__help {
@@ -695,15 +698,15 @@ function _example__help {
 
 function _example__injection {
     _arguments -C \
-    "1:: :_values '' echo\ fail" \
-    "2:: :_values '' echo\ fail" \
-    "3:: :_values '' echo\ fail" \
-    "4:: :_values '' \ echo\ fail\ " \
-    "5:: :_values '' \ echo\ fail\ " \
-    "6:: :_values '' \ echo\ fail\ " \
-    "7:: :_values '' echo\ fail" \
-    "8:: : _message -r 'no values to complete'" \
-    "9:: :_values '' LAST\ POSITIONAL\ VALUE"
+    "1: :_values '' echo\ fail" \
+    "2: :_values '' echo\ fail" \
+    "3: :_values '' echo\ fail" \
+    "4: :_values '' \ echo\ fail\ " \
+    "5: :_values '' \ echo\ fail\ " \
+    "6: :_values '' \ echo\ fail\ " \
+    "7: :_values '' echo\ fail" \
+    "8: : _message -r 'no values to complete'" \
+    "9: :_values '' LAST\ POSITIONAL\ VALUE"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `

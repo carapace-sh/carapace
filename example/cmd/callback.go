@@ -30,4 +30,10 @@ func init() {
 			return carapace.ActionValues("callback1", "callback2")
 		}),
 	)
+
+	carapace.Gen(callbackCmd).PositionalAnyCompletion(
+		carapace.ActionCallback(func(args []string) carapace.Action {
+			return carapace.ActionMessage(fmt.Sprintf("POS_%v", len(args)))
+		}),
+	)
 }

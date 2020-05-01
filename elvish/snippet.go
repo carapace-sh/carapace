@@ -92,6 +92,10 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 				break // TODO only consistent entries for now
 			}
 		}
+		if action, ok := actions[uid.Positional(cmd, 0)]; ok {
+			positionals = append(positionals, "      "+snippetPositionalCompletion(action))
+			positionals = append(positionals, "      "+"...")
+		}
 		if len(positionals) == 0 {
 			if cmd.ValidArgs != nil {
 				positionals = []string{"        " + snippetPositionalCompletion(ActionValues(cmd.ValidArgs...))}

@@ -30,10 +30,10 @@ func TestSnippetFlagCompletion(t *testing.T) {
 
 func TestSnippetPositionalCompletion(t *testing.T) {
 	pos1 := snippetPositionalCompletion(1, ActionValues("a", "b", "c"))
-	assert.Equal(t, `"1:: :_values '' a b c"`, pos1)
+	assert.Equal(t, `"1: :_values '' a b c"`, pos1)
 
 	pos2 := snippetPositionalCompletion(2, ActionMessage("test"))
-	assert.Equal(t, `"2:: : _message -r 'test'"`, pos2)
+	assert.Equal(t, `"2: : _message -r 'test'"`, pos2)
 }
 
 func TestSnippetSubcommands(t *testing.T) {

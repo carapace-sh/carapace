@@ -59,43 +59,23 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 }
 
 func (c Carapace) Bash() string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Bash
-	}
-	return bash.Snippet(c.cmd.Root(), actions)
+	return c.Snippet("bash")
 }
 
 func (c Carapace) Elvish() string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Elvish
-	}
-	return elvish.Snippet(c.cmd.Root(), actions)
+	return c.Snippet("elvish")
 }
 
 func (c Carapace) Fish() string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Fish
-	}
-	return fish.Snippet(c.cmd.Root(), actions)
+	return c.Snippet("fish")
 }
 
 func (c Carapace) Powershell() string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Powershell
-	}
-	return powershell.Snippet(c.cmd.Root(), actions)
+	return c.Snippet("powershell")
 }
 
 func (c Carapace) Zsh() string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Zsh
-	}
-	return zsh.Snippet(c.cmd.Root(), actions)
+	return c.Snippet("zsh")
 }
 
 func (c Carapace) Standalone() {
@@ -108,20 +88,22 @@ func (c Carapace) Standalone() {
 }
 
 func (c Carapace) Snippet(shell string) string {
+	var snippet func(cmd *cobra.Command, actions map[string]string) string
 	switch shell {
 	case "bash":
-		return c.Bash()
+		snippet = bash.Snippet
 	case "elvish":
-		return c.Elvish()
+		snippet = elvish.Snippet
 	case "fish":
-		return c.Fish()
+		snippet = fish.Snippet
 	case "powershell":
-		return c.Powershell()
+		snippet = powershell.Snippet
 	case "zsh":
-		return c.Zsh()
+		snippet = zsh.Snippet
 	default:
-		return fmt.Sprintf("expected 'bash', 'fish', 'powershell' or 'zsh' [was: %v]", shell)
+		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'powershell' or 'zsh' [was: %v]", shell)
 	}
+	return snippet(c.cmd.Root(), completions.actions.Shell(shell))
 }
 
 var completions = Completions{

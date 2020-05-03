@@ -59,6 +59,14 @@ func (a Action) Value(shell string) string {
 	}
 }
 
+func (m *ActionMap) Shell(shell string) map[string]string {
+	actions := make(map[string]string, len(completions.actions))
+	for key, value := range completions.actions {
+		actions[key] = value.Value(shell)
+	}
+	return actions
+}
+
 // ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{Callback: callback}

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	ps "github.com/mitchellh/go-ps"
 	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
@@ -121,7 +122,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				fmt.Println("zsh/fish argument missing")
+				fmt.Println(Gen(cmd).Snippet(determineShell()))
 			} else {
 				if len(args) == 1 {
 					switch args[0] {
@@ -194,6 +195,30 @@ func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
 	targetCmd, targetArgs, _ := cmd.Root().Traverse(args)
 	targetCmd.ParseFlags(targetArgs)
 	return targetCmd, targetCmd.Flags().Args() // TODO check length
+}
+
+func determineShell() string {
+	process, err := ps.FindProcess(os.Getpid())
+	for {
+		if process, err = ps.FindProcess(process.PPid()); err != nil {
+			return ""
+		} else {
+			switch process.Executable() {
+			case "bash":
+				return "bash"
+			case "elvish":
+				return "elvish"
+			case "fish":
+				return "fish"
+			case "pwsh":
+				return "powershell"
+			case "zsh":
+				return "zsh"
+			default:
+			}
+		}
+
+	}
 }
 
 func IsCallback() bool {

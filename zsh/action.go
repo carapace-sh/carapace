@@ -20,6 +20,8 @@ var sanitizer = strings.NewReplacer(
 	`)`, ``,
 	`;`, ``,
 	`#`, ``,
+	`[`, `\[`,
+	`]`, `\]`,
 )
 
 func Sanitize(values ...string) []string {
@@ -99,7 +101,7 @@ func ActionValuesDescribed(values ...string) string {
 	vals := make([]string, len(sanitized))
 	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf("'%v[%v]'", strings.Replace(val, " ", `\ `, -1), strings.Replace(values[index+1], " ", `\ `, -1))
+			vals[index/2] = fmt.Sprintf("'%v[%v]'", strings.Replace(val, " ", `\ `, -1), strings.Replace(sanitized[index+1], " ", `\ `, -1))
 		}
 	}
 	return fmt.Sprintf(`_values '' %v`, strings.Join(vals, " "))

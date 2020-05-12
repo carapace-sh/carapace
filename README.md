@@ -142,6 +142,10 @@ Additional information can be found at:
 - Powershell: [Dynamic Tab Completion](https://adamtheautomator.com/powershell-parameters-argumentcompleter/) and [Register-ArgumentCompleter](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
 - Zsh: [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and [Completion-System](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
 
+## Standalone Mode
+
+Carapace can also be used to provide completion for arbitrary commands as well (similar to [aws_completer](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html)).
+See [rsteube/carapace-completers](https://github.com/rsteube/carapace-completers) for examples. There is also a binary to parse flags from gnu help pages at [carapace](./carapace/).
 
 ## Example
 

@@ -125,6 +125,25 @@ Since callbacks are simply invocations of the program they can be tested directl
 # _message -r 'flag --required must be set to valid: invalid'
 ```
 
+### ActionMultiParts
+
+> This is an initial version which still got some quirks, expect some changes here
+
+ActionMultiParts is a [callback action](#actioncallback) where parts of an argument can be completed separately (e.g. user:group from [chown](https://github.com/rsteube/carapace-completers/blob/master/completers/chown_completer/cmd/root.go)). Divider can be empty as well, but note that `bash` and `fish` will add the space suffix for anything other than `/=@:.,` (it still works, but after each selction backspace is needed to continue the completion).
+
+```go
+carapace.ActionMultiParts(":", func(args []string, parts []string) []string {
+	switch len(parts) {
+	case 0:
+		return []{"user1:", "user2:", "user3:"}
+	case 1:
+		return []{"groupA", "groupB", "groupC"}
+	default:
+		return []string{}
+	}
+})
+```
+
 ### Custom Action
 
 For [actions](#action) that aren't implemented or missing required options, a custom action can be defined.

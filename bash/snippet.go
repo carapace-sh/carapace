@@ -19,7 +19,7 @@ _%v_callback() {
       last="${last// /\\\\ }" 
   fi
 
-  echo "$compline" | sed -e 's/ $/ _/' -e 's/"/\"/g' | xargs %v _carapace bash "$1"
+  echo "$compline" | sed -e "s/ $/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash "$1"
 }
 
 _%v_completions() {
@@ -34,7 +34,7 @@ _%v_completions() {
   fi
 
   local state
-  state="$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs %v _carapace bash state)"
+  state="$(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash state)"
   local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
   local IFS=$'\n'
 
@@ -43,7 +43,7 @@ _%v_completions() {
   esac
 
   [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ ${COMPREPLY[0]} == */ ]] && compopt -o nospace
+  [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 
 complete -F _%v_completions %v

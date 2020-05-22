@@ -94,6 +94,15 @@ func ActionMessage(msg string) string {
 	return ActionValuesDescribed("_", msg, "ERR", msg)
 }
 
-func ActionMultiParts(separator rune, values ...string) string {
-	return ActionValues(values...)
+func ActionPrefixValues(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		vals[index] = fmt.Sprintf(`[CompletionResult]::new('%v', '%v', [CompletionResultType]::ParameterValue, ' ')`, EscapeSpace(prefix+val), val)
+	}
+	return strings.Join(vals, "\n")
 }

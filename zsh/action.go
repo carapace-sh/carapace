@@ -112,7 +112,35 @@ func ActionMessage(msg string) string {
 	return fmt.Sprintf(" _message -r '%v'", msg) // space before _message is necessary
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char
-func ActionMultiParts(separator rune, values ...string) string {
-	return fmt.Sprintf("_multi_parts %v '(%v)'", string(separator), strings.Join(values, " "))
+func ActionPrefixValues(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		// TODO escape special characters
+		//vals[index] = fmt.Sprintf("'%v'" ,strings.Replace(val, " ", `\ `, -1))
+		vals[index] = fmt.Sprintf("'%v'", val)
+	}
+	//return fmt.Sprintf("compadd -S '' -P '%v' %v", currentValue, strings.Join(vals, " "))
+	return fmt.Sprintf("compadd -S '' -p '%v' %v", prefix, strings.Join(vals, " "))
+}
+
+func ActionPrefixValuesDescribed(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		// TODO escape special characters
+		//vals[index] = fmt.Sprintf("'%v'" ,strings.Replace(val, " ", `\ `, -1))
+		vals[index] = fmt.Sprintf("'%v'", val)
+	}
+	//return fmt.Sprintf("compadd -S '' -P '%v' %v", currentValue, strings.Join(vals, " "))
+	// TODO
+	return fmt.Sprintf("local _comp_desc(desc1 desc2 desc3);compadd -S '' -l -d _comp_desc -p '%v' %v", prefix, strings.Join(vals, " "))
 }

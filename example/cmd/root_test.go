@@ -17,7 +17,7 @@ _example_callback() {
       last="${last// /\\\\ }" 
   fi
 
-  echo "$compline" | sed -e 's/ $/ _/' -e 's/"/\"/g' | xargs example _carapace bash "$1"
+  echo "$compline" | sed -e "s/ $/ ''/" -e 's/"/\"/g' | xargs example _carapace bash "$1"
 }
 
 _example_completions() {
@@ -32,7 +32,7 @@ _example_completions() {
   fi
 
   local state
-  state="$(echo "$compline" | sed -e "s/ \$/ _/" -e 's/"/\"/g' | xargs example _carapace bash state)"
+  state="$(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs example _carapace bash state)"
   local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
   local IFS=$'\n'
 
@@ -59,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--multi_parts\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -84,10 +84,6 @@ _example_completions() {
 
           -m | --message)
             COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- "$last"))
-            ;;
-
-          --multi_parts)
-            COMPREPLY=($(compgen -W $'multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts' -- "$last"))
             ;;
 
           -n | --net_interfaces)
@@ -178,7 +174,7 @@ _example_completions() {
   esac
 
   [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ ${COMPREPLY[0]} == */ ]] && compopt -o nospace
+  [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 
 complete -F _example_completions example
@@ -235,15 +231,14 @@ edit:complex-candidate injection &display-suffix=' (just trying to break things)
         [&long='custom' &desc='custom flag' &short='c' &arg-required=$true &completer=[_]{  }]
         [&long='directories' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
         [&long='files' &desc='files flag' &short='f' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
-        [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{  }]
-        [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{  }]
+        [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
+        [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
         [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display-suffix=' (message example)'
 edit:complex-candidate _ &display-suffix=' ()'
 
  }]
-        [&long='multi_parts' &desc='multi_parts flag' &arg-required=$true &completer=[_]{ put multi/parts multi/parts/example multi/parts/test example/parts }]
         [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
-        [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{  }]
+        [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
         [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate values &display-suffix=' (valueDescription)'
 edit:complex-candidate example &display-suffix=' (exampleDescription)'
@@ -264,6 +259,7 @@ edit:complex-candidate example &display-suffix=' (exampleDescription)'
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__callback#1' }
+      [_]{ _example_callback '_example__callback#2' }
       [_]{ _example_callback '_example__callback#0' }
       ...
     ]
@@ -346,48 +342,47 @@ function _example_state
 end
 
 function _example_callback
-  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ _/" | xargs example _carapace fish $argv )
+  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs example _carapace fish $argv )
   eval "$CALLBACK"
 end
 
 complete -c example -f
 
-complete -c example -f -n '_example_state _example' -l array -s a -d 'multiflag' -r
-complete -c example -f -n '_example_state _example' -l persistentFlag -s p -d 'Help message for persistentFlag'
-complete -c example -f -n '_example_state _example' -l toggle -s t -d 'Help message for toggle' -a '(echo -e "true\nfalse")' -r
-complete -c example -f -n '_example_state _example ' -a 'action alias' -d 'action example'
-complete -c example -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
-complete -c example -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
-complete -c example -f -n '_example_state _example ' -a 'help ' -d 'Help about any command'
-complete -c example -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
+complete -c 'example' -f -n '_example_state _example' -l 'array' -s 'a' -d 'multiflag' -r
+complete -c 'example' -f -n '_example_state _example' -l 'persistentFlag' -s 'p' -d 'Help message for persistentFlag'
+complete -c 'example' -f -n '_example_state _example' -l 'toggle' -s 't' -d 'Help message for toggle' -a '(echo -e "true\nfalse")' -r
+complete -c 'example' -f -n '_example_state _example ' -a 'action alias' -d 'action example'
+complete -c 'example' -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
+complete -c 'example' -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
+complete -c 'example' -f -n '_example_state _example ' -a 'help ' -d 'Help about any command'
+complete -c 'example' -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
 
 
-complete -c example -f -n '_example_state _example__action' -l custom -s c -d 'custom flag' -a '()' -r
-complete -c example -f -n '_example_state _example__action' -l directories -d 'files flag' -a '(__fish_complete_directories)' -r
-complete -c example -f -n '_example_state _example__action' -l files -s f -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
-complete -c example -f -n '_example_state _example__action' -l groups -s g -d 'groups flag' -a '(__fish_complete_groups)' -r
-complete -c example -f -n '_example_state _example__action' -l hosts -d 'hosts flag' -a '(__fish_print_hostnames)' -r
-complete -c example -f -n '_example_state _example__action' -l message -s m -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
-complete -c example -f -n '_example_state _example__action' -l multi_parts -d 'multi_parts flag' -a '(echo -e "multi/parts\nmulti/parts/example\nmulti/parts/test\nexample/parts")' -r
-complete -c example -f -n '_example_state _example__action' -l net_interfaces -s n -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
-complete -c example -f -n '_example_state _example__action' -l users -s u -d 'users flag' -a '(__fish_complete_users)' -r
-complete -c example -f -n '_example_state _example__action' -l values -s v -d 'values flag' -a '(echo -e "values\nexample")' -r
-complete -c example -f -n '_example_state _example__action' -l values_described -s d -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
-complete -c example -f -n '_example_state _example__action' -a '(_example_callback _)'
+complete -c 'example' -f -n '_example_state _example__action' -l 'custom' -s 'c' -d 'custom flag' -a '()' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'directories' -d 'files flag' -a '(__fish_complete_directories)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'files' -s 'f' -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g' -d 'groups flag' -a '(__fish_complete_groups)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(__fish_print_hostnames)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'values_described' -s 'd' -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
+complete -c 'example' -f -n '_example_state _example__action' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__callback' -l callback -s c -d 'Help message for callback' -a '(_example_callback _example__callback##callback)' -r
-complete -c example -f -n '_example_state _example__callback' -a '(_example_callback _)'
+complete -c 'example' -f -n '_example_state _example__callback' -l 'callback' -s 'c' -d 'Help message for callback' -a '(_example_callback _example__callback##callback)' -r
+complete -c 'example' -f -n '_example_state _example__callback' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__condition' -l required -s r -d 'required flag' -a '(echo -e "valid\ninvalid")' -r
-complete -c example -f -n '_example_state _example__condition' -a '(_example_callback _)'
+complete -c 'example' -f -n '_example_state _example__condition' -l 'required' -s 'r' -d 'required flag' -a '(echo -e "valid\ninvalid")' -r
+complete -c 'example' -f -n '_example_state _example__condition' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__help' -a '(_example_callback _)'
+complete -c 'example' -f -n '_example_state _example__help' -a '(_example_callback _)'
 
 
-complete -c example -f -n '_example_state _example__injection' -a '(_example_callback _)'
+complete -c 'example' -f -n '_example_state _example__injection' -a '(_example_callback _)'
 `
 	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Fish())
@@ -409,7 +404,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
     Function _example_callback {
       param($uid)
       if (!$wordToComplete) {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) _ | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) "''" | Out-String | Invoke-Expression
       } else {
         example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
       }
@@ -458,11 +453,11 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 '^(-g|--groups)$' {
-                        $(Get-Localgroup).Name 
+                        _example_callback '_example__action##groups' 
                         break
                       }
                 '^(--hosts)$' {
-                         
+                        _example_callback '_example__action##hosts' 
                         break
                       }
                 '^(-m|--message)$' {
@@ -472,19 +467,12 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                          
                         break
                       }
-                '^(--multi_parts)$' {
-                        [CompletionResult]::new('multi/parts ', 'multi/parts', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('multi/parts/example ', 'multi/parts/example', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('multi/parts/test ', 'multi/parts/test', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('example/parts ', 'example/parts', [CompletionResultType]::ParameterValue, ' ') 
-                        break
-                      }
                 '^(-n|--net_interfaces)$' {
                         $(Get-NetAdapter).Name 
                         break
                       }
                 '^(-u|--users)$' {
-                        $(Get-LocalUser).Name 
+                        _example_callback '_example__action##users' 
                         break
                       }
                 '^(-v|--values)$' {
@@ -512,7 +500,6 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('--hosts ', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
                 [CompletionResult]::new('-m ', '-m', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
-                [CompletionResult]::new('--multi_parts ', '--multi_parts', [CompletionResultType]::ParameterName, 'multi_parts flag')
                 [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
@@ -669,7 +656,6 @@ function _example__action {
     "(-g --groups)"{-g,--groups}"[groups flag]: :_groups" \
     "--hosts[hosts flag]: :_hosts" \
     "(-m --message)"{-m,--message}"[message flag]: : _message -r 'message example'" \
-    "--multi_parts[multi_parts flag]: :_multi_parts / '(multi/parts multi/parts/example multi/parts/test example/parts)'" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :_net_interfaces" \
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \
@@ -682,6 +668,7 @@ function _example__callback {
     _arguments -C \
     "(-c --callback)"{-c,--callback}"[Help message for callback]: : eval \$(example _carapace zsh '_example__callback##callback' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "1: : eval \$(example _carapace zsh '_example__callback#1' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
+    "2: : eval \$(example _carapace zsh '_example__callback#2' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "*: : eval \$(example _carapace zsh '_example__callback#0' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})"
 }
 

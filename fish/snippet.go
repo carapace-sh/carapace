@@ -41,7 +41,7 @@ function _%v_state
 end
 
 function _%v_callback
-  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ _/" | xargs %v _carapace fish $argv )
+  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish $argv )
   eval "$CALLBACK"
 end
 
@@ -76,7 +76,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		positionals = []string{}
 		for _, subcmd := range cmd.Commands() {
 			if !subcmd.Hidden {
-				positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name()+" "+strings.Join(subcmd.Aliases, " "), replacer.Replace(subcmd.Short)))
+				positionals = append(positionals, fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v ' -a '%v' -d '%v'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), subcmd.Name()+" "+strings.Join(subcmd.Aliases, " "), replacer.Replace(subcmd.Short)))
 			}
 		}
 	} else {
@@ -84,7 +84,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 			if cmd.ValidArgs != nil {
 				//positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
 			}
-			positionals = append(positionals, fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -a '(_%v_callback _)'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), cmd.Root().Name()))
+			positionals = append(positionals, fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -a '(_%v_callback _)'`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), cmd.Root().Name()))
 		}
 	}
 
@@ -113,9 +113,9 @@ func snippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string)
 	}
 
 	if flag.Shorthand == "" { // no shorthannd
-		snippet = fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -l %v -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -l '%v' -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, replacer.Replace(flag.Usage), suffix)
 	} else {
-		snippet = fmt.Sprintf(`complete -c %v -f -n '_%v_state %v' -l %v -s %v -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -l '%v' -s '%v' -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
 	}
 	return
 }

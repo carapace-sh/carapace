@@ -85,6 +85,17 @@ func ActionMessage(msg string) string {
 	return ActionExecute(fmt.Sprintf(`echo -e "ERR\t%v\n_"`, Sanitize(msg)[0]))
 }
 
-func ActionMultiParts(separator rune, values ...string) string {
-	return ActionValues(values...)
+func ActionPrefixValues(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		// TODO escape special characters
+		//vals[index] = strings.Replace(val, " ", `\ `, -1)
+		vals[index] = prefix + val
+	}
+	return ActionExecute(fmt.Sprintf(`echo -e "%v"`, strings.Join(vals, `\n`)))
 }

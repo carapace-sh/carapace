@@ -91,6 +91,21 @@ func ActionMessage(msg string) string {
 	return ActionValues("ERR", Sanitize(msg)[0])
 }
 
-func ActionMultiParts(separator rune, values ...string) string {
-	return ActionValues(values...)
+func ActionPrefixValues(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		// TODO escape special characters
+		vals[index] = strings.Replace(val, ` `, `\\\ `, -1)
+	}
+
+	if index := strings.LastIndexAny(prefix, ":="); index > -1 {
+		// COMP_WORD will split on these characters, so $last does not contain the full argument
+		prefix = prefix[index:]
+	}
+	return fmt.Sprintf(`compgen -W $'%v' -- "${last/%v/}"`, strings.Join(vals, `\n`), prefix)
 }

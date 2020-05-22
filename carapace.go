@@ -141,17 +141,19 @@ func addCompletionCommand(cmd *cobra.Command) {
 
 					switch id {
 					case "_":
-						if action, ok := findAction(targetCmd, targetArgs); ok {
+						if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
+							CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
 							if action.Callback == nil {
 								fmt.Println(action.Value(shell))
 							} else {
-								fmt.Println(action.Callback(targetArgs).Value(shell))
+								fmt.Println(action.Callback(targetArgs).NestedValue(targetArgs, shell, 1))
 							}
 						}
 					case "state":
 						fmt.Println(uid.Command(targetCmd))
 					default:
-						fmt.Println(completions.invokeCallback(id, targetArgs).Value(shell))
+						CallbackValue = uid.Value(targetCmd, targetArgs, id)
+						fmt.Println(completions.invokeCallback(id, targetArgs).NestedValue(targetArgs, shell, 1))
 					}
 				}
 			}
@@ -163,8 +165,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 	})
 }
 
-func findAction(targetCmd *cobra.Command, targetArgs []string) (action Action, ok bool) {
-	var id string
+func findAction(targetCmd *cobra.Command, targetArgs []string) (id string, action Action, ok bool) {
 	if len(targetArgs) == 0 {
 		id = uid.Positional(targetCmd, 1)
 	} else {
@@ -192,7 +193,15 @@ func findTarget(cmd *cobra.Command) (*cobra.Command, []string) {
 
 func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
 	// ignore flag parse errors (like a missing argument for the flag currently being completed)
-	targetCmd, targetArgs, _ := cmd.Root().Traverse(args)
+	a := args
+	if len(args) > 0 && args[len(args)-1] == "" {
+		a = args[0 : len(args)-1]
+	}
+
+	targetCmd, targetArgs, _ := cmd.Root().Traverse(a)
+	if len(args) > 0 && args[len(args)-1] == "" {
+		targetArgs = append(targetArgs, "")
+	}
 	targetCmd.ParseFlags(targetArgs)
 	return targetCmd, targetCmd.Flags().Args() // TODO check length
 }

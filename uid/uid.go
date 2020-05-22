@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -46,6 +47,26 @@ func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
 func Positional(cmd *cobra.Command, position int) string {
 	// TODO complete function
 	return fmt.Sprintf("%v#%v", Command(cmd), position)
+}
+
+func Value(cmd *cobra.Command, args []string, uid string) string {
+	// TODO assumes cmd is correct
+	if strings.Contains(uid, "##") {
+		split := strings.Split(uid, "##")
+		if flag := cmd.Flag(split[len(split)-1]); flag != nil {
+			return flag.Value.String()
+		}
+
+	} else if strings.Contains(uid, "#") {
+		split := strings.Split(uid, "#")
+		if index, err := strconv.Atoi(split[len(split)-1]); err == nil {
+			index = index - 1
+			if len(args)-1 >= index && index >= 0 {
+				return args[index]
+			}
+		}
+	}
+	return ""
 }
 
 func find(cmd *cobra.Command, uid string) *cobra.Command {

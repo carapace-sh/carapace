@@ -1,6 +1,11 @@
 package carapace
 
 import (
+	"io/ioutil"
+	"regexp"
+	"strings"
+
+	"github.com/mitchellh/go-homedir"
 	"github.com/rsteube/carapace/bash"
 	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
@@ -56,6 +61,14 @@ func (a Action) Value(shell string) string {
 		return a.Zsh
 	default:
 		return ""
+	}
+}
+
+func (a Action) NestedValue(args []string, shell string, maxDepth int) string {
+	if value := a.Value(shell); value == "" && a.Callback != nil && maxDepth > 0 {
+		return a.Callback(args).NestedValue(args, shell, maxDepth-1)
+	} else {
+		return value
 	}
 }
 
@@ -122,33 +135,68 @@ func ActionNetInterfaces() Action {
 // ActionUsers completes user names
 func ActionUsers() Action {
 	return Action{
-		Bash:       bash.ActionUsers(),
-		Elvish:     elvish.ActionUsers(),
-		Fish:       fish.ActionUsers(),
-		Powershell: powershell.ActionUsers(),
-		Zsh:        zsh.ActionUsers(),
+		Bash: bash.ActionUsers(),
+		Fish: fish.ActionUsers(),
+		Zsh:  zsh.ActionUsers(),
+		Callback: func(args []string) Action {
+			users := []string{}
+			if content, err := ioutil.ReadFile("/etc/passwd"); err == nil {
+				for _, entry := range strings.Split(string(content), "\n") {
+					user := strings.Split(entry, ":")[0]
+					if len(strings.TrimSpace(user)) > 0 {
+						users = append(users, user)
+					}
+				}
+			}
+			return ActionValues(users...)
+		},
 	}
 }
 
 // ActionGroups completes group names
 func ActionGroups() Action {
 	return Action{
-		Bash:       bash.ActionGroups(),
-		Elvish:     elvish.ActionGroups(),
-		Fish:       fish.ActionGroups(),
-		Powershell: powershell.ActionGroups(),
-		Zsh:        zsh.ActionGroups(),
+		Bash: bash.ActionGroups(),
+		Fish: fish.ActionGroups(),
+		Zsh:  zsh.ActionGroups(),
+		Callback: func(args []string) Action {
+			// TODO windows
+			groups := []string{}
+			if content, err := ioutil.ReadFile("/etc/group"); err == nil {
+				for _, entry := range strings.Split(string(content), "\n") {
+					group := strings.Split(entry, ":")[0]
+					if len(strings.TrimSpace(group)) > 0 {
+						groups = append(groups, group)
+					}
+				}
+			}
+			return ActionValues(groups...)
+		},
 	}
 }
 
 // ActionHosts completes host names
 func ActionHosts() Action {
 	return Action{
-		Bash:       bash.ActionHosts(),
-		Elvish:     elvish.ActionHosts(),
-		Fish:       fish.ActionHosts(),
-		Powershell: powershell.ActionHosts(),
-		Zsh:        zsh.ActionHosts(),
+		Bash: bash.ActionHosts(),
+		Fish: fish.ActionHosts(),
+		Zsh:  zsh.ActionHosts(),
+		Callback: func(args []string) Action {
+			hosts := []string{}
+			if file, err := homedir.Expand("~/.ssh/known_hosts"); err == nil {
+				if content, err := ioutil.ReadFile(file); err == nil {
+					r := regexp.MustCompile(`^(?P<host>[^ ,#]+)`)
+					for _, entry := range strings.Split(string(content), "\n") {
+						if r.MatchString(entry) {
+							hosts = append(hosts, r.FindStringSubmatch(entry)[0])
+						}
+					}
+				} else {
+					return ActionValues(err.Error())
+				}
+			}
+			return ActionValues(hosts...)
+		},
 	}
 }
 
@@ -185,13 +233,35 @@ func ActionMessage(msg string) Action {
 	}
 }
 
+func ActionPrefixValues(prefix string, values ...string) Action {
+	return Action(Action{
+		Bash:       bash.ActionPrefixValues(prefix, values...),
+		Elvish:     elvish.ActionPrefixValues(prefix, values...),
+		Fish:       fish.ActionPrefixValues(prefix, values...),
+		Powershell: powershell.ActionPrefixValues(prefix, values...),
+		Zsh:        zsh.ActionPrefixValues(prefix, values...),
+	})
+}
+
+// TODO find a better solution for this
+var CallbackValue string
+
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char
-func ActionMultiParts(separator rune, values ...string) Action {
-	return Action{
-		Bash:       bash.ActionMultiParts(separator, values...),
-		Elvish:     elvish.ActionMultiParts(separator, values...),
-		Fish:       fish.ActionMultiParts(separator, values...),
-		Powershell: powershell.ActionMultiParts(separator, values...),
-		Zsh:        zsh.ActionMultiParts(separator, values...),
-	}
+func ActionMultiParts(divider string, callback func(args []string, parts []string) []string) Action {
+	return ActionCallback(func(args []string) Action {
+		// TODO multiple dividers by splitting on each char
+		index := strings.LastIndex(CallbackValue, string(divider))
+		prefix := ""
+		if len(divider) == 0 {
+			prefix = CallbackValue
+		} else if index != -1 {
+			prefix = CallbackValue[0 : index+1]
+		}
+		parts := strings.Split(prefix, string(divider))
+		if len(parts) > 0 {
+			parts = parts[0 : len(parts)-1]
+		}
+
+		return ActionPrefixValues(prefix, callback(args, parts)...)
+	})
 }

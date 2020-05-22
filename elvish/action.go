@@ -53,10 +53,6 @@ func ActionUsers() string {
 	return `` // TODO
 }
 
-func ActionGroups() string {
-	return `` // TODO
-}
-
 func ActionHosts() string {
 	return `` // TODO
 }
@@ -92,6 +88,16 @@ func ActionMessage(msg string) string {
 	return ActionValuesDescribed("ERR", Sanitize(msg)[0], "_", "")
 }
 
-func ActionMultiParts(separator rune, values ...string) string {
-	return ActionValues(values...)
+func ActionPrefixValues(prefix string, values ...string) string {
+	sanitized := Sanitize(values...)
+	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
+		return ActionMessage("no values to complete")
+	}
+
+	vals := make([]string, len(sanitized))
+	for index, val := range sanitized {
+		// TODO escape special characters
+		vals[index] = fmt.Sprintf(`edit:complex-candidate '%v' &display='%v'`, prefix+val, val)
+	}
+	return strings.Join(vals, "\n")
 }

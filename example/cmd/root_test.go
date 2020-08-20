@@ -209,12 +209,12 @@ func TestElvish(t *testing.T) {
         [&long='toggle' &desc='Help message for toggle' &short='t']
     ]
     arg-handlers = [
-        [_]{ edit:complex-candidate action &display-suffix=' (action example)'
-edit:complex-candidate alias &display-suffix=' (action example)'
-edit:complex-candidate callback &display-suffix=' (callback example)'
-edit:complex-candidate condition &display-suffix=' (condition example)'
-edit:complex-candidate help &display-suffix=' (Help about any command)'
-edit:complex-candidate injection &display-suffix=' (just trying to break things)'
+        [_]{ edit:complex-candidate action &display='action (action example)'
+edit:complex-candidate alias &display='alias (action example)'
+edit:complex-candidate callback &display='callback (callback example)'
+edit:complex-candidate condition &display='condition (condition example)'
+edit:complex-candidate help &display='help (Help about any command)'
+edit:complex-candidate injection &display='injection (just trying to break things)'
 
 
 
@@ -233,15 +233,15 @@ edit:complex-candidate injection &display-suffix=' (just trying to break things)
         [&long='files' &desc='files flag' &short='f' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
         [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
         [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
-        [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display-suffix=' (message example)'
-edit:complex-candidate _ &display-suffix=' ()'
+        [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display='ERR (message example)'
+edit:complex-candidate _ &display='_ ()'
 
  }]
         [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
         [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
-        [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate values &display-suffix=' (valueDescription)'
-edit:complex-candidate example &display-suffix=' (exampleDescription)'
+        [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate values &display='values (valueDescription)'
+edit:complex-candidate example &display='example (exampleDescription)'
 
  }]
     ]
@@ -301,8 +301,8 @@ edit:complex-candidate example &display-suffix=' (exampleDescription)'
       [_]{ put  echo fail  }
       [_]{ put  echo fail  }
       [_]{ put echo fail }
-      [_]{ edit:complex-candidate ERR &display-suffix=' (no values to complete)'
-edit:complex-candidate _ &display-suffix=' ()'
+      [_]{ edit:complex-candidate ERR &display='ERR (no values to complete)'
+edit:complex-candidate _ &display='_ ()'
 
  }
       [_]{ put LAST POSITIONAL VALUE }

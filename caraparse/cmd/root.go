@@ -45,6 +45,7 @@ func (c *Command) Format() string {
 	pattern := `package cmd
 
 import (
+	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
 )
 

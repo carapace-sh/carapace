@@ -93,10 +93,18 @@ func (flag *Flag) Format(cmdName string) string {
 			return fmt.Sprintf(`%v.Flags().String("%v", "", "%v")`, cmdName, flag.Name, strings.Replace(flag.Description, `"`, `\"`, -1))
 		}
 	} else {
-		if flag.Value == "" {
-			return fmt.Sprintf(`%v.Flags().BoolP("%v", "%v", false, "%v")`, cmdName, flag.Name, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+		if flag.Name == "" {
+			if flag.Value == "" {
+				return fmt.Sprintf(`%v.Flags().BoolS("%v", "%v", false, "%v")`, cmdName, flag.Shorthand, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+			} else {
+				return fmt.Sprintf(`%v.Flags().StringS("%v", "%v", "", "%v")`, cmdName, flag.Shorthand, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+			}
 		} else {
-			return fmt.Sprintf(`%v.Flags().StringP("%v", "%v", "", "%v")`, cmdName, flag.Name, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+			if flag.Value == "" {
+				return fmt.Sprintf(`%v.Flags().BoolP("%v", "%v", false, "%v")`, cmdName, flag.Name, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+			} else {
+				return fmt.Sprintf(`%v.Flags().StringP("%v", "%v", "", "%v")`, cmdName, flag.Name, flag.Shorthand, strings.Replace(flag.Description, `"`, `\"`, -1))
+			}
 		}
 	}
 }
@@ -151,7 +159,6 @@ func parse(line string) (*Flag, error) {
 		if flag.Shorthand == "" {
 			return nil, errors.New("neither name nor shorthand matched")
 		}
-		flag.Name = flag.Shorthand // pflag does not support shorthand-only flags so set name to the same value
 	}
 	return flag, nil
 }

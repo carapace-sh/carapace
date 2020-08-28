@@ -111,6 +111,8 @@ func snippetFlagCompletion(flag *pflag.Flag, action *string) (snippet string) {
 
 	if flag.Shorthand == "" { // no shorthannd
 		snippet = fmt.Sprintf(`"%v--%v[%v]%v"`, multimark, flag.Name, replacer.Replace(flag.Usage), suffix)
+	} else if flag.ShorthandOnly {
+		snippet = fmt.Sprintf(`"%v-%v[%v]%v"`, multimark, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
 	} else {
 		snippet = fmt.Sprintf(`"(%v-%v %v--%v)"{%v-%v,%v--%v}"[%v]%v"`, multimark, flag.Shorthand, multimark, flag.Name, multimarkEscaped, flag.Shorthand, multimarkEscaped, flag.Name, replacer.Replace(flag.Usage), suffix)
 	}

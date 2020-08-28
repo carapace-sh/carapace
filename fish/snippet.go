@@ -114,6 +114,8 @@ func snippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string)
 
 	if flag.Shorthand == "" { // no shorthannd
 		snippet = fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -l '%v' -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, replacer.Replace(flag.Usage), suffix)
+	} else if flag.ShorthandOnly {
+		snippet = fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -s '%v' -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Shorthand, replacer.Replace(flag.Usage), suffix)
 	} else {
 		snippet = fmt.Sprintf(`complete -c '%v' -f -n '_%v_state %v' -l '%v' -s '%v' -d '%v'%v`, cmd.Root().Name(), cmd.Root().Name(), uid.Command(cmd), flag.Name, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
 	}

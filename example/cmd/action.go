@@ -25,7 +25,9 @@ func init() {
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
 	actionCmd.Flags().StringP("custom", "c", "", "custom flag")
-	actionCmd.Flags().StringP("signal", "s", "", "kill signals")
+	actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
+actionCmd.Flags().StringP("kill", "k", "", "kill signals")
+
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files":            carapace.ActionFiles(".go"),

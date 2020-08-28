@@ -10,3 +10,5 @@ require (
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/pflag v1.0.5
 )
+
+replace github.com/spf13/pflag v1.0.5 => github.com/cornfeedhobo/pflag v1.0.2-0.20200824165833-dd6f6588b61d

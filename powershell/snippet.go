@@ -83,6 +83,8 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string) string {
 		match := fmt.Sprintf(`^(--%v)$`, flag.Name)
 		if flag.Shorthand != "" {
 			match = fmt.Sprintf(`^(-%v|--%v)$`, flag.Shorthand, flag.Name)
+		} else if flag.ShorthandOnly {
+			match = fmt.Sprintf(`^(-%v)$`, flag.Shorthand)
 		}
 		var action = ""
 		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
@@ -106,7 +108,9 @@ func snippetTODO(cmd *cobra.Command) string {
 			if len(flag.Shorthand) > 0 {
 				result += fmt.Sprintf("\n                [CompletionResult]::new('-%s ', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
 			}
-			result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			if !flag.ShorthandOnly {
+				result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			}
 		}
 	})
 

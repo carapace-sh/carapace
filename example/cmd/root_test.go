@@ -212,9 +212,9 @@ func TestElvish(t *testing.T) {
   if (eq 1 0) {
   }  elif (eq $state '_example') {
     opt-specs = [
-        [&long='array' &desc='multiflag' &short='a' &arg-required=$true &completer=[_]{  }]
-        [&long='persistentFlag' &desc='Help message for persistentFlag' &short='p']
-        [&long='toggle' &desc='Help message for toggle' &short='t']
+        [&long='array' &short='a' &desc='multiflag' &arg-required=$true &completer=[_]{  }]
+        [&long='persistentFlag' &short='p' &desc='Help message for persistentFlag']
+        [&long='toggle' &short='t' &desc='Help message for toggle']
     ]
     arg-handlers = [
         [_]{ edit:complex-candidate action &display='action (action example)'
@@ -236,12 +236,12 @@ edit:complex-candidate injection &display='injection (just trying to break thing
     }
   }  elif (eq $state '_example__action') {
     opt-specs = [
-        [&long='custom' &desc='custom flag' &short='c' &arg-required=$true &completer=[_]{  }]
+        [&long='custom' &short='c' &desc='custom flag' &arg-required=$true &completer=[_]{  }]
         [&long='directories' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
-        [&long='files' &desc='files flag' &short='f' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
-        [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
+        [&long='files' &short='f' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
+        [&long='groups' &short='g' &desc='groups flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
         [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
-        [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display='ERR (message example)'
+        [&long='message' &short='m' &desc='message flag' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display='ERR (message example)'
 edit:complex-candidate _ &display='_ ()'
 
  }]
@@ -326,7 +326,7 @@ edit:complex-candidate example &display='example (exampleDescription)'
     }
   }  elif (eq $state '_example__callback') {
     opt-specs = [
-        [&long='callback' &desc='Help message for callback' &short='c' &arg-required=$true &completer=[_]{ _example_callback '_example__callback##callback' }]
+        [&long='callback' &short='c' &desc='Help message for callback' &arg-required=$true &completer=[_]{ _example_callback '_example__callback##callback' }]
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__callback#1' }
@@ -340,7 +340,7 @@ edit:complex-candidate example &display='example (exampleDescription)'
     }
   }  elif (eq $state '_example__condition') {
     opt-specs = [
-        [&long='required' &desc='required flag' &short='r' &arg-required=$true &completer=[_]{ put valid invalid }]
+        [&long='required' &short='r' &desc='required flag' &arg-required=$true &completer=[_]{ put valid invalid }]
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__condition#1' }

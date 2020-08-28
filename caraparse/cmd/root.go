@@ -55,6 +55,8 @@ var %v = &cobra.Command{
 }
 %v
 func init() {
+	carapace.Gen(rootCmd).Standalone()
+
 %v%v
 }`
 	cmdName := c.Name + "Cmd"

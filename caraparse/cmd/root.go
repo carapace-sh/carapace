@@ -14,7 +14,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "carapace",
+	Use:   "caraparse",
+	Short: "GNU help parser.\n(e.g. 'ln --help | ./caraparse -n ln')",
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		parent, _ := cmd.Flags().GetString("parent")

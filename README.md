@@ -164,7 +164,7 @@ Additional information can be found at:
 ## Standalone Mode
 
 Carapace can also be used to provide completion for arbitrary commands as well (similar to [aws_completer](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html)).
-See [rsteube/carapace-completers](https://github.com/rsteube/carapace-completers) for examples. There is also a binary to parse flags from gnu help pages at [carapace](./carapace/).
+See [rsteube/carapace-completers](https://github.com/rsteube/carapace-completers) for examples. There is also a binary to parse flags from gnu help pages at [caraparse](./caraparse/).
 
 ## Example
 

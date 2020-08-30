@@ -59,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -88,6 +88,10 @@ _example_completions() {
 
           -n | --net_interfaces)
             COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"))
+            ;;
+
+          --usergroup)
+            COMPREPLY=($(eval $(_example_callback '_example__action##usergroup')))
             ;;
 
           -u | --users)
@@ -238,6 +242,7 @@ edit:complex-candidate _ &display='_ ()'
 
  }]
         [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
+        [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
         [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
         [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate values &display='values (valueDescription)'
@@ -365,6 +370,7 @@ complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g'
 complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(__fish_print_hostnames)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'usergroup' -d 'user\:group flag' -a '(_example_callback _example__action##usergroup)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values_described' -s 'd' -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
@@ -471,6 +477,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         $(Get-NetAdapter).Name 
                         break
                       }
+                '^(--usergroup)$' {
+                        _example_callback '_example__action##usergroup' 
+                        break
+                      }
                 '^(-u|--users)$' {
                         _example_callback '_example__action##users' 
                         break
@@ -502,6 +512,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+                [CompletionResult]::new('--usergroup ', '--usergroup', [CompletionResultType]::ParameterName, 'user:group flag')
                 [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
                 [CompletionResult]::new('--users ', '--users', [CompletionResultType]::ParameterName, 'users flag')
                 [CompletionResult]::new('-v ', '-v', [CompletionResultType]::ParameterName, 'values flag')
@@ -657,6 +668,7 @@ function _example__action {
     "--hosts[hosts flag]: :_hosts" \
     "(-m --message)"{-m,--message}"[message flag]: : _message -r 'message example'" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :_net_interfaces" \
+    "--usergroup[user\:group flag]: : eval \$(example _carapace zsh '_example__action##usergroup' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \
     "(-d --values_described)"{-d,--values_described}"[values with description flag]: :_values '' 'values[valueDescription]' 'example[exampleDescription]'  " \

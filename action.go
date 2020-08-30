@@ -139,16 +139,7 @@ func ActionUsers() Action {
 		Fish: fish.ActionUsers(),
 		Zsh:  zsh.ActionUsers(),
 		Callback: func(args []string) Action {
-			users := []string{}
-			if content, err := ioutil.ReadFile("/etc/passwd"); err == nil {
-				for _, entry := range strings.Split(string(content), "\n") {
-					user := strings.Split(entry, ":")[0]
-					if len(strings.TrimSpace(user)) > 0 {
-						users = append(users, user)
-					}
-				}
-			}
-			return ActionValues(users...)
+			return ActionValues(users()...)
 		},
 	}
 }
@@ -160,19 +151,56 @@ func ActionGroups() Action {
 		Fish: fish.ActionGroups(),
 		Zsh:  zsh.ActionGroups(),
 		Callback: func(args []string) Action {
-			// TODO windows
-			groups := []string{}
-			if content, err := ioutil.ReadFile("/etc/group"); err == nil {
-				for _, entry := range strings.Split(string(content), "\n") {
-					group := strings.Split(entry, ":")[0]
-					if len(strings.TrimSpace(group)) > 0 {
-						groups = append(groups, group)
-					}
-				}
-			}
-			return ActionValues(groups...)
+			return ActionValues(groups()...)
 		},
 	}
+}
+
+// ActionUserGroup completes user:group separately
+func ActionUserGroup() Action {
+	return ActionMultiParts(":", func(args []string, parts []string) []string {
+		switch len(parts) {
+		case 0:
+			users := users()
+			usersWithSuffix := make([]string, len(users))
+			for index, user := range users {
+				usersWithSuffix[index] = user + ":"
+			}
+			return usersWithSuffix
+		case 1:
+			return groups()
+		default:
+			return []string{}
+		}
+	})
+}
+
+// TODO windows
+func users() []string {
+	users := []string{}
+	if content, err := ioutil.ReadFile("/etc/passwd"); err == nil {
+		for _, entry := range strings.Split(string(content), "\n") {
+			user := strings.Split(entry, ":")[0]
+			if len(strings.TrimSpace(user)) > 0 {
+				users = append(users, user)
+			}
+		}
+	}
+	return users
+}
+
+// TODO windows
+func groups() []string {
+	users := []string{}
+	if content, err := ioutil.ReadFile("/etc/group"); err == nil {
+		for _, entry := range strings.Split(string(content), "\n") {
+			group := strings.Split(entry, ":")[0]
+			if len(strings.TrimSpace(group)) > 0 {
+				users = append(users, group)
+			}
+		}
+	}
+	return users
 }
 
 // ActionHosts completes host names

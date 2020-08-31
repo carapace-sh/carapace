@@ -207,4 +207,8 @@ docker-compose run --rm [bash|elvish|fish|powershell|zsh]
 example <TAB>
 ```
 
+## Projects
+
+- [lab](https://github.com/zaquestion/lab)
+
 [cobra]:https://github.com/spf13/cobra

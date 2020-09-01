@@ -56,7 +56,7 @@ var %v = &cobra.Command{
 }
 %v
 func init() {
-	carapace.Gen(rootCmd).Standalone()
+	carapace.Gen(%v).Standalone()
 
 %v%v
 }`
@@ -78,7 +78,7 @@ func Execute() error {
 		flags[i] = "\t" + flag.Format(cmdName)
 	}
 
-	return fmt.Sprintf(pattern, cmdName, c.Name, c.Short, executeFunction, strings.Join(flags, "\n"), parent)
+	return fmt.Sprintf(pattern, cmdName, c.Name, c.Short, executeFunction, cmdName,  strings.Join(flags, "\n"), parent)
 }
 
 type Flag struct {

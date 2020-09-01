@@ -26,8 +26,7 @@ func init() {
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
 	actionCmd.Flags().StringP("custom", "c", "", "custom flag")
 	actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
-actionCmd.Flags().StringP("kill", "k", "", "kill signals")
-
+	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files":            carapace.ActionFiles(".go"),
@@ -41,7 +40,7 @@ actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 		"values":           carapace.ActionValues("values", "example"),
 		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
 		"custom":           carapace.Action{Zsh: "_most_recent_file 2"},
-		"signal":           carapace.ActionKillSignals(),
+		"kill":             carapace.ActionKillSignals(),
 	})
 
 	carapace.Gen(actionCmd).PositionalCompletion(

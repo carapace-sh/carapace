@@ -59,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--signal\n-s\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -88,6 +88,10 @@ _example_completions() {
 
           -n | --net_interfaces)
             COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"))
+            ;;
+
+          -s | --signal)
+            COMPREPLY=($(compgen -W $'ABRT\nALRM\nBUS\nCHLD\nCONT\nFPE\nHUP\nILL\nINT\nKILL\nPIPE\nPOLL\nPROF\nPWR\nQUIT\nSEGV\nSTKFLT\nSTOP\nSYS\nTERM\nTRAP\nTSTP\nTTIN\nTTOU\nURG\nUSR1\nUSR2\nVTALRM\nWINCH\nXCPU\nXFSZ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n' -- "$last"))
             ;;
 
           --usergroup)
@@ -242,6 +246,68 @@ edit:complex-candidate _ &display='_ ()'
 
  }]
         [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
+        [&long='signal' &desc='kill signals' &short='s' &arg-required=$true &completer=[_]{ edit:complex-candidate ABRT &display='ABRT (Abnormal termination)'
+edit:complex-candidate ALRM &display='ALRM (Virtual alarm clock)'
+edit:complex-candidate BUS &display='BUS (BUS error)'
+edit:complex-candidate CHLD &display='CHLD (Child status has changed)'
+edit:complex-candidate CONT &display='CONT (Continue stopped process)'
+edit:complex-candidate FPE &display='FPE (Floating-point exception)'
+edit:complex-candidate HUP &display='HUP (Hangup detected on controlling terminal)'
+edit:complex-candidate ILL &display='ILL (Illegal instruction)'
+edit:complex-candidate INT &display='INT (Interrupt from keyboard)'
+edit:complex-candidate KILL &display='KILL (Kill, unblockable)'
+edit:complex-candidate PIPE &display='PIPE (Broken pipe)'
+edit:complex-candidate POLL &display='POLL (Pollable event occurred)'
+edit:complex-candidate PROF &display='PROF (Profiling alarm clock timer expired)'
+edit:complex-candidate PWR &display='PWR (Power failure restart)'
+edit:complex-candidate QUIT &display='QUIT (Quit from keyboard)'
+edit:complex-candidate SEGV &display='SEGV (Segmentation violation)'
+edit:complex-candidate STKFLT &display='STKFLT (Stack fault on coprocessor)'
+edit:complex-candidate STOP &display='STOP (Stop process, unblockable)'
+edit:complex-candidate SYS &display='SYS (Bad system call)'
+edit:complex-candidate TERM &display='TERM (Termination request)'
+edit:complex-candidate TRAP &display='TRAP (Trace/breakpoint trap)'
+edit:complex-candidate TSTP &display='TSTP (Stop typed at keyboard)'
+edit:complex-candidate TTIN &display='TTIN (Background read from tty)'
+edit:complex-candidate TTOU &display='TTOU (Background write to tty)'
+edit:complex-candidate URG &display='URG (Urgent condition on socket)'
+edit:complex-candidate USR1 &display='USR1 (User-defined signal 1)'
+edit:complex-candidate USR2 &display='USR2 (User-defined signal 2)'
+edit:complex-candidate VTALRM &display='VTALRM (Virtual alarm clock)'
+edit:complex-candidate WINCH &display='WINCH (Window size change)'
+edit:complex-candidate XCPU &display='XCPU (CPU time limit exceeded)'
+edit:complex-candidate XFSZ &display='XFSZ (File size limit exceeded)'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ }]
         [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
         [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
@@ -370,6 +436,7 @@ complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g'
 complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(__fish_print_hostnames)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'signal' -s 's' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'usergroup' -d 'user\:group flag' -a '(_example_callback _example__action##usergroup)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
@@ -477,6 +544,71 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         $(Get-NetAdapter).Name 
                         break
                       }
+                '^(-s|--signal)$' {
+                        [CompletionResult]::new('ABRT ', 'ABRT', [CompletionResultType]::ParameterValue, 'Abnormal termination')
+                        [CompletionResult]::new('ALRM ', 'ALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock')
+                        [CompletionResult]::new('BUS ', 'BUS', [CompletionResultType]::ParameterValue, 'BUS error')
+                        [CompletionResult]::new('CHLD ', 'CHLD', [CompletionResultType]::ParameterValue, 'Child status has changed')
+                        [CompletionResult]::new('CONT ', 'CONT', [CompletionResultType]::ParameterValue, 'Continue stopped process')
+                        [CompletionResult]::new('FPE ', 'FPE', [CompletionResultType]::ParameterValue, 'Floating-point exception')
+                        [CompletionResult]::new('HUP ', 'HUP', [CompletionResultType]::ParameterValue, 'Hangup detected on controlling terminal')
+                        [CompletionResult]::new('ILL ', 'ILL', [CompletionResultType]::ParameterValue, 'Illegal instruction')
+                        [CompletionResult]::new('INT ', 'INT', [CompletionResultType]::ParameterValue, 'Interrupt from keyboard')
+                        [CompletionResult]::new('KILL ', 'KILL', [CompletionResultType]::ParameterValue, 'Kill, unblockable')
+                        [CompletionResult]::new('PIPE ', 'PIPE', [CompletionResultType]::ParameterValue, 'Broken pipe')
+                        [CompletionResult]::new('POLL ', 'POLL', [CompletionResultType]::ParameterValue, 'Pollable event occurred')
+                        [CompletionResult]::new('PROF ', 'PROF', [CompletionResultType]::ParameterValue, 'Profiling alarm clock timer expired')
+                        [CompletionResult]::new('PWR ', 'PWR', [CompletionResultType]::ParameterValue, 'Power failure restart')
+                        [CompletionResult]::new('QUIT ', 'QUIT', [CompletionResultType]::ParameterValue, 'Quit from keyboard')
+                        [CompletionResult]::new('SEGV ', 'SEGV', [CompletionResultType]::ParameterValue, 'Segmentation violation')
+                        [CompletionResult]::new('STKFLT ', 'STKFLT', [CompletionResultType]::ParameterValue, 'Stack fault on coprocessor')
+                        [CompletionResult]::new('STOP ', 'STOP', [CompletionResultType]::ParameterValue, 'Stop process, unblockable')
+                        [CompletionResult]::new('SYS ', 'SYS', [CompletionResultType]::ParameterValue, 'Bad system call')
+                        [CompletionResult]::new('TERM ', 'TERM', [CompletionResultType]::ParameterValue, 'Termination request')
+                        [CompletionResult]::new('TRAP ', 'TRAP', [CompletionResultType]::ParameterValue, 'Trace/breakpoint trap')
+                        [CompletionResult]::new('TSTP ', 'TSTP', [CompletionResultType]::ParameterValue, 'Stop typed at keyboard')
+                        [CompletionResult]::new('TTIN ', 'TTIN', [CompletionResultType]::ParameterValue, 'Background read from tty')
+                        [CompletionResult]::new('TTOU ', 'TTOU', [CompletionResultType]::ParameterValue, 'Background write to tty')
+                        [CompletionResult]::new('URG ', 'URG', [CompletionResultType]::ParameterValue, 'Urgent condition on socket')
+                        [CompletionResult]::new('USR1 ', 'USR1', [CompletionResultType]::ParameterValue, 'User-defined signal 1')
+                        [CompletionResult]::new('USR2 ', 'USR2', [CompletionResultType]::ParameterValue, 'User-defined signal 2')
+                        [CompletionResult]::new('VTALRM ', 'VTALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock')
+                        [CompletionResult]::new('WINCH ', 'WINCH', [CompletionResultType]::ParameterValue, 'Window size change')
+                        [CompletionResult]::new('XCPU ', 'XCPU', [CompletionResultType]::ParameterValue, 'CPU time limit exceeded')
+                        [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded')
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                         
+                        break
+                      }
                 '^(--usergroup)$' {
                         _example_callback '_example__action##usergroup' 
                         break
@@ -512,6 +644,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+                [CompletionResult]::new('-s ', '-s', [CompletionResultType]::ParameterName, 'kill signals')
+                [CompletionResult]::new('--signal ', '--signal', [CompletionResultType]::ParameterName, 'kill signals')
                 [CompletionResult]::new('--usergroup ', '--usergroup', [CompletionResultType]::ParameterName, 'user:group flag')
                 [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
                 [CompletionResult]::new('--users ', '--users', [CompletionResultType]::ParameterName, 'users flag')
@@ -668,6 +802,7 @@ function _example__action {
     "--hosts[hosts flag]: :_hosts" \
     "(-m --message)"{-m,--message}"[message flag]: : _message -r 'message example'" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :_net_interfaces" \
+    "(-s --signal)"{-s,--signal}"[kill signals]: :_values '' 'ABRT[Abnormal\ termination]' 'ALRM[Virtual\ alarm\ clock]' 'BUS[BUS\ error]' 'CHLD[Child\ status\ has\ changed]' 'CONT[Continue\ stopped\ process]' 'FPE[Floating-point\ exception]' 'HUP[Hangup\ detected\ on\ controlling\ terminal]' 'ILL[Illegal\ instruction]' 'INT[Interrupt\ from\ keyboard]' 'KILL[Kill,\ unblockable]' 'PIPE[Broken\ pipe]' 'POLL[Pollable\ event\ occurred]' 'PROF[Profiling\ alarm\ clock\ timer\ expired]' 'PWR[Power\ failure\ restart]' 'QUIT[Quit\ from\ keyboard]' 'SEGV[Segmentation\ violation]' 'STKFLT[Stack\ fault\ on\ coprocessor]' 'STOP[Stop\ process,\ unblockable]' 'SYS[Bad\ system\ call]' 'TERM[Termination\ request]' 'TRAP[Trace/breakpoint\ trap]' 'TSTP[Stop\ typed\ at\ keyboard]' 'TTIN[Background\ read\ from\ tty]' 'TTOU[Background\ write\ to\ tty]' 'URG[Urgent\ condition\ on\ socket]' 'USR1[User-defined\ signal\ 1]' 'USR2[User-defined\ signal\ 2]' 'VTALRM[Virtual\ alarm\ clock]' 'WINCH[Window\ size\ change]' 'XCPU[CPU\ time\ limit\ exceeded]' 'XFSZ[File\ size\ limit\ exceeded]'                               " \
     "--usergroup[user\:group flag]: : eval \$(example _carapace zsh '_example__action##usergroup' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \

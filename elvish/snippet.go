@@ -18,11 +18,12 @@ var replacer = strings.NewReplacer( // TODO
 )
 
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
-	result := fmt.Sprintf(`edit:completion:arg-completer[%v] = [@arg]{
+	result := fmt.Sprintf(`use str
+edit:completion:arg-completer[%v] = [@arg]{
   fn _%v_callback [uid]{
     # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
     tmpfile=(mktemp -t carapace_%v_callback-XXXXX.elv)
-    echo (joins ' ' $arg) | xargs %v _carapace elvish $uid > $tmpfile
+    echo (str:join ' ' $arg) | xargs %v _carapace elvish $uid > $tmpfile
     -source $tmpfile
     rm $tmpfile
   }
@@ -34,7 +35,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
     echo $index
   }
   
-  state=(echo (joins ' ' $arg) | xargs %v _carapace elvish state)
+  state=(echo (str:join ' ' $arg) | xargs %v _carapace elvish state)
   if (eq 1 0) {
   } %v
 }

@@ -192,11 +192,12 @@ complete -F _example_completions example
 }
 
 func TestElvish(t *testing.T) {
-	expected := `edit:completion:arg-completer[example] = [@arg]{
+	expected := `use str
+edit:completion:arg-completer[example] = [@arg]{
   fn _example_callback [uid]{
     # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
     tmpfile=(mktemp -t carapace_example_callback-XXXXX.elv)
-    echo (joins ' ' $arg) | xargs example _carapace elvish $uid > $tmpfile
+    echo (str:join ' ' $arg) | xargs example _carapace elvish $uid > $tmpfile
     -source $tmpfile
     rm $tmpfile
   }
@@ -208,7 +209,7 @@ func TestElvish(t *testing.T) {
     echo $index
   }
   
-  state=(echo (joins ' ' $arg) | xargs example _carapace elvish state)
+  state=(echo (str:join ' ' $arg) | xargs example _carapace elvish state)
   if (eq 1 0) {
   }  elif (eq $state '_example') {
     opt-specs = [

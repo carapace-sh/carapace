@@ -78,7 +78,7 @@ func ActionValuesDescribed(values ...string) string {
 	vals := make([]string, len(values))
 	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf(`edit:complex-candidate %v &display='%v (%v)'`, val, val, sanitized[index+1])
+			vals[index/2] = fmt.Sprintf(`edit:complex-candidate '%v' &display='%v (%v)'`, val, val, sanitized[index+1])
 		}
 	}
 	return strings.Join(vals, "\n")

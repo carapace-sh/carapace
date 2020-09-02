@@ -59,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--kill\n-k\n--message\n-m\n--net_interfaces\n-n\n-s\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--signal\n-s\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -222,12 +222,12 @@ edit:completion:arg-completer[example] = [@arg]{
         [&long='toggle' &short='t' &desc='Help message for toggle']
     ]
     arg-handlers = [
-        [_]{ edit:complex-candidate action &display='action (action example)'
-edit:complex-candidate alias &display='alias (action example)'
-edit:complex-candidate callback &display='callback (callback example)'
-edit:complex-candidate condition &display='condition (condition example)'
-edit:complex-candidate help &display='help (Help about any command)'
-edit:complex-candidate injection &display='injection (just trying to break things)'
+        [_]{ edit:complex-candidate 'action' &display='action (action example)'
+edit:complex-candidate 'alias' &display='alias (action example)'
+edit:complex-candidate 'callback' &display='callback (callback example)'
+edit:complex-candidate 'condition' &display='condition (condition example)'
+edit:complex-candidate 'help' &display='help (Help about any command)'
+edit:complex-candidate 'injection' &display='injection (just trying to break things)'
 
 
 
@@ -246,37 +246,37 @@ edit:complex-candidate injection &display='injection (just trying to break thing
         [&long='files' &short='f' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
         [&long='groups' &short='g' &desc='groups flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
         [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
-        [&long='kill' &short='k' &desc='kill signals' &arg-required=$true &completer=[_]{ edit:complex-candidate ABRT &display='ABRT (Abnormal termination)'
-edit:complex-candidate ALRM &display='ALRM (Virtual alarm clock)'
-edit:complex-candidate BUS &display='BUS (BUS error)'
-edit:complex-candidate CHLD &display='CHLD (Child status has changed)'
-edit:complex-candidate CONT &display='CONT (Continue stopped process)'
-edit:complex-candidate FPE &display='FPE (Floating-point exception)'
-edit:complex-candidate HUP &display='HUP (Hangup detected on controlling terminal)'
-edit:complex-candidate ILL &display='ILL (Illegal instruction)'
-edit:complex-candidate INT &display='INT (Interrupt from keyboard)'
-edit:complex-candidate KILL &display='KILL (Kill, unblockable)'
-edit:complex-candidate PIPE &display='PIPE (Broken pipe)'
-edit:complex-candidate POLL &display='POLL (Pollable event occurred)'
-edit:complex-candidate PROF &display='PROF (Profiling alarm clock timer expired)'
-edit:complex-candidate PWR &display='PWR (Power failure restart)'
-edit:complex-candidate QUIT &display='QUIT (Quit from keyboard)'
-edit:complex-candidate SEGV &display='SEGV (Segmentation violation)'
-edit:complex-candidate STKFLT &display='STKFLT (Stack fault on coprocessor)'
-edit:complex-candidate STOP &display='STOP (Stop process, unblockable)'
-edit:complex-candidate SYS &display='SYS (Bad system call)'
-edit:complex-candidate TERM &display='TERM (Termination request)'
-edit:complex-candidate TRAP &display='TRAP (Trace/breakpoint trap)'
-edit:complex-candidate TSTP &display='TSTP (Stop typed at keyboard)'
-edit:complex-candidate TTIN &display='TTIN (Background read from tty)'
-edit:complex-candidate TTOU &display='TTOU (Background write to tty)'
-edit:complex-candidate URG &display='URG (Urgent condition on socket)'
-edit:complex-candidate USR1 &display='USR1 (User-defined signal 1)'
-edit:complex-candidate USR2 &display='USR2 (User-defined signal 2)'
-edit:complex-candidate VTALRM &display='VTALRM (Virtual alarm clock)'
-edit:complex-candidate WINCH &display='WINCH (Window size change)'
-edit:complex-candidate XCPU &display='XCPU (CPU time limit exceeded)'
-edit:complex-candidate XFSZ &display='XFSZ (File size limit exceeded)'
+        [&long='kill' &short='k' &desc='kill signals' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ABRT' &display='ABRT (Abnormal termination)'
+edit:complex-candidate 'ALRM' &display='ALRM (Virtual alarm clock)'
+edit:complex-candidate 'BUS' &display='BUS (BUS error)'
+edit:complex-candidate 'CHLD' &display='CHLD (Child status has changed)'
+edit:complex-candidate 'CONT' &display='CONT (Continue stopped process)'
+edit:complex-candidate 'FPE' &display='FPE (Floating-point exception)'
+edit:complex-candidate 'HUP' &display='HUP (Hangup detected on controlling terminal)'
+edit:complex-candidate 'ILL' &display='ILL (Illegal instruction)'
+edit:complex-candidate 'INT' &display='INT (Interrupt from keyboard)'
+edit:complex-candidate 'KILL' &display='KILL (Kill, unblockable)'
+edit:complex-candidate 'PIPE' &display='PIPE (Broken pipe)'
+edit:complex-candidate 'POLL' &display='POLL (Pollable event occurred)'
+edit:complex-candidate 'PROF' &display='PROF (Profiling alarm clock timer expired)'
+edit:complex-candidate 'PWR' &display='PWR (Power failure restart)'
+edit:complex-candidate 'QUIT' &display='QUIT (Quit from keyboard)'
+edit:complex-candidate 'SEGV' &display='SEGV (Segmentation violation)'
+edit:complex-candidate 'STKFLT' &display='STKFLT (Stack fault on coprocessor)'
+edit:complex-candidate 'STOP' &display='STOP (Stop process, unblockable)'
+edit:complex-candidate 'SYS' &display='SYS (Bad system call)'
+edit:complex-candidate 'TERM' &display='TERM (Termination request)'
+edit:complex-candidate 'TRAP' &display='TRAP (Trace/breakpoint trap)'
+edit:complex-candidate 'TSTP' &display='TSTP (Stop typed at keyboard)'
+edit:complex-candidate 'TTIN' &display='TTIN (Background read from tty)'
+edit:complex-candidate 'TTOU' &display='TTOU (Background write to tty)'
+edit:complex-candidate 'URG' &display='URG (Urgent condition on socket)'
+edit:complex-candidate 'USR1' &display='USR1 (User-defined signal 1)'
+edit:complex-candidate 'USR2' &display='USR2 (User-defined signal 2)'
+edit:complex-candidate 'VTALRM' &display='VTALRM (Virtual alarm clock)'
+edit:complex-candidate 'WINCH' &display='WINCH (Window size change)'
+edit:complex-candidate 'XCPU' &display='XCPU (CPU time limit exceeded)'
+edit:complex-candidate 'XFSZ' &display='XFSZ (File size limit exceeded)'
 
 
 
@@ -308,8 +308,8 @@ edit:complex-candidate XFSZ &display='XFSZ (File size limit exceeded)'
 
 
  }]
-        [&long='message' &short='m' &desc='message flag' &arg-required=$true &completer=[_]{ edit:complex-candidate ERR &display='ERR (message example)'
-edit:complex-candidate _ &display='_ ()'
+        [&long='message' &short='m' &desc='message flag' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ERR' &display='ERR (message example)'
+edit:complex-candidate '_' &display='_ ()'
 
  }]
         [&long='net_interfaces' &short='n' &desc='net_interfaces flag' &arg-required=$true &completer=[_]{  }]
@@ -317,8 +317,8 @@ edit:complex-candidate _ &display='_ ()'
         [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
         [&long='users' &short='u' &desc='users flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &short='v' &desc='values flag' &arg-required=$true &completer=[_]{ put values example }]
-        [&long='values_described' &short='d' &desc='values with description flag' &arg-required=$true &completer=[_]{ edit:complex-candidate values &display='values (valueDescription)'
-edit:complex-candidate example &display='example (exampleDescription)'
+        [&long='values_described' &short='d' &desc='values with description flag' &arg-required=$true &completer=[_]{ edit:complex-candidate 'values' &display='values (valueDescription)'
+edit:complex-candidate 'example' &display='example (exampleDescription)'
 
  }]
     ]
@@ -378,8 +378,8 @@ edit:complex-candidate example &display='example (exampleDescription)'
       [_]{ put  echo fail  }
       [_]{ put  echo fail  }
       [_]{ put echo fail }
-      [_]{ edit:complex-candidate ERR &display='ERR (no values to complete)'
-edit:complex-candidate _ &display='_ ()'
+      [_]{ edit:complex-candidate 'ERR' &display='ERR (no values to complete)'
+edit:complex-candidate '_' &display='_ ()'
 
  }
       [_]{ put LAST POSITIONAL VALUE }

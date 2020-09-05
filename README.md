@@ -17,7 +17,7 @@ Completion script generator for [cobra] with support for:
 
 ## Usage
 
-Calling `carapace.Gen` on any command is enough for adding completion script generation using the [hidden command](#hidden-command).
+Calling `carapace.Gen` on any command is enough to enable completion script generation using the [hidden command](#hidden-command).
 
 > Invocations to `carapace.Gen` must be **after** the command was added to the parent command so that the [uids](#uid) are correct.
 
@@ -127,7 +127,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 
 ### ActionMultiParts
 
-> This is an initial version which still got some quirks, expect some changes here
+> This is an initial version which still got some quirks, expect some changes here (in the long term this shall return Action as well)
 
 ActionMultiParts is a [callback action](#actioncallback) where parts of an argument can be completed separately (e.g. user:group from [chown](https://github.com/rsteube/carapace-completers/blob/master/completers/chown_completer/cmd/root.go)). Divider can be empty as well, but note that `bash` and `fish` will add the space suffix for anything other than `/=@:.,` (it still works, but after each selction backspace is needed to continue the completion).
 

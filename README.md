@@ -129,7 +129,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 
 > This is an initial version which still got some quirks, expect some changes here (in the long term this shall return Action as well)
 
-ActionMultiParts is a [callback action](#actioncallback) where parts of an argument can be completed separately (e.g. user:group from [chown](https://github.com/rsteube/carapace-completers/blob/master/completers/chown_completer/cmd/root.go)). Divider can be empty as well, but note that `bash` and `fish` will add the space suffix for anything other than `/=@:.,` (it still works, but after each selction backspace is needed to continue the completion).
+ActionMultiParts is a [callback action](#actioncallback) where parts of an argument can be completed separately (e.g. user:group from [chown](https://github.com/rsteube/carapace-completers/blob/master/completers/chown_completer/cmd/root.go)). Divider can be empty as well, but note that `bash` and `fish` will add the space suffix for anything other than `/=@:.,` (it still works, but after each selection backspace is needed to continue the completion).
 
 ```go
 carapace.ActionMultiParts(":", func(args []string, parts []string) []string {

@@ -209,7 +209,7 @@ example <TAB>
 
 ## Projects
 
-- [carapace-bin](https://github.com/rsteube-carapace-bin) multi-shell multi-command argument completer
-- [lab](https://github.com/zaquestion/lab) CLI client for GitLab
+- [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
+- [lab](https://github.com/zaquestion/lab) cli client for GitLab
 
 [cobra]:https://github.com/spf13/cobra

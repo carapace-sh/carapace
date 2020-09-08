@@ -90,6 +90,10 @@ func (c Carapace) Standalone() {
 
 func (c Carapace) Snippet(shell string) string {
 	var snippet func(cmd *cobra.Command, actions map[string]string) string
+
+	if shell == "" {
+		shell = determineShell()
+	}
 	switch shell {
 	case "bash":
 		snippet = bash.Snippet

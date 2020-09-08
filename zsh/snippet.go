@@ -10,6 +10,7 @@ import (
 )
 
 var replacer = strings.NewReplacer(
+	"`", `\"`,
 	`:`, `\:`,
 	`"`, `\"`,
 	`[`, `\[`,

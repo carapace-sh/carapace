@@ -178,7 +178,8 @@ go build .
 PATH=$PATH:$(pwd)
 source <(example _carapace bash)
 
-# elvish
+# elvish (-source will be replaced in next version: `eval (example _carapace elvish | slurp`)
+)
 paths=[$@paths (pwd)]
 example _carapace elvish > example.elv
 -source example.elv

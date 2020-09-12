@@ -101,12 +101,14 @@ func (c Carapace) Snippet(shell string) string {
 		snippet = elvish.Snippet
 	case "fish":
 		snippet = fish.Snippet
+	case "osh":
+		snippet = bash.Snippet
 	case "powershell":
 		snippet = powershell.Snippet
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'powershell' or 'zsh' [was: %v]", shell)
+		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'osh', 'powershell' or 'zsh' [was: %v]", shell)
 	}
 	return snippet(c.cmd.Root(), completions.actions.Shell(shell))
 }
@@ -223,14 +225,16 @@ func determineShell() string {
 				return "elvish"
 			case "fish":
 				return "fish"
+			case "osh":
+				return "osh"
 			case "pwsh":
 				return "powershell"
 			case "zsh":
 				return "zsh"
 			default:
+				return ""
 			}
 		}
-
 	}
 }
 

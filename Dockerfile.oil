@@ -1,0 +1,21 @@
+FROM golang
+
+RUN apt-get update \
+ && apt install -y build-essential libreadline-dev
+
+RUN curl https://www.oilshell.org/download/oil-0.8.0.tar.gz | tar -xvz \
+ && cd oil-*/ \
+ && ./configure \
+ && make \
+ && ./install
+
+RUN mkdir -p ~/.config/oil \
+ && echo "\n\
+PS1=$'\e[0;36mcarapace \e[0m'\n\
+source <(example _carapace bash)" \
+       > ~/.config/oil/oshrc
+
+RUN ln -s /carapace/example/example /usr/local/bin/example
+
+ENTRYPOINT [ "osh" ]
+

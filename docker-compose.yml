@@ -28,6 +28,13 @@ services:
       dockerfile: Dockerfile.fish
     volumes:
       - '.:/carapace/'
+  
+  oil:
+    build:
+      context: .
+      dockerfile: Dockerfile.oil
+    volumes:
+      - '.:/carapace/'
 
   powershell:
     build:

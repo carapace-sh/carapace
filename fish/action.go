@@ -73,7 +73,7 @@ func ActionValues(values ...string) string {
 func ActionValuesDescribed(values ...string) string {
 	sanitized := Sanitize(values...)
 	// TODO verify length (description always exists)
-	vals := make([]string, len(sanitized))
+	vals := make([]string, len(sanitized)/2)
 	for index, val := range sanitized {
 		if index%2 == 0 {
 			if sanitized[index+1] == "" {

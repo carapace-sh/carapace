@@ -78,7 +78,7 @@ func ActionValues(values ...string) string {
 
 func ActionValuesDescribed(values ...string) string {
 	// TODO verify length (description always exists)
-	vals := make([]string, len(values))
+	vals := make([]string, len(values)/2)
 	for index, val := range values {
 		if index%2 == 0 {
 			vals[index/2] = val

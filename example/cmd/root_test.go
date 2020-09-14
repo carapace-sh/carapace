@@ -91,7 +91,7 @@ _example_completions() {
             ;;
 
           -s | --signal)
-            COMPREPLY=($(compgen -W $'ABRT\nALRM\nBUS\nCHLD\nCONT\nFPE\nHUP\nILL\nINT\nKILL\nPIPE\nPOLL\nPROF\nPWR\nQUIT\nSEGV\nSTKFLT\nSTOP\nSYS\nTERM\nTRAP\nTSTP\nTTIN\nTTOU\nURG\nUSR1\nUSR2\nVTALRM\nWINCH\nXCPU\nXFSZ\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n' -- "$last"))
+            COMPREPLY=($(compgen -W $'ABRT\nALRM\nBUS\nCHLD\nCONT\nFPE\nHUP\nILL\nINT\nKILL\nPIPE\nPOLL\nPROF\nPWR\nQUIT\nSEGV\nSTKFLT\nSTOP\nSYS\nTERM\nTRAP\nTSTP\nTTIN\nTTOU\nURG\nUSR1\nUSR2\nVTALRM\nWINCH\nXCPU\nXFSZ' -- "$last"))
             ;;
 
           --usergroup)
@@ -107,7 +107,7 @@ _example_completions() {
             ;;
 
           -d | --values_described)
-            COMPREPLY=($(compgen -W $'values\nexample\n\n' -- "$last"))
+            COMPREPLY=($(compgen -W $'values\nexample' -- "$last"))
             ;;
 
           *)
@@ -223,13 +223,7 @@ edit:complex-candidate 'alias' &display='alias (action example)'
 edit:complex-candidate 'callback' &display='callback (callback example)'
 edit:complex-candidate 'condition' &display='condition (condition example)'
 edit:complex-candidate 'help' &display='help (Help about any command)'
-edit:complex-candidate 'injection' &display='injection (just trying to break things)'
-
-
-
-
-
- }
+edit:complex-candidate 'injection' &display='injection (just trying to break things)' }
     ]
     subargs = $arg[(subindex example):] 
     if (> (count $subargs) 0) {
@@ -243,9 +237,7 @@ edit:complex-candidate 'injection' &display='injection (just trying to break thi
         [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
         [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
         [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ERR' &display='ERR (message example)'
-edit:complex-candidate '_' &display='_ ()'
-
- }]
+edit:complex-candidate '_' &display='_ ()' }]
         [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
         [&long='signal' &desc='kill signals' &short='s' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ABRT' &display='ABRT (Abnormal termination)'
 edit:complex-candidate 'ALRM' &display='ALRM (Virtual alarm clock)'
@@ -277,45 +269,12 @@ edit:complex-candidate 'USR2' &display='USR2 (User-defined signal 2)'
 edit:complex-candidate 'VTALRM' &display='VTALRM (Virtual alarm clock)'
 edit:complex-candidate 'WINCH' &display='WINCH (Window size change)'
 edit:complex-candidate 'XCPU' &display='XCPU (CPU time limit exceeded)'
-edit:complex-candidate 'XFSZ' &display='XFSZ (File size limit exceeded)'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- }]
+edit:complex-candidate 'XFSZ' &display='XFSZ (File size limit exceeded)' }]
         [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
         [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
         [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate 'values' &display='values (valueDescription)'
-edit:complex-candidate 'example' &display='example (exampleDescription)'
-
- }]
+edit:complex-candidate 'example' &display='example (exampleDescription)' }]
     ]
     arg-handlers = [
       [_]{ put positional1 p1 }
@@ -374,9 +333,7 @@ edit:complex-candidate 'example' &display='example (exampleDescription)'
       [_]{ put  echo fail  }
       [_]{ put echo fail }
       [_]{ edit:complex-candidate 'ERR' &display='ERR (no values to complete)'
-edit:complex-candidate '_' &display='_ ()'
-
- }
+edit:complex-candidate '_' &display='_ ()' }
       [_]{ put LAST POSITIONAL VALUE }
     ]
     subargs = $arg[(subindex injection):] 
@@ -437,11 +394,11 @@ complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g'
 complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(__fish_print_hostnames)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
-complete -c 'example' -f -n '_example_state _example__action' -l 'signal' -s 's' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'signal' -s 's' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'usergroup' -d 'user\:group flag' -a '(_example_callback _example__action##usergroup)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
-complete -c 'example' -f -n '_example_state _example__action' -l 'values_described' -s 'd' -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription\n\n")' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'values_described' -s 'd' -d 'values with description flag' -a '(echo -e "values\tvalueDescription\nexample\texampleDescription")' -r
 complete -c 'example' -f -n '_example_state _example__action' -a '(_example_callback _)'
 
 
@@ -536,9 +493,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                       }
                 '^(-m|--message)$' {
                         [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example ')
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example ')
-                        
-                         
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example ') 
                         break
                       }
                 '^(-n|--net_interfaces)$' {
@@ -576,38 +531,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         [CompletionResult]::new('VTALRM ', 'VTALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
                         [CompletionResult]::new('WINCH ', 'WINCH', [CompletionResultType]::ParameterValue, 'Window size change ')
                         [CompletionResult]::new('XCPU ', 'XCPU', [CompletionResultType]::ParameterValue, 'CPU time limit exceeded ')
-                        [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ')
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                         
+                        [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ') 
                         break
                       }
                 '^(--usergroup)$' {
@@ -625,9 +549,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                       }
                 '^(-d|--values_described)$' {
                         [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, 'valueDescription ')
-                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription ')
-                        
-                         
+                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription ') 
                         break
                       }
                 default {

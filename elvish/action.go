@@ -75,7 +75,7 @@ func ActionValues(values ...string) string {
 func ActionValuesDescribed(values ...string) string {
 	// TODO verify length (description always exists)
 	sanitized := Sanitize(values...)
-	vals := make([]string, len(values))
+	vals := make([]string, len(values)/2)
 	for index, val := range sanitized {
 		if index%2 == 0 {
 			vals[index/2] = fmt.Sprintf(`edit:complex-candidate '%v' &display='%v (%v)'`, val, val, sanitized[index+1])

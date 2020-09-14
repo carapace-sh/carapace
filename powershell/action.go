@@ -84,7 +84,7 @@ func ActionValuesDescribed(values ...string) string {
 	vals := make([]string, len(sanitized))
 	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, '%v')`, EscapeSpace(val), val, sanitized[index+1])
+			vals[index/2] = fmt.Sprintf(`[CompletionResult]::new('%v ', '%v', [CompletionResultType]::ParameterValue, '%v ')`, EscapeSpace(val), val, sanitized[index+1])
 		}
 	}
 	return strings.Join(vals, "\n")

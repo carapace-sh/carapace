@@ -76,7 +76,11 @@ func ActionValuesDescribed(values ...string) string {
 	vals := make([]string, len(sanitized))
 	for index, val := range sanitized {
 		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf(`%v\t%v`, val, sanitized[index+1])
+			if sanitized[index+1] == "" {
+				vals[index/2] = fmt.Sprintf(`%v`, val)
+			} else {
+				vals[index/2] = fmt.Sprintf(`%v\t%v`, val, sanitized[index+1])
+			}
 		}
 	}
 	return ActionExecute(fmt.Sprintf(`echo -e "%v"`, strings.Join(vals, `\n`)))

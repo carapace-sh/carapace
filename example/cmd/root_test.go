@@ -535,8 +535,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 '^(-m|--message)$' {
-                        [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example')
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example')
+                        [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example ')
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example ')
                         
                          
                         break
@@ -546,37 +546,37 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 '^(-s|--signal)$' {
-                        [CompletionResult]::new('ABRT ', 'ABRT', [CompletionResultType]::ParameterValue, 'Abnormal termination')
-                        [CompletionResult]::new('ALRM ', 'ALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock')
-                        [CompletionResult]::new('BUS ', 'BUS', [CompletionResultType]::ParameterValue, 'BUS error')
-                        [CompletionResult]::new('CHLD ', 'CHLD', [CompletionResultType]::ParameterValue, 'Child status has changed')
-                        [CompletionResult]::new('CONT ', 'CONT', [CompletionResultType]::ParameterValue, 'Continue stopped process')
-                        [CompletionResult]::new('FPE ', 'FPE', [CompletionResultType]::ParameterValue, 'Floating-point exception')
-                        [CompletionResult]::new('HUP ', 'HUP', [CompletionResultType]::ParameterValue, 'Hangup detected on controlling terminal')
-                        [CompletionResult]::new('ILL ', 'ILL', [CompletionResultType]::ParameterValue, 'Illegal instruction')
-                        [CompletionResult]::new('INT ', 'INT', [CompletionResultType]::ParameterValue, 'Interrupt from keyboard')
-                        [CompletionResult]::new('KILL ', 'KILL', [CompletionResultType]::ParameterValue, 'Kill, unblockable')
-                        [CompletionResult]::new('PIPE ', 'PIPE', [CompletionResultType]::ParameterValue, 'Broken pipe')
-                        [CompletionResult]::new('POLL ', 'POLL', [CompletionResultType]::ParameterValue, 'Pollable event occurred')
-                        [CompletionResult]::new('PROF ', 'PROF', [CompletionResultType]::ParameterValue, 'Profiling alarm clock timer expired')
-                        [CompletionResult]::new('PWR ', 'PWR', [CompletionResultType]::ParameterValue, 'Power failure restart')
-                        [CompletionResult]::new('QUIT ', 'QUIT', [CompletionResultType]::ParameterValue, 'Quit from keyboard')
-                        [CompletionResult]::new('SEGV ', 'SEGV', [CompletionResultType]::ParameterValue, 'Segmentation violation')
-                        [CompletionResult]::new('STKFLT ', 'STKFLT', [CompletionResultType]::ParameterValue, 'Stack fault on coprocessor')
-                        [CompletionResult]::new('STOP ', 'STOP', [CompletionResultType]::ParameterValue, 'Stop process, unblockable')
-                        [CompletionResult]::new('SYS ', 'SYS', [CompletionResultType]::ParameterValue, 'Bad system call')
-                        [CompletionResult]::new('TERM ', 'TERM', [CompletionResultType]::ParameterValue, 'Termination request')
-                        [CompletionResult]::new('TRAP ', 'TRAP', [CompletionResultType]::ParameterValue, 'Trace/breakpoint trap')
-                        [CompletionResult]::new('TSTP ', 'TSTP', [CompletionResultType]::ParameterValue, 'Stop typed at keyboard')
-                        [CompletionResult]::new('TTIN ', 'TTIN', [CompletionResultType]::ParameterValue, 'Background read from tty')
-                        [CompletionResult]::new('TTOU ', 'TTOU', [CompletionResultType]::ParameterValue, 'Background write to tty')
-                        [CompletionResult]::new('URG ', 'URG', [CompletionResultType]::ParameterValue, 'Urgent condition on socket')
-                        [CompletionResult]::new('USR1 ', 'USR1', [CompletionResultType]::ParameterValue, 'User-defined signal 1')
-                        [CompletionResult]::new('USR2 ', 'USR2', [CompletionResultType]::ParameterValue, 'User-defined signal 2')
-                        [CompletionResult]::new('VTALRM ', 'VTALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock')
-                        [CompletionResult]::new('WINCH ', 'WINCH', [CompletionResultType]::ParameterValue, 'Window size change')
-                        [CompletionResult]::new('XCPU ', 'XCPU', [CompletionResultType]::ParameterValue, 'CPU time limit exceeded')
-                        [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded')
+                        [CompletionResult]::new('ABRT ', 'ABRT', [CompletionResultType]::ParameterValue, 'Abnormal termination ')
+                        [CompletionResult]::new('ALRM ', 'ALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
+                        [CompletionResult]::new('BUS ', 'BUS', [CompletionResultType]::ParameterValue, 'BUS error ')
+                        [CompletionResult]::new('CHLD ', 'CHLD', [CompletionResultType]::ParameterValue, 'Child status has changed ')
+                        [CompletionResult]::new('CONT ', 'CONT', [CompletionResultType]::ParameterValue, 'Continue stopped process ')
+                        [CompletionResult]::new('FPE ', 'FPE', [CompletionResultType]::ParameterValue, 'Floating-point exception ')
+                        [CompletionResult]::new('HUP ', 'HUP', [CompletionResultType]::ParameterValue, 'Hangup detected on controlling terminal ')
+                        [CompletionResult]::new('ILL ', 'ILL', [CompletionResultType]::ParameterValue, 'Illegal instruction ')
+                        [CompletionResult]::new('INT ', 'INT', [CompletionResultType]::ParameterValue, 'Interrupt from keyboard ')
+                        [CompletionResult]::new('KILL ', 'KILL', [CompletionResultType]::ParameterValue, 'Kill, unblockable ')
+                        [CompletionResult]::new('PIPE ', 'PIPE', [CompletionResultType]::ParameterValue, 'Broken pipe ')
+                        [CompletionResult]::new('POLL ', 'POLL', [CompletionResultType]::ParameterValue, 'Pollable event occurred ')
+                        [CompletionResult]::new('PROF ', 'PROF', [CompletionResultType]::ParameterValue, 'Profiling alarm clock timer expired ')
+                        [CompletionResult]::new('PWR ', 'PWR', [CompletionResultType]::ParameterValue, 'Power failure restart ')
+                        [CompletionResult]::new('QUIT ', 'QUIT', [CompletionResultType]::ParameterValue, 'Quit from keyboard ')
+                        [CompletionResult]::new('SEGV ', 'SEGV', [CompletionResultType]::ParameterValue, 'Segmentation violation ')
+                        [CompletionResult]::new('STKFLT ', 'STKFLT', [CompletionResultType]::ParameterValue, 'Stack fault on coprocessor ')
+                        [CompletionResult]::new('STOP ', 'STOP', [CompletionResultType]::ParameterValue, 'Stop process, unblockable ')
+                        [CompletionResult]::new('SYS ', 'SYS', [CompletionResultType]::ParameterValue, 'Bad system call ')
+                        [CompletionResult]::new('TERM ', 'TERM', [CompletionResultType]::ParameterValue, 'Termination request ')
+                        [CompletionResult]::new('TRAP ', 'TRAP', [CompletionResultType]::ParameterValue, 'Trace/breakpoint trap ')
+                        [CompletionResult]::new('TSTP ', 'TSTP', [CompletionResultType]::ParameterValue, 'Stop typed at keyboard ')
+                        [CompletionResult]::new('TTIN ', 'TTIN', [CompletionResultType]::ParameterValue, 'Background read from tty ')
+                        [CompletionResult]::new('TTOU ', 'TTOU', [CompletionResultType]::ParameterValue, 'Background write to tty ')
+                        [CompletionResult]::new('URG ', 'URG', [CompletionResultType]::ParameterValue, 'Urgent condition on socket ')
+                        [CompletionResult]::new('USR1 ', 'USR1', [CompletionResultType]::ParameterValue, 'User-defined signal 1 ')
+                        [CompletionResult]::new('USR2 ', 'USR2', [CompletionResultType]::ParameterValue, 'User-defined signal 2 ')
+                        [CompletionResult]::new('VTALRM ', 'VTALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
+                        [CompletionResult]::new('WINCH ', 'WINCH', [CompletionResultType]::ParameterValue, 'Window size change ')
+                        [CompletionResult]::new('XCPU ', 'XCPU', [CompletionResultType]::ParameterValue, 'CPU time limit exceeded ')
+                        [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ')
                         
                         
                         
@@ -624,8 +624,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 '^(-d|--values_described)$' {
-                        [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, 'valueDescription')
-                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription')
+                        [CompletionResult]::new('values ', 'values', [CompletionResultType]::ParameterValue, 'valueDescription ')
+                        [CompletionResult]::new('example ', 'example', [CompletionResultType]::ParameterValue, 'exampleDescription ')
                         
                          
                         break

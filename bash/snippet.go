@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rsteube/carapace/common"
 	"github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -112,7 +113,9 @@ func snippetFlagList(flags *pflag.FlagSet) string {
 
 	flags.VisitAll(func(flag *pflag.Flag) {
 		if !flag.Hidden {
-			flagValues = append(flagValues, "--"+flag.Name)
+			if !common.IsShorthandOnly(flag) {
+				flagValues = append(flagValues, "--"+flag.Name)
+			}
 			if flag.Shorthand != "" {
 				flagValues = append(flagValues, "-"+flag.Shorthand)
 			}
@@ -132,7 +135,11 @@ func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 
 	var names string
 	if flag.Shorthand != "" {
-		names = fmt.Sprintf("-%v | --%v", flag.Shorthand, flag.Name)
+		if common.IsShorthandOnly(flag) {
+			names = fmt.Sprintf("-%v", flag.Shorthand)
+		} else {
+			names = fmt.Sprintf("-%v | --%v", flag.Shorthand, flag.Name)
+		}
 	} else {
 		names = "--" + flag.Name
 	}

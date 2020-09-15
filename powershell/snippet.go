@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/rsteube/carapace/common"
 	"github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -83,6 +84,8 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string) string {
 		match := fmt.Sprintf(`^(--%v)$`, flag.Name)
 		if flag.Shorthand != "" {
 			match = fmt.Sprintf(`^(-%v|--%v)$`, flag.Shorthand, flag.Name)
+		} else if common.IsShorthandOnly(flag) {
+			match = fmt.Sprintf(`^(-%v)$`, flag.Shorthand)
 		}
 		var action = ""
 		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
@@ -106,7 +109,9 @@ func snippetTODO(cmd *cobra.Command) string {
 			if len(flag.Shorthand) > 0 {
 				result += fmt.Sprintf("\n                [CompletionResult]::new('-%s ', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
 			}
-			result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			if !common.IsShorthandOnly(flag) {
+				result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+			}
 		}
 	})
 

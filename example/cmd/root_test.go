@@ -59,7 +59,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--message\n-m\n--net_interfaces\n-n\n--signal\n-s\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--kill\n-k\n--message\n-m\n--net_interfaces\n-n\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -82,16 +82,16 @@ _example_completions() {
             COMPREPLY=($(compgen -W "$(cut -d ' ' -f1 < ~/.ssh/known_hosts | cut -d ',' -f1)" -- "$last"))
             ;;
 
+          -k | --kill)
+            COMPREPLY=($(compgen -W $'ABRT\nALRM\nBUS\nCHLD\nCONT\nFPE\nHUP\nILL\nINT\nKILL\nPIPE\nPOLL\nPROF\nPWR\nQUIT\nSEGV\nSTKFLT\nSTOP\nSYS\nTERM\nTRAP\nTSTP\nTTIN\nTTOU\nURG\nUSR1\nUSR2\nVTALRM\nWINCH\nXCPU\nXFSZ' -- "$last"))
+            ;;
+
           -m | --message)
             COMPREPLY=($(compgen -W $'ERR\nmessage\\\ example' -- "$last"))
             ;;
 
           -n | --net_interfaces)
             COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"))
-            ;;
-
-          -s | --signal)
-            COMPREPLY=($(compgen -W $'ABRT\nALRM\nBUS\nCHLD\nCONT\nFPE\nHUP\nILL\nINT\nKILL\nPIPE\nPOLL\nPROF\nPWR\nQUIT\nSEGV\nSTKFLT\nSTOP\nSYS\nTERM\nTRAP\nTSTP\nTTIN\nTTOU\nURG\nUSR1\nUSR2\nVTALRM\nWINCH\nXCPU\nXFSZ' -- "$last"))
             ;;
 
           --usergroup)
@@ -213,9 +213,9 @@ edit:completion:arg-completer[example] = [@arg]{
   if (eq 1 0) {
   }  elif (eq $state '_example') {
     opt-specs = [
-        [&long='array' &desc='multiflag' &short='a' &arg-required=$true &completer=[_]{  }]
-        [&long='persistentFlag' &desc='Help message for persistentFlag' &short='p']
-        [&long='toggle' &desc='Help message for toggle' &short='t']
+        [&long='array' &short='a' &desc='multiflag' &arg-required=$true &completer=[_]{  }]
+        [&long='persistentFlag' &short='p' &desc='Help message for persistentFlag']
+        [&long='toggle' &short='t' &desc='Help message for toggle']
     ]
     arg-handlers = [
         [_]{ edit:complex-candidate 'action' &display='action (action example)'
@@ -231,15 +231,12 @@ edit:complex-candidate 'injection' &display='injection (just trying to break thi
     }
   }  elif (eq $state '_example__action') {
     opt-specs = [
-        [&long='custom' &desc='custom flag' &short='c' &arg-required=$true &completer=[_]{  }]
+        [&long='custom' &short='c' &desc='custom flag' &arg-required=$true &completer=[_]{  }]
         [&long='directories' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
-        [&long='files' &desc='files flag' &short='f' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
-        [&long='groups' &desc='groups flag' &short='g' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
+        [&long='files' &short='f' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
+        [&long='groups' &short='g' &desc='groups flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
         [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
-        [&long='message' &desc='message flag' &short='m' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ERR' &display='ERR (message example)'
-edit:complex-candidate '_' &display='_ ()' }]
-        [&long='net_interfaces' &desc='net_interfaces flag' &short='n' &arg-required=$true &completer=[_]{  }]
-        [&long='signal' &desc='kill signals' &short='s' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ABRT' &display='ABRT (Abnormal termination)'
+        [&long='kill' &short='k' &desc='kill signals' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ABRT' &display='ABRT (Abnormal termination)'
 edit:complex-candidate 'ALRM' &display='ALRM (Virtual alarm clock)'
 edit:complex-candidate 'BUS' &display='BUS (BUS error)'
 edit:complex-candidate 'CHLD' &display='CHLD (Child status has changed)'
@@ -270,10 +267,13 @@ edit:complex-candidate 'VTALRM' &display='VTALRM (Virtual alarm clock)'
 edit:complex-candidate 'WINCH' &display='WINCH (Window size change)'
 edit:complex-candidate 'XCPU' &display='XCPU (CPU time limit exceeded)'
 edit:complex-candidate 'XFSZ' &display='XFSZ (File size limit exceeded)' }]
+        [&long='message' &short='m' &desc='message flag' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ERR' &display='ERR (message example)'
+edit:complex-candidate '_' &display='_ ()' }]
+        [&long='net_interfaces' &short='n' &desc='net_interfaces flag' &arg-required=$true &completer=[_]{  }]
         [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
-        [&long='users' &desc='users flag' &short='u' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
-        [&long='values' &desc='values flag' &short='v' &arg-required=$true &completer=[_]{ put values example }]
-        [&long='values_described' &desc='values with description flag' &short='d' &arg-required=$true &completer=[_]{ edit:complex-candidate 'values' &display='values (valueDescription)'
+        [&long='users' &short='u' &desc='users flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
+        [&long='values' &short='v' &desc='values flag' &arg-required=$true &completer=[_]{ put values example }]
+        [&long='values_described' &short='d' &desc='values with description flag' &arg-required=$true &completer=[_]{ edit:complex-candidate 'values' &display='values (valueDescription)'
 edit:complex-candidate 'example' &display='example (exampleDescription)' }]
     ]
     arg-handlers = [
@@ -286,7 +286,7 @@ edit:complex-candidate 'example' &display='example (exampleDescription)' }]
     }
   }  elif (eq $state '_example__callback') {
     opt-specs = [
-        [&long='callback' &desc='Help message for callback' &short='c' &arg-required=$true &completer=[_]{ _example_callback '_example__callback##callback' }]
+        [&long='callback' &short='c' &desc='Help message for callback' &arg-required=$true &completer=[_]{ _example_callback '_example__callback##callback' }]
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__callback#1' }
@@ -300,7 +300,7 @@ edit:complex-candidate 'example' &display='example (exampleDescription)' }]
     }
   }  elif (eq $state '_example__condition') {
     opt-specs = [
-        [&long='required' &desc='required flag' &short='r' &arg-required=$true &completer=[_]{ put valid invalid }]
+        [&long='required' &short='r' &desc='required flag' &arg-required=$true &completer=[_]{ put valid invalid }]
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__condition#1' }
@@ -392,9 +392,9 @@ complete -c 'example' -f -n '_example_state _example__action' -l 'directories' -
 complete -c 'example' -f -n '_example_state _example__action' -l 'files' -s 'f' -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g' -d 'groups flag' -a '(__fish_complete_groups)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(__fish_print_hostnames)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'kill' -s 'k' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
-complete -c 'example' -f -n '_example_state _example__action' -l 'signal' -s 's' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'usergroup' -d 'user\:group flag' -a '(_example_callback _example__action##usergroup)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
@@ -491,16 +491,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         _example_callback '_example__action##hosts' 
                         break
                       }
-                '^(-m|--message)$' {
-                        [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example ')
-                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example ') 
-                        break
-                      }
-                '^(-n|--net_interfaces)$' {
-                        $(Get-NetAdapter).Name 
-                        break
-                      }
-                '^(-s|--signal)$' {
+                '^(-k|--kill)$' {
                         [CompletionResult]::new('ABRT ', 'ABRT', [CompletionResultType]::ParameterValue, 'Abnormal termination ')
                         [CompletionResult]::new('ALRM ', 'ALRM', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
                         [CompletionResult]::new('BUS ', 'BUS', [CompletionResultType]::ParameterValue, 'BUS error ')
@@ -534,6 +525,15 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         [CompletionResult]::new('XFSZ ', 'XFSZ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ') 
                         break
                       }
+                '^(-m|--message)$' {
+                        [CompletionResult]::new('_ ', '_', [CompletionResultType]::ParameterValue, 'message example ')
+                        [CompletionResult]::new('ERR ', 'ERR', [CompletionResultType]::ParameterValue, 'message example ') 
+                        break
+                      }
+                '^(-n|--net_interfaces)$' {
+                        $(Get-NetAdapter).Name 
+                        break
+                      }
                 '^(--usergroup)$' {
                         _example_callback '_example__action##usergroup' 
                         break
@@ -563,12 +563,12 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('-g ', '-g', [CompletionResultType]::ParameterName, 'groups flag')
                 [CompletionResult]::new('--groups ', '--groups', [CompletionResultType]::ParameterName, 'groups flag')
                 [CompletionResult]::new('--hosts ', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
+                [CompletionResult]::new('-k ', '-k', [CompletionResultType]::ParameterName, 'kill signals')
+                [CompletionResult]::new('--kill ', '--kill', [CompletionResultType]::ParameterName, 'kill signals')
                 [CompletionResult]::new('-m ', '-m', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
-                [CompletionResult]::new('-s ', '-s', [CompletionResultType]::ParameterName, 'kill signals')
-                [CompletionResult]::new('--signal ', '--signal', [CompletionResultType]::ParameterName, 'kill signals')
                 [CompletionResult]::new('--usergroup ', '--usergroup', [CompletionResultType]::ParameterName, 'user:group flag')
                 [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
                 [CompletionResult]::new('--users ', '--users', [CompletionResultType]::ParameterName, 'users flag')
@@ -723,9 +723,9 @@ function _example__action {
     "(-f --files)"{-f,--files}"[files flag]: :_files -g '*.go'" \
     "(-g --groups)"{-g,--groups}"[groups flag]: :_groups" \
     "--hosts[hosts flag]: :_hosts" \
+    "(-k --kill)"{-k,--kill}"[kill signals]: :_values '' 'ABRT[Abnormal\ termination]' 'ALRM[Virtual\ alarm\ clock]' 'BUS[BUS\ error]' 'CHLD[Child\ status\ has\ changed]' 'CONT[Continue\ stopped\ process]' 'FPE[Floating-point\ exception]' 'HUP[Hangup\ detected\ on\ controlling\ terminal]' 'ILL[Illegal\ instruction]' 'INT[Interrupt\ from\ keyboard]' 'KILL[Kill,\ unblockable]' 'PIPE[Broken\ pipe]' 'POLL[Pollable\ event\ occurred]' 'PROF[Profiling\ alarm\ clock\ timer\ expired]' 'PWR[Power\ failure\ restart]' 'QUIT[Quit\ from\ keyboard]' 'SEGV[Segmentation\ violation]' 'STKFLT[Stack\ fault\ on\ coprocessor]' 'STOP[Stop\ process,\ unblockable]' 'SYS[Bad\ system\ call]' 'TERM[Termination\ request]' 'TRAP[Trace/breakpoint\ trap]' 'TSTP[Stop\ typed\ at\ keyboard]' 'TTIN[Background\ read\ from\ tty]' 'TTOU[Background\ write\ to\ tty]' 'URG[Urgent\ condition\ on\ socket]' 'USR1[User-defined\ signal\ 1]' 'USR2[User-defined\ signal\ 2]' 'VTALRM[Virtual\ alarm\ clock]' 'WINCH[Window\ size\ change]' 'XCPU[CPU\ time\ limit\ exceeded]' 'XFSZ[File\ size\ limit\ exceeded]'                               " \
     "(-m --message)"{-m,--message}"[message flag]: : _message -r 'message example'" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :_net_interfaces" \
-    "(-s --signal)"{-s,--signal}"[kill signals]: :_values '' 'ABRT[Abnormal\ termination]' 'ALRM[Virtual\ alarm\ clock]' 'BUS[BUS\ error]' 'CHLD[Child\ status\ has\ changed]' 'CONT[Continue\ stopped\ process]' 'FPE[Floating-point\ exception]' 'HUP[Hangup\ detected\ on\ controlling\ terminal]' 'ILL[Illegal\ instruction]' 'INT[Interrupt\ from\ keyboard]' 'KILL[Kill,\ unblockable]' 'PIPE[Broken\ pipe]' 'POLL[Pollable\ event\ occurred]' 'PROF[Profiling\ alarm\ clock\ timer\ expired]' 'PWR[Power\ failure\ restart]' 'QUIT[Quit\ from\ keyboard]' 'SEGV[Segmentation\ violation]' 'STKFLT[Stack\ fault\ on\ coprocessor]' 'STOP[Stop\ process,\ unblockable]' 'SYS[Bad\ system\ call]' 'TERM[Termination\ request]' 'TRAP[Trace/breakpoint\ trap]' 'TSTP[Stop\ typed\ at\ keyboard]' 'TTIN[Background\ read\ from\ tty]' 'TTOU[Background\ write\ to\ tty]' 'URG[Urgent\ condition\ on\ socket]' 'USR1[User-defined\ signal\ 1]' 'USR2[User-defined\ signal\ 2]' 'VTALRM[Virtual\ alarm\ clock]' 'WINCH[Window\ size\ change]' 'XCPU[CPU\ time\ limit\ exceeded]' 'XFSZ[File\ size\ limit\ exceeded]'                               " \
     "--usergroup[user\:group flag]: : eval \$(example _carapace zsh '_example__action##usergroup' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \

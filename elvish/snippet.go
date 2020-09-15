@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rsteube/carapace/common"
 	"github.com/rsteube/carapace/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -119,13 +120,16 @@ func snippetPositionalCompletion(action string) string {
 }
 
 func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
-	spec := []string{
-		fmt.Sprintf(`&long='%v'`, flag.Name),
-		fmt.Sprintf(`&desc='%v'`, replacer.Replace(flag.Usage)),
+	spec := []string{}
+	if !common.IsShorthandOnly(flag) {
+		spec = append(spec, fmt.Sprintf(`&long='%v'`, flag.Name))
 	}
 	if flag.Shorthand != "" {
 		spec = append(spec, fmt.Sprintf(`&short='%v'`, flag.Shorthand))
 	}
+
+	spec = append(spec, fmt.Sprintf(`&desc='%v'`, replacer.Replace(flag.Usage)))
+
 	if flag.NoOptDefVal == "" {
 		spec = append(spec, `&arg-required=$true`, fmt.Sprintf(`&completer=[_]{ %v }`, action))
 	}

@@ -17,12 +17,12 @@ func TestSnippetFlagCompletion(t *testing.T) {
 	root.Flags().StringArrayP("stringarray", "a", []string{"a"}, "stringarray flag")
 	root.Flags().StringSlice("stringslice", []string{"a"}, "stringslice flag")
 
-	assert.Equal(t, `"--simple[simple flag]"`, snippetFlagCompletion(root.Flag("simple"), nil))
+	assert.Equal(t, `"--simple=-[simple flag]::"`, snippetFlagCompletion(root.Flag("simple"), nil))
 
 	valuesAction := ActionValues("a", "b", "c")
 	assert.Equal(t, `"--values[values action flag]: :_values '' a b c"`, snippetFlagCompletion(root.Flag("values"), &valuesAction))
 
-	assert.Equal(t, `"(-s --shorthand)"{-s,--shorthand}"[shorthand flag]"`, snippetFlagCompletion(root.Flag("shorthand"), nil))
+	assert.Equal(t, `"(-s --shorthand)"{-s=-,--shorthand=-}"[shorthand flag]::"`, snippetFlagCompletion(root.Flag("shorthand"), nil))
 
 	assert.Equal(t, `"(*-a *--stringarray)"{\*-a,\*--stringarray}"[stringarray flag]: :"`, snippetFlagCompletion(root.Flag("stringarray"), nil))
 	assert.Equal(t, `"*--stringslice[stringslice flag]: :"`, snippetFlagCompletion(root.Flag("stringslice"), nil))

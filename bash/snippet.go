@@ -37,6 +37,16 @@ _%v_completions() {
   local state
   state="$(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash state)"
   local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
+
+  # crude optarg patch - won't work with --optarg=key=value
+  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
+  if [[ $previous == '=' ]]; then
+      previous="${COMP_WORDS[$((COMP_CWORD-2))]}="
+  elif [[ $last == '=' ]]; then
+      last=''
+      previous="$previous="
+  fi
+
   local IFS=$'\n'
 
   case $state in
@@ -129,19 +139,20 @@ func snippetFlagList(flags *pflag.FlagSet) string {
 }
 
 func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
+	optArgSuffix := ""
 	if flag.NoOptDefVal != "" {
-		return ""
+		optArgSuffix = "="
 	}
 
 	var names string
 	if flag.Shorthand != "" {
 		if common.IsShorthandOnly(flag) {
-			names = fmt.Sprintf("-%v", flag.Shorthand)
+			names = fmt.Sprintf("-%v", flag.Shorthand+optArgSuffix)
 		} else {
-			names = fmt.Sprintf("-%v | --%v", flag.Shorthand, flag.Name)
+			names = fmt.Sprintf("-%v | --%v", flag.Shorthand+optArgSuffix, flag.Name+optArgSuffix)
 		}
 	} else {
-		names = "--" + flag.Name
+		names = "--" + flag.Name + optArgSuffix
 	}
 
 	return fmt.Sprintf(`          %v)

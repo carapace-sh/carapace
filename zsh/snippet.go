@@ -98,12 +98,16 @@ func snippetFlagCompletion(flag *pflag.Flag, action *string) (snippet string) {
 	var suffix, multimark, multimarkEscaped string
 	if action == nil {
 		if flag.NoOptDefVal != "" {
-			suffix = "" // no argument required for flag
+			suffix = "::" // no argument required for flag
 		} else {
 			suffix = ": :" // require a value
 		}
 	} else {
-		suffix = fmt.Sprintf(": :%v", *action)
+		if flag.NoOptDefVal != "" {
+			suffix = fmt.Sprintf(":: :%v", *action)
+		} else {
+			suffix = fmt.Sprintf(": :%v", *action)
+		}
 	}
 
 	if zshCompFlagCouldBeSpecifiedMoreThenOnce(flag) {
@@ -111,12 +115,18 @@ func snippetFlagCompletion(flag *pflag.Flag, action *string) (snippet string) {
 		multimarkEscaped = "\\*"
 	}
 
+	// TODO cleanup structure so that it can be read easier
+	optArgSuffix := ""
+	if flag.NoOptDefVal != "" {
+		optArgSuffix = "=-"
+	}
+
 	if flag.Shorthand == "" { // no shorthannd
-		snippet = fmt.Sprintf(`"%v--%v[%v]%v"`, multimark, flag.Name, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`"%v--%v[%v]%v"`, multimark, flag.Name+optArgSuffix, replacer.Replace(flag.Usage), suffix)
 	} else if common.IsShorthandOnly(flag) {
-		snippet = fmt.Sprintf(`"%v-%v[%v]%v"`, multimark, flag.Shorthand, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`"%v-%v[%v]%v"`, multimark, flag.Shorthand+optArgSuffix, replacer.Replace(flag.Usage), suffix)
 	} else {
-		snippet = fmt.Sprintf(`"(%v-%v %v--%v)"{%v-%v,%v--%v}"[%v]%v"`, multimark, flag.Shorthand, multimark, flag.Name, multimarkEscaped, flag.Shorthand, multimarkEscaped, flag.Name, replacer.Replace(flag.Usage), suffix)
+		snippet = fmt.Sprintf(`"(%v-%v %v--%v)"{%v-%v,%v--%v}"[%v]%v"`, multimark, flag.Shorthand, multimark, flag.Name, multimarkEscaped, flag.Shorthand+optArgSuffix, multimarkEscaped, flag.Name+optArgSuffix, replacer.Replace(flag.Usage), suffix)
 	}
 	return
 }

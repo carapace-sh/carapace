@@ -132,6 +132,8 @@ func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 
 	if flag.NoOptDefVal == "" {
 		spec = append(spec, `&arg-required=$true`, fmt.Sprintf(`&completer=[_]{ %v }`, action))
+	} else {
+		spec = append(spec, `&arg-optional=$true`, fmt.Sprintf(`&completer=[_]{ %v }`, action))
 	}
 	return fmt.Sprintf(`        [%v]`, strings.Join(spec, " "))
 }

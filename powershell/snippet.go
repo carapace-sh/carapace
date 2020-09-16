@@ -62,10 +62,16 @@ func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, action
             switch -regex ($previous) {
 %v
                 default {
+                    switch -regex ($wordToComplete) {
 %v
+
+                        default {
+%v
+                        }
+                    }
                 }
             }
-`, snippetFlagActions(cmd, actions), snippetTODO(cmd))
+`, snippetFlagActions(cmd, actions, false), snippetFlagActions(cmd, actions, true), snippetTODO(cmd))
 
 	for _, subCmd := range cmd.Commands() {
 		if !subCmd.Hidden {
@@ -74,27 +80,47 @@ func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, action
 	}
 }
 
-func snippetFlagActions(cmd *cobra.Command, actions map[string]string) string {
+func snippetFlagActions(cmd *cobra.Command, actions map[string]string, optArgFlag bool) string {
 	flagActions := make([]string, 0)
 	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
-		if flag.NoOptDefVal != "" {
+		// TODO cleanup this mess
+		if flag.NoOptDefVal != "" && !optArgFlag {
+			return
+		}
+		if flag.NoOptDefVal == "" && optArgFlag {
 			return
 		}
 
-		match := fmt.Sprintf(`^(--%v)$`, flag.Name)
+		optArgSuffix := ""
+		if flag.NoOptDefVal != "" {
+			optArgSuffix = "=*"
+		}
+
+		match := fmt.Sprintf(`^(--%v)$`, flag.Name+optArgSuffix)
 		if flag.Shorthand != "" {
-			match = fmt.Sprintf(`^(-%v|--%v)$`, flag.Shorthand, flag.Name)
+			match = fmt.Sprintf(`^(-%v|--%v)$`, flag.Shorthand+optArgSuffix, flag.Name+optArgSuffix)
 		} else if common.IsShorthandOnly(flag) {
-			match = fmt.Sprintf(`^(-%v)$`, flag.Shorthand)
+			match = fmt.Sprintf(`^(-%v)$`, flag.Shorthand+optArgSuffix)
 		}
 		var action = ""
 		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
 			action = a
 		}
-		flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
+		if flag.NoOptDefVal != "" {
+			// add flag prefix to each CompletionResult
+			flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
+                        @(
+                        %v
+                        ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
+                        break
+                      }`, match, strings.Replace(action, "\n", "\n                        ", -1)))
+
+		} else {
+			flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
                         %v 
                         break
                       }`, match, strings.Replace(action, "\n", "\n                        ", -1)))
+		}
 	})
 	return strings.Join(flagActions, "\n")
 }

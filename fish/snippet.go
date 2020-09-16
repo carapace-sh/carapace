@@ -110,7 +110,11 @@ func snippetFlagCompletion(cmd *cobra.Command, flag *pflag.Flag, action *string)
 			suffix = " -r" // require a value
 		}
 	} else {
-		suffix = fmt.Sprintf(" -a '(%v)' -r", *action)
+		if flag.NoOptDefVal != "" {
+			suffix = fmt.Sprintf(" -a '(%v)'", *action)
+		} else {
+			suffix = fmt.Sprintf(" -a '(%v)' -r", *action)
+		}
 	}
 
 	if flag.Shorthand == "" { // no shorthannd

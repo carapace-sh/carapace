@@ -34,6 +34,16 @@ _example_completions() {
   local state
   state="$(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs example _carapace bash state)"
   local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
+
+  # crude optarg patch - won't work with --optarg=key=value
+  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
+  if [[ $previous == '=' ]]; then
+      previous="${COMP_WORDS[$((COMP_CWORD-2))]}="
+  elif [[ $last == '=' ]]; then
+      last=''
+      previous="$previous="
+  fi
+
   local IFS=$'\n'
 
   case $state in
@@ -47,7 +57,13 @@ _example_completions() {
             COMPREPLY=($())
             ;;
 
+          -p= | --persistentFlag=)
+            COMPREPLY=($())
+            ;;
 
+          -t= | --toggle=)
+            COMPREPLY=($(compgen -W $'true\nfalse' -- "$last"))
+            ;;
 
           *)
             COMPREPLY=($(compgen -W $'action\nalias\ncallback\ncondition\nhelp\ninjection' -- "$last"))
@@ -59,7 +75,7 @@ _example_completions() {
 
     '_example__action' )
       if [[ $last == -* ]]; then
-        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--kill\n-k\n--message\n-m\n--net_interfaces\n-n\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
+        COMPREPLY=($(compgen -W $'--custom\n-c\n--directories\n--files\n-f\n--groups\n-g\n--hosts\n--kill\n-k\n--message\n-m\n--net_interfaces\n-n\n--optarg\n-o\n--usergroup\n--users\n-u\n--values\n-v\n--values_described\n-d' -- "$last"))
       else
         case $previous in
           -c | --custom)
@@ -92,6 +108,10 @@ _example_completions() {
 
           -n | --net_interfaces)
             COMPREPLY=($(compgen -W "$(ifconfig -a | grep -o '^[^ :]\+')" -- "$last"))
+            ;;
+
+          -o= | --optarg=)
+            COMPREPLY=($(compgen -W $'blue\nred\ngreen\nyellow' -- "$last"))
             ;;
 
           --usergroup)
@@ -214,8 +234,8 @@ edit:completion:arg-completer[example] = [@arg]{
   }  elif (eq $state '_example') {
     opt-specs = [
         [&long='array' &short='a' &desc='multiflag' &arg-required=$true &completer=[_]{  }]
-        [&long='persistentFlag' &short='p' &desc='Help message for persistentFlag']
-        [&long='toggle' &short='t' &desc='Help message for toggle']
+        [&long='persistentFlag' &short='p' &desc='Help message for persistentFlag' &arg-optional=$true &completer=[_]{  }]
+        [&long='toggle' &short='t' &desc='Help message for toggle' &arg-optional=$true &completer=[_]{ put true false }]
     ]
     arg-handlers = [
         [_]{ edit:complex-candidate 'action' &display='action (action example)'
@@ -270,6 +290,7 @@ edit:complex-candidate 'XFSZ' &display='XFSZ (File size limit exceeded)' }]
         [&long='message' &short='m' &desc='message flag' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ERR' &display='ERR (message example)'
 edit:complex-candidate '_' &display='_ ()' }]
         [&long='net_interfaces' &short='n' &desc='net_interfaces flag' &arg-required=$true &completer=[_]{  }]
+        [&long='optarg' &short='o' &desc='optional arg with default value blue' &arg-optional=$true &completer=[_]{ put blue red green yellow }]
         [&long='usergroup' &desc='user\:group flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##usergroup' }]
         [&long='users' &short='u' &desc='users flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##users' }]
         [&long='values' &short='v' &desc='values flag' &arg-required=$true &completer=[_]{ put values example }]
@@ -379,7 +400,7 @@ complete -c example -f
 
 complete -c 'example' -f -n '_example_state _example' -l 'array' -s 'a' -d 'multiflag' -r
 complete -c 'example' -f -n '_example_state _example' -l 'persistentFlag' -s 'p' -d 'Help message for persistentFlag'
-complete -c 'example' -f -n '_example_state _example' -l 'toggle' -s 't' -d 'Help message for toggle' -a '(echo -e "true\nfalse")' -r
+complete -c 'example' -f -n '_example_state _example' -l 'toggle' -s 't' -d 'Help message for toggle' -a '(echo -e "true\nfalse")'
 complete -c 'example' -f -n '_example_state _example ' -a 'action alias' -d 'action example'
 complete -c 'example' -f -n '_example_state _example ' -a 'callback ' -d 'callback example'
 complete -c 'example' -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
@@ -395,6 +416,7 @@ complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hos
 complete -c 'example' -f -n '_example_state _example__action' -l 'kill' -s 'k' -d 'kill signals' -a '(echo -e "ABRT\tAbnormal termination\nALRM\tVirtual alarm clock\nBUS\tBUS error\nCHLD\tChild status has changed\nCONT\tContinue stopped process\nFPE\tFloating-point exception\nHUP\tHangup detected on controlling terminal\nILL\tIllegal instruction\nINT\tInterrupt from keyboard\nKILL\tKill, unblockable\nPIPE\tBroken pipe\nPOLL\tPollable event occurred\nPROF\tProfiling alarm clock timer expired\nPWR\tPower failure restart\nQUIT\tQuit from keyboard\nSEGV\tSegmentation violation\nSTKFLT\tStack fault on coprocessor\nSTOP\tStop process, unblockable\nSYS\tBad system call\nTERM\tTermination request\nTRAP\tTrace/breakpoint trap\nTSTP\tStop typed at keyboard\nTTIN\tBackground read from tty\nTTOU\tBackground write to tty\nURG\tUrgent condition on socket\nUSR1\tUser-defined signal 1\nUSR2\tUser-defined signal 2\nVTALRM\tVirtual alarm clock\nWINCH\tWindow size change\nXCPU\tCPU time limit exceeded\nXFSZ\tFile size limit exceeded")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "ERR\tmessage example\n_")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(__fish_print_interfaces)' -r
+complete -c 'example' -f -n '_example_state _example__action' -l 'optarg' -s 'o' -d 'optional arg with default value blue' -a '(echo -e "blue\nred\ngreen\nyellow")'
 complete -c 'example' -f -n '_example_state _example__action' -l 'usergroup' -d 'user\:group flag' -a '(_example_callback _example__action##usergroup)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'users' -s 'u' -d 'users flag' -a '(__fish_complete_users)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'values' -s 'v' -d 'values flag' -a '(echo -e "values\nexample")' -r
@@ -449,6 +471,22 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 default {
+                    switch -regex ($wordToComplete) {
+                '^(-p=*|--persistentFlag=*)$' {
+                        @(
+                        
+                        ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
+                        break
+                      }
+                '^(-t=*|--toggle=*)$' {
+                        @(
+                        [CompletionResult]::new('true ', 'true', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('false ', 'false', [CompletionResultType]::ParameterValue, ' ')
+                        ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
+                        break
+                      }
+
+                        default {
 
             if ($wordToComplete -like "-*") {
                 [CompletionResult]::new('-a ', '-a', [CompletionResultType]::ParameterName, 'multiflag')
@@ -466,6 +504,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -553,6 +593,18 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 default {
+                    switch -regex ($wordToComplete) {
+                '^(-o=*|--optarg=*)$' {
+                        @(
+                        [CompletionResult]::new('blue ', 'blue', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('red ', 'red', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('green ', 'green', [CompletionResultType]::ParameterValue, ' ')
+                        [CompletionResult]::new('yellow ', 'yellow', [CompletionResultType]::ParameterValue, ' ')
+                        ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
+                        break
+                      }
+
+                        default {
 
             if ($wordToComplete -like "-*") {
                 [CompletionResult]::new('-c ', '-c', [CompletionResultType]::ParameterName, 'custom flag')
@@ -569,6 +621,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('--message ', '--message', [CompletionResultType]::ParameterName, 'message flag')
                 [CompletionResult]::new('-n ', '-n', [CompletionResultType]::ParameterName, 'net_interfaces flag')
                 [CompletionResult]::new('--net_interfaces ', '--net_interfaces', [CompletionResultType]::ParameterName, 'net_interfaces flag')
+                [CompletionResult]::new('-o ', '-o', [CompletionResultType]::ParameterName, 'optional arg with default value blue')
+                [CompletionResult]::new('--optarg ', '--optarg', [CompletionResultType]::ParameterName, 'optional arg with default value blue')
                 [CompletionResult]::new('--usergroup ', '--usergroup', [CompletionResultType]::ParameterName, 'user:group flag')
                 [CompletionResult]::new('-u ', '-u', [CompletionResultType]::ParameterName, 'users flag')
                 [CompletionResult]::new('--users ', '--users', [CompletionResultType]::ParameterName, 'users flag')
@@ -581,6 +635,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -591,6 +647,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 default {
+                    switch -regex ($wordToComplete) {
+
+
+                        default {
 
             if ($wordToComplete -like "-*") {
                 [CompletionResult]::new('-c ', '-c', [CompletionResultType]::ParameterName, 'Help message for callback')
@@ -600,6 +660,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -611,6 +673,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         break
                       }
                 default {
+                    switch -regex ($wordToComplete) {
+
+
+                        default {
 
             if ($wordToComplete -like "-*") {
                 [CompletionResult]::new('-r ', '-r', [CompletionResultType]::ParameterName, 'required flag')
@@ -620,6 +686,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -627,6 +695,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             switch -regex ($previous) {
 
                 default {
+                    switch -regex ($wordToComplete) {
+
+
+                        default {
 
             if ($wordToComplete -like "-*") {
             } else {
@@ -634,6 +706,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -641,6 +715,10 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             switch -regex ($previous) {
 
                 default {
+                    switch -regex ($wordToComplete) {
+
+
+                        default {
 
             if ($wordToComplete -like "-*") {
             } else {
@@ -648,6 +726,8 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
             }
             break
         }
+                        }
+                    }
                 }
             }
 
@@ -673,8 +753,8 @@ function _example {
 
   _arguments -C \
     "(*-a *--array)"{\*-a,\*--array}"[multiflag]: :" \
-    "(-p --persistentFlag)"{-p,--persistentFlag}"[Help message for persistentFlag]" \
-    "(-t --toggle)"{-t,--toggle}"[Help message for toggle]: :_values '' true false" \
+    "(-p --persistentFlag)"{-p=-,--persistentFlag=-}"[Help message for persistentFlag]::" \
+    "(-t --toggle)"{-t=-,--toggle=-}"[Help message for toggle]:: :_values '' true false" \
     "1: :->cmnds" \
     "*::arg:->args"
 
@@ -726,6 +806,7 @@ function _example__action {
     "(-k --kill)"{-k,--kill}"[kill signals]: :_values '' 'ABRT[Abnormal\ termination]' 'ALRM[Virtual\ alarm\ clock]' 'BUS[BUS\ error]' 'CHLD[Child\ status\ has\ changed]' 'CONT[Continue\ stopped\ process]' 'FPE[Floating-point\ exception]' 'HUP[Hangup\ detected\ on\ controlling\ terminal]' 'ILL[Illegal\ instruction]' 'INT[Interrupt\ from\ keyboard]' 'KILL[Kill,\ unblockable]' 'PIPE[Broken\ pipe]' 'POLL[Pollable\ event\ occurred]' 'PROF[Profiling\ alarm\ clock\ timer\ expired]' 'PWR[Power\ failure\ restart]' 'QUIT[Quit\ from\ keyboard]' 'SEGV[Segmentation\ violation]' 'STKFLT[Stack\ fault\ on\ coprocessor]' 'STOP[Stop\ process,\ unblockable]' 'SYS[Bad\ system\ call]' 'TERM[Termination\ request]' 'TRAP[Trace/breakpoint\ trap]' 'TSTP[Stop\ typed\ at\ keyboard]' 'TTIN[Background\ read\ from\ tty]' 'TTOU[Background\ write\ to\ tty]' 'URG[Urgent\ condition\ on\ socket]' 'USR1[User-defined\ signal\ 1]' 'USR2[User-defined\ signal\ 2]' 'VTALRM[Virtual\ alarm\ clock]' 'WINCH[Window\ size\ change]' 'XCPU[CPU\ time\ limit\ exceeded]' 'XFSZ[File\ size\ limit\ exceeded]'                               " \
     "(-m --message)"{-m,--message}"[message flag]: : _message -r 'message example'" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :_net_interfaces" \
+    "(-o --optarg)"{-o=-,--optarg=-}"[optional arg with default value blue]:: :_values '' blue red green yellow" \
     "--usergroup[user\:group flag]: : eval \$(example _carapace zsh '_example__action##usergroup' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"})" \
     "(-u --users)"{-u,--users}"[users flag]: :_users" \
     "(-v --values)"{-v,--values}"[values flag]: :_values '' values example" \

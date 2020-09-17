@@ -7,7 +7,9 @@ Completion script generator for [cobra] with support for:
 - [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
 - [Elvish](https://elv.sh/ref/edit.html#editcompletionarg-completer)
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
+- [Oil](http://www.oilshell.org/blog/2018/10/10.html) *broken* ([#86](https://github.com/rsteube/carapace/issues/86))
 - [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
+- [Xonsh](https://xon.sh/tutorial_completers.html#writing-a-new-completer) *experimental*
 - [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 
@@ -121,6 +123,12 @@ Since callbacks are simply invocations of the program they can be tested directl
 #[CompletionResult]::new('ERR', 'ERR', [CompletionResultType]::ParameterValue, ' ')
 #[CompletionResult]::new('flag --required must be set to valid: invalid', 'flag --required must be set to valid: invalid', [CompletionResultType]::ParameterValue, ' ')
 
+./example _carapace xonsh '_example__condition#1' example condition --required invalid
+#{
+#  RichCompletion('_', display='_', description='flag --required must be set to valid: invalid', prefix_len=0),
+#  RichCompletion('ERR', display='ERR', description='flag --required must be set to valid: invalid', prefix_len=0),
+#}
+
 ./example _carapace zsh '_example__condition#1' example condition --required invalid
 # _message -r 'flag --required must be set to valid: invalid'
 ```
@@ -159,6 +167,7 @@ Additional information can be found at:
 - Elvish: [using-and-writing-completions-in-elvish](https://zzamboni.org/post/using-and-writing-completions-in-elvish/) and [argument-completer](https://elv.sh/ref/edit.html#argument-completer)
 - Fish: [fish-shell/share/functions](https://github.com/fish-shell/fish-shell/tree/master/share/functions) and [writing your own completions](https://fishshell.com/docs/current/#writing-your-own-completions)
 - Powershell: [Dynamic Tab Completion](https://adamtheautomator.com/powershell-parameters-argumentcompleter/) and [Register-ArgumentCompleter](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
+- Xonsh: [Programmable Tab-Completion](https://xon.sh/tutorial_completers.html) and [RichCompletion(str)](https://github.com/xonsh/xonsh/blob/master/xonsh/completers/tools.py)
 - Zsh: [zsh-completions-howto](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#functions-for-performing-complex-completions-of-single-words) and [Completion-System](http://zsh.sourceforge.net/Doc/Release/Completion-System.html#Completion-System).
 
 ## Standalone Mode
@@ -188,10 +197,18 @@ example _carapace elvish > example.elv
 set PATH $PATH (pwd) 
 example _carapace fish | source
 
+# oil
+PATH=$PATH:$(pwd)
+source <(example _carapace oil)
+
 # powershell
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 $env:PATH += ":$pwd"
 example _carapace powershell | out-string | Invoke-Expression
+
+# xonsh
+$PATH.append($(pwd))
+exec($(example _carapace xonsh))
 
 # zsh
 PATH=$PATH:$(pwd)
@@ -203,7 +220,7 @@ example <TAB>
 or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
 docker-compose run --rm build
-docker-compose run --rm [bash|elvish|fish|powershell|zsh]
+docker-compose run --rm [bash|elvish|fish|oil|powershell|xonsh|zsh]
 
 example <TAB>
 ```

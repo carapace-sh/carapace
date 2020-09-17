@@ -10,6 +10,7 @@ import (
 	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/powershell"
+	"github.com/rsteube/carapace/xonsh"
 	"github.com/rsteube/carapace/zsh"
 	"github.com/spf13/cobra"
 )
@@ -18,8 +19,9 @@ type Action struct {
 	Bash       string
 	Elvish     string
 	Fish       string
-	Zsh        string
 	Powershell string
+	Xonsh      string
+	Zsh        string
 	Callback   CompletionCallback
 }
 type ActionMap map[string]Action
@@ -40,6 +42,9 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 		if a.Powershell == "" {
 			a.Powershell = powershell.Callback(cmd.Root().Name(), uid)
 		}
+		if a.Xonsh == "" {
+			a.Xonsh = xonsh.Callback(cmd.Root().Name(), uid)
+		}
 		if a.Zsh == "" {
 			a.Zsh = zsh.Callback(uid)
 		}
@@ -57,6 +62,8 @@ func (a Action) Value(shell string) string {
 		return a.Elvish
 	case "powershell":
 		return a.Powershell
+	case "xonsh":
+		return a.Xonsh
 	case "zsh":
 		return a.Zsh
 	default:
@@ -92,6 +99,7 @@ func ActionExecute(command string) Action {
 		Elvish:     elvish.ActionExecute(command),
 		Fish:       fish.ActionExecute(command),
 		Powershell: powershell.ActionExecute(command),
+		Xonsh:      xonsh.ActionExecute(command),
 		Zsh:        zsh.ActionExecute(command),
 	}
 }
@@ -107,6 +115,7 @@ func ActionDirectories() Action {
 		Elvish:     elvish.ActionDirectories(),
 		Fish:       fish.ActionDirectories(),
 		Powershell: powershell.ActionDirectories(),
+		Xonsh:      xonsh.ActionDirectories(),
 		Zsh:        zsh.ActionDirectories(),
 	}
 }
@@ -117,6 +126,7 @@ func ActionFiles(suffix string) Action {
 		Elvish:     elvish.ActionFiles(suffix),
 		Fish:       fish.ActionFiles(suffix),
 		Powershell: powershell.ActionFiles(suffix),
+		Xonsh:      xonsh.ActionFiles(suffix),
 		Zsh:        zsh.ActionFiles("*" + suffix),
 	}
 }
@@ -128,6 +138,7 @@ func ActionNetInterfaces() Action {
 		Elvish:     elvish.ActionNetInterfaces(),
 		Fish:       fish.ActionNetInterfaces(),
 		Powershell: powershell.ActionNetInterfaces(),
+		Xonsh:      xonsh.ActionNetInterfaces(),
 		Zsh:        zsh.ActionNetInterfaces(),
 	}
 }
@@ -235,6 +246,7 @@ func ActionValues(values ...string) Action {
 		Elvish:     elvish.ActionValues(values...),
 		Fish:       fish.ActionValues(values...),
 		Powershell: powershell.ActionValues(values...),
+		Xonsh:      xonsh.ActionValues(values...),
 		Zsh:        zsh.ActionValues(values...),
 	}
 }
@@ -246,6 +258,7 @@ func ActionValuesDescribed(values ...string) Action {
 		Elvish:     elvish.ActionValuesDescribed(values...),
 		Fish:       fish.ActionValuesDescribed(values...),
 		Powershell: powershell.ActionValuesDescribed(values...),
+		Xonsh:      xonsh.ActionValuesDescribed(values...),
 		Zsh:        zsh.ActionValuesDescribed(values...),
 	}
 }
@@ -257,6 +270,7 @@ func ActionMessage(msg string) Action {
 		Elvish:     elvish.ActionMessage(msg),
 		Fish:       fish.ActionMessage(msg),
 		Powershell: powershell.ActionMessage(msg),
+		Xonsh:      xonsh.ActionMessage(msg),
 		Zsh:        zsh.ActionMessage(msg),
 	}
 }
@@ -267,6 +281,7 @@ func ActionPrefixValues(prefix string, values ...string) Action {
 		Elvish:     elvish.ActionPrefixValues(prefix, values...),
 		Fish:       fish.ActionPrefixValues(prefix, values...),
 		Powershell: powershell.ActionPrefixValues(prefix, values...),
+		Xonsh:      xonsh.ActionPrefixValues(prefix, values...),
 		Zsh:        zsh.ActionPrefixValues(prefix, values...),
 	})
 }

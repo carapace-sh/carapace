@@ -41,7 +41,7 @@ func init() {
 		"users":            carapace.ActionUsers(),
 		"values":           carapace.ActionValues("values", "example"),
 		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
-		"custom":           carapace.Action{Zsh: "_most_recent_file 2"},
+		"custom":           carapace.Action{Zsh: "_most_recent_file 2", Xonsh: "{}"},
 		"kill":             carapace.ActionKillSignals(),
 		"optarg":           carapace.ActionValues("blue", "red", "green", "yellow"),
 	})

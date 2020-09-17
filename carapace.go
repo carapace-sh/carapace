@@ -11,6 +11,7 @@ import (
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/powershell"
 	"github.com/rsteube/carapace/uid"
+	"github.com/rsteube/carapace/xonsh"
 	"github.com/rsteube/carapace/zsh"
 	"github.com/spf13/cobra"
 )
@@ -79,6 +80,10 @@ func (c Carapace) Zsh() string {
 	return c.Snippet("zsh")
 }
 
+func (c Carapace) Xonsh() string {
+	return c.Snippet("xonsh")
+}
+
 func (c Carapace) Standalone() {
 	// TODO probably needs to be done for each subcommand
 	if c.cmd.Root().Flag("help") != nil {
@@ -101,14 +106,16 @@ func (c Carapace) Snippet(shell string) string {
 		snippet = elvish.Snippet
 	case "fish":
 		snippet = fish.Snippet
-	case "osh":
+	case "oil":
 		snippet = bash.Snippet
 	case "powershell":
 		snippet = powershell.Snippet
+	case "xonsh":
+		snippet = xonsh.Snippet
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'osh', 'powershell' or 'zsh' [was: %v]", shell)
+		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell)
 	}
 	return snippet(c.cmd.Root(), completions.actions.Shell(shell))
 }
@@ -226,9 +233,11 @@ func determineShell() string {
 			case "fish":
 				return "fish"
 			case "osh":
-				return "osh"
+				return "oil"
 			case "pwsh":
 				return "powershell"
+			case "xonsh":
+				return "xonsh"
 			case "zsh":
 				return "zsh"
 			default:

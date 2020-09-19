@@ -17,7 +17,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 
 	var subCommandCases bytes.Buffer
 	generateXonshSubcommandCases(&subCommandCases, cmd, actions)
-	fmt.Fprintf(buf, xonshCompletionTemplate, cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), subCommandCases.String(), cmd.Name(), cmd.Name())
+	fmt.Fprintf(buf, xonshCompletionTemplate, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), subCommandCases.String(), cmd.Name(), cmd.Name())
 
 	return buf.String()
 }
@@ -39,6 +39,9 @@ def %v_completer(prefix, line, begidx, endidx, ctx):
     current=words[-1]
     previous=words[-2]
     suffix=full_words[len(words)-1][len(current):]
+
+    if words[0] != '%v':
+        return # not the expected command to complete
     
     result = {}
 

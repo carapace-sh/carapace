@@ -42,6 +42,13 @@ services:
       dockerfile: Dockerfile.powershell
     volumes:
       - '.:/carapace/'
+  
+  xonsh:
+    build:
+      context: .
+      dockerfile: Dockerfile.xonsh
+    volumes:
+      - '.:/carapace/'
 
   zsh:
     build:

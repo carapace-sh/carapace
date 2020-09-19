@@ -12,6 +12,7 @@ import (
 
 var replacer = strings.NewReplacer( // TODO
 	`:`, `\:`,
+	"\n", ``,
 	`"`, `\"`,
 	`[`, `\[`,
 	`]`, `\]`,

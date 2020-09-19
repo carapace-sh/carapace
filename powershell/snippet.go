@@ -84,6 +84,9 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string, optArgFla
 	flagActions := make([]string, 0)
 	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
 		// TODO cleanup this mess
+		if flag.Value.Type() == "bool" {
+			return
+		}
 		if flag.NoOptDefVal != "" && !optArgFlag {
 			return
 		}
@@ -133,10 +136,10 @@ func snippetTODO(cmd *cobra.Command) string {
 		if !flag.Hidden {
 			usage := escapeStringForPowerShell(flag.Usage)
 			if len(flag.Shorthand) > 0 {
-				result += fmt.Sprintf("\n                [CompletionResult]::new('-%s ', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, usage)
+				result += fmt.Sprintf("\n                [CompletionResult]::new('-%s ', '-%s', [CompletionResultType]::ParameterName, '%s')", flag.Shorthand, flag.Shorthand, sanitizer.Replace(usage))
 			}
 			if !common.IsShorthandOnly(flag) {
-				result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, usage)
+				result += fmt.Sprintf("\n                [CompletionResult]::new('--%s ', '--%s', [CompletionResultType]::ParameterName, '%s')", flag.Name, flag.Name, sanitizer.Replace(usage))
 			}
 		}
 	})
@@ -145,7 +148,7 @@ func snippetTODO(cmd *cobra.Command) string {
 	for _, subCmd := range cmd.Commands() {
 		if !subCmd.Hidden {
 			usage := escapeStringForPowerShell(subCmd.Short)
-			result += fmt.Sprintf("\n                [CompletionResult]::new('%s ', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), usage)
+			result += fmt.Sprintf("\n                [CompletionResult]::new('%s ', '%s', [CompletionResultType]::Command, '%s')", subCmd.Name(), subCmd.Name(), sanitizer.Replace(usage))
 		}
 	}
 

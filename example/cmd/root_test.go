@@ -478,13 +478,6 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                         ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
                         break
                       }
-                '^(-t=*|--toggle=*)$' {
-                        @(
-                        [CompletionResult]::new('true ', 'true', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('false ', 'false', [CompletionResultType]::ParameterValue, ' ')
-                        ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
-                        break
-                      }
 
                         default {
 
@@ -754,7 +747,8 @@ from xonsh.completers._aliases import _add_one_completer
 from xonsh.completers.path import complete_dir, complete_path
 from xonsh.completers.tools import RichCompletion
 
-def example_completer(prefix, line, begidx, endidx, ctx):
+def _example_completer(prefix, line, begidx, endidx, ctx):
+    """carapace completer for example"""
     if not line.startswith('example '):
         return # not the expected command to complete
     
@@ -780,6 +774,7 @@ def example_completer(prefix, line, begidx, endidx, ctx):
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
         cb = cb.decode('utf-8')
+        nonlocal prefix, line, begidx, endidx, ctx
         return eval(cb)
    
     if False:
@@ -797,13 +792,6 @@ def example_completer(prefix, line, begidx, endidx, ctx):
                 result = {}
                 result = set(map(lambda x: RichCompletion(current.split('=')[0]+'='+x, display=x.display, description=x.description, prefix_len=x.prefix_len), result))
     
-            elif re.search('^(-t=.*|--toggle=.*)$',current):
-                result = {
-                              RichCompletion('true', display='true', description='', prefix_len=0),
-                              RichCompletion('false', display='false', description='', prefix_len=0),
-                            }
-                result = set(map(lambda x: RichCompletion(current.split('=')[0]+'='+x, display=x.display, description=x.description, prefix_len=x.prefix_len), result))
-    
 
             elif re.search("-.*",current):
                 result = {
@@ -816,11 +804,11 @@ def example_completer(prefix, line, begidx, endidx, ctx):
                 }
             else:
                 result = {
-                RichCompletion('action', display='action', description='example completion', prefix_len=0),
-                RichCompletion('callback', display='callback', description='example completion', prefix_len=0),
-                RichCompletion('condition', display='condition', description='example completion', prefix_len=0),
-                RichCompletion('help', display='help', description='example completion', prefix_len=0),
-                RichCompletion('injection', display='injection', description='example completion', prefix_len=0),
+                RichCompletion('action', display='action', description='action example', prefix_len=0),
+                RichCompletion('callback', display='callback', description='callback example', prefix_len=0),
+                RichCompletion('condition', display='condition', description='condition example', prefix_len=0),
+                RichCompletion('help', display='help', description='Help about any command', prefix_len=0),
+                RichCompletion('injection', display='injection', description='just trying to break things', prefix_len=0),
                 }
 
 
@@ -1029,7 +1017,7 @@ def example_completer(prefix, line, begidx, endidx, ctx):
 
     result = set(map(lambda x: RichCompletion(x[:len(x)-len(suffix)], display=x.display, description=x.description, prefix_len=len(current)), result))
     return result
-_add_one_completer('example', example_completer, 'start')
+_add_one_completer('example', _example_completer, 'start')
 `
 
 	rootCmd.InitDefaultHelpCmd()

@@ -9,6 +9,7 @@ RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh \
 
 RUN mkdir -p ~/.config/xonsh \
  && echo "\n\
+\$COMPLETIONS_CONFIRM=True\n\
 \$PROMPT='carapace '\n\
 exec(\$(example _carapace xonsh))" \
   > ~/.config/xonsh/rc.xsh

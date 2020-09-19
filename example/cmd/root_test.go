@@ -755,6 +755,9 @@ from xonsh.completers.path import complete_dir, complete_path
 from xonsh.completers.tools import RichCompletion
 
 def example_completer(prefix, line, begidx, endidx, ctx):
+    if not line.startswith('example '):
+        return # not the expected command to complete
+    
     full_words=split(line + "_") # ensure last word is empty when ends with space
     full_words[-1]=full_words[-1][0:-1]
     words=split(line[0:endidx] + "_") # ensure last word is empty when ends with space
@@ -763,9 +766,6 @@ def example_completer(prefix, line, begidx, endidx, ctx):
     previous=words[-2]
     suffix=full_words[len(words)-1][len(current):]
 
-    if words[0] != 'example':
-        return # not the expected command to complete
-    
     result = {}
 
     # TODO python retrieve state

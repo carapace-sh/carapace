@@ -8,6 +8,7 @@ import (
 var sanitizer = strings.NewReplacer( // TODO
 	`$`, ``,
 	"`", ``,
+	"\n", ``,
 	`\`, ``,
 	`"`, ``,
 	`'`, ``,
@@ -30,7 +31,7 @@ func Sanitize(values ...string) []string {
 }
 
 func Callback(prefix string, uid string) string {
-	return fmt.Sprintf("_%v_callback('%v')", prefix, uid)
+	return fmt.Sprintf("_%v_callback('%v')", strings.Replace(prefix, "-", "__", -1), uid)
 }
 
 func ActionExecute(command string) string {

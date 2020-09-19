@@ -17,7 +17,8 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 
 	var subCommandCases bytes.Buffer
 	generateXonshSubcommandCases(&subCommandCases, cmd, actions)
-	fmt.Fprintf(buf, xonshCompletionTemplate, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), subCommandCases.String(), cmd.Name(), cmd.Name())
+	functionName := strings.Replace(cmd.Name(), "-", "__", -1)
+	fmt.Fprintf(buf, xonshCompletionTemplate, functionName, cmd.Name(), cmd.Name(), uid.Executable(), functionName, uid.Executable(), subCommandCases.String(), cmd.Name(), functionName)
 
 	return buf.String()
 }
@@ -31,7 +32,8 @@ from xonsh.completers._aliases import _add_one_completer
 from xonsh.completers.path import complete_dir, complete_path
 from xonsh.completers.tools import RichCompletion
 
-def %v_completer(prefix, line, begidx, endidx, ctx):
+def _%v_completer(prefix, line, begidx, endidx, ctx):
+    """carapace completer for %v"""
     if not line.startswith('%v '):
         return # not the expected command to complete
     
@@ -57,6 +59,7 @@ def %v_completer(prefix, line, begidx, endidx, ctx):
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
         cb = cb.decode('utf-8')
+        nonlocal prefix, line, begidx, endidx, ctx
         return eval(cb)
    
     if False:
@@ -68,7 +71,7 @@ def %v_completer(prefix, line, begidx, endidx, ctx):
 
     result = set(map(lambda x: RichCompletion(x[:len(x)-len(suffix)], display=x.display, description=x.description, prefix_len=len(current)), result))
     return result
-_add_one_completer('%v', %v_completer, 'start')
+_add_one_completer('%v', _%v_completer, 'start')
 `
 
 func generateXonshSubcommandCases(out io.Writer, cmd *cobra.Command, actions map[string]string) {
@@ -97,6 +100,9 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string, optArgFla
 	flagActions := make([]string, 0)
 	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
 		// TODO cleanup this mess
+		if flag.Value.Type() == "bool" {
+			return
+		}
 		if flag.NoOptDefVal != "" && !optArgFlag {
 			return
 		}
@@ -158,13 +164,13 @@ func snippetTODO(cmd *cobra.Command) string {
 		result += fmt.Sprint("\n                result = {")
 		for _, subCmd := range cmd.Commands() {
 			if !subCmd.Hidden {
-				result += fmt.Sprintf("\n                RichCompletion('%v', display='%v', description='%v', prefix_len=0),", subCmd.Name(), subCmd.Name(), sanitizer.Replace(cmd.Short))
+				result += fmt.Sprintf("\n                RichCompletion('%v', display='%v', description='%v', prefix_len=0),", subCmd.Name(), subCmd.Name(), sanitizer.Replace(subCmd.Short))
 			}
 		}
 		result += fmt.Sprint("\n                }")
 	} else {
 		if !cmd.HasAvailableSubCommands() {
-			result += fmt.Sprintf("\n                result = _%v_callback('_')", cmd.Root().Name())
+			result += fmt.Sprintf("\n                result = _%v_callback('_')", strings.Replace(cmd.Root().Name(), "-", "__", -1))
 		}
 	}
 	result += fmt.Sprint("\n")

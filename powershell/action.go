@@ -8,6 +8,7 @@ import (
 var sanitizer = strings.NewReplacer( // TODO
 	`$`, ``,
 	"`", ``,
+	"\n", ``,
 	`\`, ``,
 	`"`, ``,
 	`'`, ``,

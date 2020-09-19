@@ -762,6 +762,9 @@ def example_completer(prefix, line, begidx, endidx, ctx):
     current=words[-1]
     previous=words[-2]
     suffix=full_words[len(words)-1][len(current):]
+
+    if words[0] != 'example':
+        return # not the expected command to complete
     
     result = {}
 

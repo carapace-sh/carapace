@@ -30,21 +30,21 @@ func init() {
 		carapace.ActionCallback(func(args []string) carapace.Action {
 			return carapace.ActionValues("callback1", "callback2")
 		}),
-		carapace.ActionMultiParts("=", func(args []string, parts []string) []string {
+		carapace.ActionMultiParts("=", func(args []string, parts []string) carapace.Action {
 			switch len(parts) {
 			case 0:
-				return []string{"alpha=", "beta=", "gamma"}
+				return carapace.ActionValues("alpha=", "beta=", "gamma")
 			case 1:
 				switch parts[0] {
 				case "alpha":
-					return []string{"one", "two", "three"}
+					return carapace.ActionValues("one", "two", "three")
 				case "beta":
-					return []string{"1", "2", "3"}
+					return carapace.ActionValues("1", "2", "3")
 				default:
-					return []string{}
+					return carapace.ActionValues()
 				}
 			default:
-				return []string{}
+				return carapace.ActionValues()
 			}
 		}),
 	)

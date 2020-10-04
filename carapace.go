@@ -60,30 +60,6 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 	}
 }
 
-func (c Carapace) Bash() string {
-	return c.Snippet("bash")
-}
-
-func (c Carapace) Elvish() string {
-	return c.Snippet("elvish")
-}
-
-func (c Carapace) Fish() string {
-	return c.Snippet("fish")
-}
-
-func (c Carapace) Powershell() string {
-	return c.Snippet("powershell")
-}
-
-func (c Carapace) Zsh() string {
-	return c.Snippet("zsh")
-}
-
-func (c Carapace) Xonsh() string {
-	return c.Snippet("xonsh")
-}
-
 func (c Carapace) Standalone() {
 	// TODO probably needs to be done for each subcommand
 	if c.cmd.Root().Flag("help") != nil {
@@ -159,14 +135,14 @@ func addCompletionCommand(cmd *cobra.Command) {
 							if action.Callback == nil {
 								fmt.Println(action.Value(shell))
 							} else {
-								fmt.Println(action.Callback(targetArgs).NestedValue(targetArgs, shell, 1))
+								fmt.Println(action.Callback(targetArgs).NestedAction(targetArgs, 2).Value(shell))
 							}
 						}
 					case "state":
 						fmt.Println(uid.Command(targetCmd))
 					default:
 						CallbackValue = uid.Value(targetCmd, targetArgs, id)
-						fmt.Println(completions.invokeCallback(id, targetArgs).NestedValue(targetArgs, shell, 1))
+						fmt.Println(completions.invokeCallback(id, targetArgs).NestedAction(targetArgs, 2).Value(shell))
 					}
 				}
 			}

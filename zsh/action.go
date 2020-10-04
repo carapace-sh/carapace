@@ -2,7 +2,7 @@ package zsh
 
 import (
 	"fmt"
-	"github.com/rsteube/carapace/uid"
+	"github.com/rsteube/carapace/common"
 	"strings"
 )
 
@@ -24,7 +24,6 @@ var sanitizer = strings.NewReplacer(
 	`#`, ``,
 	`[`, `\[`,
 	`]`, `\]`,
-	`:`, `\:`,
 )
 
 func Sanitize(values ...string) []string {
@@ -35,13 +34,8 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func Callback(cuid string) string {
-	return ActionExecute(fmt.Sprintf(`%v _carapace zsh '%v' ${${os_args:1:gs/\"/\\\"}:gs/\'/\\\"}`, uid.Executable(), cuid))
-}
-
-// ActionExecute uses command substitution to invoke a command and evalues it's result as Action
-func ActionExecute(command string) string {
-	return fmt.Sprintf(` eval \$(%v)`, command) // {EVAL-STRING} action did not handle space escaping ('\ ') as expected (separate arguments), this one works
+func Callback(prefix string, cuid string) string {
+	return fmt.Sprintf(`_%v_callback '%v'`, prefix, cuid)
 }
 
 func ActionDirectories() string {
@@ -58,92 +52,17 @@ func ActionFiles(pattern string) string {
 	}
 }
 
-// ActionNetInterfaces completes network interface names
-func ActionNetInterfaces() string {
-	return "_net_interfaces"
-}
-
-// ActionUsers completes user names
-func ActionUsers() string {
-	return "_users"
-}
-
-// ActionGroups completes group names
-func ActionGroups() string {
-	return "_groups"
-}
-
-// ActionHosts completes host names
-func ActionHosts() string {
-	return "_hosts"
-}
-
-// ActionValues completes arbitrary keywords (values)
-func ActionValues(values ...string) string {
-	sanitized := Sanitize(values...)
-	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
-		return ActionMessage("no values to complete")
-	}
-
-	vals := make([]string, len(sanitized))
-	for index, val := range sanitized {
-		// TODO escape special characters
-		vals[index] = strings.Replace(val, " ", `\ `, -1)
-	}
-	return fmt.Sprintf(`_values '' %v`, strings.Join(vals, " "))
-}
-
-// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
-func ActionValuesDescribed(values ...string) string {
-	sanitized := Sanitize(values...)
-	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
-		return ActionMessage("no values to complete")
-	}
-
-	// TODO verify length (description always exists)
-	vals := make([]string, len(sanitized))
-	for index, val := range sanitized {
-		if index%2 == 0 {
-			vals[index/2] = fmt.Sprintf("'%v[%v]'", strings.Replace(val, " ", `\ `, -1), strings.Replace(sanitized[index+1], " ", `\ `, -1))
+func ActionCandidates(values ...common.Candidate) string {
+	vals := make([]string, len(values))
+	displays := make([]string, len(values))
+	for index, val := range values {
+		// TODO sanitize
+		vals[index] = fmt.Sprintf("'%v'", sanitizer.Replace(val.Value))
+		if strings.TrimSpace(val.Description) == "" {
+			displays[index] = fmt.Sprintf("'%v'", sanitizer.Replace(val.Display))
+		} else {
+			displays[index] = fmt.Sprintf("'%v (%v)'", sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
 		}
 	}
-	return fmt.Sprintf(`_values '' %v`, strings.Join(vals, " "))
-}
-
-// ActionMessage displays a help messages in places where no completions can be generated
-func ActionMessage(msg string) string {
-	return fmt.Sprintf(" _message -r '%v'", msg) // space before _message is necessary
-}
-
-func ActionPrefixValues(prefix string, values ...string) string {
-	sanitized := Sanitize(values...)
-	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
-		return ActionMessage("no values to complete")
-	}
-
-	vals := make([]string, len(sanitized))
-	for index, val := range sanitized {
-		// TODO escape special characters
-		//vals[index] = fmt.Sprintf("'%v'" ,strings.Replace(val, " ", `\ `, -1))
-		vals[index] = fmt.Sprintf("'%v'", val)
-	}
-	//return fmt.Sprintf("compadd -S '' -P '%v' %v", currentValue, strings.Join(vals, " "))
-	return fmt.Sprintf("compadd -S '' -p '%v' %v", prefix, strings.Join(vals, " "))
-}
-
-func ActionPrefixValuesDescribed(prefix string, values ...string) string {
-	sanitized := Sanitize(values...)
-	if len(strings.TrimSpace(strings.Join(sanitized, ""))) == 0 {
-		return ActionMessage("no values to complete")
-	}
-
-	vals := make([]string, len(sanitized))
-	for index, val := range sanitized {
-		// TODO escape special characters
-		//vals[index] = fmt.Sprintf("'%v'" ,strings.Replace(val, " ", `\ `, -1))
-		vals[index] = fmt.Sprintf("'%v'", val)
-	}
-	//return fmt.Sprintf("compadd -S '' -P '%v' %v", currentValue, strings.Join(vals, " "))
-	// TODO
-	return fmt.Sprintf("local _comp_desc(desc1 desc2 desc3);compadd -S '' -l -d _comp_desc -p '%v' %v", prefix, strings.Join(vals, " "))
+	return fmt.Sprintf("{local _comp_desc=(%v);compadd -S '' -d _comp_desc %v}", strings.Join(displays, " "), strings.Join(vals, " "))
 }

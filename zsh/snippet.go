@@ -21,6 +21,11 @@ var replacer = strings.NewReplacer(
 
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	result := fmt.Sprintf("#compdef %v\n", cmd.Name())
+	result += fmt.Sprintf(`function _%v_callback {
+  # shellcheck disable=SC2086
+  eval "$(%v _carapace zsh "$5" ${os_args})"
+}
+`, cmd.Name(), uid.Executable())
 	result += snippetFunctions(cmd, actions)
 
 	result += fmt.Sprintf("if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi\n", cmd.Name(), cmd.Name(), cmd.Name()) // check if withing completion function and enable direct sourcing
@@ -76,7 +81,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		}
 		if len(positionals) == 0 {
 			if cmd.ValidArgs != nil {
-				positionals = []string{"    " + snippetPositionalCompletion(1, ActionValues(cmd.ValidArgs...))}
+				positionals = []string{"    " + snippetPositionalCompletion(1, ActionCandidates(common.CandidateFromValues(cmd.ValidArgs...)...))}
 			}
 			positionals = append(positionals, `    "*::arg:->args"`)
 		}

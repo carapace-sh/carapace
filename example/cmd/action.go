@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/rsteube/carapace"
+	"github.com/rsteube/carapace/example/cmd/action"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +25,6 @@ func init() {
 	actionCmd.Flags().StringP("users", "u", "", "users flag")
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
-	actionCmd.Flags().StringP("custom", "c", "", "custom flag")
 	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
 	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 	actionCmd.Flags().StringP("optarg", "o", "", "optional arg with default value blue")
@@ -33,16 +33,15 @@ func init() {
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files":            carapace.ActionFiles(".go"),
 		"directories":      carapace.ActionDirectories(),
-		"groups":           carapace.ActionGroups(),
-		"hosts":            carapace.ActionHosts(),
+		"groups":           action.ActionGroups(),
+		"hosts":            action.ActionHosts(),
 		"message":          carapace.ActionMessage("message example"),
-		"net_interfaces":   carapace.ActionNetInterfaces(),
-		"usergroup":        carapace.ActionUserGroup(),
-		"users":            carapace.ActionUsers(),
+		"net_interfaces":   action.ActionNetInterfaces(),
+		"usergroup":        action.ActionUserGroup(),
+		"users":            action.ActionUsers(),
 		"values":           carapace.ActionValues("values", "example"),
 		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
-		"custom":           carapace.Action{Zsh: "_most_recent_file 2", Xonsh: "{}"},
-		"kill":             carapace.ActionKillSignals(),
+		"kill":             action.ActionKillSignals(),
 		"optarg":           carapace.ActionValues("blue", "red", "green", "yellow"),
 	})
 

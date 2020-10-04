@@ -75,16 +75,16 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 
 	var positionals []string
 	if cmd.HasAvailableSubCommands() {
-		subcommands := make([]string, 0)
+		subcommands := make([]common.Candidate, 0)
 		for _, c := range cmd.Commands() {
 			if !c.Hidden {
-				subcommands = append(subcommands, c.Name(), c.Short)
+				subcommands = append(subcommands, common.Candidate{Value: c.Name(), Display: c.Name(), Description: c.Short})
 				for _, alias := range c.Aliases {
-					subcommands = append(subcommands, alias, c.Short)
+					subcommands = append(subcommands, common.Candidate{Value: alias, Display: alias, Description: c.Short})
 				}
 			}
 		}
-		positionals = []string{"        " + snippetPositionalCompletion(ActionValuesDescribed(subcommands...))}
+		positionals = []string{"        " + snippetPositionalCompletion(ActionCandidates(subcommands...))}
 	} else {
 		pos := 1
 		for {
@@ -101,7 +101,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		}
 		if len(positionals) == 0 {
 			if cmd.ValidArgs != nil {
-				positionals = []string{"        " + snippetPositionalCompletion(ActionValues(cmd.ValidArgs...))}
+				positionals = []string{"        " + snippetPositionalCompletion(ActionCandidates(common.CandidateFromValues(cmd.ValidArgs...)...))}
 			}
 		}
 	}

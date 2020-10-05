@@ -14,38 +14,32 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_callback() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
-  local last="${COMP_WORDS[${COMP_CWORD}]}"
-  if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
-      compline="${compline}${last:0:1}"
-      last="${last// /\\\\ }" 
-  fi
+  # TODO
+  #if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+  #    compline="${compline}${last:0:1}"
+  #    last="${last// /\\\\ }" 
+  #fi
 
   echo "$compline" | sed -e "s/ $/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash "$1"
 }
 
 _%v_completions() {
+  local cur prev #words cword split
+  _init_completion -n :=
+  local curprefix
+  curprefix="$(echo "$cur" | sed -r 's_^(.*[:/=])?.*_\1_')"
   local compline="${COMP_LINE:0:${COMP_POINT}}"
-  local last="${COMP_WORDS[${COMP_CWORD}]}"
-  
-  if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
-      compline="${compline}${last:0:1}"
-      last="${last// /\\\\ }" 
-  else
-      last="${last// /\\\ }" 
-  fi
+ 
+  # TODO
+  #if [[ $last =~ ^[\"\'] ]] && ! echo "$last" | xargs echo 2>/dev/null >/dev/null ; then
+  #    compline="${compline}${last:0:1}"
+  #    last="${last// /\\\\ }" 
+  #else
+  #    last="${last// /\\\ }" 
+  #fi
 
   local state
   state="$(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash state)"
-  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
-
-  # crude optarg patch - won't work with --optarg=key=value
-  local previous="${COMP_WORDS[$((COMP_CWORD-1))]}"
-  if [[ $previous == '=' ]]; then
-      previous="${COMP_WORDS[$((COMP_CWORD-2))]}="
-  elif [[ $last == '=' ]]; then
-      last=''
-      previous="$previous="
-  fi
 
   local IFS=$'\n'
 
@@ -53,7 +47,8 @@ _%v_completions() {
 %v
   esac
 
-  [[ $last =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
+  [[ $cur =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
+  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%% (*} )  # https://stackoverflow.com/a/10130007
   [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 
@@ -66,10 +61,15 @@ complete -F _%v_completions %v
 func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 	function_pattern := `
     '%v' )
-      if [[ $last == -* ]]; then
-        COMPREPLY=($(%v))
+      if [[ $cur == -* ]]; then
+        case $cur in
+%v
+          *)
+            COMPREPLY=($(%v))
+            ;;
+        esac
       else
-        case $previous in
+        case $prev in
 %v
           *)
             COMPREPLY=($(%v))
@@ -79,37 +79,54 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
       ;;
 `
 
+	optArgflags := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		if !f.Hidden {
+			var s string
+			if action, ok := actions[uid.Flag(cmd, f)]; ok {
+				s = snippetFlagCompletion(f, action, true)
+			} else {
+				s = snippetFlagCompletion(f, "", true)
+			}
+			if s != "" {
+				optArgflags = append(optArgflags, s)
+			}
+		}
+	})
+
 	flags := make([]string, 0)
 	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
 		if !f.Hidden {
 			var s string
 			if action, ok := actions[uid.Flag(cmd, f)]; ok {
-				s = snippetFlagCompletion(f, action)
+				s = snippetFlagCompletion(f, action, false)
 			} else {
-				s = snippetFlagCompletion(f, "")
+				s = snippetFlagCompletion(f, "", false)
 			}
-			flags = append(flags, s)
+			if s != "" {
+				flags = append(flags, s)
+			}
 		}
 	})
 
 	var positionalAction string
 	if cmd.HasAvailableSubCommands() {
-		subcommands := make([]string, 0)
+		subcommands := make([]common.Candidate, 0)
 		for _, c := range cmd.Commands() {
 			if !c.Hidden {
-				subcommands = append(subcommands, c.Name())
+				subcommands = append(subcommands, common.Candidate{Value: c.Name(), Description: c.Short})
 				for _, alias := range c.Aliases {
-					subcommands = append(subcommands, alias)
+					subcommands = append(subcommands, common.Candidate{Value: alias, Description: c.Short})
 				}
 			}
 		}
-		positionalAction = ActionValues(subcommands...)
+		positionalAction = ActionCandidates(subcommands...)
 	} else {
 		positionalAction = Callback(cmd.Root().Name(), "_")
 	}
 
 	result := make([]string, 0)
-	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), snippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), positionalAction))
+	result = append(result, fmt.Sprintf(function_pattern, uid.Command(cmd), strings.Join(optArgflags, "\n"), snippetFlagList(cmd.LocalFlags()), strings.Join(flags, "\n"), positionalAction))
 	for _, subcmd := range cmd.Commands() {
 		if !subcmd.Hidden {
 			result = append(result, snippetFunctions(subcmd, actions))
@@ -119,29 +136,42 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 }
 
 func snippetFlagList(flags *pflag.FlagSet) string {
-	flagValues := make([]string, 0)
+	flagValues := make([]common.Candidate, 0)
 
 	flags.VisitAll(func(flag *pflag.Flag) {
 		if !flag.Hidden {
 			if !common.IsShorthandOnly(flag) {
-				flagValues = append(flagValues, "--"+flag.Name)
+				//flagValues = append(flagValues, "--"+flag.Name)
+				flagValues = append(flagValues, common.Candidate{Value: "--" + flag.Name, Description: flag.Usage})
 			}
 			if flag.Shorthand != "" {
-				flagValues = append(flagValues, "-"+flag.Shorthand)
+				//flagValues = append(flagValues, "-"+flag.Shorthand)
+				flagValues = append(flagValues, common.Candidate{Value: "-" + flag.Shorthand, Description: flag.Usage})
 			}
 		}
 	})
 	if len(flagValues) > 0 {
-		return ActionValues(flagValues...)
+		return ActionCandidates(flagValues...) // TODO use candidatas
 	} else {
 		return ""
 	}
 }
 
-func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
+func snippetFlagCompletion(flag *pflag.Flag, action string, optArgFlag bool) (snippet string) {
+	// TODO cleanup this mess
+	if flag.Value.Type() == "bool" {
+		return
+	}
+	if flag.NoOptDefVal != "" && !optArgFlag {
+		return
+	}
+	if flag.NoOptDefVal == "" && optArgFlag {
+		return
+	}
+
 	optArgSuffix := ""
 	if flag.NoOptDefVal != "" {
-		optArgSuffix = "="
+		optArgSuffix = "=*"
 	}
 
 	var names string
@@ -155,8 +185,18 @@ func snippetFlagCompletion(flag *pflag.Flag, action string) (snippet string) {
 		names = "--" + flag.Name + optArgSuffix
 	}
 
-	return fmt.Sprintf(`          %v)
+	if optArgFlag {
+		return fmt.Sprintf(`          %v)
+            cur=${cur#*=}
+            curprefix=${curprefix#*=}
             COMPREPLY=($(%v))
             ;;
 `, names, action)
+
+	} else {
+		return fmt.Sprintf(`          %v)
+            COMPREPLY=($(%v))
+            ;;
+`, names, action)
+	}
 }

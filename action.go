@@ -1,12 +1,10 @@
 package carapace
 
 import (
-	"io/ioutil"
-	"regexp"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/rsteube/carapace/bash"
+	"github.com/rsteube/carapace/common"
 	"github.com/rsteube/carapace/elvish"
 	"github.com/rsteube/carapace/fish"
 	"github.com/rsteube/carapace/powershell"
@@ -16,12 +14,13 @@ import (
 )
 
 type Action struct {
-	Bash       string
-	Elvish     string
-	Fish       string
-	Powershell string
-	Xonsh      string
-	Zsh        string
+	rawValues  []common.Candidate
+	bash       func() string
+	elvish     func() string
+	fish       func() string
+	powershell func() string
+	xonsh      func() string
+	zsh        func() string
 	Callback   CompletionCallback
 }
 type ActionMap map[string]Action
@@ -30,52 +29,83 @@ type CompletionCallback func(args []string) Action
 // finalize replaces value if a callback function is set
 func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	if a.Callback != nil {
-		if a.Bash == "" {
-			a.Bash = bash.Callback(cmd.Root().Name(), uid)
+		if a.bash == nil {
+			a.bash = func() string { return bash.Callback(cmd.Root().Name(), uid) }
 		}
-		if a.Elvish == "" {
-			a.Elvish = elvish.Callback(cmd.Root().Name(), uid)
+		if a.elvish == nil {
+			a.elvish = func() string { return elvish.Callback(cmd.Root().Name(), uid) }
 		}
-		if a.Fish == "" {
-			a.Fish = fish.Callback(cmd.Root().Name(), uid)
+		if a.fish == nil {
+			a.fish = func() string { return fish.Callback(cmd.Root().Name(), uid) }
 		}
-		if a.Powershell == "" {
-			a.Powershell = powershell.Callback(cmd.Root().Name(), uid)
+		if a.powershell == nil {
+			a.powershell = func() string { return powershell.Callback(cmd.Root().Name(), uid) }
 		}
-		if a.Xonsh == "" {
-			a.Xonsh = xonsh.Callback(cmd.Root().Name(), uid)
+		if a.xonsh == nil {
+			a.xonsh = func() string { return xonsh.Callback(cmd.Root().Name(), uid) }
 		}
-		if a.Zsh == "" {
-			a.Zsh = zsh.Callback(uid)
+		if a.zsh == nil {
+			a.zsh = func() string { return zsh.Callback(cmd.Root().Name(), uid) }
 		}
 	}
 	return a
 }
 
-func (a Action) Value(shell string) string {
-	switch shell {
-	case "bash":
-		return a.Bash
-	case "fish":
-		return a.Fish
-	case "elvish":
-		return a.Elvish
-	case "powershell":
-		return a.Powershell
-	case "xonsh":
-		return a.Xonsh
-	case "zsh":
-		return a.Zsh
-	default:
-		return ""
+// TODO maybe use Invoke(args) and work on []Candidate
+func (a Action) Prefix(prefix string, args []string) Action {
+	if nestedAction := a.NestedAction(args, 5); nestedAction.rawValues != nil {
+		for index, val := range nestedAction.rawValues {
+			nestedAction.rawValues[index].Value = prefix + val.Value // TODO check if val.Value can be assigned directly
+		}
+		return nestedAction
+	} else {
+		return ActionMessage("TODO Prefix(str) failed")
 	}
 }
 
-func (a Action) NestedValue(args []string, shell string, maxDepth int) string {
-	if value := a.Value(shell); value == "" && a.Callback != nil && maxDepth > 0 {
-		return a.Callback(args).NestedValue(args, shell, maxDepth-1)
+// TODO maybe use Invoke(args) and work on []Candidate
+func (a Action) Suffix(suffix string, args []string) Action {
+	if nestedAction := a.NestedAction(args, 5); nestedAction.rawValues != nil {
+		for index, val := range nestedAction.rawValues {
+			nestedAction.rawValues[index].Value = val.Value + suffix // TODO check if val.Value can be assigned directly
+		}
+		return nestedAction
 	} else {
-		return value
+		return ActionMessage("TODO Prefix(str) failed")
+	}
+}
+
+// TODO maybe rename to Invoke(args)
+func (a Action) NestedAction(args []string, maxDepth int) Action {
+	if a.rawValues == nil && a.Callback != nil && maxDepth > 0 {
+		return a.Callback(args).NestedAction(args, maxDepth-1)
+	} else {
+		return a
+	}
+}
+
+func (a Action) Value(shell string) string {
+	var f func() string
+	switch shell {
+	case "bash":
+		f = a.bash
+	case "fish":
+		f = a.fish
+	case "elvish":
+		f = a.elvish
+	case "powershell":
+		f = a.powershell
+	case "xonsh":
+		f = a.xonsh
+	case "zsh":
+		f = a.zsh
+	}
+
+	if f == nil {
+		// TODO "{}" for xonsh?
+		return ""
+	} else {
+		return f()
 	}
 }
 
@@ -92,18 +122,6 @@ func ActionCallback(callback CompletionCallback) Action {
 	return Action{Callback: callback}
 }
 
-// ActionExecute uses command substitution to invoke a command and evalues it's result as Action
-func ActionExecute(command string) Action {
-	return Action{
-		Bash:       bash.ActionExecute(command),
-		Elvish:     elvish.ActionExecute(command),
-		Fish:       fish.ActionExecute(command),
-		Powershell: powershell.ActionExecute(command),
-		Xonsh:      xonsh.ActionExecute(command),
-		Zsh:        zsh.ActionExecute(command),
-	}
-}
-
 // ActionBool completes true/false
 func ActionBool() Action {
 	return ActionValues("true", "false")
@@ -111,186 +129,69 @@ func ActionBool() Action {
 
 func ActionDirectories() Action {
 	return Action{
-		Bash:       bash.ActionDirectories(),
-		Elvish:     elvish.ActionDirectories(),
-		Fish:       fish.ActionDirectories(),
-		Powershell: powershell.ActionDirectories(),
-		Xonsh:      xonsh.ActionDirectories(),
-		Zsh:        zsh.ActionDirectories(),
+		bash:       func() string { return bash.ActionDirectories() },
+		elvish:     func() string { return elvish.ActionDirectories() },
+		fish:       func() string { return fish.ActionDirectories() },
+		powershell: func() string { return powershell.ActionDirectories() },
+		xonsh:      func() string { return xonsh.ActionDirectories() },
+		zsh:        func() string { return zsh.ActionDirectories() },
+		// TODO add Callback so that the action can be used in ActionMultiParts as well
 	}
 }
 
 func ActionFiles(suffix string) Action {
 	return Action{
-		Bash:       bash.ActionFiles(suffix),
-		Elvish:     elvish.ActionFiles(suffix),
-		Fish:       fish.ActionFiles(suffix),
-		Powershell: powershell.ActionFiles(suffix),
-		Xonsh:      xonsh.ActionFiles(suffix),
-		Zsh:        zsh.ActionFiles("*" + suffix),
-	}
-}
-
-// ActionNetInterfaces completes network interface names
-func ActionNetInterfaces() Action {
-	return Action{
-		Bash:       bash.ActionNetInterfaces(),
-		Elvish:     elvish.ActionNetInterfaces(),
-		Fish:       fish.ActionNetInterfaces(),
-		Powershell: powershell.ActionNetInterfaces(),
-		Xonsh:      xonsh.ActionNetInterfaces(),
-		Zsh:        zsh.ActionNetInterfaces(),
-	}
-}
-
-// ActionUsers completes user names
-func ActionUsers() Action {
-	return Action{
-		Bash: bash.ActionUsers(),
-		Fish: fish.ActionUsers(),
-		Zsh:  zsh.ActionUsers(),
-		Callback: func(args []string) Action {
-			return ActionValues(users()...)
-		},
-	}
-}
-
-// ActionGroups completes group names
-func ActionGroups() Action {
-	return Action{
-		Bash: bash.ActionGroups(),
-		Fish: fish.ActionGroups(),
-		Zsh:  zsh.ActionGroups(),
-		Callback: func(args []string) Action {
-			return ActionValues(groups()...)
-		},
-	}
-}
-
-// ActionUserGroup completes user:group separately
-func ActionUserGroup() Action {
-	return ActionMultiParts(":", func(args []string, parts []string) []string {
-		switch len(parts) {
-		case 0:
-			users := users()
-			usersWithSuffix := make([]string, len(users))
-			for index, user := range users {
-				usersWithSuffix[index] = user + ":"
-			}
-			return usersWithSuffix
-		case 1:
-			return groups()
-		default:
-			return []string{}
-		}
-	})
-}
-
-// TODO windows
-func users() []string {
-	users := []string{}
-	if content, err := ioutil.ReadFile("/etc/passwd"); err == nil {
-		for _, entry := range strings.Split(string(content), "\n") {
-			user := strings.Split(entry, ":")[0]
-			if len(strings.TrimSpace(user)) > 0 {
-				users = append(users, user)
-			}
-		}
-	}
-	return users
-}
-
-// TODO windows
-func groups() []string {
-	users := []string{}
-	if content, err := ioutil.ReadFile("/etc/group"); err == nil {
-		for _, entry := range strings.Split(string(content), "\n") {
-			group := strings.Split(entry, ":")[0]
-			if len(strings.TrimSpace(group)) > 0 {
-				users = append(users, group)
-			}
-		}
-	}
-	return users
-}
-
-// ActionHosts completes host names
-func ActionHosts() Action {
-	return Action{
-		Bash: bash.ActionHosts(),
-		Fish: fish.ActionHosts(),
-		Zsh:  zsh.ActionHosts(),
-		Callback: func(args []string) Action {
-			hosts := []string{}
-			if file, err := homedir.Expand("~/.ssh/known_hosts"); err == nil {
-				if content, err := ioutil.ReadFile(file); err == nil {
-					r := regexp.MustCompile(`^(?P<host>[^ ,#]+)`)
-					for _, entry := range strings.Split(string(content), "\n") {
-						if r.MatchString(entry) {
-							hosts = append(hosts, r.FindStringSubmatch(entry)[0])
-						}
-					}
-				} else {
-					return ActionValues(err.Error())
-				}
-			}
-			return ActionValues(hosts...)
-		},
+		bash:       func() string { return bash.ActionFiles(suffix) },
+		elvish:     func() string { return elvish.ActionFiles(suffix) },
+		fish:       func() string { return fish.ActionFiles(suffix) },
+		powershell: func() string { return powershell.ActionFiles(suffix) },
+		xonsh:      func() string { return xonsh.ActionFiles(suffix) },
+		zsh:        func() string { return zsh.ActionFiles("*" + suffix) },
+		// TODO add Callback so that the action can be used in ActionMultiParts as well
 	}
 }
 
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
-	return Action{
-		Bash:       bash.ActionValues(values...),
-		Elvish:     elvish.ActionValues(values...),
-		Fish:       fish.ActionValues(values...),
-		Powershell: powershell.ActionValues(values...),
-		Xonsh:      xonsh.ActionValues(values...),
-		Zsh:        zsh.ActionValues(values...),
+	vals := make([]string, len(values)*2)
+	for index, val := range values {
+		vals[index*2] = val
+		vals[(index*2)+1] = ""
 	}
+	return ActionValuesDescribed(vals...)
 }
 
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
+	vals := make([]common.Candidate, len(values)/2)
+	for index, val := range values {
+		if index%2 == 0 {
+			vals[index/2] = common.Candidate{Value: val, Display: val, Description: values[index+1]}
+		}
+	}
 	return Action{
-		Bash:       bash.ActionValuesDescribed(values...),
-		Elvish:     elvish.ActionValuesDescribed(values...),
-		Fish:       fish.ActionValuesDescribed(values...),
-		Powershell: powershell.ActionValuesDescribed(values...),
-		Xonsh:      xonsh.ActionValuesDescribed(values...),
-		Zsh:        zsh.ActionValuesDescribed(values...),
+		rawValues:  vals,
+		bash:       func() string { return bash.ActionCandidates(vals...) },
+		elvish:     func() string { return elvish.ActionCandidates(vals...) },
+		fish:       func() string { return fish.ActionCandidates(vals...) },
+		powershell: func() string { return powershell.ActionCandidates(vals...) },
+		xonsh:      func() string { return xonsh.ActionCandidates(vals...) },
+		zsh:        func() string { return zsh.ActionCandidates(vals...) },
 	}
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated
-func ActionMessage(msg string) Action {
-	return Action{
-		Bash:       bash.ActionMessage(msg),
-		Elvish:     elvish.ActionMessage(msg),
-		Fish:       fish.ActionMessage(msg),
-		Powershell: powershell.ActionMessage(msg),
-		Xonsh:      xonsh.ActionMessage(msg),
-		Zsh:        zsh.ActionMessage(msg),
-	}
-}
-
-func ActionPrefixValues(prefix string, values ...string) Action {
-	return Action(Action{
-		Bash:       bash.ActionPrefixValues(prefix, values...),
-		Elvish:     elvish.ActionPrefixValues(prefix, values...),
-		Fish:       fish.ActionPrefixValues(prefix, values...),
-		Powershell: powershell.ActionPrefixValues(prefix, values...),
-		Xonsh:      xonsh.ActionPrefixValues(prefix, values...),
-		Zsh:        zsh.ActionPrefixValues(prefix, values...),
-	})
+func ActionMessage(msg string) Action { // TODO somehow handle this differently for Prefix/Suffix
+	return ActionValuesDescribed("_", "", "ERR", msg)
+	// TODO muss not be filtered if value already contains a submatch (so that it is always shown)
+	// TODO zsh is the only one with actual message function		zsh:        func() string { return zsh.ActionMessage(msg) },
 }
 
 // TODO find a better solution for this
 var CallbackValue string
 
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char
-func ActionMultiParts(divider string, callback func(args []string, parts []string) []string) Action {
+func ActionMultiParts(divider string, callback func(args []string, parts []string) Action) Action {
 	return ActionCallback(func(args []string) Action {
 		// TODO multiple dividers by splitting on each char
 		index := strings.LastIndex(CallbackValue, string(divider))
@@ -305,42 +206,6 @@ func ActionMultiParts(divider string, callback func(args []string, parts []strin
 			parts = parts[0 : len(parts)-1]
 		}
 
-		return ActionPrefixValues(prefix, callback(args, parts)...)
+		return callback(args, parts).Prefix(prefix, args)
 	})
-}
-
-func ActionKillSignals() Action {
-	return ActionValuesDescribed(
-		"ABRT", "Abnormal termination",
-		"ALRM", "Virtual alarm clock",
-		"BUS", "BUS error",
-		"CHLD", "Child status has changed",
-		"CONT", "Continue stopped process",
-		"FPE", "Floating-point exception",
-		"HUP", "Hangup detected on controlling terminal",
-		"ILL", "Illegal instruction",
-		"INT", "Interrupt from keyboard",
-		"KILL", "Kill, unblockable",
-		"PIPE", "Broken pipe",
-		"POLL", "Pollable event occurred",
-		"PROF", "Profiling alarm clock timer expired",
-		"PWR", "Power failure restart",
-		"QUIT", "Quit from keyboard",
-		"SEGV", "Segmentation violation",
-		"STKFLT", "Stack fault on coprocessor",
-		"STOP", "Stop process, unblockable",
-		"SYS", "Bad system call",
-		"TERM", "Termination request",
-		"TRAP", "Trace/breakpoint trap",
-		"TSTP", "Stop typed at keyboard",
-		"TTIN", "Background read from tty",
-		"TTOU", "Background write to tty",
-		"URG", "Urgent condition on socket",
-		"USR1", "User-defined signal 1",
-		"USR2", "User-defined signal 2",
-		"VTALRM", "Virtual alarm clock",
-		"WINCH", "Window size change",
-		"XCPU", "CPU time limit exceeded",
-		"XFSZ", "File size limit exceeded",
-	)
 }

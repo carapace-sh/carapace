@@ -66,7 +66,7 @@ Uids are generated to identify corresponding completions:
 
 
 ## Action
-An [action](#action) indicates how to complete a flag or a positional argument. See [action.go](./action.go) and the examples below for current implementations.
+An [action](#action) indicates how to complete a flag or a positional argument. See [action.go](./action.go) and the examples below for current implementations. A range of custom actions can be found at [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin/tree/master/actions)
 
 ### ActionMessage
 
@@ -135,32 +135,24 @@ Since callbacks are simply invocations of the program they can be tested directl
 
 ### ActionMultiParts
 
-> This is an initial version which still got some quirks, expect some changes here (in the long term this shall return Action as well)
-
 ActionMultiParts is a [callback action](#actioncallback) where parts of an argument can be completed separately (e.g. user:group from [chown](https://github.com/rsteube/carapace-completers/blob/master/completers/chown_completer/cmd/root.go)). Divider can be empty as well, but note that `bash` and `fish` will add the space suffix for anything other than `/=@:.,` (it still works, but after each selection backspace is needed to continue the completion).
 
 ```go
-carapace.ActionMultiParts(":", func(args []string, parts []string) []string {
-	switch len(parts) {
-	case 0:
-		return []{"user1:", "user2:", "user3:"}
-	case 1:
-		return []{"groupA", "groupB", "groupC"}
-	default:
-		return []string{}
-	}
-})
+func ActionUserGroup() carapace.Action {
+	return carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Action {
+		switch len(parts) {
+		case 0:
+			return ActionUsers().Suffix(":", args)
+		case 1:
+			return ActionGroups()
+		default:
+			return carapace.ActionValues()
+		}
+	})
+}
 ```
 
-### Custom Action
-
-For [actions](#action) that aren't implemented or missing required options, a custom action can be defined.
-
-```go
-carapace.Action{Zsh: "_most_recent_file 2"}
-
-// #./example action --custom <TAB>
-```
+### Shell Completion Documentation
 
 Additional information can be found at:
 - Bash: [bash-programmable-completion-tutorial](https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial) and [Programmable-Completion-Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins)

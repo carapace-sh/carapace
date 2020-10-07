@@ -21,14 +21,14 @@ type Action struct {
 	powershell func() string
 	xonsh      func() string
 	zsh        func() string
-	Callback   CompletionCallback
+	callback   CompletionCallback
 }
 type ActionMap map[string]Action
 type CompletionCallback func(args []string) Action
 
 // finalize replaces value if a callback function is set
 func (a Action) finalize(cmd *cobra.Command, uid string) Action {
-	if a.Callback != nil {
+	if a.callback != nil {
 		if a.bash == nil {
 			a.bash = func() string { return bash.Callback(cmd.Root().Name(), uid) }
 		}
@@ -51,34 +51,47 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	return a
 }
 
-// TODO maybe use Invoke(args) and work on []Candidate
-func (a Action) Prefix(prefix string, args []string) Action {
-	if nestedAction := a.NestedAction(args, 5); nestedAction.rawValues != nil {
-		for index, val := range nestedAction.rawValues {
-			nestedAction.rawValues[index].Value = prefix + val.Value // TODO check if val.Value can be assigned directly
-		}
-		return nestedAction
-	} else {
-		return ActionMessage("TODO Prefix(str) failed")
-	}
+type InvokedAction Action
+
+func (a Action) Invoke(args []string) InvokedAction {
+	return InvokedAction(a.nestedAction(args, 5))
 }
 
-// TODO maybe use Invoke(args) and work on []Candidate
-func (a Action) Suffix(suffix string, args []string) Action {
-	if nestedAction := a.NestedAction(args, 5); nestedAction.rawValues != nil {
-		for index, val := range nestedAction.rawValues {
-			nestedAction.rawValues[index].Value = val.Value + suffix // TODO check if val.Value can be assigned directly
-		}
-		return nestedAction
-	} else {
-		return ActionMessage("TODO Prefix(str) failed")
+func (a InvokedAction) Filter(values []string) InvokedAction {
+	toremove := make(map[string]bool)
+	for _, v := range values {
+		toremove[v] = true
 	}
+	filtered := make(common.Candidates, 0)
+	for _, candidate := range a.rawValues {
+		if _, ok := toremove[candidate.Value]; !ok {
+			filtered = append(filtered, candidate)
+		}
+	}
+	return InvokedAction(actionCandidates(filtered...))
 }
 
-// TODO maybe rename to Invoke(args)
-func (a Action) NestedAction(args []string, maxDepth int) Action {
-	if a.rawValues == nil && a.Callback != nil && maxDepth > 0 {
-		return a.Callback(args).NestedAction(args, maxDepth-1)
+func (a InvokedAction) Prefix(prefix string) InvokedAction {
+	for index, val := range a.rawValues {
+		a.rawValues[index].Value = prefix + val.Value
+	}
+	return a
+}
+
+func (a InvokedAction) Suffix(suffix string) InvokedAction {
+	for index, val := range a.rawValues {
+		a.rawValues[index].Value = val.Value + suffix
+	}
+	return a
+}
+
+func (a InvokedAction) ToA() Action {
+	return Action(a)
+}
+
+func (a Action) nestedAction(args []string, maxDepth int) Action {
+	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
+		return a.callback(args).nestedAction(args, maxDepth-1)
 	} else {
 		return a
 	}
@@ -119,7 +132,7 @@ func (m *ActionMap) Shell(shell string) map[string]string {
 
 // ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
-	return Action{Callback: callback}
+	return Action{callback: callback}
 }
 
 // ActionBool completes true/false
@@ -169,25 +182,27 @@ func ActionValuesDescribed(values ...string) Action {
 			vals[index/2] = common.Candidate{Value: val, Display: val, Description: values[index+1]}
 		}
 	}
+	return actionCandidates(vals...)
+}
+
+func actionCandidates(candidates ...common.Candidate) Action {
 	return Action{
-		rawValues:  vals,
-		bash:       func() string { return bash.ActionCandidates(vals...) },
-		elvish:     func() string { return elvish.ActionCandidates(vals...) },
-		fish:       func() string { return fish.ActionCandidates(vals...) },
-		powershell: func() string { return powershell.ActionCandidates(vals...) },
-		xonsh:      func() string { return xonsh.ActionCandidates(vals...) },
-		zsh:        func() string { return zsh.ActionCandidates(vals...) },
+		rawValues:  candidates,
+		bash:       func() string { return bash.ActionCandidates(candidates...) },
+		elvish:     func() string { return elvish.ActionCandidates(candidates...) },
+		fish:       func() string { return fish.ActionCandidates(candidates...) },
+		powershell: func() string { return powershell.ActionCandidates(candidates...) },
+		xonsh:      func() string { return xonsh.ActionCandidates(candidates...) },
+		zsh:        func() string { return zsh.ActionCandidates(candidates...) },
 	}
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated
-func ActionMessage(msg string) Action { // TODO somehow handle this differently for Prefix/Suffix
+func ActionMessage(msg string) Action {
 	return ActionValuesDescribed("_", "", "ERR", msg)
-	// TODO muss not be filtered if value already contains a submatch (so that it is always shown)
-	// TODO zsh is the only one with actual message function		zsh:        func() string { return zsh.ActionMessage(msg) },
 }
 
-// TODO find a better solution for this
+// CCallbackValue is set to the currently completed flag/positional value during callback
 var CallbackValue string
 
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char
@@ -206,6 +221,6 @@ func ActionMultiParts(divider string, callback func(args []string, parts []strin
 			parts = parts[0 : len(parts)-1]
 		}
 
-		return callback(args, parts).Prefix(prefix, args)
+		return callback(args, parts).Invoke(args).Prefix(prefix).ToA()
 	})
 }

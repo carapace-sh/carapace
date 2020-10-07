@@ -48,11 +48,11 @@ func ActionCandidates(values ...common.Candidate) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if val.Description == "" {
-			vals[index] = strings.Replace(sanitizer.Replace(val.Value), ` `, `\\\ `, -1)
+			vals[index] = sanitizer.Replace(val.Value)
 		} else {
-			vals[index] = fmt.Sprintf(`%v (%v)`, strings.Replace(sanitizer.Replace(val.Value), ` `, `\\\ `, -1), sanitizer.Replace(val.Description))
+			vals[index] = fmt.Sprintf(`%v (%v)`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Description))
 		}
 	}
 
-	return fmt.Sprintf(`compgen -W $'%v' -- "$cur" | sed "s!^$curprefix!!"`, strings.Join(vals, `\n`))
+	return fmt.Sprintf(`compgen -W $'%v' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"`, strings.Join(vals, `\n`))
 }

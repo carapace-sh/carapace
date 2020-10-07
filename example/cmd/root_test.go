@@ -22,7 +22,7 @@ _example_callback() {
 
 _example_completions() {
   local cur prev #words cword split
-  _init_completion -n :=
+  _init_completion -n /=:.,
   local curprefix
   curprefix="$(echo "$cur" | sed -r 's_^(.*[:/=])?.*_\1_')"
   local compline="${COMP_LINE:0:${COMP_POINT}}"
@@ -52,7 +52,7 @@ _example_completions() {
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'--array (multiflag)\n-a (multiflag)\n--persistentFlag (Help message for persistentFlag)\n-p (Help message for persistentFlag)\n--toggle (Help message for toggle)\n-t (Help message for toggle)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'--array (multiflag)\n-a (multiflag)\n--persistentFlag (Help message for persistentFlag)\n-p (Help message for persistentFlag)\n--toggle (Help message for toggle)\n-t (Help message for toggle)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       else
@@ -62,7 +62,7 @@ _example_completions() {
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'action (action example)\nalias (action example)\ncallback (callback example)\ncondition (condition example)\nhelp (Help about any command)\ninjection (just trying to break things)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'action (action example)\nalias (action example)\ncallback (callback example)\ncondition (condition example)\nhelp (Help about any command)\ninjection (just trying to break things)\nmultiparts (multiparts example)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       fi
@@ -75,11 +75,11 @@ _example_completions() {
           -o=* | --optarg=*)
             cur=${cur#*=}
             curprefix=${curprefix#*=}
-            COMPREPLY=($(compgen -W $'blue\nred\ngreen\nyellow' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'blue\nred\ngreen\nyellow' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'--directories (files flag)\n--files (files flag)\n-f (files flag)\n--groups (groups flag)\n-g (groups flag)\n--hosts (hosts flag)\n--kill (kill signals)\n-k (kill signals)\n--message (message flag)\n-m (message flag)\n--net_interfaces (net_interfaces flag)\n-n (net_interfaces flag)\n--optarg (optional arg with default value blue)\n-o (optional arg with default value blue)\n--usergroup (user:group flag)\n--users (users flag)\n-u (users flag)\n--values (values flag)\n-v (values flag)\n--values_described (values with description flag)\n-d (values with description flag)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'--directories (files flag)\n--files (files flag)\n-f (files flag)\n--groups (groups flag)\n-g (groups flag)\n--hosts (hosts flag)\n--kill (kill signals)\n-k (kill signals)\n--message (message flag)\n-m (message flag)\n--net_interfaces (net_interfaces flag)\n-n (net_interfaces flag)\n--optarg (optional arg with default value blue)\n-o (optional arg with default value blue)\n--usergroup (user:group flag)\n--users (users flag)\n-u (users flag)\n--values (values flag)\n-v (values flag)\n--values_described (values with description flag)\n-d (values with description flag)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       else
@@ -101,11 +101,11 @@ _example_completions() {
             ;;
 
           -k | --kill)
-            COMPREPLY=($(compgen -W $'ABRT (Abnormal termination)\nALRM (Virtual alarm clock)\nBUS (BUS error)\nCHLD (Child status has changed)\nCONT (Continue stopped process)\nFPE (Floating-point exception)\nHUP (Hangup detected on controlling terminal)\nILL (Illegal instruction)\nINT (Interrupt from keyboard)\nKILL (Kill, unblockable)\nPIPE (Broken pipe)\nPOLL (Pollable event occurred)\nPROF (Profiling alarm clock timer expired)\nPWR (Power failure restart)\nQUIT (Quit from keyboard)\nSEGV (Segmentation violation)\nSTKFLT (Stack fault on coprocessor)\nSTOP (Stop process, unblockable)\nSYS (Bad system call)\nTERM (Termination request)\nTRAP (Trace/breakpoint trap)\nTSTP (Stop typed at keyboard)\nTTIN (Background read from tty)\nTTOU (Background write to tty)\nURG (Urgent condition on socket)\nUSR1 (User-defined signal 1)\nUSR2 (User-defined signal 2)\nVTALRM (Virtual alarm clock)\nWINCH (Window size change)\nXCPU (CPU time limit exceeded)\nXFSZ (File size limit exceeded)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'ABRT (Abnormal termination)\nALRM (Virtual alarm clock)\nBUS (BUS error)\nCHLD (Child status has changed)\nCONT (Continue stopped process)\nFPE (Floating-point exception)\nHUP (Hangup detected on controlling terminal)\nILL (Illegal instruction)\nINT (Interrupt from keyboard)\nKILL (Kill, unblockable)\nPIPE (Broken pipe)\nPOLL (Pollable event occurred)\nPROF (Profiling alarm clock timer expired)\nPWR (Power failure restart)\nQUIT (Quit from keyboard)\nSEGV (Segmentation violation)\nSTKFLT (Stack fault on coprocessor)\nSTOP (Stop process, unblockable)\nSYS (Bad system call)\nTERM (Termination request)\nTRAP (Trace/breakpoint trap)\nTSTP (Stop typed at keyboard)\nTTIN (Background read from tty)\nTTOU (Background write to tty)\nURG (Urgent condition on socket)\nUSR1 (User-defined signal 1)\nUSR2 (User-defined signal 2)\nVTALRM (Virtual alarm clock)\nWINCH (Window size change)\nXCPU (CPU time limit exceeded)\nXFSZ (File size limit exceeded)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           -m | --message)
-            COMPREPLY=($(compgen -W $'_\nERR (message example)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'_\nERR (message example)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           -n | --net_interfaces)
@@ -121,11 +121,11 @@ _example_completions() {
             ;;
 
           -v | --values)
-            COMPREPLY=($(compgen -W $'values\nexample' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'values\nexample' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           -d | --values_described)
-            COMPREPLY=($(compgen -W $'values (valueDescription)\nexample (exampleDescription)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'values (valueDescription)\nexample (exampleDescription)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           *)
@@ -141,7 +141,7 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--callback (Help message for callback)\n-c (Help message for callback)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'--callback (Help message for callback)\n-c (Help message for callback)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       else
@@ -163,13 +163,13 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--required (required flag)\n-r (required flag)' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'--required (required flag)\n-r (required flag)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       else
         case $prev in
           -r | --required)
-            COMPREPLY=($(compgen -W $'valid\ninvalid' -- "$cur" | sed "s!^$curprefix!!"))
+            COMPREPLY=($(compgen -W $'valid\ninvalid' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
 
           *)
@@ -209,6 +209,52 @@ _example_completions() {
         esac
       else
         case $prev in
+
+          *)
+            COMPREPLY=($(eval $(_example_callback '_')))
+            ;;
+        esac
+      fi
+      ;;
+
+
+    '_example__multiparts' )
+      if [[ $cur == -* ]]; then
+        case $cur in
+
+          *)
+            COMPREPLY=($(compgen -W $'--at (multiparts with @ as divider)\n--colon (multiparts with : as divider )\n--comma (multiparts with , as divider)\n--dot (multiparts with . as divider)\n--equals (multiparts with = as divider)\n--none (multiparts without divider)\n--slash (multiparts with / as divider)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
+            ;;
+        esac
+      else
+        case $prev in
+          --at)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##at')))
+            ;;
+
+          --colon)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##colon')))
+            ;;
+
+          --comma)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##comma')))
+            ;;
+
+          --dot)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##dot')))
+            ;;
+
+          --equals)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##equals')))
+            ;;
+
+          --none)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##none')))
+            ;;
+
+          --slash)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##slash')))
+            ;;
 
           *)
             COMPREPLY=($(eval $(_example_callback '_')))
@@ -263,7 +309,8 @@ edit:complex-candidate 'alias' &display='alias (action example)'
 edit:complex-candidate 'callback' &display='callback (callback example)'
 edit:complex-candidate 'condition' &display='condition (condition example)'
 edit:complex-candidate 'help' &display='help (Help about any command)'
-edit:complex-candidate 'injection' &display='injection (just trying to break things)' }
+edit:complex-candidate 'injection' &display='injection (just trying to break things)'
+edit:complex-candidate 'multiparts' &display='multiparts (multiparts example)' }
     ]
     subargs = $arg[(subindex example):] 
     if (> (count $subargs) 0) {
@@ -386,6 +433,23 @@ edit:complex-candidate 'invalid' &display='invalid' }]
     if (> (count $subargs) 0) {
       edit:complete-getopt $subargs $opt-specs $arg-handlers
     }
+  }  elif (eq $state '_example__multiparts') {
+    opt-specs = [
+        [&long='at' &desc='multiparts with @ as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##at' }]
+        [&long='colon' &desc='multiparts with \: as divider ' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##colon' }]
+        [&long='comma' &desc='multiparts with , as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##comma' }]
+        [&long='dot' &desc='multiparts with . as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##dot' }]
+        [&long='equals' &desc='multiparts with = as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##equals' }]
+        [&long='none' &desc='multiparts without divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##none' }]
+        [&long='slash' &desc='multiparts with / as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##slash' }]
+    ]
+    arg-handlers = [
+
+    ]
+    subargs = $arg[(subindex multiparts):] 
+    if (> (count $subargs) 0) {
+      edit:complete-getopt $subargs $opt-specs $arg-handlers
+    }
   }
 }
 `
@@ -431,6 +495,7 @@ complete -c 'example' -f -n '_example_state _example ' -a 'callback ' -d 'callba
 complete -c 'example' -f -n '_example_state _example ' -a 'condition ' -d 'condition example'
 complete -c 'example' -f -n '_example_state _example ' -a 'help ' -d 'Help about any command'
 complete -c 'example' -f -n '_example_state _example ' -a 'injection ' -d 'just trying to break things'
+complete -c 'example' -f -n '_example_state _example ' -a 'multiparts ' -d 'multiparts example'
 
 
 complete -c 'example' -f -n '_example_state _example__action' -l 'directories' -d 'files flag' -a '(__fish_complete_directories)' -r
@@ -460,6 +525,16 @@ complete -c 'example' -f -n '_example_state _example__help' -a '(_example_callba
 
 
 complete -c 'example' -f -n '_example_state _example__injection' -a '(_example_callback _)'
+
+
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'at' -d 'multiparts with @ as divider' -a '(_example_callback _example__multiparts##at)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'colon' -d 'multiparts with \: as divider ' -a '(_example_callback _example__multiparts##colon)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'comma' -d 'multiparts with , as divider' -a '(_example_callback _example__multiparts##comma)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'dot' -d 'multiparts with . as divider' -a '(_example_callback _example__multiparts##dot)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'equals' -d 'multiparts with = as divider' -a '(_example_callback _example__multiparts##equals)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'none' -d 'multiparts without divider' -a '(_example_callback _example__multiparts##none)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'slash' -d 'multiparts with / as divider' -a '(_example_callback _example__multiparts##slash)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -a '(_example_callback _)'
 `
 	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("fish"))
@@ -518,6 +593,7 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 [CompletionResult]::new('condition ', 'condition', [CompletionResultType]::Command, 'condition example')
                 [CompletionResult]::new('help ', 'help', [CompletionResultType]::Command, 'Help about any command')
                 [CompletionResult]::new('injection ', 'injection', [CompletionResultType]::Command, 'just trying to break things')
+                [CompletionResult]::new('multiparts ', 'multiparts', [CompletionResultType]::Command, 'multiparts example')
             }
             break
         }
@@ -742,6 +818,60 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
                 }
             }
 
+        '_example__multiparts' {
+            switch -regex ($previous) {
+                '^(--at)$' {
+                        _example_callback '_example__multiparts##at' 
+                        break
+                      }
+                '^(--colon)$' {
+                        _example_callback '_example__multiparts##colon' 
+                        break
+                      }
+                '^(--comma)$' {
+                        _example_callback '_example__multiparts##comma' 
+                        break
+                      }
+                '^(--dot)$' {
+                        _example_callback '_example__multiparts##dot' 
+                        break
+                      }
+                '^(--equals)$' {
+                        _example_callback '_example__multiparts##equals' 
+                        break
+                      }
+                '^(--none)$' {
+                        _example_callback '_example__multiparts##none' 
+                        break
+                      }
+                '^(--slash)$' {
+                        _example_callback '_example__multiparts##slash' 
+                        break
+                      }
+                default {
+                    switch -regex ($wordToComplete) {
+
+
+                        default {
+
+            if ($wordToComplete -like "-*") {
+                [CompletionResult]::new('--at ', '--at', [CompletionResultType]::ParameterName, 'multiparts with @ as divider')
+                [CompletionResult]::new('--colon ', '--colon', [CompletionResultType]::ParameterName, 'multiparts with : as divider ')
+                [CompletionResult]::new('--comma ', '--comma', [CompletionResultType]::ParameterName, 'multiparts with , as divider')
+                [CompletionResult]::new('--dot ', '--dot', [CompletionResultType]::ParameterName, 'multiparts with . as divider')
+                [CompletionResult]::new('--equals ', '--equals', [CompletionResultType]::ParameterName, 'multiparts with = as divider')
+                [CompletionResult]::new('--none ', '--none', [CompletionResultType]::ParameterName, 'multiparts without divider')
+                [CompletionResult]::new('--slash ', '--slash', [CompletionResultType]::ParameterName, 'multiparts with / as divider')
+            } else {
+                _example_callback '_'
+            }
+            break
+        }
+                        }
+                    }
+                }
+            }
+
     })
 
     if ($completions.count -eq 0) {
@@ -827,6 +957,7 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
                 RichCompletion('condition', display='condition', description='condition example', prefix_len=0),
                 RichCompletion('help', display='help', description='Help about any command', prefix_len=0),
                 RichCompletion('injection', display='injection', description='just trying to break things', prefix_len=0),
+                RichCompletion('multiparts', display='multiparts', description='multiparts example', prefix_len=0),
                 }
 
 
@@ -1023,6 +1154,49 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
                 result = _example_callback('_')
 
 
+    elif state == '_example__multiparts':
+        if False: # switch previous
+            pass
+        elif re.search('^(--at)$',previous):
+            result = _example_callback('_example__multiparts##at')
+                  
+        elif re.search('^(--colon)$',previous):
+            result = _example_callback('_example__multiparts##colon')
+                  
+        elif re.search('^(--comma)$',previous):
+            result = _example_callback('_example__multiparts##comma')
+                  
+        elif re.search('^(--dot)$',previous):
+            result = _example_callback('_example__multiparts##dot')
+                  
+        elif re.search('^(--equals)$',previous):
+            result = _example_callback('_example__multiparts##equals')
+                  
+        elif re.search('^(--none)$',previous):
+            result = _example_callback('_example__multiparts##none')
+                  
+        elif re.search('^(--slash)$',previous):
+            result = _example_callback('_example__multiparts##slash')
+                  
+        else:
+            if False:
+                pass
+    
+
+            elif re.search("-.*",current):
+                result = {
+                    RichCompletion('--at', display='--at', description='multiparts with @ as divider', prefix_len=0),
+                    RichCompletion('--colon', display='--colon', description='multiparts with : as divider ', prefix_len=0),
+                    RichCompletion('--comma', display='--comma', description='multiparts with , as divider', prefix_len=0),
+                    RichCompletion('--dot', display='--dot', description='multiparts with . as divider', prefix_len=0),
+                    RichCompletion('--equals', display='--equals', description='multiparts with = as divider', prefix_len=0),
+                    RichCompletion('--none', display='--none', description='multiparts without divider', prefix_len=0),
+                    RichCompletion('--slash', display='--slash', description='multiparts with / as divider', prefix_len=0),
+                }
+            else:
+                result = _example_callback('_')
+
+
 
     result = set(filter(lambda x: x.startswith(current) and x.endswith(suffix), result))
     if len(result) == 0:
@@ -1066,6 +1240,7 @@ function _example {
         "condition:condition example"
         "help:Help about any command"
         "injection:just trying to break things"
+        "multiparts:multiparts example"
       )
       _describe "command" commands
       ;;
@@ -1089,6 +1264,9 @@ function _example {
       ;;
     injection)
       _example__injection
+      ;;
+    multiparts)
+      _example__multiparts
       ;;
   esac
 }
@@ -1141,6 +1319,18 @@ function _example__injection {
     "7: :{local _comp_desc=('echo fail');compadd -S '' -d _comp_desc 'echo fail'}" \
     "8: :{local _comp_desc=('');compadd -S '' -d _comp_desc ''}" \
     "9: :{local _comp_desc=('LAST POSITIONAL VALUE');compadd -S '' -d _comp_desc 'LAST POSITIONAL VALUE'}"
+}
+
+function _example__multiparts {
+    _arguments -C \
+    "--at[multiparts with @ as divider]: :_example_callback '_example__multiparts##at'" \
+    "--colon[multiparts with \: as divider ]: :_example_callback '_example__multiparts##colon'" \
+    "--comma[multiparts with , as divider]: :_example_callback '_example__multiparts##comma'" \
+    "--dot[multiparts with . as divider]: :_example_callback '_example__multiparts##dot'" \
+    "--equals[multiparts with = as divider]: :_example_callback '_example__multiparts##equals'" \
+    "--none[multiparts without divider]: :_example_callback '_example__multiparts##none'" \
+    "--slash[multiparts with / as divider]: :_example_callback '_example__multiparts##slash'" \
+    "*::arg:->args"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `

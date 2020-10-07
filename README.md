@@ -9,7 +9,7 @@ Completion script generator for [cobra] with support for:
 - [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
 - [Oil](http://www.oilshell.org/blog/2018/10/10.html) *broken* ([#86](https://github.com/rsteube/carapace/issues/86))
 - [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
-- [Xonsh](https://xon.sh/tutorial_completers.html#writing-a-new-completer) *experimental*
+- [Xonsh](https://xon.sh/tutorial_completers.html#writing-a-new-completer)
 - [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
 
 

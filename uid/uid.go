@@ -54,7 +54,15 @@ func Value(cmd *cobra.Command, args []string, uid string) string {
 	if strings.Contains(uid, "##") {
 		split := strings.Split(uid, "##")
 		if flag := cmd.Flag(split[len(split)-1]); flag != nil {
-			return flag.Value.String()
+			if flag.Value.Type() == "stringSlice" {
+				slice, _ := cmd.Flags().GetStringSlice(split[len(split)-1])
+				return strings.Join(slice, ",")
+			} else if flag.Value.Type() == "stringArray" {
+				slice, _ := cmd.Flags().GetStringArray(split[len(split)-1])
+				return strings.Join(slice, ",")
+			} else {
+				return flag.Value.String()
+			}
 		}
 
 	} else if strings.Contains(uid, "#") {

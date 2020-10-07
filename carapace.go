@@ -22,8 +22,8 @@ type Completions struct {
 
 func (c Completions) invokeCallback(uid string, args []string) Action {
 	if action, ok := c.actions[uid]; ok {
-		if action.Callback != nil {
-			return action.Callback(args)
+		if action.callback != nil {
+			return action.callback(args)
 		}
 	}
 	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
@@ -132,17 +132,17 @@ func addCompletionCommand(cmd *cobra.Command) {
 					case "_":
 						if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
 							CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
-							if action.Callback == nil {
+							if action.callback == nil {
 								fmt.Println(action.Value(shell))
 							} else {
-								fmt.Println(action.Callback(targetArgs).NestedAction(targetArgs, 2).Value(shell))
+								fmt.Println(action.callback(targetArgs).nestedAction(targetArgs, 2).Value(shell))
 							}
 						}
 					case "state":
 						fmt.Println(uid.Command(targetCmd))
 					default:
 						CallbackValue = uid.Value(targetCmd, targetArgs, id)
-						fmt.Println(completions.invokeCallback(id, targetArgs).NestedAction(targetArgs, 2).Value(shell))
+						fmt.Println(completions.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
 					}
 				}
 			}

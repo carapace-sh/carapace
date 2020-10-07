@@ -6,7 +6,9 @@ type Candidate struct {
 	Description string
 }
 
-func CandidateFromValues(values ...string) []Candidate {
+type Candidates []Candidate
+
+func CandidateFromValues(values ...string) Candidates {
 	candidates := make([]Candidate, len(values))
 	for index, val := range values {
 		candidates[index] = Candidate{Value: val, Display: val}

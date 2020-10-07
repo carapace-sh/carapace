@@ -25,7 +25,7 @@ _%v_callback() {
 
 _%v_completions() {
   local cur prev #words cword split
-  _init_completion -n :=
+  _init_completion -n /=:.,
   local curprefix
   curprefix="$(echo "$cur" | sed -r 's_^(.*[:/=])?.*_\1_')"
   local compline="${COMP_LINE:0:${COMP_POINT}}"

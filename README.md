@@ -110,7 +110,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 
 ```sh
 ./example _carapace bash '_example__condition#1' example condition --required invalid
-#compgen -W "ERR flag_--required_must_be_set_to_valid:_invalid" -- $last
+#compgen -W $'_\nERR (flag --required must be set to valid: invalid)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"
 
 ./example _carapace elvish '_example__condition#1' example condition --required invalid
 #edit:complex-candidate ERR &display-suffix=' (flag --required must be set to valid: invalid)'
@@ -130,7 +130,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 #}
 
 ./example _carapace zsh '_example__condition#1' example condition --required invalid
-# {local _comp_desc=('_' 'ERR (flag --required must be set to valid: invalid)');compadd -S '' -d _comp_desc '_' 'ERR'}
+#{local _comp_desc=('_' 'ERR (flag --required must be set to valid: invalid)');compadd -S '' -d _comp_desc '_' 'ERR'}
 ```
 
 ### ActionMultiParts

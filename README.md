@@ -130,7 +130,7 @@ Since callbacks are simply invocations of the program they can be tested directl
 #}
 
 ./example _carapace zsh '_example__condition#1' example condition --required invalid
-# _message -r 'flag --required must be set to valid: invalid'
+# {local _comp_desc=('_' 'ERR (flag --required must be set to valid: invalid)');compadd -S '' -d _comp_desc '_' 'ERR'}
 ```
 
 ### ActionMultiParts

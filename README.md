@@ -144,7 +144,7 @@ func ActionUserGroup() carapace.Action {
 	return carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Action {
 		switch len(parts) {
 		case 0:
-			return ActionUsers().Suffix(":", args)
+			return ActionUsers().Invoke(args).Suffix(":").ToA()
 		case 1:
 			return ActionGroups()
 		default:

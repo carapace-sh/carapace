@@ -68,7 +68,7 @@ Uids are generated to identify corresponding completions:
 
 
 ## Action
-An [action](#action) indicates how to complete a flag or a positional argument. See [action.go](./action.go) and the examples below for current implementations. A range of custom actions can be found at [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin/tree/master/actions)
+An [action](#action) indicates how to complete a flag or a positional argument. See [action.go](./action.go) and the examples below for current implementations. A range of custom actions can be found at [rsteube/carapace-bin](https://pkg.go.dev/mod/github.com/rsteube/carapace-bin)
 
 ### ActionMessage
 

@@ -273,7 +273,7 @@ _example_completions() {
 complete -F _example_completions example
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("bash"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("bash", false))
 }
 
 func TestElvish(t *testing.T) {
@@ -454,7 +454,7 @@ edit:complex-candidate 'invalid' &display='invalid' }]
 }
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("elvish"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("elvish", false))
 }
 
 func TestFish(t *testing.T) {
@@ -537,13 +537,13 @@ complete -c 'example' -f -n '_example_state _example__multiparts' -l 'slash' -d 
 complete -c 'example' -f -n '_example_state _example__multiparts' -a '(_example_callback _)'
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("fish"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("fish", false))
 }
 
 func TestPowershell(t *testing.T) {
 	expected := `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
-Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
+$_example_completer = {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
     $previous = $commandElements[-1].Extent
@@ -880,9 +880,11 @@ Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock {
 
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
-}`
+}
+Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock $_example_completer
+`
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("powershell"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("powershell", false))
 }
 
 func TestXonsh(t *testing.T) {
@@ -1208,7 +1210,7 @@ _add_one_completer('example', _example_completer, 'start')
 `
 
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("xonsh"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("xonsh", false))
 }
 
 func TestZsh(t *testing.T) {
@@ -1335,5 +1337,5 @@ function _example__multiparts {
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("zsh"))
+	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("zsh", false))
 }

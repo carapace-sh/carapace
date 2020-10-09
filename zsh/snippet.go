@@ -19,7 +19,21 @@ var replacer = strings.NewReplacer(
 	`]`, `\]`,
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`#compdef %v
+function _%v {
+    source <(%v _carapace zsh)
+}
+
+if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi
+`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
+
 	result := fmt.Sprintf("#compdef %v\n", cmd.Name())
 	result += fmt.Sprintf(`function _%v_callback {
   # shellcheck disable=SC2086

@@ -10,7 +10,21 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`#!/bin/bash
+_%v_completions() {
+   source <(%v _carapace bash) 
+   _%v_completions
+}
+complete -F _%v_completions %v
+`, cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
+
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_callback() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"

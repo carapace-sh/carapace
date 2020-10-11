@@ -19,7 +19,20 @@ var replacer = strings.NewReplacer( // TODO
 	`'`, `\"`,
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`edit:completion:arg-completer[%v] = [@arg]{
+    edit:completion:arg-completer[%v] = [@arg]{}
+    eval (%v _carapace elvish | slurp)
+    $edit:completion:arg-completer[%v] $@arg
+}
+`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
+
 	result := fmt.Sprintf(`use str
 edit:completion:arg-completer[%v] = [@arg]{
   fn _%v_callback [uid]{

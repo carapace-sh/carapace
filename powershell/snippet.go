@@ -12,19 +12,32 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    %v _carapace powershell | Out-String | Invoke-Expression
+    & $_%v_completer $wordToComplete $commandAst $cursorPosition
+}
+`, cmd.Name(), uid.Executable(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
+
 	buf := new(bytes.Buffer)
 
 	var subCommandCases bytes.Buffer
 	generatePowerShellSubcommandCases(&subCommandCases, cmd, actions)
-	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), uid.Executable(), subCommandCases.String())
+	fmt.Fprintf(buf, powerShellCompletionTemplate, cmd.Name(), uid.Executable(), cmd.Name(), uid.Executable(), uid.Executable(), subCommandCases.String(), cmd.Name(), cmd.Name())
 
 	return buf.String()
 }
 
 var powerShellCompletionTemplate = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
-Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
+$_%v_completer = {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
     $previous = $commandElements[-1].Extent
@@ -52,7 +65,9 @@ Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
 
     $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
-}`
+}
+Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock $_%v_completer
+`
 
 func generatePowerShellSubcommandCases(out io.Writer, cmd *cobra.Command, actions map[string]string) {
 	var cmdName = fmt.Sprintf("%v", uid.Command(cmd))

@@ -19,7 +19,21 @@ var replacer = strings.NewReplacer(
 	`'`, `\"`,
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`function _%v_completions
+   complete -c %v -e
+   %v _carapace fish | source
+   complete --do-complete (commandline -cp)
+end
+complete -c %v -a '(_%v_completions)'
+complete -c %v -f
+`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
 	result := fmt.Sprintf(`function _%v_quote_suffix
   if not commandline -cp | xargs echo 2>/dev/null >/dev/null
     if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null

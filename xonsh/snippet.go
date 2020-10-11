@@ -12,7 +12,27 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func snippetLazy(cmd *cobra.Command) string {
+	return fmt.Sprintf(`import xonsh
+import subprocess
+import builtins
+def _%v_completer(prefix, line, begidx, endidx, ctx):
+    """lazy carapace completer for %v"""
+    if not line.startswith('%v '):
+        return # not the expected command to complete
+    builtins.__xonsh__.completers = builtins.__xonsh__.completers.copy()
+    del builtins.__xonsh__.completers['%v']
+    exec(compile(subprocess.run(['%v', '_carapace', 'xonsh'], stdout=subprocess.PIPE).stdout.decode('utf-8'), "", "exec"))
+    return builtins.__xonsh__.completers['%v'](prefix, line, begidx, endidx, ctx)
+_add_one_completer('%v', _%v_completer, 'start')
+`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+}
+
+func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+	if lazy {
+		return snippetLazy(cmd)
+	}
+
 	buf := new(bytes.Buffer)
 
 	var subCommandCases bytes.Buffer

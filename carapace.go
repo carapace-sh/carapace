@@ -1,3 +1,4 @@
+// Pacakge carapace provides multi-shell completion script generation for spf13/cobra
 package carapace
 
 import (
@@ -69,8 +70,8 @@ func (c Carapace) Standalone() {
 	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
-func (c Carapace) Snippet(shell string) string {
-	var snippet func(cmd *cobra.Command, actions map[string]string) string
+func (c Carapace) Snippet(shell string, lazy bool) string {
+	var snippet func(cmd *cobra.Command, actions map[string]string, lazy bool) string
 
 	if shell == "" {
 		shell = determineShell()
@@ -93,7 +94,7 @@ func (c Carapace) Snippet(shell string) string {
 	default:
 		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell)
 	}
-	return snippet(c.cmd.Root(), completions.actions.Shell(shell))
+	return snippet(c.cmd.Root(), completions.actions.Shell(shell), lazy)
 }
 
 var completions = Completions{
@@ -111,7 +112,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				fmt.Println(Gen(cmd).Snippet(determineShell()))
+				fmt.Println(Gen(cmd).Snippet(determineShell(), true))
 			} else {
 				if len(args) == 1 {
 					switch args[0] {
@@ -120,7 +121,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
 					default:
-						fmt.Println(Gen(cmd).Snippet(args[0]))
+						fmt.Println(Gen(cmd).Snippet(args[0], false))
 					}
 				} else {
 					targetCmd, targetArgs := findTarget(cmd)

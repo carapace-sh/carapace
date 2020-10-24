@@ -223,7 +223,7 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--at (multiparts with @ as divider)\n--colon (multiparts with : as divider )\n--comma (multiparts with , as divider)\n--dot (multiparts with . as divider)\n--equals (multiparts with = as divider)\n--none (multiparts without divider)\n--slash (multiparts with / as divider)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
+            COMPREPLY=($(compgen -W $'--at (multiparts with @ as divider)\n--colon (multiparts with : as divider )\n--comma (multiparts with , as divider)\n--dot (multiparts with . as divider)\n--dotdotdot (multiparts with ... as divider)\n--equals (multiparts with = as divider)\n--none (multiparts without divider)\n--slash (multiparts with / as divider)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"))
             ;;
         esac
       else
@@ -242,6 +242,10 @@ _example_completions() {
 
           --dot)
             COMPREPLY=($(eval $(_example_callback '_example__multiparts##dot')))
+            ;;
+
+          --dotdotdot)
+            COMPREPLY=($(eval $(_example_callback '_example__multiparts##dotdotdot')))
             ;;
 
           --equals)
@@ -439,6 +443,7 @@ edit:complex-candidate 'invalid' &display='invalid' }]
         [&long='colon' &desc='multiparts with \: as divider ' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##colon' }]
         [&long='comma' &desc='multiparts with , as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##comma' }]
         [&long='dot' &desc='multiparts with . as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##dot' }]
+        [&long='dotdotdot' &desc='multiparts with ... as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##dotdotdot' }]
         [&long='equals' &desc='multiparts with = as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##equals' }]
         [&long='none' &desc='multiparts without divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##none' }]
         [&long='slash' &desc='multiparts with / as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##slash' }]
@@ -531,6 +536,7 @@ complete -c 'example' -f -n '_example_state _example__multiparts' -l 'at' -d 'mu
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'colon' -d 'multiparts with \: as divider ' -a '(_example_callback _example__multiparts##colon)' -r
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'comma' -d 'multiparts with , as divider' -a '(_example_callback _example__multiparts##comma)' -r
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'dot' -d 'multiparts with . as divider' -a '(_example_callback _example__multiparts##dot)' -r
+complete -c 'example' -f -n '_example_state _example__multiparts' -l 'dotdotdot' -d 'multiparts with ... as divider' -a '(_example_callback _example__multiparts##dotdotdot)' -r
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'equals' -d 'multiparts with = as divider' -a '(_example_callback _example__multiparts##equals)' -r
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'none' -d 'multiparts without divider' -a '(_example_callback _example__multiparts##none)' -r
 complete -c 'example' -f -n '_example_state _example__multiparts' -l 'slash' -d 'multiparts with / as divider' -a '(_example_callback _example__multiparts##slash)' -r
@@ -836,6 +842,10 @@ $_example_completer = {
                         _example_callback '_example__multiparts##dot' 
                         break
                       }
+                '^(--dotdotdot)$' {
+                        _example_callback '_example__multiparts##dotdotdot' 
+                        break
+                      }
                 '^(--equals)$' {
                         _example_callback '_example__multiparts##equals' 
                         break
@@ -859,6 +869,7 @@ $_example_completer = {
                 [CompletionResult]::new('--colon ', '--colon', [CompletionResultType]::ParameterName, 'multiparts with : as divider ')
                 [CompletionResult]::new('--comma ', '--comma', [CompletionResultType]::ParameterName, 'multiparts with , as divider')
                 [CompletionResult]::new('--dot ', '--dot', [CompletionResultType]::ParameterName, 'multiparts with . as divider')
+                [CompletionResult]::new('--dotdotdot ', '--dotdotdot', [CompletionResultType]::ParameterName, 'multiparts with ... as divider')
                 [CompletionResult]::new('--equals ', '--equals', [CompletionResultType]::ParameterName, 'multiparts with = as divider')
                 [CompletionResult]::new('--none ', '--none', [CompletionResultType]::ParameterName, 'multiparts without divider')
                 [CompletionResult]::new('--slash ', '--slash', [CompletionResultType]::ParameterName, 'multiparts with / as divider')
@@ -1171,6 +1182,9 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
         elif re.search('^(--dot)$',previous):
             result = _example_callback('_example__multiparts##dot')
                   
+        elif re.search('^(--dotdotdot)$',previous):
+            result = _example_callback('_example__multiparts##dotdotdot')
+                  
         elif re.search('^(--equals)$',previous):
             result = _example_callback('_example__multiparts##equals')
                   
@@ -1191,6 +1205,7 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
                     RichCompletion('--colon', display='--colon', description='multiparts with : as divider ', prefix_len=0),
                     RichCompletion('--comma', display='--comma', description='multiparts with , as divider', prefix_len=0),
                     RichCompletion('--dot', display='--dot', description='multiparts with . as divider', prefix_len=0),
+                    RichCompletion('--dotdotdot', display='--dotdotdot', description='multiparts with ... as divider', prefix_len=0),
                     RichCompletion('--equals', display='--equals', description='multiparts with = as divider', prefix_len=0),
                     RichCompletion('--none', display='--none', description='multiparts without divider', prefix_len=0),
                     RichCompletion('--slash', display='--slash', description='multiparts with / as divider', prefix_len=0),
@@ -1329,6 +1344,7 @@ function _example__multiparts {
     "--colon[multiparts with \: as divider ]: :_example_callback '_example__multiparts##colon'" \
     "--comma[multiparts with , as divider]: :_example_callback '_example__multiparts##comma'" \
     "--dot[multiparts with . as divider]: :_example_callback '_example__multiparts##dot'" \
+    "--dotdotdot[multiparts with ... as divider]: :_example_callback '_example__multiparts##dotdotdot'" \
     "--equals[multiparts with = as divider]: :_example_callback '_example__multiparts##equals'" \
     "--none[multiparts without divider]: :_example_callback '_example__multiparts##none'" \
     "--slash[multiparts with / as divider]: :_example_callback '_example__multiparts##slash'" \

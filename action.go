@@ -214,7 +214,7 @@ func ActionMultiParts(divider string, callback func(args []string, parts []strin
 		if len(divider) == 0 {
 			prefix = CallbackValue
 		} else if index != -1 {
-			prefix = CallbackValue[0 : index+1]
+			prefix = CallbackValue[0 : index+len(divider)]
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 {

@@ -13,6 +13,7 @@ import (
 )
 
 func snippetLazy(cmd *cobra.Command) string {
+	functionName := strings.Replace(cmd.Name(), "-", "__", -1)
 	return fmt.Sprintf(`import xonsh
 import subprocess
 import builtins
@@ -25,7 +26,7 @@ def _%v_completer(prefix, line, begidx, endidx, ctx):
     exec(compile(subprocess.run(['%v', '_carapace', 'xonsh'], stdout=subprocess.PIPE).stdout.decode('utf-8'), "", "exec"))
     return builtins.__xonsh__.completers['%v'](prefix, line, begidx, endidx, ctx)
 _add_one_completer('%v', _%v_completer, 'start')
-`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+`, functionName, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), functionName)
 }
 
 func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {

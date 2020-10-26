@@ -89,6 +89,24 @@ func (a InvokedAction) ToA() Action {
 	return Action(a)
 }
 
+func (a InvokedAction) ToMultipartsA(divider string) Action {
+	return ActionMultiParts(divider, func(args, parts []string) Action {
+		vals := make([]string, 0)
+		for _, val := range a.rawValues {
+			if strings.HasPrefix(val.Value, CallbackValue) {
+				if splitted := strings.Split(val.Value, divider); len(splitted) > len(parts) {
+					if len(splitted) == len(parts)+1 {
+						vals = append(vals, splitted[len(parts)], val.Description)
+					} else {
+						vals = append(vals, splitted[len(parts)]+divider, val.Description)
+					}
+				}
+			}
+		}
+		return ActionValuesDescribed(vals...)
+	})
+}
+
 func (a Action) nestedAction(args []string, maxDepth int) Action {
 	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
 		return a.callback(args).nestedAction(args, maxDepth-1)

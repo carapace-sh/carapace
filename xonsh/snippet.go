@@ -14,9 +14,15 @@ import (
 
 func snippetLazy(cmd *cobra.Command) string {
 	functionName := strings.Replace(cmd.Name(), "-", "__", -1)
-	return fmt.Sprintf(`import xonsh
+	return fmt.Sprintf(`from shlex import split
+import re
+import pathlib
 import subprocess
+import xonsh
 import builtins
+from xonsh.completers._aliases import _add_one_completer
+from xonsh.completers.path import complete_dir, complete_path
+from xonsh.completers.tools import RichCompletion
 def _%v_completer(prefix, line, begidx, endidx, ctx):
     """lazy carapace completer for %v"""
     if not line.startswith('%v '):

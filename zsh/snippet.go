@@ -37,7 +37,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
 	result := fmt.Sprintf("#compdef %v\n", cmd.Name())
 	result += fmt.Sprintf(`function _%v_callback {
   # shellcheck disable=SC2086
-  eval "$(%v _carapace zsh "$5" ${os_args})"
+  eval "$(%v _carapace zsh "$1" ${os_args})"
 }
 `, cmd.Name(), uid.Executable())
 	result += snippetFunctions(cmd, actions)

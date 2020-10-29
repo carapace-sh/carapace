@@ -25,9 +25,10 @@ func snippetLazy(cmd *cobra.Command) string {
    %v _carapace fish | source
    complete --do-complete (commandline -cp)
 end
+complete --do-complete '%v ' > /dev/null
+complete -c %v -e
 complete -c %v -a '(_%v_completions)'
-complete -c %v -f
-`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
 }
 
 func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {

@@ -35,7 +35,7 @@ func Sanitize(values ...string) []string {
 }
 
 func Callback(prefix string, cuid string) string {
-	return fmt.Sprintf(`_%v_callback '%v'`, prefix, cuid)
+	return fmt.Sprintf(`{_%v_callback '%v'}`, prefix, cuid)
 }
 
 func ActionDirectories() string {

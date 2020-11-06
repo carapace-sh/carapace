@@ -222,6 +222,7 @@ example <TAB>
 ## Projects
 
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
+- [gh](https://github.com/rsteube/gh) github cli with added completions (fork)
 - [lab](https://github.com/zaquestion/lab) cli client for GitLab
 
 [cobra]:https://github.com/spf13/cobra

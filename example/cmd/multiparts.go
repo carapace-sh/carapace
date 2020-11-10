@@ -36,6 +36,10 @@ func init() {
 			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(args).Filter(strings.Split(carapace.CallbackValue, "")).ToA()
 		}),
 	})
+
+	carapace.Gen(multipartsCmd).PositionalCompletion(ActionMultipartsTest(","))
+
+	carapace.Gen(multipartsCmd).PositionalAnyCompletion(ActionMultipartsTest("/"))
 }
 
 func ActionMultipartsTest(divider string) carapace.Action {

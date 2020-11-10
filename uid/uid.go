@@ -68,9 +68,13 @@ func Value(cmd *cobra.Command, args []string, uid string) string {
 	} else if strings.Contains(uid, "#") {
 		split := strings.Split(uid, "#")
 		if index, err := strconv.Atoi(split[len(split)-1]); err == nil {
-			index = index - 1
-			if len(args)-1 >= index && index >= 0 {
-				return args[index]
+			if index > 0 {
+				index = index - 1
+				if len(args)-1 >= index && index >= 0 {
+					return args[index]
+				}
+			} else if len(args) > 0 && os.Args[len(os.Args)-1] != "" {
+				return args[len(args)-1]
 			}
 		}
 	}

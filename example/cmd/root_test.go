@@ -286,6 +286,9 @@ edit:completion:arg-completer[example] = [@arg]{
   fn _example_callback [uid]{
     # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
     tmpfile=(mktemp -t carapace_example_callback-XXXXX.elv)
+    if (eq $arg[-1] "") {
+        arg[-1] = "''"
+    }
     echo (str:join ' ' $arg) | xargs example _carapace elvish $uid > $tmpfile
     -source $tmpfile
     rm $tmpfile
@@ -449,7 +452,9 @@ edit:complex-candidate 'invalid' &display='invalid' }]
         [&long='slash' &desc='multiparts with / as divider' &arg-required=$true &completer=[_]{ _example_callback '_example__multiparts##slash' }]
     ]
     arg-handlers = [
-
+      [_]{ _example_callback '_example__multiparts#1' }
+      [_]{ _example_callback '_example__multiparts#0' }
+      ...
     ]
     subargs = $arg[(subindex multiparts):] 
     if (> (count $subargs) 0) {
@@ -1348,7 +1353,8 @@ function _example__multiparts {
     "--equals[multiparts with = as divider]: :{_example_callback '_example__multiparts##equals'}" \
     "--none[multiparts without divider]: :{_example_callback '_example__multiparts##none'}" \
     "--slash[multiparts with / as divider]: :{_example_callback '_example__multiparts##slash'}" \
-    "*::arg:->args"
+    "1: :{_example_callback '_example__multiparts#1'}" \
+    "*: :{_example_callback '_example__multiparts#0'}"
 }
 if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
 `

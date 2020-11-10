@@ -38,6 +38,9 @@ edit:completion:arg-completer[%v] = [@arg]{
   fn _%v_callback [uid]{
     # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
     tmpfile=(mktemp -t carapace_%v_callback-XXXXX.elv)
+    if (eq $arg[-1] "") {
+        arg[-1] = "''"
+    }
     echo (str:join ' ' $arg) | xargs %v _carapace elvish $uid > $tmpfile
     -source $tmpfile
     rm $tmpfile

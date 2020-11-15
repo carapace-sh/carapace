@@ -22,11 +22,14 @@ var replacer = strings.NewReplacer(
 func snippetLazy(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
 function _%v {
+    compdef -d %v
+    unfunction _%v
     source <(%v _carapace zsh)
 }
 
-if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi
-`, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+compquote '' 2>/dev/null && _%v
+compdef _%v %v
+`, cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
 }
 
 func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
@@ -42,7 +45,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
 `, cmd.Name(), uid.Executable())
 	result += snippetFunctions(cmd, actions)
 
-	result += fmt.Sprintf("if compquote '' 2>/dev/null; then _%v; else compdef _%v %v; fi\n", cmd.Name(), cmd.Name(), cmd.Name()) // check if withing completion function and enable direct sourcing
+	result += fmt.Sprintf("compquote '' 2>/dev/null && _%v\ncompdef _%v %v\n", cmd.Name(), cmd.Name(), cmd.Name())
 	return result
 }
 

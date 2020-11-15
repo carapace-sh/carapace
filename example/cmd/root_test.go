@@ -1356,7 +1356,8 @@ function _example__multiparts {
     "1: :{_example_callback '_example__multiparts#1'}" \
     "*: :{_example_callback '_example__multiparts#0'}"
 }
-if compquote '' 2>/dev/null; then _example; else compdef _example example; fi
+compquote '' 2>/dev/null && _example
+compdef _example example
 `
 	rootCmd.InitDefaultHelpCmd()
 	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("zsh", false))

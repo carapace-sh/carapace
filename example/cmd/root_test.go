@@ -284,14 +284,10 @@ func TestElvish(t *testing.T) {
 	expected := `use str
 edit:completion:arg-completer[example] = [@arg]{
   fn _example_callback [uid]{
-    # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
-    tmpfile=(mktemp -t carapace_example_callback-XXXXX.elv)
     if (eq $arg[-1] "") {
         arg[-1] = "''"
     }
-    echo (str:join ' ' $arg) | xargs example _carapace elvish $uid > $tmpfile
-    -source $tmpfile
-    rm $tmpfile
+    eval (echo (str:join ' ' $arg) | xargs example _carapace elvish $uid | slurp)
   }
 
   fn subindex [subcommand]{

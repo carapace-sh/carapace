@@ -36,14 +36,10 @@ func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
 	result := fmt.Sprintf(`use str
 edit:completion:arg-completer[%v] = [@arg]{
   fn _%v_callback [uid]{
-    # TODO there is no 'eval' in elvish and '-source' needs a file so use a tempary one for callback 
-    tmpfile=(mktemp -t carapace_%v_callback-XXXXX.elv)
     if (eq $arg[-1] "") {
         arg[-1] = "''"
     }
-    echo (str:join ' ' $arg) | xargs %v _carapace elvish $uid > $tmpfile
-    -source $tmpfile
-    rm $tmpfile
+    eval (echo (str:join ' ' $arg) | xargs %v _carapace elvish $uid | slurp)
   }
 
   fn subindex [subcommand]{
@@ -57,7 +53,7 @@ edit:completion:arg-completer[%v] = [@arg]{
   if (eq 1 0) {
   } %v
 }
-`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), snippetFunctions(cmd, actions))
+`, cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), snippetFunctions(cmd, actions))
 
 	return result
 }

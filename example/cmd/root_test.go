@@ -940,8 +940,11 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
         cb = cb.decode('utf-8')
-        nonlocal prefix, line, begidx, endidx, ctx
-        return eval(cb)
+        if cb == "":
+            return {}
+        else:
+            nonlocal prefix, line, begidx, endidx, ctx
+            return eval(cb)
    
     if False:
         pass

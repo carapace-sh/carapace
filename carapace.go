@@ -2,6 +2,7 @@
 package carapace
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -70,7 +71,7 @@ func (c Carapace) Standalone() {
 	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
-func (c Carapace) Snippet(shell string, lazy bool) string {
+func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
 	var snippet func(cmd *cobra.Command, actions map[string]string, lazy bool) string
 
 	if shell == "" {
@@ -92,9 +93,9 @@ func (c Carapace) Snippet(shell string, lazy bool) string {
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell)
+		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
-	return snippet(c.cmd.Root(), completions.actions.Shell(shell), lazy)
+	return snippet(c.cmd.Root(), completions.actions.Shell(shell), lazy), nil
 }
 
 var completions = Completions{
@@ -112,7 +113,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				fmt.Println(Gen(cmd).Snippet(determineShell(), true))
+				if s, err := Gen(cmd).Snippet(determineShell(), true); err != nil {
+					fmt.Fprintln(os.Stderr, err.Error())
+				} else {
+					fmt.Println(s)
+				}
 			} else {
 				if len(args) == 1 {
 					switch args[0] {
@@ -121,7 +126,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
 					default:
-						fmt.Println(Gen(cmd).Snippet(args[0], false))
+						if s, err := Gen(cmd).Snippet(args[0], false); err != nil {
+							fmt.Fprintln(os.Stderr, err.Error())
+						} else {
+							fmt.Println(s)
+						}
 					}
 				} else {
 					targetCmd, targetArgs := findTarget(cmd)

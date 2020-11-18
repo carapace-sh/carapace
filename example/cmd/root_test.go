@@ -277,7 +277,8 @@ _example_completions() {
 complete -F _example_completions example
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("bash", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("bash", false)
+	assert.Equal(t, expected, s)
 }
 
 func TestElvish(t *testing.T) {
@@ -460,7 +461,8 @@ edit:complex-candidate 'invalid' &display='invalid' }]
 }
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("elvish", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("elvish", false)
+	assert.Equal(t, expected, s)
 }
 
 func TestFish(t *testing.T) {
@@ -544,7 +546,8 @@ complete -c 'example' -f -n '_example_state _example__multiparts' -l 'slash' -d 
 complete -c 'example' -f -n '_example_state _example__multiparts' -a '(_example_callback _)'
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("fish", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("fish", false)
+	assert.Equal(t, expected, s)
 }
 
 func TestPowershell(t *testing.T) {
@@ -896,7 +899,8 @@ $_example_completer = {
 Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock $_example_completer
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("powershell", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("powershell", false)
+	assert.Equal(t, expected, s)
 }
 
 func TestXonsh(t *testing.T) {
@@ -1226,7 +1230,8 @@ _add_one_completer('example', _example_completer, 'start')
 `
 
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("xonsh", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("xonsh", false)
+	assert.Equal(t, expected, s)
 }
 
 func TestZsh(t *testing.T) {
@@ -1356,5 +1361,6 @@ compquote '' 2>/dev/null && _example
 compdef _example example
 `
 	rootCmd.InitDefaultHelpCmd()
-	assert.Equal(t, expected, carapace.Gen(rootCmd).Snippet("zsh", false))
+	s, _ := carapace.Gen(rootCmd).Snippet("zsh", false)
+	assert.Equal(t, expected, s)
 }

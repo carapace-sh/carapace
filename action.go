@@ -57,6 +57,21 @@ func (a Action) Invoke(args []string) InvokedAction {
 	return InvokedAction(a.nestedAction(args, 5))
 }
 
+func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
+	uniqueCandidates := make(map[string]common.Candidate)
+	for _, other := range append([]InvokedAction{a}, others...) {
+		for _, c := range other.rawValues {
+			uniqueCandidates[c.Value] = c
+		}
+	}
+
+	candidates := make([]common.Candidate, 0, len(uniqueCandidates))
+	for _, c := range uniqueCandidates {
+		candidates = append(candidates, c)
+	}
+	return InvokedAction(actionCandidates(candidates...))
+}
+
 func (a InvokedAction) Filter(values []string) InvokedAction {
 	toremove := make(map[string]bool)
 	for _, v := range values {

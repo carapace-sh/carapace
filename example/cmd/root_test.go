@@ -566,7 +566,7 @@ $_example_completer = {
     Function _example_callback {
       param($uid)
       if (!$wordToComplete) {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) "''" | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) '' | Out-String | Invoke-Expression
       } else {
         example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
       }

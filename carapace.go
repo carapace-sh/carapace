@@ -4,6 +4,9 @@ package carapace
 import (
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 
@@ -112,11 +115,13 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Use:    "_carapace",
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
+			logger.Println(os.Args) // TODO replace last with '' if empty
+
 			if len(args) == 0 {
 				if s, err := Gen(cmd).Snippet(determineShell(), true); err != nil {
-					fmt.Fprintln(os.Stderr, err.Error())
+					fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
 				} else {
-					fmt.Println(s)
+					fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
 				}
 			} else {
 				if len(args) == 1 {
@@ -127,9 +132,9 @@ func addCompletionCommand(cmd *cobra.Command) {
 						}
 					default:
 						if s, err := Gen(cmd).Snippet(args[0], false); err != nil {
-							fmt.Fprintln(os.Stderr, err.Error())
+							fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
 						} else {
-							fmt.Println(s)
+							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
 						}
 					}
 				} else {
@@ -143,16 +148,16 @@ func addCompletionCommand(cmd *cobra.Command) {
 						if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
 							CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
 							if action.callback == nil {
-								fmt.Println(action.Value(shell))
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Value(shell))
 							} else {
-								fmt.Println(action.callback(targetArgs).nestedAction(targetArgs, 2).Value(shell))
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(targetArgs).nestedAction(targetArgs, 2).Value(shell))
 							}
 						}
 					case "state":
-						fmt.Println(uid.Command(targetCmd))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
 					default:
 						CallbackValue = uid.Value(targetCmd, targetArgs, id)
-						fmt.Println(completions.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), completions.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
 					}
 				}
 			}
@@ -226,8 +231,6 @@ func determineShell() string {
 				return "xonsh"
 			case "zsh":
 				return "zsh"
-			default:
-				return ""
 			}
 		}
 	}
@@ -235,4 +238,25 @@ func determineShell() string {
 
 func IsCallback() bool {
 	return len(os.Args) > 3 && os.Args[1] == "_carapace" && os.Args[3] != "state"
+}
+
+var logger = log.New(ioutil.Discard, "", log.Flags())
+
+func init() {
+	if _, enabled := os.LookupEnv("CARAPACE_LOG"); enabled {
+		if err := initLogger(); err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+}
+
+func initLogger() (err error) {
+	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
+	if err = os.MkdirAll(tmpdir, os.ModePerm); err == nil {
+		var logfileWriter io.Writer
+		if logfileWriter, err = os.OpenFile(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
+			logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|log.Lmsgprefix)
+		}
+	}
+	return
 }

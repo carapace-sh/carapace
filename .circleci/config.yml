@@ -60,6 +60,12 @@ jobs:
     steps:
       - checkout
       - run_tests
+  release:
+    docker:
+      - image: circleci/golang:1.15
+    steps:
+      - checkout
+      - run: curl -sL https://git.io/goreleaser | bash
 
 workflows:
   version: 2
@@ -68,3 +74,12 @@ workflows:
       - go-current
       - go-previous
       - go-latest
+  tags:
+    jobs:
+      - release:
+          # Only run this job on git tag pushes
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/

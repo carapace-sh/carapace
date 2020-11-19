@@ -22,6 +22,7 @@ var sanitizer = strings.NewReplacer( // TODO
 	`)`, ``,
 	`;`, ``,
 	`#`, ``,
+	`’`, ``,
 )
 
 func Sanitize(values ...string) []string {

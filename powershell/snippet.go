@@ -50,7 +50,7 @@ $_%v_completer = {
     Function _%v_callback {
       param($uid)
       if (!$wordToComplete) {
-        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) '' | Out-String | Invoke-Expression
+        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) '""' | Out-String | Invoke-Expression
       } else {
         %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
       }

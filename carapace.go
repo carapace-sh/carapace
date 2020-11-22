@@ -227,6 +227,8 @@ func determineShell() string {
 				return "oil"
 			case "pwsh":
 				return "powershell"
+			case "pwsh.exe":
+				return "powershell"
 			case "xonsh":
 				return "xonsh"
 			case "zsh":

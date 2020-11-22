@@ -213,7 +213,7 @@ func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
 func determineShell() string {
 	process, err := ps.FindProcess(os.Getpid())
 	for {
-		if process, err = ps.FindProcess(process.PPid()); err != nil {
+		if process, err = ps.FindProcess(process.PPid()); err != nil || process == nil {
 			return ""
 		} else {
 			switch process.Executable() {

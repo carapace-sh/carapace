@@ -3,7 +3,7 @@ FROM golang
 RUN apt-get update \
  && apt install -y build-essential libreadline-dev bash-completion
 
-RUN curl https://www.oilshell.org/download/oil-0.8.0.tar.gz | tar -xvz \
+RUN curl https://www.oilshell.org/download/oil-0.8.5.tar.gz | tar -xvz \
  && cd oil-*/ \
  && ./configure \
  && make \

@@ -255,7 +255,9 @@ func initLogger() (err error) {
 	if err = os.MkdirAll(tmpdir, os.ModePerm); err == nil {
 		var logfileWriter io.Writer
 		if logfileWriter, err = os.OpenFile(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
-			logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|log.Lmsgprefix)
+			Lmsgprefix := 1 << 6
+			logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|Lmsgprefix)
+			//logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|log.Lmsgprefix)
 		}
 	}
 	return

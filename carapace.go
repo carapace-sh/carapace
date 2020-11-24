@@ -225,6 +225,8 @@ func determineShell() string {
 				return "fish"
 			case "osh":
 				return "oil"
+			case "powershell.exe":
+				return "powershell"
 			case "pwsh":
 				return "powershell"
 			case "pwsh.exe":

@@ -4,7 +4,7 @@ RUN mkdir -p /root/.config/powershell \
  && echo "\n\
 function prompt {Write-Host \"carapace\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
-example _carapace powershell | out-string | Invoke-Expression" \
+example _carapace | out-string | Invoke-Expression" \
        > /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
 RUN ln -s /carapace/example/example /usr/local/bin/example

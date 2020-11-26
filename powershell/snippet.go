@@ -13,7 +13,9 @@ import (
 )
 
 func snippetLazy(cmd *cobra.Command) string {
-	return fmt.Sprintf(`Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
+	return fmt.Sprintf(`using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
+Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     %v _carapace powershell | Out-String | Invoke-Expression
     & $_%v_completer $wordToComplete $commandAst $cursorPosition

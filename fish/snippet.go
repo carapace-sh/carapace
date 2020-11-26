@@ -23,9 +23,9 @@ func snippetLazy(cmd *cobra.Command) string {
 	return fmt.Sprintf(`function _%v_completions
    complete -c %v -e
    %v _carapace fish | source
-   complete --do-complete (commandline -cp)
+   complete --do-complete=(commandline -cp)
 end
-complete --do-complete '%v ' > /dev/null
+complete --do-complete='%v ' > /dev/null
 complete -c %v -e
 complete -c %v -a '(_%v_completions)'
 `, cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())

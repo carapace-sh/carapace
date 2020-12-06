@@ -2,6 +2,13 @@
 
 - [carapace](./carapace.md)
   - [Action](./carapace/action.md)
+    - [ActionValues](./carapace/action/actionValues.md)
+    - [ActionValuesDescribed](./carapace/action/actionValuesDescribed.md)
+    - [ActionFiles](./carapace/action/actionFiles.md)
+    - [ActionDirectories](./carapace/action/actionDirectories.md)
+    - [ActionMessage](./carapace/action/actionMessage.md)
+    - [ActionCallback](./carapace/action/actionCallback.md)
+    - [ActionMultiParts](./carapace/action/actionMultiParts.md)
   - [InvokedAction](./carapace/invokedAction.md)
   - [Uid](./carapace/uid.md) 
   - [Hidden Subcommand](./carapace/hiddenSubcommand.md)

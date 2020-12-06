@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  build:
+  build: &base
     image: golang
     command: sh -c 'cd /carapace/examples && go build .'
     volumes:
@@ -11,49 +11,49 @@ services:
   bash:
     build:
       context: .
-      dockerfile: Dockerfile.bash
+      dockerfile: docker/Dockerfile.bash
     volumes:
       - '.:/carapace/'
 
   elvish:
     build:
       context: .
-      dockerfile: Dockerfile.elvish
+      dockerfile: docker/Dockerfile.elvish
     volumes:
       - '.:/carapace/'
 
   fish:
     build:
       context: .
-      dockerfile: Dockerfile.fish
+      dockerfile: docker/Dockerfile.fish
     volumes:
       - '.:/carapace/'
   
   oil:
     build:
       context: .
-      dockerfile: Dockerfile.oil
+      dockerfile: docker/Dockerfile.oil
     volumes:
       - '.:/carapace/'
 
   powershell:
     build:
       context: .
-      dockerfile: Dockerfile.powershell
+      dockerfile: docker/Dockerfile.powershell
     volumes:
       - '.:/carapace/'
   
   xonsh:
     build:
       context: .
-      dockerfile: Dockerfile.xonsh
+      dockerfile: docker/Dockerfile.xonsh
     volumes:
       - '.:/carapace/'
 
   zsh:
     build:
       context: .
-      dockerfile: Dockerfile.zsh
+      dockerfile: docker/Dockerfile.zsh
     volumes:
       - '.:/carapace/'
 

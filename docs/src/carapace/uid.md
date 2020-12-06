@@ -12,4 +12,8 @@ _{{rootCmd}}__{{subCommand1}}__{{subCommand2}}#{{position}}
 _{{rootCmd}}__{{subCommand1}}__{{subCommand2}}##{{flagName}}
 ```
 
+- state
+```handlebars
+_{{rootCmd}}__{{subCommand1}}__{{subCommand2}}
+```
 

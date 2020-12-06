@@ -11,6 +11,8 @@ carapace.ActionCallback(func(args []string) carapace.Action {
 })
 ```
 
+## Testing
+
 Since callbacks are simply invocations of the program they can be tested directly.
 ```sh
 ./example _carapace bash '_example__condition#1' example condition --required invalid

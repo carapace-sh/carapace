@@ -54,5 +54,5 @@ func ActionCandidates(values ...common.Candidate) string {
 		}
 	}
 
-	return fmt.Sprintf(`compgen -W $'%v' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"`, strings.Join(vals, `\n`))
+	return fmt.Sprintf(`compgen -W $'%v' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'`, strings.Join(vals, `\n`))
 }

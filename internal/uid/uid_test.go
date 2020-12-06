@@ -3,7 +3,7 @@ package uid
 import (
 	"testing"
 
-	"github.com/rsteube/carapace/assert"
+	"github.com/rsteube/carapace/internal/assert"
 	"github.com/spf13/cobra"
 )
 

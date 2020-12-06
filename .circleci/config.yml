@@ -1,9 +1,5 @@
 version: 2.1
 
-references:
-  workspace: &workspace
-    /go/src/github.com/rsteube/carapace
-
 commands:
   run_tests:
     steps:
@@ -19,11 +15,13 @@ commands:
       - run:
           name: "install shellcheck"
           command: |
-            curl -Lso shellcheck https://github.com/caarlos0/shellcheck-docker/releases/download/v0.4.6/shellcheck
+            scversion="stable" # or "v0.4.7", or "latest"
+            wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv shellcheck-stable/shellcheck
+            mv shellcheck-stable/shellcheck .
             chmod +x shellcheck
       - run:
           name: "shellcheck bash"
-          command: ./shellcheck -e SC2046,SC2207 <(./example/example _carapace bash)
+          command: ./shellcheck -e SC2046,SC2206,SC2207 <(./example/example _carapace bash)
       - run:
           name: "shellcheck fish"
           command: ./shellcheck -e SC1064,SC1072,SC1073 <(./example/example _carapace fish)
@@ -34,10 +32,9 @@ commands:
 jobs:
   go-current:
     docker:
-      - image: circleci/golang:1.15
+      - image: cimg/go:1.15
         environment:
           GO111MODULE: "on"
-    working_directory: *workspace
     steps:
       - checkout
       - run_tests
@@ -46,23 +43,36 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   go-previous:
     docker:
-      - image: circleci/golang:1.14
+      - image: cimg/go:1.14
         environment:
           GO111MODULE: "on"
-    working_directory: *workspace
     steps:
       - checkout
       - run_tests
-  go-latest:
+  doc:
     docker:
-      - image: circleci/golang:latest
-    working_directory: *workspace
+      - image: cimg/go:1.15
     steps:
       - checkout
-      - run_tests
+      - run:
+          name: "install mdbook"
+          command: curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook-v0.4.4-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook
+      - run:
+          name: "build docs"
+          command: ./mdbook build docs
+      - run:
+          name: "push gh-pages"
+          command: |
+            cd docs/book/
+            git init
+            git config user.name rsteube
+            git config user.email rsteube@users.noreply.github.com
+            git add .
+            git commit -m "Initial commit [ci skip]"
+            git push --force https://rsteube:${GITHUB_TOKEN}@github.com/rsteube/carapace.git master:gh-pages
   release:
     docker:
-      - image: circleci/golang:1.15
+      - image: cimg/go:1.15
     steps:
       - checkout
       - run: cd example && curl -sL https://git.io/goreleaser | bash
@@ -73,7 +83,12 @@ workflows:
     jobs:
       - go-current
       - go-previous
-      - go-latest
+      - doc:
+          filters:
+            branches:
+              only: /master/
+            tags:
+              ignore: /.*/
   tags:
     jobs:
       - release:

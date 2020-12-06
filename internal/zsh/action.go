@@ -2,7 +2,7 @@ package zsh
 
 import (
 	"fmt"
-	"github.com/rsteube/carapace/common"
+	"github.com/rsteube/carapace/internal/common"
 	"strings"
 )
 

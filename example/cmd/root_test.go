@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/assert"
+	"github.com/rsteube/carapace/internal/assert"
 )
 
 func TestBash(t *testing.T) {

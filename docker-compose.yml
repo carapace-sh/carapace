@@ -3,7 +3,7 @@ version: '3'
 services:
   build:
     image: golang
-    command: sh -c 'cd /carapace/example && go build .'
+    command: sh -c 'cd /carapace/examples && go build .'
     volumes:
       - '.:/carapace/'
       - 'go:/go/'

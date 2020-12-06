@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rsteube/carapace/common"
+	"github.com/rsteube/carapace/internal/common"
 )
 
 var sanitizer = strings.NewReplacer(

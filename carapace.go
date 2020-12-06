@@ -11,13 +11,13 @@ import (
 	"strings"
 
 	ps "github.com/mitchellh/go-ps"
-	"github.com/rsteube/carapace/bash"
-	"github.com/rsteube/carapace/elvish"
-	"github.com/rsteube/carapace/fish"
-	"github.com/rsteube/carapace/powershell"
-	"github.com/rsteube/carapace/uid"
-	"github.com/rsteube/carapace/xonsh"
-	"github.com/rsteube/carapace/zsh"
+	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/elvish"
+	"github.com/rsteube/carapace/internal/fish"
+	"github.com/rsteube/carapace/internal/powershell"
+	"github.com/rsteube/carapace/internal/uid"
+	"github.com/rsteube/carapace/internal/xonsh"
+	"github.com/rsteube/carapace/internal/zsh"
 	"github.com/spf13/cobra"
 )
 

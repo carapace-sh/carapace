@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rsteube/carapace/common"
-	"github.com/rsteube/carapace/uid"
+	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

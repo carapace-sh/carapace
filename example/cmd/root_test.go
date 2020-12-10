@@ -79,7 +79,7 @@ _example_completions() {
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'--directories (files flag)\n--files (files flag)\n-f (files flag)\n--groups (groups flag)\n-g (groups flag)\n--hosts (hosts flag)\n--kill (kill signals)\n-k (kill signals)\n--message (message flag)\n-m (message flag)\n--net_interfaces (net_interfaces flag)\n-n (net_interfaces flag)\n--optarg (optional arg with default value blue)\n-o (optional arg with default value blue)\n--usergroup (user:group flag)\n--users (users flag)\n-u (users flag)\n--values (values flag)\n-v (values flag)\n--values_described (values with description flag)\n-d (values with description flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--directories (files flag)\n--files (files flag)\n-f (files flag)\n--groups (groups flag)\n-g (groups flag)\n--kill (kill signals)\n-k (kill signals)\n--message (message flag)\n-m (message flag)\n--net_interfaces (net_interfaces flag)\n-n (net_interfaces flag)\n--optarg (optional arg with default value blue)\n-o (optional arg with default value blue)\n--usergroup (user:group flag)\n--users (users flag)\n-u (users flag)\n--values (values flag)\n-v (values flag)\n--values_described (values with description flag)\n-d (values with description flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
@@ -94,10 +94,6 @@ _example_completions() {
 
           -g | --groups)
             COMPREPLY=($(eval $(_example_callback '_example__action##groups')))
-            ;;
-
-          --hosts)
-            COMPREPLY=($(eval $(_example_callback '_example__action##hosts')))
             ;;
 
           -k | --kill)
@@ -325,7 +321,6 @@ edit:complex-candidate 'multiparts' &display='multiparts (multiparts example)' }
         [&long='directories' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
         [&long='files' &short='f' &desc='files flag' &arg-required=$true &completer=[_]{ edit:complete-filename $arg[-1] }]
         [&long='groups' &short='g' &desc='groups flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##groups' }]
-        [&long='hosts' &desc='hosts flag' &arg-required=$true &completer=[_]{ _example_callback '_example__action##hosts' }]
         [&long='kill' &short='k' &desc='kill signals' &arg-required=$true &completer=[_]{ edit:complex-candidate 'ABRT' &display='ABRT (Abnormal termination)'
 edit:complex-candidate 'ALRM' &display='ALRM (Virtual alarm clock)'
 edit:complex-candidate 'BUS' &display='BUS (BUS error)'
@@ -509,7 +504,6 @@ complete -c 'example' -f -n '_example_state _example ' -a 'multiparts ' -d 'mult
 complete -c 'example' -f -n '_example_state _example__action' -l 'directories' -d 'files flag' -a '(__fish_complete_directories)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'files' -s 'f' -d 'files flag' -a '(__fish_complete_suffix ".go")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'groups' -s 'g' -d 'groups flag' -a '(_example_callback _example__action##groups)' -r
-complete -c 'example' -f -n '_example_state _example__action' -l 'hosts' -d 'hosts flag' -a '(_example_callback _example__action##hosts)' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'kill' -s 'k' -d 'kill signals' -a '(echo -e "ABRT	Abnormal termination\nALRM	Virtual alarm clock\nBUS	BUS error\nCHLD	Child status has changed\nCONT	Continue stopped process\nFPE	Floating-point exception\nHUP	Hangup detected on controlling terminal\nILL	Illegal instruction\nINT	Interrupt from keyboard\nKILL	Kill, unblockable\nPIPE	Broken pipe\nPOLL	Pollable event occurred\nPROF	Profiling alarm clock timer expired\nPWR	Power failure restart\nQUIT	Quit from keyboard\nSEGV	Segmentation violation\nSTKFLT	Stack fault on coprocessor\nSTOP	Stop process, unblockable\nSYS	Bad system call\nTERM	Termination request\nTRAP	Trace/breakpoint trap\nTSTP	Stop typed at keyboard\nTTIN	Background read from tty\nTTOU	Background write to tty\nURG	Urgent condition on socket\nUSR1	User-defined signal 1\nUSR2	User-defined signal 2\nVTALRM	Virtual alarm clock\nWINCH	Window size change\nXCPU	CPU time limit exceeded\nXFSZ	File size limit exceeded")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'message' -s 'm' -d 'message flag' -a '(echo -e "_	\nERR	message example")' -r
 complete -c 'example' -f -n '_example_state _example__action' -l 'net_interfaces' -s 'n' -d 'net_interfaces flag' -a '(_example_callback _example__action##net_interfaces)' -r
@@ -626,10 +620,6 @@ $_example_completer = {
                         _example_callback '_example__action##groups' 
                         break
                       }
-                '^(--hosts)$' {
-                        _example_callback '_example__action##hosts' 
-                        break
-                      }
                 '^(-k|--kill)$' {
                         [CompletionResult]::new('ABRT', 'ABRT ', [CompletionResultType]::ParameterValue, 'Abnormal termination ')
                         [CompletionResult]::new('ALRM', 'ALRM ', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
@@ -711,7 +701,6 @@ $_example_completer = {
                 [CompletionResult]::new('--files ', '--files', [CompletionResultType]::ParameterName, 'files flag')
                 [CompletionResult]::new('-g ', '-g', [CompletionResultType]::ParameterName, 'groups flag')
                 [CompletionResult]::new('--groups ', '--groups', [CompletionResultType]::ParameterName, 'groups flag')
-                [CompletionResult]::new('--hosts ', '--hosts', [CompletionResultType]::ParameterName, 'hosts flag')
                 [CompletionResult]::new('-k ', '-k', [CompletionResultType]::ParameterName, 'kill signals')
                 [CompletionResult]::new('--kill ', '--kill', [CompletionResultType]::ParameterName, 'kill signals')
                 [CompletionResult]::new('-m ', '-m', [CompletionResultType]::ParameterName, 'message flag')
@@ -994,9 +983,6 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
         elif re.search('^(-g|--groups)$',previous):
             result = _example_callback('_example__action##groups')
                   
-        elif re.search('^(--hosts)$',previous):
-            result = _example_callback('_example__action##hosts')
-                  
         elif re.search('^(-k|--kill)$',previous):
             result = {
                           RichCompletion('ABRT', display='ABRT', description='Abnormal termination', prefix_len=0),
@@ -1079,7 +1065,6 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
                     RichCompletion('--files', display='--files', description='files flag', prefix_len=0),
                     RichCompletion('-g', display='-g', description='groups flag', prefix_len=0),
                     RichCompletion('--groups', display='--groups', description='groups flag', prefix_len=0),
-                    RichCompletion('--hosts', display='--hosts', description='hosts flag', prefix_len=0),
                     RichCompletion('-k', display='-k', description='kill signals', prefix_len=0),
                     RichCompletion('--kill', display='--kill', description='kill signals', prefix_len=0),
                     RichCompletion('-m', display='-m', description='message flag', prefix_len=0),
@@ -1302,7 +1287,6 @@ function _example__action {
     "--directories[files flag]: :_files -/" \
     "(-f --files)"{-f,--files}"[files flag]: :_files -g '*.go'" \
     "(-g --groups)"{-g,--groups}"[groups flag]: :{_example_callback '_example__action##groups'}" \
-    "--hosts[hosts flag]: :{_example_callback '_example__action##hosts'}" \
     "(-k --kill)"{-k,--kill}"[kill signals]: :{local _comp_desc=('ABRT (Abnormal termination)' 'ALRM (Virtual alarm clock)' 'BUS (BUS error)' 'CHLD (Child status has changed)' 'CONT (Continue stopped process)' 'FPE (Floating-point exception)' 'HUP (Hangup detected on controlling terminal)' 'ILL (Illegal instruction)' 'INT (Interrupt from keyboard)' 'KILL (Kill, unblockable)' 'PIPE (Broken pipe)' 'POLL (Pollable event occurred)' 'PROF (Profiling alarm clock timer expired)' 'PWR (Power failure restart)' 'QUIT (Quit from keyboard)' 'SEGV (Segmentation violation)' 'STKFLT (Stack fault on coprocessor)' 'STOP (Stop process, unblockable)' 'SYS (Bad system call)' 'TERM (Termination request)' 'TRAP (Trace/breakpoint trap)' 'TSTP (Stop typed at keyboard)' 'TTIN (Background read from tty)' 'TTOU (Background write to tty)' 'URG (Urgent condition on socket)' 'USR1 (User-defined signal 1)' 'USR2 (User-defined signal 2)' 'VTALRM (Virtual alarm clock)' 'WINCH (Window size change)' 'XCPU (CPU time limit exceeded)' 'XFSZ (File size limit exceeded)');compadd -S '' -d _comp_desc 'ABRT' 'ALRM' 'BUS' 'CHLD' 'CONT' 'FPE' 'HUP' 'ILL' 'INT' 'KILL' 'PIPE' 'POLL' 'PROF' 'PWR' 'QUIT' 'SEGV' 'STKFLT' 'STOP' 'SYS' 'TERM' 'TRAP' 'TSTP' 'TTIN' 'TTOU' 'URG' 'USR1' 'USR2' 'VTALRM' 'WINCH' 'XCPU' 'XFSZ'}" \
     "(-m --message)"{-m,--message}"[message flag]: :{local _comp_desc=('_' 'ERR (message example)');compadd -S '' -d _comp_desc '_' 'ERR'}" \
     "(-n --net_interfaces)"{-n,--net_interfaces}"[net_interfaces flag]: :{_example_callback '_example__action##net_interfaces'}" \

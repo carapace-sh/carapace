@@ -1,35 +1,33 @@
 package assert
 
 import (
-	"bytes"
-	"log"
+	"io/ioutil"
+	"os"
+	"os/exec"
 	"strings"
 	"testing"
-
-	"github.com/alecthomas/chroma/quick"
-	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 func Highlight(s string) string {
-	buf := bytes.NewBufferString("")
-	if err := quick.Highlight(buf, s, "bash", "terminal256", "monokai"); err != nil {
-		log.Fatal(err)
+	cmd := exec.Command("bat", "-l", "bash", "--color", "always", "--wrap", "never")
+	cmd.Stdin = strings.NewReader(s)
+	if output, err := cmd.Output(); err != nil {
+		return s // no bat command
+	} else {
+		return string(output)
 	}
-	return buf.String()
 }
 
 func Equal(t *testing.T, expected string, actual string) {
 	if expected == actual {
-		t.Log(Highlight(actual))
+		t.Log("\n" + Highlight(actual))
 	} else {
-		dmp := diffmatchpatch.New()
-		diffs := dmp.DiffMain(expected, actual, false)
+		expectedFile, _ := ioutil.TempFile(os.TempDir(), "carapace_test")
+		actualFile, _ := ioutil.TempFile(os.TempDir(), "carapace_test")
 
-		replacer := strings.NewReplacer(
-			`[31m`, `[2;30;41m`,
-			`[32m`, `[2;30;42m`,
-		)
-
-		t.Errorf("\nexpected: %v\nactual  : %v", expected, replacer.Replace(dmp.DiffPrettyText(diffs)))
+		ioutil.WriteFile(expectedFile.Name(), []byte(expected), os.ModePerm)
+		ioutil.WriteFile(actualFile.Name(), []byte(actual), os.ModePerm)
+		output, _ := exec.Command("diff", "--color=always", expectedFile.Name(), actualFile.Name()).Output()
+		t.Error("\n" + string(output))
 	}
 }

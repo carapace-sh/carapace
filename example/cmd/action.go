@@ -18,7 +18,6 @@ func init() {
 	actionCmd.Flags().StringP("files", "f", "", "files flag")
 	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("groups", "g", "", "groups flag")
-	actionCmd.Flags().String("hosts", "", "hosts flag")
 	actionCmd.Flags().StringP("message", "m", "", "message flag")
 	actionCmd.Flags().StringP("net_interfaces", "n", "", "net_interfaces flag")
 	actionCmd.Flags().String("usergroup", "", "user:group flag")
@@ -34,7 +33,6 @@ func init() {
 		"files":            carapace.ActionFiles(".go"),
 		"directories":      carapace.ActionDirectories(),
 		"groups":           action.ActionGroups(),
-		"hosts":            action.ActionHosts(),
 		"message":          carapace.ActionMessage("message example"),
 		"net_interfaces":   action.ActionNetInterfaces(),
 		"usergroup":        action.ActionUserGroup(),

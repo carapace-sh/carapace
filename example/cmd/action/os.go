@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"strings"
 
-	ps "github.com/mitchellh/go-ps"
 	"github.com/rsteube/carapace"
 )
 
@@ -75,20 +74,6 @@ func ActionKillSignals() carapace.Action {
 		"XCPU", "CPU time limit exceeded",
 		"XFSZ", "File size limit exceeded",
 	)
-}
-
-func ActionProcessExecutables() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
-		if processes, err := ps.Processes(); err != nil {
-			return carapace.ActionMessage(err.Error())
-		} else {
-			executables := make([]string, 0)
-			for _, process := range processes {
-				executables = append(executables, process.Executable())
-			}
-			return carapace.ActionValues(executables...)
-		}
-	})
 }
 
 func ActionProcessStates() carapace.Action {

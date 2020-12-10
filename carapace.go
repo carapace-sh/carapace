@@ -8,9 +8,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 
-	ps "github.com/mitchellh/go-ps"
 	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
@@ -211,31 +212,43 @@ func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
 }
 
 func determineShell() string {
-	process, err := ps.FindProcess(os.Getpid())
-	for {
-		if process, err = ps.FindProcess(process.PPid()); err != nil || process == nil {
-			return ""
+	for _, executable := range processExecutables() {
+		switch executable {
+		case "bash":
+			return "bash"
+		case "elvish":
+			return "elvish"
+		case "fish":
+			return "fish"
+		case "osh":
+			return "oil"
+		case "powershell.exe":
+			return "powershell"
+		case "pwsh":
+			return "powershell"
+		case "pwsh.exe":
+			return "powershell"
+		case "xonsh":
+			return "xonsh"
+		case "zsh":
+			return "zsh"
+		}
+	}
+	return ""
+}
+
+func processExecutables() []string {
+	if runtime.GOOS == "windows" {
+		return []string{"powershell.exe"} // TODO hardcoded for now, but there might be elvish or sth. else on window
+	} else {
+		if output, err := exec.Command("ps", "-o", "comm").Output(); err != nil {
+			return []string{}
 		} else {
-			switch process.Executable() {
-			case "bash":
-				return "bash"
-			case "elvish":
-				return "elvish"
-			case "fish":
-				return "fish"
-			case "osh":
-				return "oil"
-			case "powershell.exe":
-				return "powershell"
-			case "pwsh":
-				return "powershell"
-			case "pwsh.exe":
-				return "powershell"
-			case "xonsh":
-				return "xonsh"
-			case "zsh":
-				return "zsh"
+			lines := strings.Split(string(output), "\n")[1:]      // skip header
+			for i, j := 0, len(lines)-1; i < j; i, j = i+1, j-1 { // reverse slice
+				lines[i], lines[j] = lines[j], lines[i]
 			}
+			return lines
 		}
 	}
 }

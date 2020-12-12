@@ -284,7 +284,7 @@ edit:completion:arg-completer[example] = [@arg]{
     if (eq $arg[-1] "") {
         arg[-1] = "''"
     }
-    eval (echo (str:join ' ' $arg) | xargs example _carapace elvish $uid | slurp) &ns=(ns [&arg=$arg])
+    eval (echo (str:join "\001" $arg) | xargs --delimiter="\001" example _carapace elvish $uid | slurp) &ns=(ns [&arg=$arg])
   }
 
   fn subindex [subcommand]{

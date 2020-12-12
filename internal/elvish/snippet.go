@@ -39,7 +39,7 @@ edit:completion:arg-completer[%v] = [@arg]{
     if (eq $arg[-1] "") {
         arg[-1] = "''"
     }
-    eval (echo (str:join ' ' $arg) | xargs %v _carapace elvish $uid | slurp) &ns=(ns [&arg=$arg])
+    eval (echo (str:join "\001" $arg) | xargs --delimiter="\001" %v _carapace elvish $uid | slurp) &ns=(ns [&arg=$arg])
   }
 
   fn subindex [subcommand]{

@@ -39,7 +39,20 @@ func init() {
 
 	carapace.Gen(multipartsCmd).PositionalCompletion(ActionMultipartsTest(","))
 
-	carapace.Gen(multipartsCmd).PositionalAnyCompletion(ActionMultipartsTest("/"))
+	carapace.Gen(multipartsCmd).PositionalAnyCompletion(
+		carapace.ActionMultiParts(",", func(args, parts []string) carapace.Action {
+			return carapace.ActionMultiParts("=", func(args, parts []string) carapace.Action {
+				switch len(parts) {
+				case 0:
+					return carapace.ActionValues("a", "b", "c")
+				case 1:
+					return carapace.ActionValues("one", "two", "three")
+				default:
+					return carapace.ActionValues()
+				}
+			})
+		}),
+	)
 }
 
 func ActionMultipartsTest(divider string) carapace.Action {

@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Action indicates how to complete a flag or positional argument
 type Action struct {
 	rawValues  []common.Candidate
 	bash       func() string
@@ -53,6 +54,7 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 
 type InvokedAction Action
 
+// Invoke executes the callback of an action if it exists (supports nesting)
 func (a Action) Invoke(args []string) InvokedAction {
 	return InvokedAction(a.nestedAction(args, 5))
 }
@@ -173,6 +175,7 @@ func ActionBool() Action {
 	return ActionValues("true", "false")
 }
 
+// ActionDirectories completes directories
 func ActionDirectories() Action {
 	return Action{
 		bash:       func() string { return bash.ActionDirectories() },
@@ -185,6 +188,7 @@ func ActionDirectories() Action {
 	}
 }
 
+// ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix string) Action {
 	return Action{
 		bash:       func() string { return bash.ActionFiles(suffix) },
@@ -235,19 +239,19 @@ func ActionMessage(msg string) Action {
 	return ActionValuesDescribed("_", "", "ERR", msg)
 }
 
-// CCallbackValue is set to the currently completed flag/positional value during callback
+// CallbackValue is set to the currently completed flag/positional value during callback (note that this is updated during ActionMultiParts)
 var CallbackValue string
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
 func ActionMultiParts(divider string, callback func(args []string, parts []string) Action) Action {
 	return ActionCallback(func(args []string) Action {
-		// TODO multiple dividers by splitting on each char
 		index := strings.LastIndex(CallbackValue, string(divider))
 		prefix := ""
 		if len(divider) == 0 {
 			prefix = CallbackValue
 		} else if index != -1 {
 			prefix = CallbackValue[0 : index+len(divider)]
+			CallbackValue = CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 {

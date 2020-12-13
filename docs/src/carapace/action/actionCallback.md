@@ -11,6 +11,12 @@ carapace.ActionCallback(func(args []string) carapace.Action {
 })
 ```
 
+- [`carapace.CallbackValue`](https://pkg.go.dev/github.com/rsteube/carapace#pkg-variables) provides access to the current (partial) value of the flag or positional argument being completed
+- return [ActionValues](./actionValues.md) without arguments to silently skip completion
+- return [ActionMessage](./actionMessage.md) to provide an error message (e.g. failure during invocation of an external command)
+- the `args` parameter provides access to the positional arguments of the current subcommand (excluding the one currently being completed)
+- [`IsCallback()`](https://pkg.go.dev/github.com/rsteube/carapace#IsCallback) indicates if the current invocation of the program is a callback (useful to skip any lengthy init steps)
+
 ## Testing
 
 Since callbacks are simply invocations of the program they can be tested directly.

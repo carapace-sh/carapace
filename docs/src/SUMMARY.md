@@ -1,6 +1,11 @@
 # Summary
 
 - [carapace](./carapace.md)
+  - [Gen](./carapace/gen.md)
+    - [Hidden Subcommand](./carapace/gen/hiddenSubcommand.md)
+    - [PositionalCompletion](./carapace/gen/positionalCompletion.md)
+    - [FlagCompletion](./carapace/gen/flagCompletion.md) 
+    - [Uid](./carapace/gen/uid.md) 
   - [Action](./carapace/action.md)
     - [ActionValues](./carapace/action/actionValues.md)
     - [ActionValuesDescribed](./carapace/action/actionValuesDescribed.md)
@@ -10,10 +15,6 @@
     - [ActionCallback](./carapace/action/actionCallback.md)
     - [ActionMultiParts](./carapace/action/actionMultiParts.md)
   - [InvokedAction](./carapace/invokedAction.md)
-  - [Uid](./carapace/uid.md) 
-  - [Hidden Subcommand](./carapace/hiddenSubcommand.md)
-  - [Flags](./carapace/flags.md) 
-  - [Positional Arguments](./carapace/positionalArguments.md)
 - [caraparse](./caraparse.md)
 - [carapace-bin](./carapace-bin.md)
 - [lazycomplete](./lazycomplete.md)

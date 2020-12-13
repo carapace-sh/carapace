@@ -1,5 +1,5 @@
 # ActionCallback
-[ActionCallback](https://pkg.go.dev/github.com/rsteube/carapace#ActionCallback) is a special action where the program itself provides the completion dynamically. For this the [hidden subcommand](../hiddenSubcommand.md) is called with an [uid](../uid.md) and the current command line content which then lets cobra parse existing flags and invokes the callback function after that.
+[ActionCallback](https://pkg.go.dev/github.com/rsteube/carapace#ActionCallback) is a special action where the program itself provides the completion dynamically. For this the [hidden subcommand](../gen/hiddenSubcommand.md) is called with an [uid](../gen/uid.md) and the current command line content which then lets cobra parse existing flags and invokes the callback function after that.
 
 ```go
 carapace.ActionCallback(func(args []string) carapace.Action {

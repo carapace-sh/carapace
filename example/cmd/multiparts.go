@@ -37,16 +37,28 @@ func init() {
 		}),
 	})
 
-	carapace.Gen(multipartsCmd).PositionalCompletion(ActionMultipartsTest(","))
-
-	carapace.Gen(multipartsCmd).PositionalAnyCompletion(
-		carapace.ActionMultiParts(",", func(args, parts []string) carapace.Action {
+	carapace.Gen(multipartsCmd).PositionalCompletion(
+		carapace.ActionMultiParts(",", func(args, entries []string) carapace.Action {
 			return carapace.ActionMultiParts("=", func(args, parts []string) carapace.Action {
 				switch len(parts) {
 				case 0:
-					return carapace.ActionValues("a", "b", "c")
+					keys := make([]string, len(entries))
+					for index, entry := range entries {
+						keys[index] = strings.Split(entry, "=")[0]
+					}
+					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(args).Filter(keys).Suffix("=").ToA()
 				case 1:
-					return carapace.ActionValues("one", "two", "three")
+					switch parts[0] {
+					case "FILE":
+						return carapace.ActionFiles("")
+					case "DIRECTORY":
+						return carapace.ActionDirectories()
+					case "VALUE":
+						return carapace.ActionValues("one", "two", "three")
+					default:
+						return carapace.ActionValues()
+
+					}
 				default:
 					return carapace.ActionValues()
 				}

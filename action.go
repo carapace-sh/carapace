@@ -1,6 +1,8 @@
 package carapace
 
 import (
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/bash"
@@ -184,7 +186,7 @@ func ActionDirectories() Action {
 		powershell: func() string { return powershell.ActionDirectories() },
 		xonsh:      func() string { return xonsh.ActionDirectories() },
 		zsh:        func() string { return zsh.ActionDirectories() },
-		// TODO add Callback so that the action can be used in ActionMultiParts as well
+		callback:   func(args []string) Action { return actionPath("", true) },
 	}
 }
 
@@ -197,7 +199,30 @@ func ActionFiles(suffix string) Action {
 		powershell: func() string { return powershell.ActionFiles(suffix) },
 		xonsh:      func() string { return xonsh.ActionFiles(suffix) },
 		zsh:        func() string { return zsh.ActionFiles("*" + suffix) },
-		// TODO add Callback so that the action can be used in ActionMultiParts as well
+		callback:   func(args []string) Action { return actionPath(suffix, false) },
+	}
+}
+
+func actionPath(fileSuffix string, dirOnly bool) Action {
+	folder := filepath.Dir(CallbackValue)
+	if files, err := ioutil.ReadDir(folder); err != nil {
+		return ActionMessage(err.Error())
+	} else {
+		if folder == "." {
+			folder = ""
+		} else if !strings.HasSuffix(folder, "/") {
+			folder = folder + "/"
+		}
+
+		vals := make([]string, len(files))
+		for index, file := range files {
+			if file.IsDir() {
+				vals[index] = folder + file.Name() + "/"
+			} else if !dirOnly && strings.HasSuffix(file.Name(), fileSuffix) {
+				vals[index] = folder + file.Name()
+			}
+		}
+		return ActionValues(vals...)
 	}
 }
 

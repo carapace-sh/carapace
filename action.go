@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -26,7 +27,26 @@ type Action struct {
 	zsh        func() string
 	callback   CompletionCallback
 }
+
 type ActionMap map[string]Action
+
+func (a ActionMap) invokeCallback(uid string, args []string) Action {
+	if action, ok := a[uid]; ok {
+		if action.callback != nil {
+			return action.callback(args)
+		}
+	}
+	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
+}
+
+func (a ActionMap) shell(shell string) map[string]string {
+	actions := make(map[string]string, len(a))
+	for key, value := range map[string]Action(a) {
+		actions[key] = value.Value(shell)
+	}
+	return actions
+}
+
 type CompletionCallback func(args []string) Action
 
 // finalize replaces value if a callback function is set
@@ -157,14 +177,6 @@ func (a Action) Value(shell string) string {
 	} else {
 		return f()
 	}
-}
-
-func (m *ActionMap) Shell(shell string) map[string]string {
-	actions := make(map[string]string, len(completions.actions))
-	for key, value := range completions.actions {
-		actions[key] = value.Value(shell)
-	}
-	return actions
 }
 
 // ActionCallback invokes a go function during completion

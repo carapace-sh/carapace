@@ -22,18 +22,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Completions struct {
-	actions ActionMap
-}
-
-func (c Completions) invokeCallback(uid string, args []string) Action {
-	if action, ok := c.actions[uid]; ok {
-		if action.callback != nil {
-			return action.callback(args)
-		}
-	}
-	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
-}
+var actionMap ActionMap = make(ActionMap)
 
 type Carapace struct {
 	cmd *cobra.Command
@@ -48,12 +37,12 @@ func Gen(cmd *cobra.Command) *Carapace {
 
 func (c Carapace) PositionalCompletion(action ...Action) {
 	for index, a := range action {
-		completions.actions[uid.Positional(c.cmd, index+1)] = a.finalize(c.cmd, uid.Positional(c.cmd, index+1))
+		actionMap[uid.Positional(c.cmd, index+1)] = a.finalize(c.cmd, uid.Positional(c.cmd, index+1))
 	}
 }
 
 func (c Carapace) PositionalAnyCompletion(action Action) {
-	completions.actions[uid.Positional(c.cmd, 0)] = action.finalize(c.cmd, uid.Positional(c.cmd, 0))
+	actionMap[uid.Positional(c.cmd, 0)] = action.finalize(c.cmd, uid.Positional(c.cmd, 0))
 }
 
 func (c Carapace) FlagCompletion(actions ActionMap) {
@@ -61,7 +50,7 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 		if flag := c.cmd.LocalFlags().Lookup(name); flag == nil {
 			fmt.Fprintf(os.Stderr, "unknown flag: %v\n", name)
 		} else {
-			completions.actions[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
+			actionMap[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
 		}
 	}
 }
@@ -99,11 +88,7 @@ func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
 	default:
 		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
-	return snippet(c.cmd.Root(), completions.actions.Shell(shell), lazy), nil
-}
-
-var completions = Completions{
-	actions: make(map[string]Action),
+	return snippet(c.cmd.Root(), actionMap.shell(shell), lazy), nil
 }
 
 func addCompletionCommand(cmd *cobra.Command) {
@@ -128,7 +113,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 				if len(args) == 1 {
 					switch args[0] {
 					case "debug":
-						for uid, action := range completions.actions {
+						for uid, action := range actionMap {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
 					default:
@@ -158,7 +143,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
 					default:
 						CallbackValue = uid.Value(targetCmd, targetArgs, id)
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), completions.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
 					}
 				}
 			}
@@ -181,9 +166,9 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) (id string, actio
 			id = uid.Positional(targetCmd, len(targetArgs))
 		}
 	}
-	if action, ok = completions.actions[id]; !ok {
+	if action, ok = actionMap[id]; !ok {
 		id = uid.Positional(targetCmd, 0)
-		action, ok = completions.actions[id]
+		action, ok = actionMap[id]
 	}
 	return
 }

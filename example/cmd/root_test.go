@@ -445,8 +445,6 @@ edit:complex-candidate 'invalid' &display='invalid' }]
     ]
     arg-handlers = [
       [_]{ _example_callback '_example__multiparts#1' }
-      [_]{ _example_callback '_example__multiparts#0' }
-      ...
     ]
     subargs = $arg[(subindex multiparts):] 
     if (> (count $subargs) 0) {
@@ -1341,8 +1339,7 @@ function _example__multiparts {
     "--equals[multiparts with = as divider]: :{_example_callback '_example__multiparts##equals'}" \
     "--none[multiparts without divider]: :{_example_callback '_example__multiparts##none'}" \
     "--slash[multiparts with / as divider]: :{_example_callback '_example__multiparts##slash'}" \
-    "1: :{_example_callback '_example__multiparts#1'}" \
-    "*: :{_example_callback '_example__multiparts#0'}"
+    "1: :{_example_callback '_example__multiparts#1'}"
 }
 compquote '' 2>/dev/null && _example
 compdef _example example

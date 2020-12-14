@@ -22,9 +22,7 @@ Completion script generator for [cobra] with support for:
 
 ## Usage
 
-Calling `carapace.Gen` on any command is enough to enable completion script generation using the [hidden command](#hidden-command).
-
-> Invocations to `carapace.Gen` must be **after** the command was added to the parent command so that the [uids](#uid) are correct.
+Calling `carapace.Gen` on any command is sufficient to enable completion script generation using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).
 
 ```go
 import (

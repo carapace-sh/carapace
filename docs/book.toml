@@ -9,4 +9,3 @@ title = "carapace"
 default-theme = "Coal"
 
 [output.linkcheck]
-follow-web-links = false

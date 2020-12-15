@@ -59,7 +59,7 @@ jobs:
           command: curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook-v0.4.4-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook
       - run:
           name: "install mdbook-linkcheck"
-          command: curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.2/mdbook-linkcheck-v0.7.2-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck
+          command: curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.6.0/mdbook-linkcheck-v0.6.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck
       - run:
           name: "build docs"
           command: PATH=$PATH:$(pwd) mdbook build docs

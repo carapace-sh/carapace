@@ -132,7 +132,7 @@ func (a InvokedAction) ToMultipartsA(divider string) Action {
 	return ActionMultiParts(divider, func(args, parts []string) Action {
 		vals := make([]string, 0)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, CallbackValue) {
+			if strings.HasPrefix(val.Value, strings.Join(parts, divider)) {
 				if splitted := strings.Split(val.Value, divider); len(splitted) > len(parts) {
 					if len(splitted) == len(parts)+1 {
 						vals = append(vals, splitted[len(parts)], val.Description)

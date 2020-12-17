@@ -128,7 +128,7 @@ func (a InvokedAction) ToA() Action {
 	return Action(a)
 }
 
-func (a InvokedAction) ToMultipartsA(divider string) Action {
+func (a InvokedAction) ToMultiPartsA(divider string) Action {
 	return ActionMultiParts(divider, func(args, parts []string) Action {
 		vals := make([]string, 0)
 		for _, val := range a.rawValues {

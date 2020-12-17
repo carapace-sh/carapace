@@ -42,19 +42,19 @@ using namespace System.Management.Automation.Language
 $_%v_completer = {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $previous = $commandElements[-1].Extent
+    $previous = $commandElements[-1].Value
     if ($wordToComplete) {
-        $previous = $commandElements[-2].Extent
+        $previous = $commandElements[-2].Value
     }
 
-    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Extent})
+    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Value})
     
     Function _%v_callback {
       param($uid)
       if (!$wordToComplete) {
-        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) '""' | Out-String | Invoke-Expression
+        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) '""' | Out-String | Invoke-Expression
       } else {
-        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
+        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) | Out-String | Invoke-Expression
       }
     }
     
@@ -65,7 +65,7 @@ $_%v_completer = {
       return "" # prevent default file completion
     }
 
-    $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
+    $completions.Where{ ($_.CompletionText -replace '` + "`" + `','') -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }
 Register-ArgumentCompleter -Native -CommandName '%s' -ScriptBlock $_%v_completer

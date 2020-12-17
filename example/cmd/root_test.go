@@ -548,19 +548,19 @@ using namespace System.Management.Automation.Language
 $_example_completer = {
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
-    $previous = $commandElements[-1].Extent
+    $previous = $commandElements[-1].Value
     if ($wordToComplete) {
-        $previous = $commandElements[-2].Extent
+        $previous = $commandElements[-2].Value
     }
 
-    $state = example _carapace powershell state $($commandElements| Foreach {$_.Extent})
+    $state = example _carapace powershell state $($commandElements| Foreach {$_.Value})
     
     Function _example_callback {
       param($uid)
       if (!$wordToComplete) {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) '""' | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) '""' | Out-String | Invoke-Expression
       } else {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Extent}) | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) | Out-String | Invoke-Expression
       }
     }
     
@@ -628,7 +628,7 @@ $_example_completer = {
                         [CompletionResult]::new('HUP', 'HUP ', [CompletionResultType]::ParameterValue, 'Hangup detected on controlling terminal ')
                         [CompletionResult]::new('ILL', 'ILL ', [CompletionResultType]::ParameterValue, 'Illegal instruction ')
                         [CompletionResult]::new('INT', 'INT ', [CompletionResultType]::ParameterValue, 'Interrupt from keyboard ')
-                        [CompletionResult]::new('KILL', 'KILL ', [CompletionResultType]::ParameterValue, 'Kill, unblockable ')
+                        [CompletionResult]::new('KILL', 'KILL ', [CompletionResultType]::ParameterValue, 'Kill` + "`" + `, unblockable ')
                         [CompletionResult]::new('PIPE', 'PIPE ', [CompletionResultType]::ParameterValue, 'Broken pipe ')
                         [CompletionResult]::new('POLL', 'POLL ', [CompletionResultType]::ParameterValue, 'Pollable event occurred ')
                         [CompletionResult]::new('PROF', 'PROF ', [CompletionResultType]::ParameterValue, 'Profiling alarm clock timer expired ')
@@ -636,7 +636,7 @@ $_example_completer = {
                         [CompletionResult]::new('QUIT', 'QUIT ', [CompletionResultType]::ParameterValue, 'Quit from keyboard ')
                         [CompletionResult]::new('SEGV', 'SEGV ', [CompletionResultType]::ParameterValue, 'Segmentation violation ')
                         [CompletionResult]::new('STKFLT', 'STKFLT ', [CompletionResultType]::ParameterValue, 'Stack fault on coprocessor ')
-                        [CompletionResult]::new('STOP', 'STOP ', [CompletionResultType]::ParameterValue, 'Stop process, unblockable ')
+                        [CompletionResult]::new('STOP', 'STOP ', [CompletionResultType]::ParameterValue, 'Stop process` + "`" + `, unblockable ')
                         [CompletionResult]::new('SYS', 'SYS ', [CompletionResultType]::ParameterValue, 'Bad system call ')
                         [CompletionResult]::new('TERM', 'TERM ', [CompletionResultType]::ParameterValue, 'Termination request ')
                         [CompletionResult]::new('TRAP', 'TRAP ', [CompletionResultType]::ParameterValue, 'Trace/breakpoint trap ')
@@ -858,7 +858,7 @@ $_example_completer = {
             if ($wordToComplete -like "-*") {
                 [CompletionResult]::new('--at ', '--at', [CompletionResultType]::ParameterName, 'multiparts with @ as divider')
                 [CompletionResult]::new('--colon ', '--colon', [CompletionResultType]::ParameterName, 'multiparts with : as divider ')
-                [CompletionResult]::new('--comma ', '--comma', [CompletionResultType]::ParameterName, 'multiparts with , as divider')
+                [CompletionResult]::new('--comma ', '--comma', [CompletionResultType]::ParameterName, 'multiparts with ` + "`" + `, as divider')
                 [CompletionResult]::new('--dot ', '--dot', [CompletionResultType]::ParameterName, 'multiparts with . as divider')
                 [CompletionResult]::new('--dotdotdot ', '--dotdotdot', [CompletionResultType]::ParameterName, 'multiparts with ... as divider')
                 [CompletionResult]::new('--equals ', '--equals', [CompletionResultType]::ParameterName, 'multiparts with = as divider')
@@ -880,7 +880,7 @@ $_example_completer = {
       return "" # prevent default file completion
     }
 
-    $completions.Where{ $_.CompletionText -like "$wordToComplete*" } |
+    $completions.Where{ ($_.CompletionText -replace '` + "`" + `','') -like "$wordToComplete*" } |
         Sort-Object -Property ListItemText
 }
 Register-ArgumentCompleter -Native -CommandName 'example' -ScriptBlock $_example_completer

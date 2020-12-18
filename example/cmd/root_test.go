@@ -52,7 +52,7 @@ _example_completions() {
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'--array (multiflag)\n-a (multiflag)\n--persistentFlag (Help message for persistentFlag)\n-p (Help message for persistentFlag)\n--toggle (Help message for toggle)\n-t (Help message for toggle)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--array\t--array (multiflag)\n-a\t-a (multiflag)\n--persistentFlag\t--persistentFlag (Help message for persistentFlag)\n-p\t-p (Help message for persistentFlag)\n--toggle\t--toggle (Help message for toggle)\n-t\t-t (Help message for toggle)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
@@ -62,7 +62,7 @@ _example_completions() {
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'action (action example)\nalias (action example)\ncallback (callback example)\ncondition (condition example)\nhelp (Help about any command)\ninjection (just trying to break things)\nmultiparts (multiparts example)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'action\taction (action example)\nalias\taction (action example)\ncallback\tcallback (callback example)\ncondition\tcondition (condition example)\nhelp\thelp (Help about any command)\ninjection\tinjection (just trying to break things)\nmultiparts\tmultiparts (multiparts example)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       fi
@@ -75,11 +75,11 @@ _example_completions() {
           -o=* | --optarg=*)
             cur=${cur#*=}
             curprefix=${curprefix#*=}
-            COMPREPLY=($(compgen -W $'blue\nred\ngreen\nyellow' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'blue\tblue\nred\tred\ngreen\tgreen\nyellow\tyellow' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           *)
-            COMPREPLY=($(compgen -W $'--directories (files flag)\n--files (files flag)\n-f (files flag)\n--groups (groups flag)\n-g (groups flag)\n--kill (kill signals)\n-k (kill signals)\n--message (message flag)\n-m (message flag)\n--net_interfaces (net_interfaces flag)\n-n (net_interfaces flag)\n--optarg (optional arg with default value blue)\n-o (optional arg with default value blue)\n--usergroup (user:group flag)\n--users (users flag)\n-u (users flag)\n--values (values flag)\n-v (values flag)\n--values_described (values with description flag)\n-d (values with description flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--directories\t--directories (files flag)\n--files\t--files (files flag)\n-f\t-f (files flag)\n--groups\t--groups (groups flag)\n-g\t-g (groups flag)\n--kill\t--kill (kill signals)\n-k\t-k (kill signals)\n--message\t--message (message flag)\n-m\t-m (message flag)\n--net_interfaces\t--net_interfaces (net_interfaces flag)\n-n\t-n (net_interfaces flag)\n--optarg\t--optarg (optional arg with default value blue)\n-o\t-o (optional arg with default value blue)\n--usergroup\t--usergroup (user:group flag)\n--users\t--users (users flag)\n-u\t-u (users flag)\n--values\t--values (values flag)\n-v\t-v (values flag)\n--values_described\t--values_described (values with description flag)\n-d\t-d (values with description flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
@@ -97,11 +97,11 @@ _example_completions() {
             ;;
 
           -k | --kill)
-            COMPREPLY=($(compgen -W $'ABRT (Abnormal termination)\nALRM (Virtual alarm clock)\nBUS (BUS error)\nCHLD (Child status has changed)\nCONT (Continue stopped process)\nFPE (Floating-point exception)\nHUP (Hangup detected on controlling terminal)\nILL (Illegal instruction)\nINT (Interrupt from keyboard)\nKILL (Kill, unblockable)\nPIPE (Broken pipe)\nPOLL (Pollable event occurred)\nPROF (Profiling alarm clock timer expired)\nPWR (Power failure restart)\nQUIT (Quit from keyboard)\nSEGV (Segmentation violation)\nSTKFLT (Stack fault on coprocessor)\nSTOP (Stop process, unblockable)\nSYS (Bad system call)\nTERM (Termination request)\nTRAP (Trace/breakpoint trap)\nTSTP (Stop typed at keyboard)\nTTIN (Background read from tty)\nTTOU (Background write to tty)\nURG (Urgent condition on socket)\nUSR1 (User-defined signal 1)\nUSR2 (User-defined signal 2)\nVTALRM (Virtual alarm clock)\nWINCH (Window size change)\nXCPU (CPU time limit exceeded)\nXFSZ (File size limit exceeded)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'ABRT\tABRT (Abnormal termination)\nALRM\tALRM (Virtual alarm clock)\nBUS\tBUS (BUS error)\nCHLD\tCHLD (Child status has changed)\nCONT\tCONT (Continue stopped process)\nFPE\tFPE (Floating-point exception)\nHUP\tHUP (Hangup detected on controlling terminal)\nILL\tILL (Illegal instruction)\nINT\tINT (Interrupt from keyboard)\nKILL\tKILL (Kill, unblockable)\nPIPE\tPIPE (Broken pipe)\nPOLL\tPOLL (Pollable event occurred)\nPROF\tPROF (Profiling alarm clock timer expired)\nPWR\tPWR (Power failure restart)\nQUIT\tQUIT (Quit from keyboard)\nSEGV\tSEGV (Segmentation violation)\nSTKFLT\tSTKFLT (Stack fault on coprocessor)\nSTOP\tSTOP (Stop process, unblockable)\nSYS\tSYS (Bad system call)\nTERM\tTERM (Termination request)\nTRAP\tTRAP (Trace/breakpoint trap)\nTSTP\tTSTP (Stop typed at keyboard)\nTTIN\tTTIN (Background read from tty)\nTTOU\tTTOU (Background write to tty)\nURG\tURG (Urgent condition on socket)\nUSR1\tUSR1 (User-defined signal 1)\nUSR2\tUSR2 (User-defined signal 2)\nVTALRM\tVTALRM (Virtual alarm clock)\nWINCH\tWINCH (Window size change)\nXCPU\tXCPU (CPU time limit exceeded)\nXFSZ\tXFSZ (File size limit exceeded)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           -m | --message)
-            COMPREPLY=($(compgen -W $'_\nERR (message example)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'_\t_\nERR\tERR (message example)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           -n | --net_interfaces)
@@ -117,11 +117,11 @@ _example_completions() {
             ;;
 
           -v | --values)
-            COMPREPLY=($(compgen -W $'values\nexample' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'values\tvalues\nexample\texample' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           -d | --values_described)
-            COMPREPLY=($(compgen -W $'values (valueDescription)\nexample (exampleDescription)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'values\tvalues (valueDescription)\nexample\texample (exampleDescription)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           *)
@@ -137,7 +137,7 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--callback (Help message for callback)\n-c (Help message for callback)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--callback\t--callback (Help message for callback)\n-c\t-c (Help message for callback)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
@@ -159,13 +159,13 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--required (required flag)\n-r (required flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--required\t--required (required flag)\n-r\t-r (required flag)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
         case $prev in
           -r | --required)
-            COMPREPLY=($(compgen -W $'valid\ninvalid' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'valid\tvalid\ninvalid\tinvalid' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
 
           *)
@@ -219,7 +219,7 @@ _example_completions() {
         case $cur in
 
           *)
-            COMPREPLY=($(compgen -W $'--at (multiparts with @ as divider)\n--colon (multiparts with : as divider )\n--comma (multiparts with , as divider)\n--dot (multiparts with . as divider)\n--dotdotdot (multiparts with ... as divider)\n--equals (multiparts with = as divider)\n--none (multiparts without divider)\n--slash (multiparts with / as divider)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
+            COMPREPLY=($(compgen -W $'--at\t--at (multiparts with @ as divider)\n--colon\t--colon (multiparts with : as divider )\n--comma\t--comma (multiparts with , as divider)\n--dot\t--dot (multiparts with . as divider)\n--dotdotdot\t--dotdotdot (multiparts with ... as divider)\n--equals\t--equals (multiparts with = as divider)\n--none\t--none (multiparts without divider)\n--slash\t--slash (multiparts with / as divider)' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'))
             ;;
         esac
       else
@@ -266,7 +266,8 @@ _example_completions() {
   esac
 
   [[ $cur =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]% (*} )  # https://stackoverflow.com/a/10130007
+  [[ ${#COMPREPLY[*]} -gt 1 ]] && COMPREPLY=("${COMPREPLY[@]#*	}") # show visual part (all after tab)
+  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%	*} ) # show value to insert (all before tab) https://stackoverflow.com/a/10130007
   [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 

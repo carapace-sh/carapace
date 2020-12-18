@@ -267,6 +267,7 @@ _example_completions() {
 
   [[ $cur =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
   [[ ${#COMPREPLY[*]} -gt 1 ]] && COMPREPLY=("${COMPREPLY[@]#*	}") # show visual part (all after tab)
+  [[ ${#COMPREPLY[*]} -gt 1 ]] && [[ "$(printf  "%c\n" "${COMPREPLY[@]}" | uniq | wc -l)" -eq 1 ]] && COMPREPLY=("${COMPREPLY[@]}" "_ (ignore me)") # prevent insertion if all have same first character (workaround for #164)
   [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%	*} ) # show value to insert (all before tab) https://stackoverflow.com/a/10130007
   [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }

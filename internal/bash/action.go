@@ -47,10 +47,11 @@ func ActionFiles(suffix string) string {
 func ActionCandidates(values ...common.Candidate) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
+		formattedVal := strings.Replace(sanitizer.Replace(val.Value), " ", `\ `, -1)
 		if val.Description == "" {
-			vals[index] = sanitizer.Replace(val.Value)
+			vals[index] = fmt.Sprintf(`%v\t%v`, formattedVal, val.Display)
 		} else {
-			vals[index] = fmt.Sprintf(`%v (%v)`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Description))
+			vals[index] = fmt.Sprintf(`%v\t%v (%v)`, formattedVal, val.Display, sanitizer.Replace(val.Description))
 		}
 	}
 

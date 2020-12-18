@@ -62,7 +62,8 @@ _%v_completions() {
   esac
 
   [[ $cur =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%% (*} )  # https://stackoverflow.com/a/10130007
+  [[ ${#COMPREPLY[*]} -gt 1 ]] && COMPREPLY=("${COMPREPLY[@]#*	}") # show visual part (all after tab)
+  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%%	*} ) # show value to insert (all before tab) https://stackoverflow.com/a/10130007
   [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 
@@ -128,9 +129,9 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		subcommands := make([]common.Candidate, 0)
 		for _, c := range cmd.Commands() {
 			if !c.Hidden {
-				subcommands = append(subcommands, common.Candidate{Value: c.Name(), Description: c.Short})
+				subcommands = append(subcommands, common.Candidate{Value: c.Name(), Display: c.Name(), Description: c.Short})
 				for _, alias := range c.Aliases {
-					subcommands = append(subcommands, common.Candidate{Value: alias, Description: c.Short})
+					subcommands = append(subcommands, common.Candidate{Value: alias, Display: c.Name(), Description: c.Short})
 				}
 			}
 		}
@@ -156,11 +157,11 @@ func snippetFlagList(flags *pflag.FlagSet) string {
 		if !flag.Hidden {
 			if !common.IsShorthandOnly(flag) {
 				//flagValues = append(flagValues, "--"+flag.Name)
-				flagValues = append(flagValues, common.Candidate{Value: "--" + flag.Name, Description: flag.Usage})
+				flagValues = append(flagValues, common.Candidate{Value: "--" + flag.Name, Display: "--" + flag.Name, Description: flag.Usage})
 			}
 			if flag.Shorthand != "" {
 				//flagValues = append(flagValues, "-"+flag.Shorthand)
-				flagValues = append(flagValues, common.Candidate{Value: "-" + flag.Shorthand, Description: flag.Usage})
+				flagValues = append(flagValues, common.Candidate{Value: "-" + flag.Shorthand, Display: "-" + flag.Shorthand, Description: flag.Usage})
 			}
 		}
 	})

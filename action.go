@@ -130,18 +130,24 @@ func (a InvokedAction) ToA() Action {
 
 func (a InvokedAction) ToMultiPartsA(divider string) Action {
 	return ActionMultiParts(divider, func(args, parts []string) Action {
-		vals := make([]string, 0)
+		uniqueVals := make(map[string]string)
 		for _, val := range a.rawValues {
 			if strings.HasPrefix(val.Value, strings.Join(parts, divider)) {
 				if splitted := strings.Split(val.Value, divider); len(splitted) > len(parts) {
 					if len(splitted) == len(parts)+1 {
-						vals = append(vals, splitted[len(parts)], val.Description)
+						uniqueVals[splitted[len(parts)]] = val.Description
 					} else {
-						vals = append(vals, splitted[len(parts)]+divider, "")
+						uniqueVals[splitted[len(parts)]+divider] = ""
 					}
 				}
 			}
 		}
+
+		vals := make([]string, 0, len(uniqueVals)*2)
+		for val, description := range uniqueVals {
+			vals = append(vals, val, description)
+		}
+
 		return ActionValuesDescribed(vals...)
 	})
 }

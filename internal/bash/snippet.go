@@ -62,9 +62,18 @@ _%v_completions() {
   esac
 
   [[ $cur =~ ^[\"\'] ]] && COMPREPLY=("${COMPREPLY[@]//\\ /\ }")
-  [[ ${#COMPREPLY[*]} -gt 1 ]] && COMPREPLY=("${COMPREPLY[@]#*	}") # show visual part (all after tab)
-  [[ ${#COMPREPLY[*]} -gt 1 ]] && [[ "$(printf  "%%c\n" "${COMPREPLY[@]}" | uniq | wc -l)" -eq 1 ]] && COMPREPLY=("${COMPREPLY[@]}" "_ (ignore me)") # prevent insertion if all have same first character (workaround for #164)
-  [[ ${#COMPREPLY[*]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%%	*} ) # show value to insert (all before tab) https://stackoverflow.com/a/10130007
+  
+  [[ ${#COMPREPLY[@]} -gt 1 ]] && for entry in "${COMPREPLY[@]}"; do
+    value="${entry%%	*}"
+    display="${entry#*	}"
+    if [[ "${value::1}" != "${display::1}"  ]]; then # inserted value differs from display value
+       [[ "$(printf  "%%c\n" "${COMPREPLY[@]#*	}" | uniq | wc -l)" -eq 1 ]] && COMPREPLY=("${COMPREPLY[@]}" "_ (ignore me)") # prevent insertion if all have same first character (workaround for #164)
+      break
+    fi
+  done
+
+  [[ ${#COMPREPLY[@]} -gt 1 ]] && COMPREPLY=("${COMPREPLY[@]#*	}") # show visual part (all after tab)
+  [[ ${#COMPREPLY[@]} -eq 1 ]] && COMPREPLY=( ${COMPREPLY[0]%%	*} ) # show value to insert (all before tab) https://stackoverflow.com/a/10130007
   [[ ${COMPREPLY[0]} == *[/=@:.,] ]] && compopt -o nospace
 }
 

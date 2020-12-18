@@ -137,7 +137,7 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 					if len(splitted) == len(parts)+1 {
 						vals = append(vals, splitted[len(parts)], val.Description)
 					} else {
-						vals = append(vals, splitted[len(parts)]+divider, val.Description)
+						vals = append(vals, splitted[len(parts)]+divider, "")
 					}
 				}
 			}

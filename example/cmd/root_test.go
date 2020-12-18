@@ -271,7 +271,7 @@ _example_completions() {
     value="${entry%	*}"
     display="${entry#*	}"
     if [[ "${value::1}" != "${display::1}"  ]]; then # inserted value differs from display value
-       [[ "$(printf  "%c\n" "${COMPREPLY[@]#*	}" | uniq | wc -l)" -eq 1 ]] && COMPREPLY=("${COMPREPLY[@]}" "_ (ignore me)") # prevent insertion if all have same first character (workaround for #164)
+       [[ "$(printf  "%c\n" "${COMPREPLY[@]#*	}" | uniq | wc -l)" -eq 1 ]] && COMPREPLY=("${COMPREPLY[@]}" "") # prevent insertion if all have same first character (workaround for #164)
       break
     fi
   done

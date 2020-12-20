@@ -1,6 +1,6 @@
 # ActionValuesDescribed
 
-[ActionValuesDescribed](https://pkg.go.dev/github.com/rsteube/carapace#ActionValuesDescribed) completes values with a description.
+[`ActionValuesDescribed`](https://pkg.go.dev/github.com/rsteube/carapace#ActionValuesDescribed) completes values with a description.
 
 ```go
 carapace.ActionValuesDescribed(

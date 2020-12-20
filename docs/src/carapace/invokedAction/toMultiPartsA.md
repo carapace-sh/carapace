@@ -1,6 +1,6 @@
 # ToMultiPartsA
 
-[ToMultiPartsA] creates an [ActionMultiParts](../action/actionMultiParts.md) from values containing a specific separator.
+[`ToMultiPartsA`] creates an [ActionMultiParts](../action/actionMultiParts.md) from values containing a specific separator.
 E.g. completing the contents of a zip file (`dir/subdir/file`) by each path segment separately like [ActionFiles](../action/actionFiles.md):
 
 ```go
@@ -20,4 +20,4 @@ func ActionZipFileContents(file string) carapace.Action {
 }
 ```
 
-[ToMultiPartsA]:https://pkg.go.dev/github.com/rsteube/carapace#InvokedAction.ToMultiPartsA
+[`ToMultiPartsA`]:https://pkg.go.dev/github.com/rsteube/carapace#InvokedAction.ToMultiPartsA

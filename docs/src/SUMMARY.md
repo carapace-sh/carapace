@@ -21,6 +21,7 @@
     - [Prefix](./carapace/invokedAction/prefix.md)
     - [Suffix](./carapace/invokedAction/suffix.md)
     - [ToMultiPartsA](./carapace/invokedAction/toMultiPartsA.md)
+  - [Cache](./carapace/cache.md)
   - [Additional Information](./carapace/additionalInformation.md)
 - [caraparse](./caraparse.md)
 - [carapace-bin](./carapace-bin.md)

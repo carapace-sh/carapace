@@ -50,7 +50,7 @@ func ActionFiles(suffix string) string {
 	return `[CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')`
 }
 
-func ActionCandidates(values ...common.Candidate) string {
+func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error

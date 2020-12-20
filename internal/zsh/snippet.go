@@ -98,7 +98,7 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 		}
 		if len(positionals) == 0 {
 			if cmd.ValidArgs != nil {
-				positionals = []string{"    " + snippetPositionalCompletion(1, ActionCandidates(common.CandidateFromValues(cmd.ValidArgs...)...))}
+				positionals = []string{"    " + snippetPositionalCompletion(1, ActionRawValues(common.RawValuesFrom(cmd.ValidArgs...)...))}
 			}
 			positionals = append(positionals, `    "*::arg:->args"`)
 		}

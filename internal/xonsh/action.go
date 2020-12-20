@@ -45,7 +45,7 @@ func ActionFiles(suffix string) string {
 	return `{ RichCompletion(f, display=pathlib.PurePath(f).name, description='', prefix_len=0) for f in complete_path(prefix, line, begidx, endidx, ctx)[0]}`
 }
 
-func ActionCandidates(values ...common.Candidate) string {
+func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		vals[index] = fmt.Sprintf(`  RichCompletion('%v', display='%v', description='%v', prefix_len=0),`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))

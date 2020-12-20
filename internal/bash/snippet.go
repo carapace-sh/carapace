@@ -136,16 +136,16 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 
 	var positionalAction string
 	if cmd.HasAvailableSubCommands() {
-		subcommands := make([]common.Candidate, 0)
+		subcommands := make([]common.RawValue, 0)
 		for _, c := range cmd.Commands() {
 			if !c.Hidden {
-				subcommands = append(subcommands, common.Candidate{Value: c.Name(), Display: c.Name(), Description: c.Short})
+				subcommands = append(subcommands, common.RawValue{Value: c.Name(), Display: c.Name(), Description: c.Short})
 				for _, alias := range c.Aliases {
-					subcommands = append(subcommands, common.Candidate{Value: alias, Display: c.Name(), Description: c.Short})
+					subcommands = append(subcommands, common.RawValue{Value: alias, Display: c.Name(), Description: c.Short})
 				}
 			}
 		}
-		positionalAction = ActionCandidates(subcommands...)
+		positionalAction = ActionRawValues(subcommands...)
 	} else {
 		positionalAction = Callback(cmd.Root().Name(), "_")
 	}
@@ -161,22 +161,20 @@ func snippetFunctions(cmd *cobra.Command, actions map[string]string) string {
 }
 
 func snippetFlagList(flags *pflag.FlagSet) string {
-	flagValues := make([]common.Candidate, 0)
+	flagValues := make([]common.RawValue, 0)
 
 	flags.VisitAll(func(flag *pflag.Flag) {
 		if !flag.Hidden {
 			if !common.IsShorthandOnly(flag) {
-				//flagValues = append(flagValues, "--"+flag.Name)
-				flagValues = append(flagValues, common.Candidate{Value: "--" + flag.Name, Display: "--" + flag.Name, Description: flag.Usage})
+				flagValues = append(flagValues, common.RawValue{Value: "--" + flag.Name, Display: "--" + flag.Name, Description: flag.Usage})
 			}
 			if flag.Shorthand != "" {
-				//flagValues = append(flagValues, "-"+flag.Shorthand)
-				flagValues = append(flagValues, common.Candidate{Value: "-" + flag.Shorthand, Display: "-" + flag.Shorthand, Description: flag.Usage})
+				flagValues = append(flagValues, common.RawValue{Value: "-" + flag.Shorthand, Display: "-" + flag.Shorthand, Description: flag.Usage})
 			}
 		}
 	})
 	if len(flagValues) > 0 {
-		return ActionCandidates(flagValues...) // TODO use candidatas
+		return ActionRawValues(flagValues...)
 	} else {
 		return ""
 	}

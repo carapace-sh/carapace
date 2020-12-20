@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
@@ -29,7 +30,7 @@ func init() {
 	carapace.Gen(callbackCmd).PositionalCompletion(
 		carapace.ActionCallback(func(args []string) carapace.Action {
 			return carapace.ActionValues("callback1", "callback2")
-		}),
+		}).Cache(30*time.Second),
 		carapace.ActionMultiParts("=", func(args []string, parts []string) carapace.Action {
 			switch len(parts) {
 			case 0:

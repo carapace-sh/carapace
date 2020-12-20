@@ -52,7 +52,7 @@ func ActionFiles(pattern string) string {
 	}
 }
 
-func ActionCandidates(values ...common.Candidate) string {
+func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	displays := make([]string, len(values))
 	for index, val := range values {

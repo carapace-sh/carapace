@@ -4,21 +4,25 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"time"
 
 	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
 	"github.com/rsteube/carapace/internal/powershell"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
+	pkgcache "github.com/rsteube/carapace/pkg/cache"
 	"github.com/spf13/cobra"
 )
 
 // Action indicates how to complete a flag or positional argument
 type Action struct {
-	rawValues  []common.Candidate
+	rawValues  []common.RawValue
 	bash       func() string
 	elvish     func() string
 	fish       func() string
@@ -74,6 +78,31 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 	return a
 }
 
+func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
+	if a.callback != nil { // only relevant for callback actions
+		cachedCallback := a.callback
+		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
+		a.callback = func(args []string) Action {
+			if cacheFile, err := cache.File(file, line, keys...); err == nil {
+				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
+					return actionRawValues(rawValues...)
+				} else {
+					oldState := skipCache
+					skipCache = false // TODO find a better solution for this
+					invokedAction := (Action{callback: cachedCallback}).Invoke(args)
+					if !skipCache {
+						_ = cache.Write(cacheFile, invokedAction.rawValues)
+					}
+					skipCache = oldState || skipCache
+					return invokedAction.ToA()
+				}
+			}
+			return cachedCallback(args)
+		}
+	}
+	return a
+}
+
 type InvokedAction Action
 
 // Invoke executes the callback of an action if it exists (supports nesting)
@@ -82,18 +111,18 @@ func (a Action) Invoke(args []string) InvokedAction {
 }
 
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
-	uniqueCandidates := make(map[string]common.Candidate)
+	uniqueRawValues := make(map[string]common.RawValue)
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
-			uniqueCandidates[c.Value] = c
+			uniqueRawValues[c.Value] = c
 		}
 	}
 
-	candidates := make([]common.Candidate, 0, len(uniqueCandidates))
-	for _, c := range uniqueCandidates {
-		candidates = append(candidates, c)
+	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
+	for _, c := range uniqueRawValues {
+		rawValues = append(rawValues, c)
 	}
-	return InvokedAction(actionCandidates(candidates...))
+	return InvokedAction(actionRawValues(rawValues...))
 }
 
 func (a InvokedAction) Filter(values []string) InvokedAction {
@@ -101,13 +130,13 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 	for _, v := range values {
 		toremove[v] = true
 	}
-	filtered := make(common.Candidates, 0)
-	for _, candidate := range a.rawValues {
-		if _, ok := toremove[candidate.Value]; !ok {
-			filtered = append(filtered, candidate)
+	filtered := make([]common.RawValue, 0)
+	for _, rawValue := range a.rawValues {
+		if _, ok := toremove[rawValue.Value]; !ok {
+			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction(actionCandidates(filtered...))
+	return InvokedAction(actionRawValues(filtered...))
 }
 
 func (a InvokedAction) Prefix(prefix string) InvokedAction {
@@ -256,29 +285,32 @@ func ActionValues(values ...string) Action {
 
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
-	vals := make([]common.Candidate, len(values)/2)
+	vals := make([]common.RawValue, len(values)/2)
 	for index, val := range values {
 		if index%2 == 0 {
-			vals[index/2] = common.Candidate{Value: val, Display: val, Description: values[index+1]}
+			vals[index/2] = common.RawValue{Value: val, Display: val, Description: values[index+1]}
 		}
 	}
-	return actionCandidates(vals...)
+	return actionRawValues(vals...)
 }
 
-func actionCandidates(candidates ...common.Candidate) Action {
+func actionRawValues(rawValues ...common.RawValue) Action {
 	return Action{
-		rawValues:  candidates,
-		bash:       func() string { return bash.ActionCandidates(candidates...) },
-		elvish:     func() string { return elvish.ActionCandidates(candidates...) },
-		fish:       func() string { return fish.ActionCandidates(candidates...) },
-		powershell: func() string { return powershell.ActionCandidates(candidates...) },
-		xonsh:      func() string { return xonsh.ActionCandidates(candidates...) },
-		zsh:        func() string { return zsh.ActionCandidates(candidates...) },
+		rawValues:  rawValues,
+		bash:       func() string { return bash.ActionRawValues(rawValues...) },
+		elvish:     func() string { return elvish.ActionRawValues(rawValues...) },
+		fish:       func() string { return fish.ActionRawValues(rawValues...) },
+		powershell: func() string { return powershell.ActionRawValues(rawValues...) },
+		xonsh:      func() string { return xonsh.ActionRawValues(rawValues...) },
+		zsh:        func() string { return zsh.ActionRawValues(rawValues...) },
 	}
 }
+
+var skipCache bool
 
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
+	skipCache = true // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
 	return ActionValuesDescribed("_", "", "ERR", msg)
 }
 

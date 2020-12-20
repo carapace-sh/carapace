@@ -44,7 +44,7 @@ func ActionFiles(suffix string) string {
 	return fmt.Sprintf(`compgen -S / -d -- "$cur"; compgen -f -X '!*%v' -- "$cur"`, suffix)
 }
 
-func ActionCandidates(values ...common.Candidate) string {
+func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		formattedVal := strings.Replace(sanitizer.Replace(val.Value), " ", `\ `, -1)

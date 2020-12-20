@@ -38,7 +38,7 @@ func ActionFiles(suffix string) string {
 	return fmt.Sprintf(`__fish_complete_suffix "%v"`, suffix)
 }
 
-func ActionCandidates(values ...common.Candidate) string {
+func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		// TODO sanitize

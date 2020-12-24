@@ -44,7 +44,7 @@ jobs:
       - run_tests
   doc:
     docker:
-      - image: cimg/go:1.15
+      - image: rsteube/carapace
     steps:
       - checkout
       - run:

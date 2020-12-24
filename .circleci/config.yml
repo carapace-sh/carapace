@@ -13,26 +13,19 @@ commands:
             cd example
             go build .
       - run:
-          name: "install shellcheck"
-          command: |
-            scversion="stable" # or "v0.4.7", or "latest"
-            wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv shellcheck-stable/shellcheck
-            mv shellcheck-stable/shellcheck .
-            chmod +x shellcheck
-      - run:
           name: "shellcheck bash"
-          command: ./shellcheck -e SC2046,SC2206,SC2207 <(./example/example _carapace bash)
+          command: shellcheck -e SC2046,SC2206,SC2207 <(./example/example _carapace bash)
       - run:
           name: "shellcheck fish"
-          command: ./shellcheck -e SC1064,SC1072,SC1073 <(./example/example _carapace fish)
+          command: shellcheck -e SC1064,SC1072,SC1073 <(./example/example _carapace fish)
       - run:
           name: "shellcheck zsh"
-          command: ./shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
+          command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
 
 jobs:
   go-current:
     docker:
-      - image: cimg/go:1.15
+      - image: rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
@@ -43,7 +36,7 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   go-previous:
     docker:
-      - image: cimg/go:1.14
+      - image: rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
@@ -55,16 +48,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "install mdbook"
-          command: curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook-v0.4.4-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook
-      - run:
-          name: "install mdbook-linkcheck"
-          command: curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck
-      - run:
           name: "build docs"
           command: |
             sed -i 's/\[output.linkcheck\]/#[output.linkcheck]/' docs/book.toml
-            PATH=$PATH:$(pwd) mdbook build docs
+            mdbook build docs
       - run:
           name: "push gh-pages"
           command: |

@@ -3,6 +3,7 @@ version: '3'
 services:
   build: &base
     build: .
+    image: rsteube/carapace
     command: sh -c 'cd /carapace/example && go build .'
     volumes:
       - '.:/carapace/'

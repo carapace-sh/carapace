@@ -2,60 +2,45 @@ version: '3'
 
 services:
   build: &base
-    image: golang
+    build: .
     command: sh -c 'cd /carapace/example && go build .'
     volumes:
       - '.:/carapace/'
-      - 'go:/go/'
+      - 'go:/home/circleci/go/'
 
   bash:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.bash
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: bash
 
   elvish:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.elvish
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: elvish
 
   fish:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.fish
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: fish
   
   oil:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.oil
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: osh
 
   powershell:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.powershell
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: pwsh
   
-  xonsh:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.xonsh
-    volumes:
-      - '.:/carapace/'
+  xonsh: 
+    <<: *base
+    command: xonsh
 
   zsh:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.zsh
-    volumes:
-      - '.:/carapace/'
+    <<: *base
+    command: zsh
+
+  test:
+    <<: *base
+    working_dir: /carapace
+    command: go test -v ./...
+
 
 volumes:
   go:

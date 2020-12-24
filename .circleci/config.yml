@@ -22,7 +22,7 @@ commands:
           name: "PSScriptAnayzer powershell"
           command: |
             example _carapace powershell > /tmp/powershell.ps1
-            #Invoke-ScriptAnalyzer -Path /tmp/powershell.ps1
+            pwsh -Command "Invoke-ScriptAnalyzer -Path /tmp/powershell.ps1" -EnableExit
       - run:
           name: "shellcheck zsh"
           command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
@@ -39,14 +39,6 @@ jobs:
       - run:
           name: "Check formatting"
           command: diff -u <(echo -n) <(gofmt -d -s .)
-  go-previous:
-    docker:
-      - image: rsteube/carapace
-        environment:
-          GO111MODULE: "on"
-    steps:
-      - checkout
-      - run_tests
   doc:
     docker:
       - image: rsteube/carapace
@@ -79,7 +71,6 @@ workflows:
   main:
     jobs:
       - go-current
-      - go-previous
       - doc:
           filters:
             branches:

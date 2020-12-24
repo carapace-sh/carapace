@@ -46,6 +46,8 @@ RUN apt-get update \
 RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh \
  && ln -s $(which xonsh) /usr/bin/xonsh
 
+RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
+
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/

@@ -19,6 +19,11 @@ commands:
           name: "shellcheck fish"
           command: shellcheck -e SC1064,SC1072,SC1073 <(./example/example _carapace fish)
       - run:
+          name: "PSScriptAnayzer powershell"
+          command: |
+            example _carapace powershell > /tmp/powershell.ps1
+            #Invoke-ScriptAnalyzer -Path /tmp/powershell.ps1
+      - run:
           name: "shellcheck zsh"
           command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
 

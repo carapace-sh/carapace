@@ -1,0 +1,3 @@
+#!/usr/bin/fish
+example _carapace fish|source
+complete --do-complete="$argv"

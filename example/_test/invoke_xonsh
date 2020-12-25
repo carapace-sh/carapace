@@ -1,0 +1,11 @@
+#!/usr/bin/expect
+set timeout 10
+set CMDLINE [lindex $argv 0]
+log_user 0
+spawn xonsh -i
+send "exec(\$(example _carapace xonsh)); echo EXPECT_START; _example_completer('', '$CMDLINE ' , 0, len('$CMDLINE'), ''); echo EXPECT_END"
+send "\r"
+expect -re "EXPECT_START\r\n(.*?)EXPECT_END"
+puts "$expect_out(1,string)"
+send "exit\r"
+expect eof

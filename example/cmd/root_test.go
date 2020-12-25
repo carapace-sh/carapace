@@ -557,36 +557,37 @@ func TestPowershell(t *testing.T) {
 	expected := `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 $_example_completer = {
-    param($wordToComplete, $commandAst, $cursorPosition)
+    param($wordToComplete, $commandAst) #, $cursorPosition)
     $commandElements = $commandAst.CommandElements
     $previous = $commandElements[-1].Value
     if ($wordToComplete) {
         $previous = $commandElements[-2].Value
     }
 
-    $state = example _carapace powershell state $($commandElements| Foreach {$_.Value})
-    
+    $state = example _carapace powershell state $($commandElements| ForEach-Object {$_.Value})
+
     Function _example_callback {
+      [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
       param($uid)
       if (!$wordToComplete) {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) '""' | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| ForEach-Object {$_.Value}) '""' | Out-String | Invoke-Expression
       } else {
-        example _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) | Out-String | Invoke-Expression
+        example _carapace powershell "$uid" $($commandElements| ForEach-Object {$_.Value}) | Out-String | Invoke-Expression
       }
     }
-    
+
     $completions = @(switch ($state) {
         '_example' {
             switch -regex ($previous) {
                 '^(-a|--array)$' {
-                         
+
                         break
                       }
                 default {
                     switch -regex ($wordToComplete) {
                 '^(-p=*|--persistentFlag=*)$' {
                         @(
-                        
+
                         ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
                         break
                       }
@@ -618,15 +619,15 @@ $_example_completer = {
         '_example__action' {
             switch -regex ($previous) {
                 '^(--directories)$' {
-                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '') 
+                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')
                         break
                       }
                 '^(-f|--files)$' {
-                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '') 
+                        [CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')
                         break
                       }
                 '^(-g|--groups)$' {
-                        _example_callback '_example__action##groups' 
+                        _example_callback '_example__action##groups'
                         break
                       }
                 '^(-k|--kill)$' {
@@ -660,34 +661,34 @@ $_example_completer = {
                         [CompletionResult]::new('VTALRM', 'VTALRM ', [CompletionResultType]::ParameterValue, 'Virtual alarm clock ')
                         [CompletionResult]::new('WINCH', 'WINCH ', [CompletionResultType]::ParameterValue, 'Window size change ')
                         [CompletionResult]::new('XCPU', 'XCPU ', [CompletionResultType]::ParameterValue, 'CPU time limit exceeded ')
-                        [CompletionResult]::new('XFSZ', 'XFSZ ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ') 
+                        [CompletionResult]::new('XFSZ', 'XFSZ ', [CompletionResultType]::ParameterValue, 'File size limit exceeded ')
                         break
                       }
                 '^(-m|--message)$' {
                         [CompletionResult]::new('_', '_ ', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('ERR', 'ERR ', [CompletionResultType]::ParameterValue, 'message example ') 
+                        [CompletionResult]::new('ERR', 'ERR ', [CompletionResultType]::ParameterValue, 'message example ')
                         break
                       }
                 '^(-n|--net_interfaces)$' {
-                        _example_callback '_example__action##net_interfaces' 
+                        _example_callback '_example__action##net_interfaces'
                         break
                       }
                 '^(--usergroup)$' {
-                        _example_callback '_example__action##usergroup' 
+                        _example_callback '_example__action##usergroup'
                         break
                       }
                 '^(-u|--users)$' {
-                        _example_callback '_example__action##users' 
+                        _example_callback '_example__action##users'
                         break
                       }
                 '^(-v|--values)$' {
                         [CompletionResult]::new('values', 'values ', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('example', 'example ', [CompletionResultType]::ParameterValue, ' ') 
+                        [CompletionResult]::new('example', 'example ', [CompletionResultType]::ParameterValue, ' ')
                         break
                       }
                 '^(-d|--values_described)$' {
                         [CompletionResult]::new('values', 'values ', [CompletionResultType]::ParameterValue, 'valueDescription ')
-                        [CompletionResult]::new('example', 'example ', [CompletionResultType]::ParameterValue, 'exampleDescription ') 
+                        [CompletionResult]::new('example', 'example ', [CompletionResultType]::ParameterValue, 'exampleDescription ')
                         break
                       }
                 default {
@@ -738,7 +739,7 @@ $_example_completer = {
         '_example__callback' {
             switch -regex ($previous) {
                 '^(-c|--callback)$' {
-                        _example_callback '_example__callback##callback' 
+                        _example_callback '_example__callback##callback'
                         break
                       }
                 default {
@@ -764,7 +765,7 @@ $_example_completer = {
             switch -regex ($previous) {
                 '^(-r|--required)$' {
                         [CompletionResult]::new('valid', 'valid ', [CompletionResultType]::ParameterValue, ' ')
-                        [CompletionResult]::new('invalid', 'invalid ', [CompletionResultType]::ParameterValue, ' ') 
+                        [CompletionResult]::new('invalid', 'invalid ', [CompletionResultType]::ParameterValue, ' ')
                         break
                       }
                 default {
@@ -829,35 +830,35 @@ $_example_completer = {
         '_example__multiparts' {
             switch -regex ($previous) {
                 '^(--at)$' {
-                        _example_callback '_example__multiparts##at' 
+                        _example_callback '_example__multiparts##at'
                         break
                       }
                 '^(--colon)$' {
-                        _example_callback '_example__multiparts##colon' 
+                        _example_callback '_example__multiparts##colon'
                         break
                       }
                 '^(--comma)$' {
-                        _example_callback '_example__multiparts##comma' 
+                        _example_callback '_example__multiparts##comma'
                         break
                       }
                 '^(--dot)$' {
-                        _example_callback '_example__multiparts##dot' 
+                        _example_callback '_example__multiparts##dot'
                         break
                       }
                 '^(--dotdotdot)$' {
-                        _example_callback '_example__multiparts##dotdotdot' 
+                        _example_callback '_example__multiparts##dotdotdot'
                         break
                       }
                 '^(--equals)$' {
-                        _example_callback '_example__multiparts##equals' 
+                        _example_callback '_example__multiparts##equals'
                         break
                       }
                 '^(--none)$' {
-                        _example_callback '_example__multiparts##none' 
+                        _example_callback '_example__multiparts##none'
                         break
                       }
                 '^(--slash)$' {
-                        _example_callback '_example__multiparts##slash' 
+                        _example_callback '_example__multiparts##slash'
                         break
                       }
                 default {

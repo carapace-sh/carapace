@@ -40,24 +40,25 @@ func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
 var powerShellCompletionTemplate = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 $_%v_completer = {
-    param($wordToComplete, $commandAst, $cursorPosition)
+    param($wordToComplete, $commandAst) #, $cursorPosition)
     $commandElements = $commandAst.CommandElements
     $previous = $commandElements[-1].Value
     if ($wordToComplete) {
         $previous = $commandElements[-2].Value
     }
 
-    $state = %v _carapace powershell state $($commandElements| Foreach {$_.Value})
-    
+    $state = %v _carapace powershell state $($commandElements| ForEach-Object {$_.Value})
+
     Function _%v_callback {
+      [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
       param($uid)
       if (!$wordToComplete) {
-        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) '""' | Out-String | Invoke-Expression
+        %v _carapace powershell "$uid" $($commandElements| ForEach-Object {$_.Value}) '""' | Out-String | Invoke-Expression
       } else {
-        %v _carapace powershell "$uid" $($commandElements| Foreach {$_.Value}) | Out-String | Invoke-Expression
+        %v _carapace powershell "$uid" $($commandElements| ForEach-Object {$_.Value}) | Out-String | Invoke-Expression
       }
     }
-    
+
     $completions = @(switch ($state) {%s
     })
 
@@ -124,20 +125,22 @@ func snippetFlagActions(cmd *cobra.Command, actions map[string]string, optArgFla
 		}
 		var action = ""
 		if a, ok := actions[uid.Flag(cmd, flag)]; ok { // TODO cleanup
-			action = a
+			if strings.TrimSpace(a) != "" {
+				action = "                        " + a // TODO do the indenting below
+			}
 		}
 		if flag.NoOptDefVal != "" {
 			// add flag prefix to each CompletionResult
 			flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
                         @(
-                        %v
+%v
                         ) | ForEach-Object{ [CompletionResult]::new($wordToComplete.split("=")[0] + "=" + $_.CompletionText, $_.ListItemText, $_.ResultType, $_.ToolTip) }
                         break
                       }`, match, strings.Replace(action, "\n", "\n                        ", -1)))
 
 		} else {
 			flagActions = append(flagActions, fmt.Sprintf(`                '%v' {
-                        %v 
+%v
                         break
                       }`, match, strings.Replace(action, "\n", "\n                        ", -1)))
 		}

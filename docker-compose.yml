@@ -21,6 +21,14 @@ services:
     <<: *base
     command: fish
   
+  ion:
+    <<: *base
+    command: ion
+  
+  nu:
+    <<: *base
+    command: nu
+  
   oil:
     <<: *base
     command: osh

@@ -10,6 +10,17 @@ FROM base as elvish
 RUN curl https://dl.elv.sh/linux-amd64/elvish-HEAD.tar.gz | tar -xvz \
  && mv elvish-* /usr/local/bin/elvish
 
+FROM rust as ion
+RUN git clone https://gitlab.redox-os.org/redox-os/ion/ \
+ && cd ion \
+ && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
+ && sudo make install prefix=/usr \
+ && sudo make update-shells prefix=/usr
+
+FROM base as nu
+RUN curl -L https://github.com/nushell/nushell/releases/download/0.24.1/nu_0_24_1_linux.tar.gz | tar -xvz \
+ && mv nu_0_24_1_linux/nushell-0.24.1/nu* /usr/local/bin
+
 FROM base as oil
 RUN curl https://www.oilshell.org/download/oil-0.8.5.tar.gz | tar -xvz \
  && cd oil-*/ \
@@ -30,7 +41,8 @@ RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook
 
 FROM base
 RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
- && dpkg -i packages-microsoft-prod.deb
+ && dpkg -i packages-microsoft-prod.deb \
+ && rm packages-microsoft-prod.deb
 
 RUN add-apt-repository universe
 
@@ -50,6 +62,8 @@ RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
+COPY --from=ion /ion/target/release/ion /usr/local/bin/
+COPY --from=nu /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/
@@ -58,7 +72,7 @@ RUN ln -s /carapace/example/example /usr/local/bin/example
 
 # bash
 RUN echo -e "\n\
-PS1=$'\e[0;36mcarapace \e[0m'\n\
+PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
 source /usr/share/bash-completion/bash_completion \n\
 source <(example _carapace)" \
        > ~/.bashrc
@@ -68,7 +82,7 @@ RUN mkdir -p ~/.config/fish \
  && echo -e "\n\
 function fish_prompt \n\
     set_color cyan \n\
-    echo -n 'carapace ' \n\
+    echo -n 'carapace-fish ' \n\
     set_color normal\n\
 end\n\
 mkdir -p ~/.config/fish/completions\n\
@@ -78,13 +92,22 @@ example _carapace fish | source" \
 # elvish
 RUN mkdir -p ~/.elvish/lib \
  && echo -e "\
+edit:prompt = { printf  'carapace-elvish ' } \n\
 eval (example _carapace|slurp)" \
   > ~/.elvish/rc.elv
+
+# ion
+RUN mkdir -p ~/.config/ion \
+ && echo -e "\
+fn PROMPT\n\
+    printf 'carapace-ion '\n\
+end" \
+  > ~/.config/ion/initrc
 
 # oil
 RUN mkdir -p ~/.config/oil \
  && echo -e "\n\
-PS1=$'\e[0;36mcarapace \e[0m'\n\
+PS1=$'\e[0;36mcarapace-oil \e[0m'\n\
 source <(sed 's/let \"OPTIND += 1\"/(( OPTIND += 1 ))/' /usr/share/bash-completion/bash_completion)\n\
 source <(example _carapace)" \
        > ~/.config/oil/oshrc
@@ -92,7 +115,7 @@ source <(example _carapace)" \
 # powershell
 RUN mkdir -p ~/.config/powershell \
  && echo -e "\n\
-function prompt {Write-Host \"carapace\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
+function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
 example _carapace | out-string | Invoke-Expression" \
        > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
@@ -100,13 +123,14 @@ example _carapace | out-string | Invoke-Expression" \
 # xonsh
 RUN mkdir -p ~/.config/xonsh \
  && echo -e "\n\
+\$PROMPT='carapace-xonsh '\n\
 \$COMPLETIONS_CONFIRM=True\n\
 exec(\$(example _carapace xonsh))"\
   > ~/.config/xonsh/rc.xsh
 
 # zsh
 RUN echo -e "\n\
-PS1=$'%{\e[0;36m%}carapace %{\e[0m%}'\n\
+PS1=$'%{\e[0;36m%}carapace-zsh %{\e[0m%}'\n\
 \n\
 zstyle ':completion:*' menu select \n\
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\

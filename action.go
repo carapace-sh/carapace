@@ -13,11 +13,13 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
+	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // Action indicates how to complete a flag or positional argument
@@ -26,6 +28,7 @@ type Action struct {
 	bash       func() string
 	elvish     func() string
 	fish       func() string
+	oil        func() string
 	powershell func() string
 	xonsh      func() string
 	zsh        func() string
@@ -64,6 +67,9 @@ func (a Action) finalize(cmd *cobra.Command, uid string) Action {
 		}
 		if a.fish == nil {
 			a.fish = func() string { return fish.Callback(cmd.Root().Name(), uid) }
+		}
+		if a.oil == nil {
+			a.oil = func() string { return oil.Callback(cmd.Root().Name(), uid) }
 		}
 		if a.powershell == nil {
 			a.powershell = func() string { return powershell.Callback(cmd.Root().Name(), uid) }
@@ -198,6 +204,8 @@ func (a Action) Value(shell string) string {
 		f = a.fish
 	case "elvish":
 		f = a.elvish
+	case "oil":
+		f = a.oil
 	case "powershell":
 		f = a.powershell
 	case "xonsh":
@@ -230,6 +238,7 @@ func ActionDirectories() Action {
 		bash:       func() string { return bash.ActionDirectories() },
 		elvish:     func() string { return elvish.ActionDirectories() },
 		fish:       func() string { return fish.ActionDirectories() },
+		oil:        func() string { return oil.ActionDirectories() },
 		powershell: func() string { return powershell.ActionDirectories() },
 		xonsh:      func() string { return xonsh.ActionDirectories() },
 		zsh:        func() string { return zsh.ActionDirectories() },
@@ -243,6 +252,7 @@ func ActionFiles(suffix string) Action {
 		bash:       func() string { return bash.ActionFiles(suffix) },
 		elvish:     func() string { return elvish.ActionFiles(suffix) },
 		fish:       func() string { return fish.ActionFiles(suffix) },
+		oil:        func() string { return oil.ActionFiles(suffix) },
 		powershell: func() string { return powershell.ActionFiles(suffix) },
 		xonsh:      func() string { return xonsh.ActionFiles(suffix) },
 		zsh:        func() string { return zsh.ActionFiles("*" + suffix) },
@@ -300,6 +310,7 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 		bash:       func() string { return bash.ActionRawValues(rawValues...) },
 		elvish:     func() string { return elvish.ActionRawValues(rawValues...) },
 		fish:       func() string { return fish.ActionRawValues(rawValues...) },
+		oil:        func() string { return oil.ActionRawValues(rawValues...) },
 		powershell: func() string { return powershell.ActionRawValues(rawValues...) },
 		xonsh:      func() string { return xonsh.ActionRawValues(rawValues...) },
 		zsh:        func() string { return zsh.ActionRawValues(rawValues...) },
@@ -335,4 +346,31 @@ func ActionMultiParts(divider string, callback func(args []string, parts []strin
 
 		return callback(args, parts).Invoke(args).Prefix(prefix).ToA()
 	})
+}
+
+func actionSubcommands(cmd *cobra.Command) Action {
+	vals := make([]string, 0)
+	for _, subcommand := range cmd.Commands() {
+		if !subcommand.Hidden {
+			vals = append(vals, subcommand.Name(), subcommand.Short)
+			for _, alias := range subcommand.Aliases {
+				vals = append(vals, alias, subcommand.Short)
+			}
+		}
+	}
+	return ActionValuesDescribed(vals...)
+}
+
+func actionFlags(cmd *cobra.Command) Action {
+	vals := make([]string, 0)
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		if !common.IsShorthandOnly(f) {
+			vals = append(vals, "--"+f.Name, f.Usage)
+		}
+		if f.Shorthand != "" {
+			vals = append(vals, "-"+f.Shorthand, f.Usage)
+		}
+	})
+
+	return ActionValuesDescribed(vals...)
 }

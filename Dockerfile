@@ -42,9 +42,8 @@ RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook
 FROM base
 RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
  && dpkg -i packages-microsoft-prod.deb \
- && rm packages-microsoft-prod.deb
-
-RUN add-apt-repository universe
+ && rm packages-microsoft-prod.deb \
+ && add-apt-repository universe
 
 RUN apt-get update \
  && apt-get install -y bash-completion \ 
@@ -107,8 +106,7 @@ end" \
 # oil
 RUN mkdir -p ~/.config/oil \
  && echo -e "\n\
-PS1=$'\e[0;36mcarapace-oil \e[0m'\n\
-source <(sed 's/let \"OPTIND += 1\"/(( OPTIND += 1 ))/' /usr/share/bash-completion/bash_completion)\n\
+PS1='carapace-oil '\n\
 source <(example _carapace)" \
        > ~/.config/oil/oshrc
 

@@ -15,11 +15,13 @@ import (
 	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
+	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var actionMap ActionMap = make(ActionMap)
@@ -78,7 +80,7 @@ func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
 	case "fish":
 		snippet = fish.Snippet
 	case "oil":
-		snippet = bash.Snippet
+		snippet = oil.Snippet
 	case "powershell":
 		snippet = powershell.Snippet
 	case "xonsh":
@@ -89,6 +91,17 @@ func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
 		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
 	return snippet(c.cmd.Root(), actionMap.shell(shell), lazy), nil
+}
+
+func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
+	nameOrShorthand := strings.TrimLeft(strings.SplitN(arg, "=", 2)[0], "-")
+
+	if strings.HasPrefix(arg, "--") {
+		flag = cmd.LocalFlags().Lookup(nameOrShorthand)
+	} else if strings.HasPrefix(arg, "-") {
+		flag = cmd.LocalFlags().ShorthandLookup(nameOrShorthand)
+	}
+	return
 }
 
 func addCompletionCommand(cmd *cobra.Command) {
@@ -131,19 +144,42 @@ func addCompletionCommand(cmd *cobra.Command) {
 
 					switch id {
 					case "_":
-						if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
-							CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
-							if action.callback == nil {
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Value(shell))
-							} else {
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(targetArgs).nestedAction(targetArgs, 2).Value(shell))
+						current := os.Args[len(os.Args)-1]
+						previous := os.Args[len(os.Args)-2]
+						if strings.HasPrefix(current, "-") { // assume flag
+							if strings.Contains(current, "=") { // complate value for optarg flag
+								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
+									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
+										CallbackValue = current // TODO verify
+										// TODO no value for oil (elvish works)
+										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
+									}
+								}
+							} else { // complete flagnames
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionFlags(targetCmd).Value(shell))
+							}
+						} else if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" {
+							if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
+								CallbackValue = current // TODO verify
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
+							}
+						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
+							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionSubcommands(targetCmd).Value(shell))
+						} else {
+							if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
+								CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
+								if action.callback == nil {
+									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Value(shell))
+								} else {
+									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(targetArgs).Invoke(targetArgs).ToA().Value(shell))
+								}
 							}
 						}
 					case "state":
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
 					default:
 						CallbackValue = uid.Value(targetCmd, targetArgs, id)
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, targetArgs).nestedAction(targetArgs, 2).Value(shell))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, targetArgs).Invoke(targetArgs).ToA().Value(shell))
 					}
 				}
 			}
@@ -205,6 +241,8 @@ func determineShell() string {
 			return "elvish"
 		case "fish":
 			return "fish"
+		case "oil":
+			return "oil"
 		case "osh":
 			return "oil"
 		case "powershell.exe":

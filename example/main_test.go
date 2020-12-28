@@ -19,6 +19,8 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 			cmd = exec.Command("./_test/invoke_elvish", cmdline)
 		case "fish":
 			cmd = exec.Command("./_test/invoke_fish", cmdline)
+		case "oil":
+			cmd = exec.Command("./_test/invoke_oil", cmdline)
 		case "powershell":
 			cmd = exec.Command("./_test/invoke_powershell", strings.Replace(cmdline, ",", "`,", -1))
 		case "xonsh":
@@ -93,6 +95,15 @@ func TestXonsh(t *testing.T) {
 	}
 	for cmdline, text := range tests {
 		doComplete(t, "xonsh", cmdline, text)
+	}
+}
+
+func TestOil(t *testing.T) {
+	if err := exec.Command("oil", "--version").Run(); err != nil {
+		t.Skip("skipping oil")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "oil", cmdline, text)
 	}
 }
 

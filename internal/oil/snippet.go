@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string, lazy bool) string {
+func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	result := fmt.Sprintf(`#!/bin/osh
 _%v_completion() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"

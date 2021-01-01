@@ -6,5 +6,5 @@ COMP_POINT=${#1}
 COMP_WORDS=($COMP_LINE'')
 COMP_CWORD=$((${#COMP_WORDS[@]}-1))
 
-_example_completions
+_example_completion
 ( IFS=$'\n'; echo "${COMPREPLY[*]}" )

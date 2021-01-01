@@ -38,18 +38,6 @@ func EscapeSpace(value string) string {
 	return strings.Replace(value, " ", "` ", -1)
 }
 
-func Callback(prefix string, uid string) string {
-	return fmt.Sprintf("_%v_callback '%v'", prefix, uid)
-}
-
-func ActionDirectories() string {
-	return `[CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')`
-}
-
-func ActionFiles(suffix string) string {
-	return `[CompletionResult]::new('', '', [CompletionResultType]::ParameterValue, '')`
-}
-
 func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {

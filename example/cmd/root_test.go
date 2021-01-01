@@ -13,7 +13,7 @@ func testScript(t *testing.T, shell string, file string) {
 		t.Fatal("failed to read fixture file")
 	} else {
 		rootCmd.InitDefaultHelpCmd()
-		s, _ := carapace.Gen(rootCmd).Snippet(shell, false)
+		s, _ := carapace.Gen(rootCmd).Snippet(shell)
 		assert.Equal(t, string(content), s+"\n")
 	}
 }

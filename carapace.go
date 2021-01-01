@@ -1,4 +1,4 @@
-// Pacakge carapace provides multi-shell completion script generation for spf13/cobra
+// Package carapace provides multi-shell completion script generation for spf13/cobra
 package carapace
 
 import (
@@ -39,12 +39,12 @@ func Gen(cmd *cobra.Command) *Carapace {
 
 func (c Carapace) PositionalCompletion(action ...Action) {
 	for index, a := range action {
-		actionMap[uid.Positional(c.cmd, index+1)] = a.finalize(c.cmd, uid.Positional(c.cmd, index+1))
+		actionMap[uid.Positional(c.cmd, index+1)] = a
 	}
 }
 
 func (c Carapace) PositionalAnyCompletion(action Action) {
-	actionMap[uid.Positional(c.cmd, 0)] = action.finalize(c.cmd, uid.Positional(c.cmd, 0))
+	actionMap[uid.Positional(c.cmd, 0)] = action
 }
 
 func (c Carapace) FlagCompletion(actions ActionMap) {
@@ -52,7 +52,7 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 		if flag := c.cmd.LocalFlags().Lookup(name); flag == nil {
 			fmt.Fprintf(os.Stderr, "unknown flag: %v\n", name)
 		} else {
-			actionMap[uid.Flag(c.cmd, flag)] = action.finalize(c.cmd, uid.Flag(c.cmd, flag))
+			actionMap[uid.Flag(c.cmd, flag)] = action
 		}
 	}
 }
@@ -66,8 +66,8 @@ func (c Carapace) Standalone() {
 	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
-func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
-	var snippet func(cmd *cobra.Command, actions map[string]string, lazy bool) string
+func (c Carapace) Snippet(shell string) (string, error) {
+	var snippet func(cmd *cobra.Command, actions map[string]string) string
 
 	if shell == "" {
 		shell = determineShell()
@@ -90,7 +90,7 @@ func (c Carapace) Snippet(shell string, lazy bool) (string, error) {
 	default:
 		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
-	return snippet(c.cmd.Root(), actionMap.shell(shell), lazy), nil
+	return snippet(c.cmd.Root(), actionMap.shell(shell)), nil
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
@@ -117,7 +117,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			logger.Println(os.Args) // TODO replace last with '' if empty
 
 			if len(args) == 0 {
-				if s, err := Gen(cmd).Snippet(determineShell(), true); err != nil {
+				if s, err := Gen(cmd).Snippet(determineShell()); err != nil {
 					fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
 				} else {
 					fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
@@ -130,7 +130,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
 					default:
-						if s, err := Gen(cmd).Snippet(args[0], false); err != nil {
+						if s, err := Gen(cmd).Snippet(args[0]); err != nil {
 							fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
 						} else {
 							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
@@ -147,12 +147,12 @@ func addCompletionCommand(cmd *cobra.Command) {
 						current := os.Args[len(os.Args)-1]
 						previous := os.Args[len(os.Args)-2]
 						if strings.HasPrefix(current, "-") { // assume flag
-							if strings.Contains(current, "=") { // complate value for optarg flag
+							if strings.Contains(current, "=") { // complete value for optarg flag
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
 										CallbackValue = current // TODO verify
 										// TODO no value for oil (elvish works)
-										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
+										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).Prefix(strings.SplitN(current, "=", 2)[0]+"=").ToA().Value(shell))
 									}
 								}
 							} else { // complete flagnames
@@ -164,7 +164,12 @@ func addCompletionCommand(cmd *cobra.Command) {
 								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
 							}
 						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
-							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionSubcommands(targetCmd).Value(shell))
+							CallbackValue = current // TODO verify (now set multiple times, isn't this always current anyway?)
+							subcommandA := actionSubcommands(targetCmd)
+							if _, a, ok := findAction(targetCmd, targetArgs); ok {
+								subcommandA = a.Invoke(targetArgs).Merge(subcommandA.Invoke(targetArgs)).ToA()
+							}
+							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), subcommandA.Value(shell))
 						} else {
 							if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
 								CallbackValue = uid.Value(targetCmd, targetArgs, _uid)

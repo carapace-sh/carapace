@@ -56,34 +56,6 @@ func (a ActionMap) shell(shell string) map[string]string {
 
 type CompletionCallback func(args []string) Action
 
-// finalize replaces value if a callback function is set
-func (a Action) finalize(cmd *cobra.Command, uid string) Action {
-	if a.callback != nil {
-		if a.bash == nil {
-			a.bash = func() string { return bash.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.elvish == nil {
-			a.elvish = func() string { return elvish.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.fish == nil {
-			a.fish = func() string { return fish.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.oil == nil {
-			a.oil = func() string { return oil.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.powershell == nil {
-			a.powershell = func() string { return powershell.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.xonsh == nil {
-			a.xonsh = func() string { return xonsh.Callback(cmd.Root().Name(), uid) }
-		}
-		if a.zsh == nil {
-			a.zsh = func() string { return zsh.Callback(cmd.Root().Name(), uid) }
-		}
-	}
-	return a
-}
-
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
@@ -234,30 +206,16 @@ func ActionBool() Action {
 
 // ActionDirectories completes directories
 func ActionDirectories() Action {
-	return Action{
-		bash:       func() string { return bash.ActionDirectories() },
-		elvish:     func() string { return elvish.ActionDirectories() },
-		fish:       func() string { return fish.ActionDirectories() },
-		oil:        func() string { return oil.ActionDirectories() },
-		powershell: func() string { return powershell.ActionDirectories() },
-		xonsh:      func() string { return xonsh.ActionDirectories() },
-		zsh:        func() string { return zsh.ActionDirectories() },
-		callback:   func(args []string) Action { return actionPath("", true) },
-	}
+	return ActionCallback(func(args []string) Action {
+		return actionPath("", true).Invoke(args).ToMultiPartsA("/")
+	})
 }
 
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix string) Action {
-	return Action{
-		bash:       func() string { return bash.ActionFiles(suffix) },
-		elvish:     func() string { return elvish.ActionFiles(suffix) },
-		fish:       func() string { return fish.ActionFiles(suffix) },
-		oil:        func() string { return oil.ActionFiles(suffix) },
-		powershell: func() string { return powershell.ActionFiles(suffix) },
-		xonsh:      func() string { return xonsh.ActionFiles(suffix) },
-		zsh:        func() string { return zsh.ActionFiles("*" + suffix) },
-		callback:   func(args []string) Action { return actionPath(suffix, false) },
-	}
+	return ActionCallback(func(args []string) Action {
+		return actionPath(suffix, false).Invoke(args).ToMultiPartsA("/")
+	})
 }
 
 func actionPath(fileSuffix string, dirOnly bool) Action {
@@ -331,6 +289,9 @@ var CallbackValue string
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
 func ActionMultiParts(divider string, callback func(args []string, parts []string) Action) Action {
 	return ActionCallback(func(args []string) Action {
+		oldValue := CallbackValue
+		defer func() { CallbackValue = oldValue }() // TODO verify this
+
 		index := strings.LastIndex(CallbackValue, string(divider))
 		prefix := ""
 		if len(divider) == 0 {

@@ -2,6 +2,7 @@ package xonsh
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -32,23 +33,18 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func Callback(prefix string, uid string) string {
-	return fmt.Sprintf("_%v_callback('%v')", strings.Replace(prefix, "-", "__", -1), uid)
-}
-
-func ActionDirectories() string {
-	return `{ RichCompletion(f, display=pathlib.PurePath(f).name, description='', prefix_len=0) for f in complete_dir(prefix, line, begidx, endidx, ctx, True)[0]}`
-}
-
-// TODO add endswith filter function
-func ActionFiles(suffix string) string {
-	return `{ RichCompletion(f, display=pathlib.PurePath(f).name, description='', prefix_len=0) for f in complete_path(prefix, line, begidx, endidx, ctx)[0]}`
-}
-
 func ActionRawValues(values ...common.RawValue) string {
-	vals := make([]string, len(values))
-	for index, val := range values {
-		vals[index] = fmt.Sprintf(`  RichCompletion('%v', display='%v', description='%v', prefix_len=0),`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+	filtered := make([]common.RawValue, 0)
+
+	for _, r := range values {
+		if strings.HasPrefix(r.Value, os.Args[len(os.Args)-1]) {
+			filtered = append(filtered, r)
+		}
+	}
+
+	vals := make([]string, len(filtered))
+	for index, val := range filtered {
+		vals[index] = fmt.Sprintf(`  RichCompletion('%v', display='%v', description='%v', prefix_len=0),`, strings.Replace(sanitizer.Replace(val.Value), " ", `\\ `, -1), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
 	}
 	return fmt.Sprintf("{\n%v\n}", strings.Join(vals, "\n"))
 }

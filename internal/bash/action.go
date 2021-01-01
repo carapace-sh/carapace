@@ -2,6 +2,7 @@ package bash
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -32,28 +33,79 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func Callback(prefix string, uid string) string {
-	return fmt.Sprintf(`eval $(_%v_callback '%v')`, prefix, uid)
+func EscapeSpace(s string) string {
+	return strings.Replace(s, " ", `\ `, -1)
 }
 
-func ActionDirectories() string {
-	return `compgen -S / -d -- "$cur"`
+func commonPrefix(a, b string) string {
+	i := 0
+	for i < len(a) && i < len(b) && a[i] == b[i] {
+		i++
+	}
+	return a[0:i]
 }
 
-func ActionFiles(suffix string) string {
-	return fmt.Sprintf(`compgen -S / -d -- "$cur"; compgen -f -X '!*%v' -- "$cur"`, suffix)
+func commonDisplayPrefix(values ...common.RawValue) (prefix string) {
+	for index, val := range values {
+		if index == 0 {
+			prefix = val.Display
+		} else {
+			prefix = commonPrefix(prefix, val.Display)
+		}
+	}
+	return
+}
+
+func commonValuePrefix(values ...common.RawValue) (prefix string) {
+	for index, val := range values {
+		if index == 0 {
+			prefix = val.Value
+		} else {
+			prefix = commonPrefix(prefix, val.Value)
+		}
+	}
+	return
 }
 
 func ActionRawValues(values ...common.RawValue) string {
-	vals := make([]string, len(values))
-	for index, val := range values {
-		formattedVal := strings.Replace(sanitizer.Replace(val.Value), " ", `\ `, -1)
-		if val.Description == "" {
-			vals[index] = fmt.Sprintf(`%v\t%v`, formattedVal, val.Display)
-		} else {
-			vals[index] = fmt.Sprintf(`%v\t%v (%v)`, formattedVal, val.Display, sanitizer.Replace(val.Description))
+	filtered := make([]common.RawValue, 0)
+	callbackValue := os.Args[len(os.Args)-1]
+
+	for _, r := range values {
+		if strings.HasPrefix(r.Value, callbackValue) {
+			// TODO optimize
+			if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
+				wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
+				if index := strings.LastIndexAny(callbackValue, wordbreaks); index != -1 {
+					r.Value = strings.TrimPrefix(r.Value, callbackValue[:index+1])
+				}
+			}
+			filtered = append(filtered, r)
 		}
 	}
 
-	return fmt.Sprintf(`compgen -W $'%v' -- "${cur//\\ / }" | sed "s"$'\001'"^${curprefix//\\ / }"$'\001'$'\001'`, strings.Join(vals, `\n`))
+	if len(filtered) > 1 && commonDisplayPrefix(filtered...) != "" {
+		// When all display values have the same prefix bash will insert is as partial completion (which skips prefixes/formatting).
+		if valuePrefix := commonValuePrefix(filtered...); callbackValue != valuePrefix {
+			// replace values with common value prefix (`\001` is removed in snippet and compopt nospace will be set)
+			filtered = common.RawValuesFrom(commonValuePrefix(filtered...) + "\001")
+		} else {
+			// prevent insertion of partial display values by prefixing one with space
+			filtered[0].Display = " " + filtered[0].Display
+		}
+	}
+
+	vals := make([]string, len(filtered))
+	for index, val := range filtered {
+		if len(filtered) == 1 {
+			vals[index] = EscapeSpace(sanitizer.Replace(val.Value))
+		} else {
+			if val.Description != "" {
+				vals[index] = fmt.Sprintf("%v (%v)", val.Display, sanitizer.Replace(val.Description))
+			} else {
+				vals[index] = val.Display
+			}
+		}
+	}
+	return strings.Join(vals, "\n")
 }

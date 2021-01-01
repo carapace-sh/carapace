@@ -26,18 +26,6 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func Callback(prefix string, uid string) string {
-	return fmt.Sprintf(`_%v_callback %v`, prefix, uid)
-}
-
-func ActionDirectories() string {
-	return `__fish_complete_directories`
-}
-
-func ActionFiles(suffix string) string {
-	return fmt.Sprintf(`__fish_complete_suffix "%v"`, suffix)
-}
-
 func ActionRawValues(values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {

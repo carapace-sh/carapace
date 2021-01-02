@@ -32,7 +32,7 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func ActionRawValues(values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if val.Description == "" {

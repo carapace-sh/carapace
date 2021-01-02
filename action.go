@@ -265,13 +265,13 @@ func ActionValuesDescribed(values ...string) Action {
 func actionRawValues(rawValues ...common.RawValue) Action {
 	return Action{
 		rawValues:  rawValues,
-		bash:       func() string { return bash.ActionRawValues(rawValues...) },
-		elvish:     func() string { return elvish.ActionRawValues(rawValues...) },
-		fish:       func() string { return fish.ActionRawValues(rawValues...) },
-		oil:        func() string { return oil.ActionRawValues(rawValues...) },
-		powershell: func() string { return powershell.ActionRawValues(rawValues...) },
-		xonsh:      func() string { return xonsh.ActionRawValues(rawValues...) },
-		zsh:        func() string { return zsh.ActionRawValues(rawValues...) },
+		bash:       func() string { return bash.ActionRawValues(CallbackValue, rawValues...) },
+		elvish:     func() string { return elvish.ActionRawValues(CallbackValue, rawValues...) },
+		fish:       func() string { return fish.ActionRawValues(CallbackValue, rawValues...) },
+		oil:        func() string { return oil.ActionRawValues(CallbackValue, rawValues...) },
+		powershell: func() string { return powershell.ActionRawValues(CallbackValue, rawValues...) },
+		xonsh:      func() string { return xonsh.ActionRawValues(CallbackValue, rawValues...) },
+		zsh:        func() string { return zsh.ActionRawValues(CallbackValue, rawValues...) },
 	}
 }
 

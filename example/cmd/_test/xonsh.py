@@ -1,16 +1,10 @@
-from shlex import split
-import re
-import pathlib
-import subprocess
-import xonsh
-from xonsh.completers._aliases import _add_one_completer
-from xonsh.completers.path import complete_dir, complete_path
-from xonsh.completers.tools import RichCompletion
-
 def _example_completer(prefix, line, begidx, endidx, ctx):
     """carapace completer for example"""
     if not line.startswith('example '):
         return # not the expected command to complete
+
+    from shlex import split
+    from xonsh.completers.tools import RichCompletion
     
     full_words=split(line + "_") # ensure last word is empty when ends with space
     full_words[-1]=full_words[-1][0:-1]
@@ -23,9 +17,11 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
     result = {}
 
     def _example_callback():
-        cb, _ = subprocess.Popen(['example', '_carapace', 'xonsh', '_', *words],
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE).communicate()
+        from subprocess import Popen, PIPE
+        from xonsh.completers.tools import RichCompletion
+        cb, _ = Popen(['example', '_carapace', 'xonsh', '_', *words],
+                                     stdout=PIPE,
+                                     stderr=PIPE).communicate()
         cb = cb.decode('utf-8')
         if cb == "":
             return {}
@@ -40,5 +36,7 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
 
     result = set(map(lambda x: RichCompletion(x[:len(x)-(len(suffix)+suffix.count(' '))], display=x.display, description=x.description, prefix_len=len(current)+current.count(' ')), result))
     return result
+
+from xonsh.completers._aliases import _add_one_completer
 _add_one_completer('example', _example_completer, 'start')
 

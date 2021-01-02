@@ -142,15 +142,16 @@ func addCompletionCommand(cmd *cobra.Command) {
 					shell := args[0]
 					id := args[1]
 
+					current := os.Args[len(os.Args)-1]
+					previous := os.Args[len(os.Args)-2]
+					CallbackValue = current // TODO verify
+
 					switch id {
 					case "_":
-						current := os.Args[len(os.Args)-1]
-						previous := os.Args[len(os.Args)-2]
 						if strings.HasPrefix(current, "-") { // assume flag
 							if strings.Contains(current, "=") { // complete value for optarg flag
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
-										CallbackValue = current // TODO verify
 										// TODO no value for oil (elvish works)
 										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).Prefix(strings.SplitN(current, "=", 2)[0]+"=").ToA().Value(shell))
 									}
@@ -160,19 +161,16 @@ func addCompletionCommand(cmd *cobra.Command) {
 							}
 						} else if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" {
 							if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
-								CallbackValue = current // TODO verify
 								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
 							}
 						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
-							CallbackValue = current // TODO verify (now set multiple times, isn't this always current anyway?)
 							subcommandA := actionSubcommands(targetCmd)
 							if _, a, ok := findAction(targetCmd, targetArgs); ok {
 								subcommandA = a.Invoke(targetArgs).Merge(subcommandA.Invoke(targetArgs)).ToA()
 							}
 							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), subcommandA.Value(shell))
 						} else {
-							if _uid, action, ok := findAction(targetCmd, targetArgs); ok {
-								CallbackValue = uid.Value(targetCmd, targetArgs, _uid)
+							if _, action, ok := findAction(targetCmd, targetArgs); ok {
 								if action.callback == nil {
 									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Value(shell))
 								} else {
@@ -183,7 +181,6 @@ func addCompletionCommand(cmd *cobra.Command) {
 					case "state":
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
 					default:
-						CallbackValue = uid.Value(targetCmd, targetArgs, id)
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, targetArgs).Invoke(targetArgs).ToA().Value(shell))
 					}
 				}

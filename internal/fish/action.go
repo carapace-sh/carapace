@@ -26,7 +26,7 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func ActionRawValues(values ...common.RawValue) string {
+func ActionRawValues(callbackValues string, values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		// TODO sanitize

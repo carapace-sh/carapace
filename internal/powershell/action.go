@@ -38,7 +38,7 @@ func EscapeSpace(value string) string {
 	return strings.Replace(value, " ", "` ", -1)
 }
 
-func ActionRawValues(values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error

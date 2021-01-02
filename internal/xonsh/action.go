@@ -2,7 +2,6 @@ package xonsh
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -33,11 +32,11 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func ActionRawValues(values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {
-		if strings.HasPrefix(r.Value, os.Args[len(os.Args)-1]) {
+		if strings.HasPrefix(r.Value, callbackValue) {
 			filtered = append(filtered, r)
 		}
 	}

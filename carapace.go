@@ -99,7 +99,7 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 	if strings.HasPrefix(arg, "--") {
 		flag = cmd.LocalFlags().Lookup(nameOrShorthand)
 	} else if strings.HasPrefix(arg, "-") {
-		flag = cmd.LocalFlags().ShorthandLookup(nameOrShorthand)
+		flag = cmd.LocalFlags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
 	}
 	return
 }

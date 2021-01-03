@@ -52,6 +52,7 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 }
 
 var tests = map[string]string{
+	`example -ap `:                                                 "action",
 	`example action `:                                              "p",
 	`example action positional`:                                    "positional1",
 	`example action --`:                                            "--values_described",
@@ -59,6 +60,12 @@ var tests = map[string]string{
 	`example action --optarg positional`:                           "positional1",
 	`example action --optarg`:                                      "--optarg",
 	`example action --optarg=`:                                     "blue",
+	`example action -o `:                                           "p",
+	`example action -o positional`:                                 "positional1",
+	`example action -o`:                                            "-o",
+	`example action -o=`:                                           "blue",
+	`example action -fgo=`:                                         "blue",
+	`example action -fgo= `:                                        "p",
 	`example condition `:                                           "ERR",
 	`example condition --required `:                                "valid",
 	`example condition --required invalid `:                        "ERR",

@@ -69,10 +69,10 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
             return '"' + s + '"'
         return s
         
-    result = set(map(lambda x: RichCompletion(_example_quote(x), display=x.display, description=x.description, prefix_len=endidx-begidx), result))
+    result = set(map(lambda x: RichCompletion(_%v_quote(x), display=x.display, description=x.description, prefix_len=endidx-begidx), result))
     return result
 
 from xonsh.completers._aliases import _add_one_completer
 _add_one_completer('%v', _%v_completer, 'start')
-`, functionName, cmd.Name(), cmd.Name(), functionName, uid.Executable(), functionName, functionName, cmd.Name(), functionName)
+`, functionName, cmd.Name(), cmd.Name(), functionName, uid.Executable(), functionName, functionName, functionName, cmd.Name(), functionName)
 }

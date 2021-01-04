@@ -19,20 +19,28 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
     from xonsh.completers.tools import RichCompletion
   
     words=""
-    quoteLength = 0
+    wordsNonPosix=""
     try:
         words=split(line[0:endidx] + "_") # ensure last word is empty when ends with space
-        if line[endidx-1] in ('"',"'"):
-            quoteLength = 2
+        wordsNonPosix=split(line[0:endidx], posix=False)
     except:
         try:
             words=split(line[0:endidx] + '"' + "_") # ensure last word is empty when ends with space
-            quoteLength = 1
+            wordsNonPosix=split(line[0:endidx] + '"', posix=False)
+            wordsNonPosix[-1]= wordsNonPosix[-1][:-1]
         except:
             words=split(line[0:endidx] + "'" + "_") # ensure last word is empty when ends with space
-            quoteLength = 1
-
+            wordsNonPosix=split(line[0:endidx] + "'", posix=False)
+            wordsNonPosix[-1]= wordsNonPosix[-1][:-1]
+    
     words[-1]=words[-1][0:-1]
+    if len(words[-1]) != 0:
+        begidx = endidx
+        for word in reversed(wordsNonPosix):
+            begidx = begidx - len(word)
+            if line[begidx-1] == " ":
+                break
+
     current=words[-1]
     previous=words[-2]
 
@@ -61,10 +69,10 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
             return '"' + s + '"'
         return s
         
-    result = set(map(lambda x: RichCompletion(_%v_quote(x), display=x.display, description=x.description, prefix_len=len(current)+quoteLength), result))
+    result = set(map(lambda x: RichCompletion(_example_quote(x), display=x.display, description=x.description, prefix_len=endidx-begidx), result))
     return result
 
 from xonsh.completers._aliases import _add_one_completer
 _add_one_completer('%v', _%v_completer, 'start')
-`, functionName, cmd.Name(), cmd.Name(), functionName, uid.Executable(), functionName, functionName, functionName, cmd.Name(), functionName)
+`, functionName, cmd.Name(), cmd.Name(), functionName, uid.Executable(), functionName, functionName, cmd.Name(), functionName)
 }

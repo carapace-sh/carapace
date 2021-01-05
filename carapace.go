@@ -137,14 +137,20 @@ func addCompletionCommand(cmd *cobra.Command) {
 						}
 					}
 				} else {
-					targetCmd, targetArgs := findTarget(cmd)
-
 					shell := args[0]
 					id := args[1]
-
 					current := os.Args[len(os.Args)-1]
 					previous := os.Args[len(os.Args)-2]
-					CallbackValue = current // TODO verify
+					CallbackValue = current
+
+					targetCmd, targetArgs, err := findTarget(cmd)
+					if err != nil && // ignore specific errors regarding the flag currently being completed (bit fragile, but works)
+						err.Error() != fmt.Sprintf("unknown flag: %v", CallbackValue) && // unknown flag is not current one being completed (may be partial)
+						err.Error() != fmt.Sprintf("flag needs an argument: %v", CallbackValue) && // flag without argument is not current one being completed (matches a flag name)
+						(len(CallbackValue) < 2 || err.Error() != fmt.Sprintf("flag needs an argument: '%v' in %v", string(CallbackValue[len(CallbackValue)-1]), CallbackValue)) { // TODO support series of shorthand flags (skip the actual flag character and just check prefix/suffix or do regex match)
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Value(shell))
+						return
+					}
 
 					switch id {
 					case "_":
@@ -211,7 +217,7 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) (id string, actio
 	return
 }
 
-func findTarget(cmd *cobra.Command) (*cobra.Command, []string) {
+func findTarget(cmd *cobra.Command) (*cobra.Command, []string, error) {
 	origArg := []string{}
 	if len(os.Args) > 5 {
 		origArg = os.Args[5:]
@@ -219,19 +225,23 @@ func findTarget(cmd *cobra.Command) (*cobra.Command, []string) {
 	return traverse(cmd, origArg)
 }
 
-func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string) {
+func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
 	// ignore flag parse errors (like a missing argument for the flag currently being completed)
 	a := args
 	if len(args) > 0 && args[len(args)-1] == "" {
 		a = args[0 : len(args)-1]
 	}
 
-	targetCmd, targetArgs, _ := cmd.Root().Traverse(a)
+	targetCmd, targetArgs, err := cmd.Root().Traverse(a)
 	if len(args) > 0 && args[len(args)-1] == "" {
 		targetArgs = append(targetArgs, "")
 	}
-	targetCmd.ParseFlags(targetArgs)
-	return targetCmd, targetCmd.Flags().Args() // TODO check length
+	if err != nil {
+		return targetCmd, targetArgs, err
+	}
+
+	err = targetCmd.ParseFlags(targetArgs)
+	return targetCmd, targetCmd.Flags().Args(), err
 }
 
 func determineShell() string {

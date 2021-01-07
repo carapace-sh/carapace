@@ -279,8 +279,8 @@ var skipCache bool
 
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
-	skipCache = true // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
-	return ActionValuesDescribed("_", "", "ERR", msg)
+	skipCache = true                                                                                 // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
+	return ActionValuesDescribed("_", "", "ERR", msg).Invoke([]string{}).Prefix(CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
 }
 
 // CallbackValue is set to the currently completed flag/positional value during callback (note that this is updated during ActionMultiParts)
@@ -312,7 +312,7 @@ func ActionMultiParts(divider string, callback func(args []string, parts []strin
 func actionSubcommands(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
 	for _, subcommand := range cmd.Commands() {
-		if !subcommand.Hidden {
+		if !subcommand.Hidden && subcommand.Deprecated == "" {
 			vals = append(vals, subcommand.Name(), subcommand.Short)
 			for _, alias := range subcommand.Aliases {
 				vals = append(vals, alias, subcommand.Short)
@@ -324,11 +324,21 @@ func actionSubcommands(cmd *cobra.Command) Action {
 
 func actionFlags(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
-	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+	cmd.Flags().VisitAll(func(f *pflag.Flag) {
+		if f.Deprecated != "" {
+			return // skip deprecated flags
+		}
+
+		if f.Changed &&
+			!strings.Contains(f.Value.Type(), "Slice") &&
+			!strings.Contains(f.Value.Type(), "Array") {
+			return // don't repeat flag
+		}
+
 		if !common.IsShorthandOnly(f) {
 			vals = append(vals, "--"+f.Name, f.Usage)
 		}
-		if f.Shorthand != "" {
+		if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 			vals = append(vals, "-"+f.Shorthand, f.Usage)
 		}
 	})

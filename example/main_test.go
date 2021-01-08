@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -38,6 +39,7 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
+		cmd.Env = append(os.Environ(), "HOME=/tmp/carapace-fakehome")
 		if output, err := cmd.Output(); err != nil {
 			t.Fatal(err.Error() + "\n" + stderr.String())
 		} else {
@@ -65,6 +67,8 @@ var tests = map[string]string{
 	`example action --optar`:             "--optarg",
 	`example action --optarg=`:           "blue",
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
+	`example action -o`:                                            "v",
+	`example action -ov`:                                           "d",
 	`example action -o `:                                           "p",
 	`example action -o positional`:                                 "positional1",
 	`example action -o=`:                                           "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag

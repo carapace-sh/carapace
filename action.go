@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -323,6 +324,9 @@ func actionSubcommands(cmd *cobra.Command) Action {
 }
 
 func actionFlags(cmd *cobra.Command) Action {
+	re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
+	isShorthandSeries := re.MatchString(CallbackValue)
+
 	vals := make([]string, 0)
 	cmd.Flags().VisitAll(func(f *pflag.Flag) {
 		if f.Deprecated != "" {
@@ -335,13 +339,25 @@ func actionFlags(cmd *cobra.Command) Action {
 			return // don't repeat flag
 		}
 
-		if !common.IsShorthandOnly(f) {
-			vals = append(vals, "--"+f.Name, f.Usage)
-		}
-		if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-			vals = append(vals, "-"+f.Shorthand, f.Usage)
+		if isShorthandSeries {
+			if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+				vals = append(vals, f.Shorthand, f.Usage)
+			}
+		} else {
+			if !common.IsShorthandOnly(f) {
+				vals = append(vals, "--"+f.Name, f.Usage)
+			}
+			if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+				vals = append(vals, "-"+f.Shorthand, f.Usage)
+			}
 		}
 	})
 
-	return ActionValuesDescribed(vals...)
+	if isShorthandSeries {
+		matches := re.FindStringSubmatch(CallbackValue)
+		parts := strings.Split(matches[1], "")
+		return ActionValuesDescribed(vals...).Invoke([]string{}).Filter(parts).Prefix(CallbackValue).ToA()
+	} else {
+		return ActionValuesDescribed(vals...)
+	}
 }

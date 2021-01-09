@@ -230,16 +230,15 @@ func actionPath(fileSuffix string, dirOnly bool) Action {
 			folder = folder + "/"
 		}
 
-		vals := make([]string, len(files))
-		for index, file := range files {
+		vals := make([]string, 0, len(files))
+		for _, file := range files {
 			if file.IsDir() {
-				vals[index] = folder + file.Name() + "/"
+				vals = append(vals, folder+file.Name()+"/")
 			} else if !dirOnly && strings.HasSuffix(file.Name(), fileSuffix) {
-				vals[index] = folder + file.Name()
+				vals = append(vals, folder+file.Name())
 			}
 		}
-
-		if CallbackValue == "./" {
+		if strings.HasPrefix(CallbackValue, "./") {
 			return ActionValues(vals...).Invoke([]string{}).Prefix("./").ToA()
 		} else {
 			return ActionValues(vals...)

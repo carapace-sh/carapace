@@ -238,7 +238,12 @@ func actionPath(fileSuffix string, dirOnly bool) Action {
 				vals[index] = folder + file.Name()
 			}
 		}
-		return ActionValues(vals...)
+
+		if CallbackValue == "./" {
+			return ActionValues(vals...).Invoke([]string{}).Prefix("./").ToA()
+		} else {
+			return ActionValues(vals...)
+		}
 	}
 }
 

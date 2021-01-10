@@ -240,8 +240,16 @@ func actionPath(fileSuffix string, dirOnly bool) Action {
 			folder = folder + "/"
 		}
 
+		showHidden := CallbackValue != "" &&
+			!strings.HasSuffix(CallbackValue, "/") &&
+			strings.HasPrefix(filepath.Base(CallbackValue), ".")
+
 		vals := make([]string, 0, len(files))
 		for _, file := range files {
+			if !showHidden && strings.HasPrefix(file.Name(), ".") {
+				continue
+			}
+
 			if file.IsDir() {
 				vals = append(vals, folder+file.Name()+"/")
 			} else if !dirOnly && strings.HasSuffix(file.Name(), fileSuffix) {

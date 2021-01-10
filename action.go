@@ -3,6 +3,7 @@ package carapace
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -221,7 +222,16 @@ func ActionFiles(suffix string) Action {
 
 func actionPath(fileSuffix string, dirOnly bool) Action {
 	folder := filepath.Dir(CallbackValue)
-	if files, err := ioutil.ReadDir(folder); err != nil {
+	expandedFolder := folder
+	if strings.HasPrefix(CallbackValue, "~") {
+		if homedir, err := os.UserHomeDir(); err != nil {
+			return ActionMessage(err.Error())
+		} else {
+			expandedFolder = filepath.Dir(homedir + "/" + CallbackValue[1:])
+		}
+	}
+
+	if files, err := ioutil.ReadDir(expandedFolder); err != nil {
 		return ActionMessage(err.Error())
 	} else {
 		if folder == "." {

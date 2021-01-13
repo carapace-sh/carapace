@@ -1,45 +1,26 @@
 package elvish
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
-
 	"github.com/rsteube/carapace/internal/common"
 )
 
-var sanitizer = strings.NewReplacer(
-	`$`, ``,
-	"`", ``,
-	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
-)
-
-func Sanitize(values ...string) []string {
-	sanitized := make([]string, len(values))
-	for index, value := range values {
-		sanitized[index] = sanitizer.Replace(value)
-	}
-	return sanitized
+type complexCandidate struct {
+	Value   string
+	Display string
 }
 
 func ActionRawValues(callbackValue string, values ...common.RawValue) string {
-	vals := make([]string, len(values))
+	vals := make([]complexCandidate, len(values))
 	for index, val := range values {
+		// TODO have a look at this again later: seems elvish does a good job quoting any problematic characterS so the sanitize step was removed
 		if val.Description == "" {
-			vals[index] = fmt.Sprintf(`edit:complex-candidate '%v' &display='%v'`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Display))
+			vals[index] = complexCandidate{Value: val.Value, Display: val.Display}
 		} else {
-			vals[index] = fmt.Sprintf(`edit:complex-candidate '%v' &display='%v (%v)'`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+			vals[index] = complexCandidate{Value: val.Value, Display: fmt.Sprintf(`%v (%v)`, val.Display, val.Description)}
 		}
 	}
-	return strings.Join(vals, "\n")
+	m, _ := json.Marshal(vals)
+	return string(m)
 }

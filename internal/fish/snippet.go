@@ -31,8 +31,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
 end
 
 function _%v_callback
-  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish _ )
-  eval "$CALLBACK"
+  commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish _
 end
 
 complete -c %v -f

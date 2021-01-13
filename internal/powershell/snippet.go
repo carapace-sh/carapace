@@ -18,9 +18,9 @@ Function _%v_completer {
 
     $completions = @(
       if (!$wordToComplete) {
-        %v _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) '""' | Out-String | Invoke-Expression
+        %v _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) '""' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText, [CompletionResultType]::ParameterValue, $_.ToolTip) }
       } else {
-        %v _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) | Out-String | Invoke-Expression
+        %v _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText, [CompletionResultType]::ParameterValue, $_.ToolTip) }
       }
     )
 

@@ -8,9 +8,9 @@ Function _example_completer {
 
     $completions = @(
       if (!$wordToComplete) {
-        example _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) '""' | Out-String | Invoke-Expression
+        example _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) '""' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText, [CompletionResultType]::ParameterValue, $_.ToolTip) }
       } else {
-        example _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) | Out-String | Invoke-Expression
+        example _carapace powershell _ $($commandElements| ForEach-Object {$_.Extent}) | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText, [CompletionResultType]::ParameterValue, $_.ToolTip) }
       }
     )
 

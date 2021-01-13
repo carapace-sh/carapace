@@ -1,7 +1,7 @@
 package xonsh
 
 import (
-	"fmt"
+	"encoding/json"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -32,6 +32,12 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
+type richCompletion struct {
+	Value       string
+	Display     string
+	Description string
+}
+
 func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
@@ -41,9 +47,10 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 		}
 	}
 
-	vals := make([]string, len(filtered))
+	vals := make([]richCompletion, len(filtered))
 	for index, val := range filtered {
-		vals[index] = fmt.Sprintf(`  RichCompletion('%v', display='%v', description='%v', prefix_len=0),`, sanitizer.Replace(val.Value), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+		vals[index] = richCompletion{Value: sanitizer.Replace(val.Value), Display: sanitizer.Replace(val.Display), Description: sanitizer.Replace(val.Description)}
 	}
-	return fmt.Sprintf("{\n%v\n}", strings.Join(vals, "\n"))
+	m, _ := json.Marshal(vals)
+	return string(m)
 }

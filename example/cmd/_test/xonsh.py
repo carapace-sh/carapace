@@ -35,17 +35,14 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
     result = {}
 
     def _example_callback():
+        from json import loads
         from subprocess import Popen, PIPE
         from xonsh.completers.tools import RichCompletion
-        cb, _ = Popen(['example', '_carapace', 'xonsh', '_', *words],
-                                     stdout=PIPE,
-                                     stderr=PIPE).communicate()
-        cb = cb.decode('utf-8')
-        if cb == "":
-            return {}
-        else:
-            nonlocal prefix, line, begidx, endidx, ctx
-            return eval(cb)
+        cb, _ = Popen(['example', '_carapace', 'xonsh', '_', *words], stdout=PIPE, stderr=PIPE).communicate()
+        try:
+          return {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=0) for c in loads(cb)}
+        except:
+          return {}
   
     result = _example_callback()
 

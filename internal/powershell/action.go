@@ -1,7 +1,7 @@
 package powershell
 
 import (
-	"fmt"
+	"encoding/json"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -38,12 +38,31 @@ func EscapeSpace(value string) string {
 	return strings.Replace(value, " ", "` ", -1)
 }
 
+type completionResult struct {
+	CompletionText string
+	ListItemText   string
+	ToolTip        string
+}
+
+// CompletionResult doesn't like empty parameters, so just replace with space if needed
+func ensureNotEmpty(s string) string {
+	if s == "" {
+		return " "
+	}
+	return s
+}
+
 func ActionRawValues(callbackValue string, values ...common.RawValue) string {
-	vals := make([]string, len(values))
-	for index, val := range values {
+	vals := make([]completionResult, 0, len(values))
+	for _, val := range values {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error
-			vals[index] = fmt.Sprintf(`[CompletionResult]::new('%v', '%v ', [CompletionResultType]::ParameterValue, '%v ')`, EscapeSpace(sanitizer.Replace(val.Value)), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+			vals = append(vals, completionResult{
+				CompletionText: EscapeSpace(sanitizer.Replace(val.Value)),
+				ListItemText:   ensureNotEmpty(sanitizer.Replace(val.Display)),
+				ToolTip:        ensureNotEmpty(sanitizer.Replace(val.Description)),
+			})
 		}
 	}
-	return strings.Join(vals, "\n")
+	m, _ := json.Marshal(vals)
+	return string(m)
 }

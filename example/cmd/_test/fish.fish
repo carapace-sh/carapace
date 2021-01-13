@@ -11,8 +11,7 @@ function _example_quote_suffix
 end
 
 function _example_callback
-  set -lx CALLBACK (commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs example _carapace fish _ )
-  eval "$CALLBACK"
+  commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs example _carapace fish _
 end
 
 complete -c example -f

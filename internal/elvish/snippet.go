@@ -4,16 +4,6 @@ import (
 	"fmt"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
-	"strings"
-)
-
-var replacer = strings.NewReplacer( // TODO
-	`:`, `\:`,
-	"\n", ``,
-	`"`, `\"`,
-	`[`, `\[`,
-	`]`, `\]`,
-	`'`, `\"`,
 )
 
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
@@ -21,7 +11,7 @@ func Snippet(cmd *cobra.Command, actions map[string]string) string {
     if (eq $arg[-1] "") {
         arg[-1] = "''"
     }
-    eval (%v _carapace elvish _ (all $arg) | slurp) &ns=(ns [&arg=$arg])
+    %v _carapace elvish _ (all $arg) | from-json | all (one) | each [c]{ edit:complex-candidate $c[Value] &display=$c[Display] }
 }
 `, cmd.Name(), uid.Executable())
 }

@@ -20,9 +20,14 @@ var replacer = strings.NewReplacer(
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	return fmt.Sprintf(`#compdef %v
 function _%v_completion {
-  # shellcheck disable=SC2086
-  eval "$(%v _carapace zsh _ ${^words//\\ / }'')"
-
+  local IFS=$'\n'
+  # shellcheck disable=SC2207,SC2086
+  local c=($(%v _carapace zsh _ ${^words//\\ / }''))
+  # shellcheck disable=SC2034,2206
+  local vals=(${c%%%%$'\t'*})
+  # shellcheck disable=SC2034,2206
+  local descriptions=(${c##*$'\t'})
+  compadd -Q -S '' -d descriptions -a -- vals
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

@@ -49,14 +49,12 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	}
 
 	vals := make([]string, len(filtered))
-	displays := make([]string, len(filtered))
 	for index, val := range filtered {
-		vals[index] = fmt.Sprintf("'%v'", EscapeSpace(sanitizer.Replace(val.Value)))
 		if strings.TrimSpace(val.Description) == "" {
-			displays[index] = fmt.Sprintf("'%v'", sanitizer.Replace(val.Display))
+			vals[index] = fmt.Sprintf("%v\t%v", EscapeSpace(sanitizer.Replace(val.Value)), sanitizer.Replace(val.Display))
 		} else {
-			displays[index] = fmt.Sprintf("'%v (%v)'", sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+			vals[index] = fmt.Sprintf("%v\t%v (%v)", EscapeSpace(sanitizer.Replace(val.Value)), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
 		}
 	}
-	return fmt.Sprintf("{local _comp_desc=(%v);compadd -Q -S '' -d _comp_desc -- %v}", strings.Join(displays, " "), strings.Join(vals, " "))
+	return strings.Join(vals, "\n")
 }

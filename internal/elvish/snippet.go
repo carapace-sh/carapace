@@ -8,9 +8,6 @@ import (
 
 func Snippet(cmd *cobra.Command, actions map[string]string) string {
 	return fmt.Sprintf(`edit:completion:arg-completer[%v] = [@arg]{
-    if (eq $arg[-1] "") {
-        arg[-1] = "''"
-    }
     %v _carapace elvish _ (all $arg) | from-json | all (one) | each [c]{ edit:complex-candidate $c[Value] &display=$c[Display] }
 }
 `, cmd.Name(), uid.Executable())

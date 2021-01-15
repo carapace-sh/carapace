@@ -209,18 +209,18 @@ func ActionBool() Action {
 // ActionDirectories completes directories
 func ActionDirectories() Action {
 	return ActionCallback(func(args []string) Action {
-		return actionPath("", true).Invoke(args).ToMultiPartsA("/")
+		return actionPath([]string{""}, true).Invoke(args).ToMultiPartsA("/")
 	})
 }
 
 // ActionFiles completes files with optional suffix filtering
-func ActionFiles(suffix string) Action {
+func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(args []string) Action {
 		return actionPath(suffix, false).Invoke(args).ToMultiPartsA("/")
 	})
 }
 
-func actionPath(fileSuffix string, dirOnly bool) Action {
+func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	folder := filepath.Dir(CallbackValue)
 	expandedFolder := folder
 	if strings.HasPrefix(CallbackValue, "~") {
@@ -252,8 +252,16 @@ func actionPath(fileSuffix string, dirOnly bool) Action {
 
 			if file.IsDir() {
 				vals = append(vals, folder+file.Name()+"/")
-			} else if !dirOnly && strings.HasSuffix(file.Name(), fileSuffix) {
-				vals = append(vals, folder+file.Name())
+			} else if !dirOnly {
+				if len(fileSuffixes) == 0 {
+					fileSuffixes = []string{""}
+				}
+				for _, suffix := range fileSuffixes {
+					if strings.HasSuffix(file.Name(), suffix) {
+						vals = append(vals, folder+file.Name())
+						break
+					}
+				}
 			}
 		}
 		if strings.HasPrefix(CallbackValue, "./") {

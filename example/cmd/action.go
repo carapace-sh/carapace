@@ -30,7 +30,7 @@ func init() {
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
-		"files":            carapace.ActionFiles(".go"),
+		"files":            carapace.ActionFiles(".go", "go.mod"),
 		"directories":      carapace.ActionDirectories(),
 		"groups":           action.ActionGroups(),
 		"message":          carapace.ActionMessage("message example"),

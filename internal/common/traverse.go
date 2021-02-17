@@ -33,26 +33,10 @@ func filterError(args []string, err error) error {
 	}
 
 	msg := err.Error()
+
 	current := args[len(args)-1]
-	previous := args[len(args)-2]
-
-	if strings.HasPrefix(previous, "--") && msg == fmt.Sprintf("flag needs an argument: %v", previous) {
-		// ignore long flag argument currently being completed
-		return nil
-	}
-
 	if strings.HasPrefix(current, "--") && msg == fmt.Sprintf("flag needs an argument: %v", current) {
 		// ignore long flag argument currently being completed
-		return nil
-	}
-
-	if strings.HasPrefix(current, "--") && msg == fmt.Sprintf("unknown flag: %v", current) {
-		// ignore long flag curently being completed
-		return nil
-	}
-
-	if strings.HasPrefix(previous, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", previous[len(previous)-1:], previous[len(previous)-1:]) {
-		// ignore shorthand flag argument currently being completed
 		return nil
 	}
 
@@ -61,5 +45,22 @@ func filterError(args []string, err error) error {
 		return nil
 	}
 
+	if strings.HasPrefix(current, "--") && msg == fmt.Sprintf("unknown flag: %v", current) {
+		// ignore long flag curently being completed
+		return nil
+	}
+
+	if len(args) > 1 {
+		previous := args[len(args)-2]
+		if strings.HasPrefix(previous, "--") && msg == fmt.Sprintf("flag needs an argument: %v", previous) {
+			// ignore long flag argument currently being completed
+			return nil
+		}
+
+		if strings.HasPrefix(previous, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", previous[len(previous)-1:], previous[len(previous)-1:]) {
+			// ignore shorthand flag argument currently being completed
+			return nil
+		}
+	}
 	return err
 }

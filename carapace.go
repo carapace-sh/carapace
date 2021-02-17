@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
 	"github.com/rsteube/carapace/internal/oil"
@@ -144,10 +145,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 					CallbackValue = current
 
 					targetCmd, targetArgs, err := findTarget(cmd)
-					if err != nil && // ignore specific errors regarding the flag currently being completed (bit fragile, but works)
-						err.Error() != fmt.Sprintf("unknown flag: %v", CallbackValue) && // unknown flag is not current one being completed (may be partial)
-						err.Error() != fmt.Sprintf("flag needs an argument: %v", CallbackValue) && // flag without argument is not current one being completed (matches a flag name)
-						(len(CallbackValue) < 2 || err.Error() != fmt.Sprintf("flag needs an argument: '%v' in %v", string(CallbackValue[len(CallbackValue)-1]), CallbackValue)) { // TODO support series of shorthand flags (skip the actual flag character and just check prefix/suffix or do regex match)
+					if err != nil {
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Value(shell))
 						return
 					}
@@ -222,26 +220,7 @@ func findTarget(cmd *cobra.Command) (*cobra.Command, []string, error) {
 	if len(os.Args) > 5 {
 		origArg = os.Args[5:]
 	}
-	return traverse(cmd, origArg)
-}
-
-func traverse(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
-	// ignore flag parse errors (like a missing argument for the flag currently being completed)
-	a := args
-	if len(args) > 0 && args[len(args)-1] == "" {
-		a = args[0 : len(args)-1]
-	}
-
-	targetCmd, targetArgs, err := cmd.Root().Traverse(a)
-	if len(args) > 0 && args[len(args)-1] == "" {
-		targetArgs = append(targetArgs, "")
-	}
-	if err != nil {
-		return targetCmd, targetArgs, err
-	}
-
-	err = targetCmd.ParseFlags(targetArgs)
-	return targetCmd, targetCmd.Flags().Args(), err
+	return common.TraverseLenient(cmd, origArg)
 }
 
 func determineShell() string {

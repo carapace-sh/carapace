@@ -11,7 +11,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-HEAD.tar.gz | tar -xvz \
  && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v0.156.2/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
+RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v0.155.2/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
  && mv goreleaser /usr/local/bin/goreleaser
 
 FROM rust as ion

@@ -61,10 +61,10 @@ jobs:
             git push --force https://rsteube:${GITHUB_TOKEN}@github.com/rsteube/carapace.git master:gh-pages
   release:
     docker:
-      - image: cimg/go:1.15
+      - image: rsteube/carapace
     steps:
       - checkout
-      - run: cd example && curl -sL https://git.io/goreleaser | bash
+      - run: cd example && goreleaser
 
 workflows:
   version: 2

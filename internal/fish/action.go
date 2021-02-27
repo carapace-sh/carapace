@@ -6,14 +6,7 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`(`, `[`,
-	`)`, `]`,
 )
 
 func Sanitize(values ...string) []string {

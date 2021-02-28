@@ -57,12 +57,11 @@ func (a ActionMap) shell(shell string, c Context) map[string]string {
 }
 
 type Context struct {
+	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
 	CallbackValue string
-	Args          []string
-}
-
-type MultipartsContext struct {
-	Context
+	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed)
+	Args []string
+	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
 	Parts []string
 }
 
@@ -148,15 +147,15 @@ func (a InvokedAction) ToA() Action {
 }
 
 func (a InvokedAction) ToMultiPartsA(divider string) Action {
-	return ActionMultiParts(divider, func(mc MultipartsContext) Action {
+	return ActionMultiParts(divider, func(c Context) Action {
 		uniqueVals := make(map[string]string)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, strings.Join(mc.Parts, divider)) {
-				if splitted := strings.Split(val.Value, divider); len(splitted) > len(mc.Parts) {
-					if len(splitted) == len(mc.Parts)+1 {
-						uniqueVals[splitted[len(mc.Parts)]] = val.Description
+			if strings.HasPrefix(val.Value, strings.Join(c.Parts, divider)) {
+				if splitted := strings.Split(val.Value, divider); len(splitted) > len(c.Parts) {
+					if len(splitted) == len(c.Parts)+1 {
+						uniqueVals[splitted[len(c.Parts)]] = val.Description
 					} else {
-						uniqueVals[splitted[len(mc.Parts)]+divider] = ""
+						uniqueVals[splitted[len(c.Parts)]+divider] = ""
 					}
 				}
 			}
@@ -327,29 +326,24 @@ func ActionMessage(msg string) Action {
 	})
 }
 
-// CallbackValue is set to the currently completed flag/positional value during callback (note that this is updated during ActionMultiParts)
-//var CallbackValue string // TODO remove
-
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
-func ActionMultiParts(divider string, callback func(mc MultipartsContext) Action) Action {
+func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
-		mc := MultipartsContext{Context: c}
-
 		index := strings.LastIndex(c.CallbackValue, string(divider))
 		prefix := ""
 		if len(divider) == 0 {
 			prefix = c.CallbackValue
 		} else if index != -1 {
 			prefix = c.CallbackValue[0 : index+len(divider)]
-			mc.CallbackValue = c.CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
+			c.CallbackValue = c.CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 {
 			parts = parts[0 : len(parts)-1]
 		}
-		mc.Parts = parts
+		c.Parts = parts
 
-		return callback(mc).Invoke(mc.Context).Prefix(prefix).ToA()
+		return callback(c).Invoke(c).Prefix(prefix).ToA()
 	})
 }
 

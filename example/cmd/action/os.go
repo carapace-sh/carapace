@@ -110,10 +110,10 @@ func ActionUsers() carapace.Action {
 }
 
 func ActionUserGroup() carapace.Action {
-	return carapace.ActionMultiParts(":", func(mc carapace.MultipartsContext) carapace.Action {
-		switch len(mc.Parts) {
+	return carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
+		switch len(c.Parts) {
 		case 0:
-			return ActionUsers().Invoke(mc.Context).Suffix(":").ToA()
+			return ActionUsers().Invoke(c).Suffix(":").ToA()
 		case 1:
 			return ActionGroups()
 		default:

@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_completion() {
   export COMP_WORDBREAKS

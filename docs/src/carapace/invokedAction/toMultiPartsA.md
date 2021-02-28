@@ -5,7 +5,7 @@ E.g. completing the contents of a zip file (`dir/subdir/file`) by each path segm
 
 ```go
 func ActionZipFileContents(file string) carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		if reader, err := zip.OpenReader(file); err != nil {
 			return carapace.ActionMessage(err.Error())
 		} else {
@@ -14,7 +14,7 @@ func ActionZipFileContents(file string) carapace.Action {
 			for index, f := range reader.File {
 				vals[index] = f.Name
 			}
-			return carapace.ActionValues(vals...).Invoke(args).ToMultiPartsA("/")
+			return carapace.ActionValues(vals...).Invoke(c).ToMultiPartsA("/")
 		}
 	})
 }

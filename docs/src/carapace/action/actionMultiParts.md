@@ -3,10 +3,10 @@
 [`ActionMultiParts`] is a [callback action](./actionCallback.md) where parts of an argument can be completed separately (e.g. `user:group` from chown). Divider can be empty as well, but note that bash and fish will add the space suffix for anything other than `/=@:.,` (it still works, but after each selection backspace is needed to continue the completion).
 
 ```go
-carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Action {
+carapace.ActionMultiParts(":", func(mc carapace.MultipartsContext) carapace.Action {
 	switch len(parts) {
 	case 0:
-		return ActionUsers().Invoke(args).Suffix(":").ToA()
+		return ActionUsers().Invoke(mc.Args).Suffix(":").ToA()
 	case 1:
 		return ActionGroups()
 	default:
@@ -15,7 +15,6 @@ carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Acti
 })
 ```
 
-- [`carapace.CallbackValue`] is updated during execution to only contain the currently completed part
 - values **must not** contain the separator as a simple `strings.Split()` is used to separate the parts
 - it is however **allowed as suffix** to enable fluent tab completion (like `/` for a directory)
 
@@ -26,17 +25,17 @@ carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Acti
 [`ActionMultiParts`] can be nested as well, e.g. completing multiple `KEY=VALUE` pairs separated by `,`.
 
 ```go
-carapace.ActionMultiParts(",", func(args, entries []string) carapace.Action {
-	return carapace.ActionMultiParts("=", func(args, parts []string) carapace.Action {
-		switch len(parts) {
+carapace.ActionMultiParts(",", func(mcEntries carapace.MultipartsContext) carapace.Action {
+	return carapace.ActionMultiParts("=", func(mc carapace.MultipartsContext) carapace.Action {
+		switch len(mc.Parts) {
 		case 0:
-			keys := make([]string, len(entries))
-			for index, entry := range entries {
+			keys := make([]string, len(mcEntries.Parts))
+			for index, entry := range mcEntries.Parts {
 				keys[index] = strings.Split(entry, "=")[0]
 			}
-			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(args).Filter(keys).Suffix("=").ToA()
+			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(mc.Context).Filter(keys).Suffix("=").ToA()
 		case 1:
-			switch parts[0] {
+			switch mc.Parts[0] {
 			case "FILE":
 				return carapace.ActionFiles("")
 			case "DIRECTORY":
@@ -51,7 +50,7 @@ carapace.ActionMultiParts(",", func(args, entries []string) carapace.Action {
 			return carapace.ActionValues()
 		}
 	})
-}),
+})
 ```
 
 [`carapace.CallbackValue`]:https://pkg.go.dev/github.com/rsteube/carapace#pkg-variables

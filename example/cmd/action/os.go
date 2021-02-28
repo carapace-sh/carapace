@@ -10,7 +10,7 @@ import (
 )
 
 func ActionEnvironmentVariables() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		env := os.Environ()
 		vars := make([]string, len(env))
 		for index, e := range os.Environ() {
@@ -22,7 +22,7 @@ func ActionEnvironmentVariables() carapace.Action {
 }
 
 func ActionGroups() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		groups := []string{}
 		if content, err := ioutil.ReadFile("/etc/group"); err == nil {
 			for _, entry := range strings.Split(string(content), "\n") {
@@ -91,7 +91,7 @@ func ActionProcessStates() carapace.Action {
 }
 
 func ActionUsers() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		users := []string{}
 		if content, err := ioutil.ReadFile("/etc/passwd"); err == nil {
 			for _, entry := range strings.Split(string(content), "\n") {
@@ -110,10 +110,10 @@ func ActionUsers() carapace.Action {
 }
 
 func ActionUserGroup() carapace.Action {
-	return carapace.ActionMultiParts(":", func(args []string, parts []string) carapace.Action {
-		switch len(parts) {
+	return carapace.ActionMultiParts(":", func(mc carapace.MultipartsContext) carapace.Action {
+		switch len(mc.Parts) {
 		case 0:
-			return ActionUsers().Invoke(args).Suffix(":").ToA()
+			return ActionUsers().Invoke(mc.Context).Suffix(":").ToA()
 		case 1:
 			return ActionGroups()
 		default:
@@ -123,7 +123,7 @@ func ActionUserGroup() carapace.Action {
 }
 
 func ActionShells() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		if output, err := exec.Command("chsh", "--list-shells").Output(); err != nil {
 			return carapace.ActionMessage(err.Error())
 		} else {

@@ -17,7 +17,7 @@ var replacer = strings.NewReplacer(
 	`]`, `\]`,
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
 function _%v_completion {
   local IFS=$'\n'

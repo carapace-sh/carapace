@@ -68,7 +68,7 @@ func (c Carapace) Standalone() {
 }
 
 func (c Carapace) Snippet(shell string) (string, error) {
-	var snippet func(cmd *cobra.Command, actions map[string]string) string
+	var snippet func(cmd *cobra.Command) string
 
 	if shell == "" {
 		shell = determineShell()
@@ -91,7 +91,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	default:
 		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
-	return snippet(c.cmd.Root(), actionMap.shell(shell)), nil
+	return snippet(c.cmd.Root()), nil
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
@@ -142,11 +142,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 					id := args[1]
 					current := os.Args[len(os.Args)-1]
 					previous := os.Args[len(os.Args)-2]
-					CallbackValue = current
 
 					targetCmd, targetArgs, err := findTarget(cmd)
+					context := Context{CallbackValue: current, Args: targetArgs}
 					if err != nil {
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Value(shell))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Invoke(context).value(shell, context.CallbackValue))
 						return
 					}
 
@@ -157,35 +157,35 @@ func addCompletionCommand(cmd *cobra.Command) {
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
 										// TODO no value for oil (elvish works)
-										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).Prefix(strings.SplitN(current, "=", 2)[0]+"=").ToA().Value(shell))
+										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(context).Prefix(strings.SplitN(current, "=", 2)[0]+"=").value(shell, context.CallbackValue))
 									}
 								}
 							} else { // complete flagnames
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionFlags(targetCmd).Value(shell))
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionFlags(targetCmd).Invoke(context).value(shell, context.CallbackValue))
 							}
 						} else if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" {
 							if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(targetArgs).ToA().Value(shell))
+								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(context).value(shell, context.CallbackValue))
 							}
 						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
 							subcommandA := actionSubcommands(targetCmd)
 							if _, a, ok := findAction(targetCmd, targetArgs); ok {
-								subcommandA = a.Invoke(targetArgs).Merge(subcommandA.Invoke(targetArgs)).ToA()
+								subcommandA = a.Invoke(context).Merge(subcommandA.Invoke(context)).ToA()
 							}
-							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), subcommandA.Value(shell))
+							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), subcommandA.Invoke(context).value(shell, context.CallbackValue))
 						} else {
 							if _, action, ok := findAction(targetCmd, targetArgs); ok {
 								if action.callback == nil {
-									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Value(shell))
+									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Invoke(context).value(shell, context.CallbackValue))
 								} else {
-									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(targetArgs).Invoke(targetArgs).ToA().Value(shell))
+									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(context).Invoke(context).value(shell, context.CallbackValue))
 								}
 							}
 						}
 					case "state":
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
 					default:
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, targetArgs).Invoke(targetArgs).ToA().Value(shell))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))
 					}
 				}
 			}

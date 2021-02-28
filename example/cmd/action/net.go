@@ -9,7 +9,7 @@ import (
 )
 
 func ActionNetInterfaces() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		if output, err := exec.Command("ifconfig").Output(); err != nil {
 			return carapace.ActionMessage(err.Error())
 		} else {

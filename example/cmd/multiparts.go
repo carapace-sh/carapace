@@ -32,23 +32,23 @@ func init() {
 		"dotdotdot": ActionMultipartsTest("..."),
 		"equals":    ActionMultipartsTest("="),
 		"slash":     ActionMultipartsTest("/"),
-		"none": carapace.ActionMultiParts("", func(args, parts []string) carapace.Action {
-			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(args).Filter(strings.Split(carapace.CallbackValue, "")).ToA()
+		"none": carapace.ActionMultiParts("", func(mc carapace.MultipartsContext) carapace.Action {
+			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(mc.Context).Filter(strings.Split(mc.CallbackValue, "")).ToA()
 		}),
 	})
 
 	carapace.Gen(multipartsCmd).PositionalCompletion(
-		carapace.ActionMultiParts(",", func(args, entries []string) carapace.Action {
-			return carapace.ActionMultiParts("=", func(args, parts []string) carapace.Action {
-				switch len(parts) {
+		carapace.ActionMultiParts(",", func(mcEntries carapace.MultipartsContext) carapace.Action {
+			return carapace.ActionMultiParts("=", func(mc carapace.MultipartsContext) carapace.Action {
+				switch len(mc.Parts) {
 				case 0:
-					keys := make([]string, len(entries))
-					for index, entry := range entries {
+					keys := make([]string, len(mcEntries.Parts))
+					for index, entry := range mcEntries.Parts {
 						keys[index] = strings.Split(entry, "=")[0]
 					}
-					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(args).Filter(keys).Suffix("=").ToA()
+					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(mc.Context).Filter(keys).Suffix("=").ToA()
 				case 1:
-					switch parts[0] {
+					switch mc.Parts[0] {
 					case "FILE":
 						return carapace.ActionFiles("")
 					case "DIRECTORY":
@@ -68,14 +68,14 @@ func init() {
 }
 
 func ActionMultipartsTest(divider string) carapace.Action {
-	return carapace.ActionMultiParts(divider, func(args, parts []string) carapace.Action {
-		switch len(parts) {
+	return carapace.ActionMultiParts(divider, func(mc carapace.MultipartsContext) carapace.Action {
+		switch len(mc.Parts) {
 		case 0:
-			return ActionTestValues().Invoke(args).Suffix(divider).ToA()
+			return ActionTestValues().Invoke(mc.Context).Suffix(divider).ToA()
 		case 1:
-			return ActionTestValues().Invoke(args).Filter(parts).Suffix(divider).ToA()
+			return ActionTestValues().Invoke(mc.Context).Filter(mc.Parts).Suffix(divider).ToA()
 		case 2:
-			return ActionTestValues().Invoke(args).Filter(parts).ToA()
+			return ActionTestValues().Invoke(mc.Context).Filter(mc.Parts).ToA()
 		default:
 			return carapace.ActionValues()
 		}

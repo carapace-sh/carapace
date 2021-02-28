@@ -20,7 +20,7 @@ func init() {
 		"required": carapace.ActionValues("valid", "invalid"),
 	})
 
-	carapace.Gen(conditionCmd).PositionalCompletion(carapace.ActionCallback(func(args []string) carapace.Action {
+	carapace.Gen(conditionCmd).PositionalCompletion(carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		if conditionCmd.Flag("required").Value.String() == "valid" {
 			return carapace.ActionValues("condition fulfilled")
 		} else {

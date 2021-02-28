@@ -17,7 +17,7 @@ var replacer = strings.NewReplacer(
 	`'`, `\"`,
 )
 
-func Snippet(cmd *cobra.Command, actions map[string]string) string {
+func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`function _%v_quote_suffix
   if not commandline -cp | xargs echo 2>/dev/null >/dev/null
     if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null

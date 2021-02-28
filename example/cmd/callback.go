@@ -22,21 +22,21 @@ func init() {
 	callbackCmd.Flags().StringP("callback", "c", "", "Help message for callback")
 
 	carapace.Gen(callbackCmd).FlagCompletion(carapace.ActionMap{
-		"callback": carapace.ActionCallback(func(args []string) carapace.Action {
+		"callback": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues("cb1", "cb2", "cb3")
 		}),
 	})
 
 	carapace.Gen(callbackCmd).PositionalCompletion(
-		carapace.ActionCallback(func(args []string) carapace.Action {
+		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues("callback1", "callback2")
 		}).Cache(30*time.Second),
-		carapace.ActionMultiParts("=", func(args []string, parts []string) carapace.Action {
-			switch len(parts) {
+		carapace.ActionMultiParts("=", func(mc carapace.MultipartsContext) carapace.Action {
+			switch len(mc.Parts) {
 			case 0:
 				return carapace.ActionValues("alpha=", "beta=", "gamma")
 			case 1:
-				switch parts[0] {
+				switch mc.Parts[0] {
 				case "alpha":
 					return carapace.ActionValues("one", "two", "three")
 				case "beta":
@@ -51,8 +51,8 @@ func init() {
 	)
 
 	carapace.Gen(callbackCmd).PositionalAnyCompletion(
-		carapace.ActionCallback(func(args []string) carapace.Action {
-			return carapace.ActionMessage(fmt.Sprintf("POS_%v", len(args)))
+		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionMessage(fmt.Sprintf("POS_%v", len(c.Args)))
 		}),
 	)
 }

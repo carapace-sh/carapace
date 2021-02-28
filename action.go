@@ -27,49 +27,59 @@ import (
 // Action indicates how to complete a flag or positional argument
 type Action struct {
 	rawValues  []common.RawValue
-	bash       func() string
-	elvish     func() string
-	fish       func() string
-	oil        func() string
-	powershell func() string
-	xonsh      func() string
-	zsh        func() string
+	bash       func(callbackValue string) string
+	elvish     func(callbackValue string) string
+	fish       func(callbackValue string) string
+	oil        func(callbackValue string) string
+	powershell func(callbackValue string) string
+	xonsh      func(callbackValue string) string
+	zsh        func(callbackValue string) string
 	callback   CompletionCallback
 }
 
 type ActionMap map[string]Action
 
-func (a ActionMap) invokeCallback(uid string, args []string) Action {
+func (a ActionMap) invokeCallback(uid string, context Context) Action {
 	if action, ok := a[uid]; ok {
 		if action.callback != nil {
-			return action.callback(args)
+			return action.callback(context)
 		}
 	}
 	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
 }
 
-func (a ActionMap) shell(shell string) map[string]string {
+func (a ActionMap) shell(shell string, c Context) map[string]string {
 	actions := make(map[string]string, len(a))
 	for key, value := range map[string]Action(a) {
-		actions[key] = value.Value(shell)
+		actions[key] = value.Invoke(c).value(shell, c.CallbackValue)
 	}
 	return actions
 }
 
-type CompletionCallback func(args []string) Action
+type Context struct {
+	CallbackValue string
+	Args          []string
+}
+
+type MultipartsContext struct {
+	Context
+	Parts []string
+}
+
+type CompletionCallback func(c Context) Action
 
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
-		a.callback = func(args []string) Action {
+		a.callback = func(c Context) Action {
 			if cacheFile, err := cache.File(file, line, keys...); err == nil {
 				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
 					return actionRawValues(rawValues...)
 				} else {
 					oldState := skipCache
 					skipCache = false // TODO find a better solution for this
-					invokedAction := (Action{callback: cachedCallback}).Invoke(args)
+					invokedAction := (Action{callback: cachedCallback}).Invoke(c)
 					if !skipCache {
 						_ = cache.Write(cacheFile, invokedAction.rawValues)
 					}
@@ -77,7 +87,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 					return invokedAction.ToA()
 				}
 			}
-			return cachedCallback(args)
+			return cachedCallback(c)
 		}
 	}
 	return a
@@ -86,8 +96,8 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 type InvokedAction Action
 
 // Invoke executes the callback of an action if it exists (supports nesting)
-func (a Action) Invoke(args []string) InvokedAction {
-	return InvokedAction(a.nestedAction(args, 5))
+func (a Action) Invoke(c Context) InvokedAction {
+	return InvokedAction(a.nestedAction(c, 5))
 }
 
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
@@ -138,15 +148,15 @@ func (a InvokedAction) ToA() Action {
 }
 
 func (a InvokedAction) ToMultiPartsA(divider string) Action {
-	return ActionMultiParts(divider, func(args, parts []string) Action {
+	return ActionMultiParts(divider, func(mc MultipartsContext) Action {
 		uniqueVals := make(map[string]string)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, strings.Join(parts, divider)) {
-				if splitted := strings.Split(val.Value, divider); len(splitted) > len(parts) {
-					if len(splitted) == len(parts)+1 {
-						uniqueVals[splitted[len(parts)]] = val.Description
+			if strings.HasPrefix(val.Value, strings.Join(mc.Parts, divider)) {
+				if splitted := strings.Split(val.Value, divider); len(splitted) > len(mc.Parts) {
+					if len(splitted) == len(mc.Parts)+1 {
+						uniqueVals[splitted[len(mc.Parts)]] = val.Description
 					} else {
-						uniqueVals[splitted[len(parts)]+divider] = ""
+						uniqueVals[splitted[len(mc.Parts)]+divider] = ""
 					}
 				}
 			}
@@ -161,16 +171,16 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 	})
 }
 
-func (a Action) nestedAction(args []string, maxDepth int) Action {
+func (a Action) nestedAction(c Context, maxDepth int) Action {
 	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
-		return a.callback(args).nestedAction(args, maxDepth-1)
+		return a.callback(c).nestedAction(c, maxDepth-1)
 	} else {
 		return a
 	}
 }
 
-func (a Action) Value(shell string) string {
-	var f func() string
+func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
+	var f func(callbackValue string) string
 	switch shell {
 	case "bash":
 		f = a.bash
@@ -189,10 +199,9 @@ func (a Action) Value(shell string) string {
 	}
 
 	if f == nil {
-		// TODO "{}" for xonsh?
 		return ""
 	} else {
-		return f()
+		return f(callbackValue)
 	}
 }
 
@@ -208,68 +217,70 @@ func ActionBool() Action {
 
 // ActionDirectories completes directories
 func ActionDirectories() Action {
-	return ActionCallback(func(args []string) Action {
-		return actionPath([]string{""}, true).Invoke(args).ToMultiPartsA("/")
+	return ActionCallback(func(c Context) Action {
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/")
 	})
 }
 
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix ...string) Action {
-	return ActionCallback(func(args []string) Action {
-		return actionPath(suffix, false).Invoke(args).ToMultiPartsA("/")
+	return ActionCallback(func(c Context) Action {
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/")
 	})
 }
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
-	folder := filepath.Dir(CallbackValue)
-	expandedFolder := folder
-	if strings.HasPrefix(CallbackValue, "~") {
-		if homedir, err := os.UserHomeDir(); err != nil {
+	return ActionCallback(func(c Context) Action {
+		folder := filepath.Dir(c.CallbackValue)
+		expandedFolder := folder
+		if strings.HasPrefix(c.CallbackValue, "~") {
+			if homedir, err := os.UserHomeDir(); err != nil {
+				return ActionMessage(err.Error())
+			} else {
+				expandedFolder = filepath.Dir(homedir + "/" + c.CallbackValue[1:])
+			}
+		}
+
+		if files, err := ioutil.ReadDir(expandedFolder); err != nil {
 			return ActionMessage(err.Error())
 		} else {
-			expandedFolder = filepath.Dir(homedir + "/" + CallbackValue[1:])
-		}
-	}
-
-	if files, err := ioutil.ReadDir(expandedFolder); err != nil {
-		return ActionMessage(err.Error())
-	} else {
-		if folder == "." {
-			folder = ""
-		} else if !strings.HasSuffix(folder, "/") {
-			folder = folder + "/"
-		}
-
-		showHidden := CallbackValue != "" &&
-			!strings.HasSuffix(CallbackValue, "/") &&
-			strings.HasPrefix(filepath.Base(CallbackValue), ".")
-
-		vals := make([]string, 0, len(files))
-		for _, file := range files {
-			if !showHidden && strings.HasPrefix(file.Name(), ".") {
-				continue
+			if folder == "." {
+				folder = ""
+			} else if !strings.HasSuffix(folder, "/") {
+				folder = folder + "/"
 			}
 
-			if file.IsDir() {
-				vals = append(vals, folder+file.Name()+"/")
-			} else if !dirOnly {
-				if len(fileSuffixes) == 0 {
-					fileSuffixes = []string{""}
+			showHidden := c.CallbackValue != "" &&
+				!strings.HasSuffix(c.CallbackValue, "/") &&
+				strings.HasPrefix(filepath.Base(c.CallbackValue), ".")
+
+			vals := make([]string, 0, len(files))
+			for _, file := range files {
+				if !showHidden && strings.HasPrefix(file.Name(), ".") {
+					continue
 				}
-				for _, suffix := range fileSuffixes {
-					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, folder+file.Name())
-						break
+
+				if file.IsDir() {
+					vals = append(vals, folder+file.Name()+"/")
+				} else if !dirOnly {
+					if len(fileSuffixes) == 0 {
+						fileSuffixes = []string{""}
+					}
+					for _, suffix := range fileSuffixes {
+						if strings.HasSuffix(file.Name(), suffix) {
+							vals = append(vals, folder+file.Name())
+							break
+						}
 					}
 				}
 			}
+			if strings.HasPrefix(c.CallbackValue, "./") {
+				return ActionValues(vals...).Invoke(Context{}).Prefix("./").ToA()
+			} else {
+				return ActionValues(vals...)
+			}
 		}
-		if strings.HasPrefix(CallbackValue, "./") {
-			return ActionValues(vals...).Invoke([]string{}).Prefix("./").ToA()
-		} else {
-			return ActionValues(vals...)
-		}
-	}
+	})
 }
 
 // ActionValues completes arbitrary keywords (values)
@@ -296,13 +307,13 @@ func ActionValuesDescribed(values ...string) Action {
 func actionRawValues(rawValues ...common.RawValue) Action {
 	return Action{
 		rawValues:  rawValues,
-		bash:       func() string { return bash.ActionRawValues(CallbackValue, rawValues...) },
-		elvish:     func() string { return elvish.ActionRawValues(CallbackValue, rawValues...) },
-		fish:       func() string { return fish.ActionRawValues(CallbackValue, rawValues...) },
-		oil:        func() string { return oil.ActionRawValues(CallbackValue, rawValues...) },
-		powershell: func() string { return powershell.ActionRawValues(CallbackValue, rawValues...) },
-		xonsh:      func() string { return xonsh.ActionRawValues(CallbackValue, rawValues...) },
-		zsh:        func() string { return zsh.ActionRawValues(CallbackValue, rawValues...) },
+		bash:       func(callbackValue string) string { return bash.ActionRawValues(callbackValue, rawValues...) },
+		elvish:     func(callbackValue string) string { return elvish.ActionRawValues(callbackValue, rawValues...) },
+		fish:       func(callbackValue string) string { return fish.ActionRawValues(callbackValue, rawValues...) },
+		oil:        func(callbackValue string) string { return oil.ActionRawValues(callbackValue, rawValues...) },
+		powershell: func(callbackValue string) string { return powershell.ActionRawValues(callbackValue, rawValues...) },
+		xonsh:      func(callbackValue string) string { return xonsh.ActionRawValues(callbackValue, rawValues...) },
+		zsh:        func(callbackValue string) string { return zsh.ActionRawValues(callbackValue, rawValues...) },
 	}
 }
 
@@ -310,33 +321,35 @@ var skipCache bool
 
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
-	skipCache = true                                                                                 // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
-	return ActionValuesDescribed("_", "", "ERR", msg).Invoke([]string{}).Prefix(CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
+	return ActionCallback(func(c Context) Action {
+		skipCache = true                                                                          // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
+		return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
+	})
 }
 
 // CallbackValue is set to the currently completed flag/positional value during callback (note that this is updated during ActionMultiParts)
-var CallbackValue string
+//var CallbackValue string // TODO remove
 
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
-func ActionMultiParts(divider string, callback func(args []string, parts []string) Action) Action {
-	return ActionCallback(func(args []string) Action {
-		oldValue := CallbackValue
-		defer func() { CallbackValue = oldValue }() // TODO verify this
+func ActionMultiParts(divider string, callback func(mc MultipartsContext) Action) Action {
+	return ActionCallback(func(c Context) Action {
+		mc := MultipartsContext{Context: c}
 
-		index := strings.LastIndex(CallbackValue, string(divider))
+		index := strings.LastIndex(c.CallbackValue, string(divider))
 		prefix := ""
 		if len(divider) == 0 {
-			prefix = CallbackValue
+			prefix = c.CallbackValue
 		} else if index != -1 {
-			prefix = CallbackValue[0 : index+len(divider)]
-			CallbackValue = CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
+			prefix = c.CallbackValue[0 : index+len(divider)]
+			mc.CallbackValue = c.CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 {
 			parts = parts[0 : len(parts)-1]
 		}
+		mc.Parts = parts
 
-		return callback(args, parts).Invoke(args).Prefix(prefix).ToA()
+		return callback(mc).Invoke(mc.Context).Prefix(prefix).ToA()
 	})
 }
 
@@ -354,40 +367,42 @@ func actionSubcommands(cmd *cobra.Command) Action {
 }
 
 func actionFlags(cmd *cobra.Command) Action {
-	re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-	isShorthandSeries := re.MatchString(CallbackValue)
+	return ActionCallback(func(c Context) Action {
+		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
+		isShorthandSeries := re.MatchString(c.CallbackValue)
 
-	vals := make([]string, 0)
-	cmd.Flags().VisitAll(func(f *pflag.Flag) {
-		if f.Deprecated != "" {
-			return // skip deprecated flags
-		}
+		vals := make([]string, 0)
+		cmd.Flags().VisitAll(func(f *pflag.Flag) {
+			if f.Deprecated != "" {
+				return // skip deprecated flags
+			}
 
-		if f.Changed &&
-			!strings.Contains(f.Value.Type(), "Slice") &&
-			!strings.Contains(f.Value.Type(), "Array") {
-			return // don't repeat flag
-		}
+			if f.Changed &&
+				!strings.Contains(f.Value.Type(), "Slice") &&
+				!strings.Contains(f.Value.Type(), "Array") {
+				return // don't repeat flag
+			}
+
+			if isShorthandSeries {
+				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+					vals = append(vals, f.Shorthand, f.Usage)
+				}
+			} else {
+				if !common.IsShorthandOnly(f) {
+					vals = append(vals, "--"+f.Name, f.Usage)
+				}
+				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+					vals = append(vals, "-"+f.Shorthand, f.Usage)
+				}
+			}
+		})
 
 		if isShorthandSeries {
-			if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-				vals = append(vals, f.Shorthand, f.Usage)
-			}
+			matches := re.FindStringSubmatch(c.CallbackValue)
+			parts := strings.Split(matches[1], "")
+			return ActionValuesDescribed(vals...).Invoke(c).Filter(parts).Prefix(c.CallbackValue).ToA()
 		} else {
-			if !common.IsShorthandOnly(f) {
-				vals = append(vals, "--"+f.Name, f.Usage)
-			}
-			if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-				vals = append(vals, "-"+f.Shorthand, f.Usage)
-			}
+			return ActionValuesDescribed(vals...)
 		}
 	})
-
-	if isShorthandSeries {
-		matches := re.FindStringSubmatch(CallbackValue)
-		parts := strings.Split(matches[1], "")
-		return ActionValuesDescribed(vals...).Invoke([]string{}).Filter(parts).Prefix(CallbackValue).ToA()
-	} else {
-		return ActionValuesDescribed(vals...)
-	}
 }

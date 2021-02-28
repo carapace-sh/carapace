@@ -4,7 +4,7 @@ Custom Actions can be created by using a function that returns `carapace.Action`
 
 ```go
 func ActionTheme() carapace.Action {
-	return carapace.ActionCallback(func(args []string) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		if output, err := exec.Command("bat", "--list-themes").Output(); err != nil {
 			return carapace.ActionMessage(err.Error())
 		} else {

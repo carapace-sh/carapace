@@ -4,7 +4,7 @@
 E.g. completing a unique list of values in an [ActionMultiParts](../action/actionMultiParts.md):
 
 ```go
-carapace.ActionMultiParts(",", func(mc carapace.MultipartsContext) carapace.Action {
- 	return carapace.ActionValues("one", "two", "three").Invoke(mc.Context).Filter(c.Parts).ToA()
+carapace.ActionMultiParts(",", func(c carapace.Context) carapace.Action {
+ 	return carapace.ActionValues("one", "two", "three").Invoke(c).Filter(c.Parts).ToA()
 }
 ```

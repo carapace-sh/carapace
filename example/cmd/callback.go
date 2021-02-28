@@ -31,12 +31,12 @@ func init() {
 		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues("callback1", "callback2")
 		}).Cache(30*time.Second),
-		carapace.ActionMultiParts("=", func(mc carapace.MultipartsContext) carapace.Action {
-			switch len(mc.Parts) {
+		carapace.ActionMultiParts("=", func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
 			case 0:
 				return carapace.ActionValues("alpha=", "beta=", "gamma")
 			case 1:
-				switch mc.Parts[0] {
+				switch c.Parts[0] {
 				case "alpha":
 					return carapace.ActionValues("one", "two", "three")
 				case "beta":

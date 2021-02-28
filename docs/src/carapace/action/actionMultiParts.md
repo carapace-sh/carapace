@@ -3,10 +3,10 @@
 [`ActionMultiParts`] is a [callback action](./actionCallback.md) where parts of an argument can be completed separately (e.g. `user:group` from chown). Divider can be empty as well, but note that bash and fish will add the space suffix for anything other than `/=@:.,` (it still works, but after each selection backspace is needed to continue the completion).
 
 ```go
-carapace.ActionMultiParts(":", func(mc carapace.MultipartsContext) carapace.Action {
+carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 	switch len(parts) {
 	case 0:
-		return ActionUsers().Invoke(mc.Args).Suffix(":").ToA()
+		return ActionUsers().Invoke(c.Args).Suffix(":").ToA()
 	case 1:
 		return ActionGroups()
 	default:
@@ -25,17 +25,17 @@ carapace.ActionMultiParts(":", func(mc carapace.MultipartsContext) carapace.Acti
 [`ActionMultiParts`] can be nested as well, e.g. completing multiple `KEY=VALUE` pairs separated by `,`.
 
 ```go
-carapace.ActionMultiParts(",", func(mcEntries carapace.MultipartsContext) carapace.Action {
-	return carapace.ActionMultiParts("=", func(mc carapace.MultipartsContext) carapace.Action {
-		switch len(mc.Parts) {
+carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
+	return carapace.ActionMultiParts("=", func(c carapace.Context) carapace.Action {
+		switch len(c.Parts) {
 		case 0:
-			keys := make([]string, len(mcEntries.Parts))
-			for index, entry := range mcEntries.Parts {
+			keys := make([]string, len(cEntries.Parts))
+			for index, entry := range cEntries.Parts {
 				keys[index] = strings.Split(entry, "=")[0]
 			}
-			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(mc.Context).Filter(keys).Suffix("=").ToA()
+			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys).Suffix("=").ToA()
 		case 1:
-			switch mc.Parts[0] {
+			switch c.Parts[0] {
 			case "FILE":
 				return carapace.ActionFiles("")
 			case "DIRECTORY":

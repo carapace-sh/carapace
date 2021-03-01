@@ -96,6 +96,12 @@ type InvokedAction Action
 
 // Invoke executes the callback of an action if it exists (supports nesting)
 func (a Action) Invoke(c Context) InvokedAction {
+	if c.Args == nil {
+		c.Args = []string{}
+	}
+	if c.Parts == nil {
+		c.Parts = []string{}
+	}
 	return InvokedAction(a.nestedAction(c, 5))
 }
 

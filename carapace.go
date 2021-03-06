@@ -232,6 +232,8 @@ func determineShell() string {
 			return "elvish"
 		case "fish":
 			return "fish"
+		case "nu":
+			return "nushell"
 		case "oil":
 			return "oil"
 		case "osh":

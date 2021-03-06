@@ -26,7 +26,7 @@ RUN curl -L https://github.com/nushell/nushell/releases/download/0.24.1/nu_0_24_
  && mv nu_0_24_1_linux/nushell-0.24.1/nu* /usr/local/bin
 
 FROM base as oil
-RUN curl https://www.oilshell.org/download/oil-0.8.5.tar.gz | tar -xvz \
+RUN curl https://www.oilshell.org/download/oil-0.8.7.tar.gz | tar -xvz \
  && cd oil-*/ \
  && ./configure \
  && make \
@@ -50,8 +50,7 @@ RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsof
  && add-apt-repository universe
 
 RUN apt-get update \
- && apt-get install -y bash-completion \ 
-                       fish \
+ && apt-get install -y fish \
                        elvish \
                        powershell \
                        python3-pip \

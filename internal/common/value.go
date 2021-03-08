@@ -19,3 +19,9 @@ type ByValue []RawValue
 func (a ByValue) Len() int           { return len(a) }
 func (a ByValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
 func (a ByValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type ByDisplay []RawValue
+
+func (a ByDisplay) Len() int           { return len(a) }
+func (a ByDisplay) Less(i, j int) bool { return a[i].Display < a[j].Display }
+func (a ByDisplay) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

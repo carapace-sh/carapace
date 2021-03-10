@@ -49,12 +49,7 @@ def _example_completer(prefix, line, begidx, endidx, ctx):
     if len(result) == 0:
         result = {RichCompletion(current, display=current, description='', prefix_len=0)}
 
-    def _example_quote(s):
-        if " " in s:
-            return '"' + s + '"'
-        return s
-        
-    result = set(map(lambda x: RichCompletion(_example_quote(x), display=x.display, description=x.description, prefix_len=endidx-begidx), result))
+    result = set(map(lambda x: RichCompletion(x, display=x.display, description=x.description, prefix_len=endidx-begidx), result))
     return result
 
 from xonsh.completers._aliases import _add_one_completer

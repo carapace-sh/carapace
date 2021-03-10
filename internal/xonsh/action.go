@@ -2,26 +2,16 @@ package xonsh
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 )
 
 var sanitizer = strings.NewReplacer( // TODO
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
+	"\t", ``,
+	`'`, ``, // `\'` seems to work but beware of `\\'`
 )
 
 func Sanitize(values ...string) []string {
@@ -49,7 +39,12 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 
 	vals := make([]richCompletion, len(filtered))
 	for index, val := range filtered {
-		vals[index] = richCompletion{Value: sanitizer.Replace(val.Value), Display: sanitizer.Replace(val.Display), Description: sanitizer.Replace(val.Description)}
+		val.Value = sanitizer.Replace(val.Value)
+
+		if strings.ContainsAny(val.Value, ` ()[]*$?\"|<>&();#`+"`") {
+			val.Value = fmt.Sprintf("'%v'", val.Value)
+		}
+		vals[index] = richCompletion{Value: val.Value, Display: val.Display, Description: val.Description}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

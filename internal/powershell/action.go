@@ -2,28 +2,17 @@ package powershell
 
 import (
 	"encoding/json"
+	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 )
 
 var sanitizer = strings.NewReplacer( // TODO
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
-	`’`, ``,
-	`,`, "`,",
+	"\t", ``,
+	`'`, ``, // `\'` seems to work but beware of `\\'`
 )
 
 func Sanitize(values ...string) []string {
@@ -53,11 +42,20 @@ func ensureNotEmpty(s string) string {
 }
 
 func ActionRawValues(callbackValue string, values ...common.RawValue) string {
-	vals := make([]completionResult, 0, len(values))
-	for _, val := range values {
+	filtered := common.ByValues(values).Filter(callbackValue)
+	sort.Sort(common.ByDisplay(filtered))
+
+	vals := make([]completionResult, 0, len(filtered))
+	for _, val := range filtered {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error
+			val.Value = sanitizer.Replace(val.Value)
+
+			if strings.ContainsAny(val.Value, ` {}()[]*$?\"|<>&(),;#`+"`") {
+				val.Value = fmt.Sprintf("'%v'", val.Value)
+			}
+
 			vals = append(vals, completionResult{
-				CompletionText: EscapeSpace(sanitizer.Replace(val.Value)),
+				CompletionText: val.Value,
 				ListItemText:   ensureNotEmpty(sanitizer.Replace(val.Display)),
 				ToolTip:        ensureNotEmpty(sanitizer.Replace(val.Description)),
 			})

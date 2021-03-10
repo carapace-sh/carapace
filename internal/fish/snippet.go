@@ -2,19 +2,9 @@ package fish
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
-)
-
-var replacer = strings.NewReplacer(
-	"\n", ``,
-	`:`, `\:`,
-	`"`, `\"`,
-	`[`, `\[`,
-	`]`, `\]`,
-	`'`, `\"`,
 )
 
 func Snippet(cmd *cobra.Command) string {

@@ -38,3 +38,15 @@ type ByDisplay []RawValue
 func (a ByDisplay) Len() int           { return len(a) }
 func (a ByDisplay) Less(i, j int) bool { return a[i].Display < a[j].Display }
 func (a ByDisplay) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type ByValues []RawValue
+
+func (r ByValues) Filter(prefix string) []RawValue {
+	filtered := make([]RawValue, 0, len(r))
+	for _, v := range r {
+		if strings.HasPrefix(v.Value, prefix) {
+			filtered = append(filtered, v)
+		}
+	}
+	return filtered
+}

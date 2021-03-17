@@ -1,4 +1,3 @@
-// Package carapace provides multi-shell completion script generation for spf13/cobra
 package carapace
 
 import (
@@ -140,10 +139,10 @@ func addCompletionCommand(cmd *cobra.Command) {
 				} else {
 					shell := args[0]
 					id := args[1]
-					current := os.Args[len(os.Args)-1]
-					previous := os.Args[len(os.Args)-2]
+					current := args[len(args)-1]
+					previous := args[len(args)-2]
 
-					targetCmd, targetArgs, err := findTarget(cmd)
+					targetCmd, targetArgs, err := findTarget(cmd, args)
 					context := Context{CallbackValue: current, Args: targetArgs}
 					if err != nil {
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Invoke(context).value(shell, context.CallbackValue))
@@ -152,38 +151,33 @@ func addCompletionCommand(cmd *cobra.Command) {
 
 					switch id {
 					case "_":
-						if strings.HasPrefix(current, "-") { // assume flag
+						// TODO needs more cleanup and tests
+						var targetAction Action
+						if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" { // previous arg is a flag and needs a value
+							targetAction, _ = actionMap[uid.Flag(targetCmd, flag)]
+						} else if strings.HasPrefix(current, "-") { // assume flag
 							if strings.Contains(current, "=") { // complete value for optarg flag
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
 										// TODO no value for oil (elvish works)
-										fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(context).Prefix(strings.SplitN(current, "=", 2)[0]+"=").value(shell, context.CallbackValue))
+										splitted := strings.SplitN(current, "=", 2)
+										context.CallbackValue = splitted[1]
+										targetAction = a.Invoke(context).Prefix(splitted[0] + "=").ToA()
 									}
 								}
 							} else { // complete flagnames
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionFlags(targetCmd).Invoke(context).value(shell, context.CallbackValue))
-							}
-						} else if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" {
-							if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
-								fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), a.Invoke(context).value(shell, context.CallbackValue))
+								targetAction = actionFlags(targetCmd)
 							}
 						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
 							subcommandA := actionSubcommands(targetCmd)
 							if _, a, ok := findAction(targetCmd, targetArgs); ok {
 								subcommandA = a.Invoke(context).Merge(subcommandA.Invoke(context)).ToA()
 							}
-							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), subcommandA.Invoke(context).value(shell, context.CallbackValue))
+							targetAction = subcommandA
 						} else {
-							if _, action, ok := findAction(targetCmd, targetArgs); ok {
-								if action.callback == nil {
-									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.Invoke(context).value(shell, context.CallbackValue))
-								} else {
-									fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), action.callback(context).Invoke(context).value(shell, context.CallbackValue))
-								}
-							}
+							_, targetAction, _ = findAction(targetCmd, targetArgs)
 						}
-					case "state":
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), uid.Command(targetCmd))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), targetAction.Invoke(context).value(shell, context.CallbackValue))
 					default:
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))
 					}
@@ -215,10 +209,10 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) (id string, actio
 	return
 }
 
-func findTarget(cmd *cobra.Command) (*cobra.Command, []string, error) {
+func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
 	origArg := []string{}
-	if len(os.Args) > 5 {
-		origArg = os.Args[5:]
+	if len(args) > 3 {
+		origArg = args[3:]
 	}
 	return common.TraverseLenient(cmd, origArg)
 }

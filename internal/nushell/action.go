@@ -28,13 +28,8 @@ type suggestion struct {
 	Display string
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
-	filtered := make([]common.RawValue, 0)
-	for _, r := range values {
-		if strings.HasPrefix(r.Value, callbackValue) {
-			filtered = append(filtered, r)
-		}
-	}
+func ActionRawValues(callbackValue string, values common.RawValues) string {
+	filtered := values.FilterPrefix(callbackValue)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]suggestion, len(filtered))

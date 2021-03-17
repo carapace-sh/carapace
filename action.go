@@ -319,7 +319,7 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 		bash:       func(callbackValue string) string { return bash.ActionRawValues(callbackValue, rawValues...) },
 		elvish:     func(callbackValue string) string { return elvish.ActionRawValues(callbackValue, rawValues...) },
 		fish:       func(callbackValue string) string { return fish.ActionRawValues(callbackValue, rawValues...) },
-		nushell:    func(callbackValue string) string { return nushell.ActionRawValues(callbackValue, rawValues...) },
+		nushell:    func(callbackValue string) string { return nushell.ActionRawValues(callbackValue, rawValues) },
 		oil:        func(callbackValue string) string { return oil.ActionRawValues(callbackValue, rawValues...) },
 		powershell: func(callbackValue string) string { return powershell.ActionRawValues(callbackValue, rawValues...) },
 		xonsh:      func(callbackValue string) string { return xonsh.ActionRawValues(callbackValue, rawValues...) },

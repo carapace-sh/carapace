@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -47,38 +46,6 @@ func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
 func Positional(cmd *cobra.Command, position int) string {
 	// TODO complete function
 	return fmt.Sprintf("%v#%v", Command(cmd), position)
-}
-
-func Value(cmd *cobra.Command, args []string, uid string) string {
-	// TODO assumes cmd is correct
-	if strings.Contains(uid, "##") {
-		split := strings.Split(uid, "##")
-		if flag := cmd.Flag(split[len(split)-1]); flag != nil {
-			if flag.Value.Type() == "stringSlice" {
-				slice, _ := cmd.Flags().GetStringSlice(split[len(split)-1])
-				return strings.Join(slice, ",")
-			} else if flag.Value.Type() == "stringArray" {
-				slice, _ := cmd.Flags().GetStringArray(split[len(split)-1])
-				return strings.Join(slice, ",")
-			} else {
-				return flag.Value.String()
-			}
-		}
-
-	} else if strings.Contains(uid, "#") {
-		split := strings.Split(uid, "#")
-		if index, err := strconv.Atoi(split[len(split)-1]); err == nil {
-			if index > 0 {
-				index = index - 1
-				if len(args)-1 >= index && index >= 0 {
-					return args[index]
-				}
-			} else if len(args) > 0 && os.Args[len(os.Args)-1] != "" {
-				return args[len(args)-1]
-			}
-		}
-	}
-	return ""
 }
 
 func find(cmd *cobra.Command, uid string) *cobra.Command {

@@ -10,15 +10,3 @@ When [`carapace.Gen`](https://pkg.go.dev/github.com/rsteube/carapace#Gen) is inv
 ```sh
 command _carapace [SHELL]
 ```
-
-## State
-```sh
-command _carapace [SHELL] state command subcommand [options] ...
-```
-
-## Callback
-
-```sh
-command _carapace [SHELL] [UID] command subcommand [options] ...
-```
-

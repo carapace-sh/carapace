@@ -21,26 +21,24 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 Since callbacks are simply invocations of the program they can be tested directly.
 ```sh
-./example _carapace bash '_example__condition#1' example condition --required invalid
-#compgen -W $'_\nERR (flag --required must be set to valid: invalid)' -- "${cur//\\ / }" | sed "s!^${curprefix//\\ / }!!"
+example _carapace bash _ example condition --required ''
+valid
+invalid
 
-./example _carapace elvish '_example__condition#1' example condition --required invalid
-#edit:complex-candidate ERR &display-suffix=' (flag --required must be set to valid: invalid)'
-#edit:complex-candidate _ &display-suffix=' ()'
+example _carapace elvish _ example condition --required ''
+[{"Value":"valid","Display":"valid"},{"Value":"invalid","Display":"invalid"}]
 
-./example _carapace fish '_example__condition#1' example condition --required invalid
-#echo -e ERR\tflag --required must be set to valid: invalid\n_\t\n\n
+example _carapace fish _ example condition --required ''
+valid
+invalid
 
-./example _carapace powershell '_example__condition#1' example condition --required invalid
-#[CompletionResult]::new('ERR', 'ERR', [CompletionResultType]::ParameterValue, ' ')
-#[CompletionResult]::new('flag --required must be set to valid: invalid', 'flag --required must be set to valid: invalid', [CompletionResultType]::ParameterValue, ' ')
+example _carapace powershell _ example condition --required ''
+[{"CompletionText":"valid","ListItemText":"valid","ToolTip":" "},{"CompletionText":"invalid","ListItemText":"invalid","ToolTip":" "}]
 
-./example _carapace xonsh '_example__condition#1' example condition --required invalid
-#{
-#  RichCompletion('_', display='_', description='flag --required must be set to valid: invalid', prefix_len=0),
-#  RichCompletion('ERR', display='ERR', description='flag --required must be set to valid: invalid', prefix_len=0),
-#}
+example _carapace xonsh _ example condition --required ''
+[{"Value":"valid","Display":"valid","Description":""},{"Value":"invalid","Display":"invalid","Description":""}]
 
-./example _carapace zsh '_example__condition#1' example condition --required invalid
-#{local _comp_desc=('_' 'ERR (flag --required must be set to valid: invalid)');compadd -S '' -d _comp_desc '_' 'ERR'}
+example _carapace zsh _ example condition --required ''
+valid   valid
+invalid invalid
 ```

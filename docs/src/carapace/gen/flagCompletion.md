@@ -11,18 +11,11 @@ carapace.Gen(myCmd).FlagCompletion(carapace.ActionMap{
 
 ## Optional argument
 
-To mark a flag argument as optional the [`NoOptDefVal`] needs to be set to anything other than empty string.
+To mark a flag argument as optional (`--name=value`) the [`NoOptDefVal`] needs to be set to anything other than empty string.
 
 ```go
 rootCmd.Flag("optarg").NoOptDefVal = " "
 ```
-
-| type | example |
-| --- | --- |
-| shorthand | `ls -l` |
-| longhand | `ls --all` |
-| optional argument | `tail --follow=descriptor` |
-
 
 [`FlagCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.FlagCompletion
 [`NoOptDefVal`]:https://pkg.go.dev/github.com/spf13/pflag#Flag

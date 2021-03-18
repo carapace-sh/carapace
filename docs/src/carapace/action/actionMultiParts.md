@@ -6,7 +6,7 @@
 carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 	switch len(parts) {
 	case 0:
-		return ActionUsers().Invoke(c.Args).Suffix(":").ToA()
+		return ActionUsers().Invoke(c).Suffix(":").ToA()
 	case 1:
 		return ActionGroups()
 	default:

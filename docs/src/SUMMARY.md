@@ -25,4 +25,3 @@
   - [Additional Information](./carapace/additionalInformation.md)
 - [caraparse](./caraparse.md)
 - [carapace-bin](./carapace-bin.md)
-- [lazycomplete](./lazycomplete.md)

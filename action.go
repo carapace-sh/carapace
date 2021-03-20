@@ -70,6 +70,7 @@ type Context struct {
 type CompletionCallback func(c Context) Action
 
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
+	// TODO static actions are using callback now as well (for performance) - probably best to add a `static` bool to Action for this and check that here
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
@@ -294,23 +295,27 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
-	vals := make([]string, len(values)*2)
-	for index, val := range values {
-		vals[index*2] = val
-		vals[(index*2)+1] = ""
-	}
-	return ActionValuesDescribed(vals...)
+	return ActionCallback(func(c Context) Action {
+		vals := make([]string, len(values)*2)
+		for index, val := range values {
+			vals[index*2] = val
+			vals[(index*2)+1] = ""
+		}
+		return ActionValuesDescribed(vals...)
+	})
 }
 
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
-	vals := make([]common.RawValue, len(values)/2)
-	for index, val := range values {
-		if index%2 == 0 {
-			vals[index/2] = common.RawValue{Value: val, Display: val, Description: values[index+1]}
+	return ActionCallback(func(c Context) Action {
+		vals := make([]common.RawValue, len(values)/2)
+		for index, val := range values {
+			if index%2 == 0 {
+				vals[index/2] = common.RawValue{Value: val, Display: val, Description: values[index+1]}
+			}
 		}
-	}
-	return actionRawValues(vals...)
+		return actionRawValues(vals...)
+	})
 }
 
 func actionRawValues(rawValues ...common.RawValue) Action {
@@ -327,13 +332,16 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 	}
 }
 
+// TODO move this into Action and update Merge/Suffix/Prefix functions to keep the state if true
 var skipCache bool
 
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
 	return ActionCallback(func(c Context) Action {
-		skipCache = true                                                                          // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
-		return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
+		return ActionCallback(func(c Context) Action {
+			skipCache = true                                                                          // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
+			return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
+		})
 	})
 }
 

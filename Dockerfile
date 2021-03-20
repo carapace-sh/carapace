@@ -2,44 +2,51 @@ FROM cimg/go:1.15 as base
 USER root
 
 FROM base as bat
-RUN curl -L https://github.com/sharkdp/bat/releases/download/v0.17.1/bat-v0.17.1-x86_64-unknown-linux-gnu.tar.gz \
-  | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v0.17.1-x86_64-unknown-linux-gnu/bat \
+ARG version=0.17.1
+RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-x86_64-unknown-linux-gnu.tar.gz \
+  | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v${version}-x86_64-unknown-linux-gnu/bat \
  && chmod +x /usr/local/bin/bat
 
 FROM base as elvish
-RUN curl https://dl.elv.sh/linux-amd64/elvish-HEAD.tar.gz | tar -xvz \
+ARG version=0.15.0
+RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
  && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v0.155.2/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
+ARG version=0.155.2
+RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
  && mv goreleaser /usr/local/bin/goreleaser
 
 FROM rust as ion
-RUN git clone https://gitlab.redox-os.org/redox-os/ion/ \
+ARG version=master
+RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.redox-os.org/redox-os/ion/ \
  && cd ion \
  && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
  && sudo make install prefix=/usr \
  && sudo make update-shells prefix=/usr
 
 FROM base as nu
-RUN curl -L https://github.com/nushell/nushell/releases/download/0.24.1/nu_0_24_1_linux.tar.gz | tar -xvz \
- && mv nu_0_24_1_linux/nushell-0.24.1/nu* /usr/local/bin
+ARG version=0.28.0
+RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \
+ && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
 FROM base as oil
-RUN curl https://www.oilshell.org/download/oil-0.8.7.tar.gz | tar -xvz \
+ARG version=0.8.8
+RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
  && cd oil-*/ \
  && ./configure \
  && make \
  && ./install
 
 FROM base as shellcheck
-RUN  scversion="stable" \
- && wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz" | tar -xJv shellcheck-stable/shellcheck \
+ARG version=stable
+RUN wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${version?}/shellcheck-${version?}.linux.x86_64.tar.xz" | tar -xJv shellcheck-stable/shellcheck \
  && mv shellcheck-stable/shellcheck /usr/local/bin/ \
  && chmod +x /usr/local/bin/shellcheck
 
 FROM base as mdbook
-RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v0.4.4/mdbook-v0.4.4-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
+ARG version=0.4.4
+RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
  && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
  && mv mdbook* /usr/local/bin/
 
@@ -57,7 +64,7 @@ RUN apt-get update \
                        zsh \
                        expect
 
-RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh \
+RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh prompt_toolkit \
  && ln -s $(which xonsh) /usr/bin/xonsh
 
 RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"

@@ -11,7 +11,7 @@ import (
 var sanitizer = strings.NewReplacer( // TODO
 	"\n", ``,
 	"\t", ``,
-	`'`, ``, // `\'` seems to work but beware of `\\'`
+	`'`, `\'`,
 )
 
 func Sanitize(values ...string) []string {
@@ -41,8 +41,12 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	for index, val := range filtered {
 		val.Value = sanitizer.Replace(val.Value)
 
-		if strings.ContainsAny(val.Value, ` ()[]*$?\"|<>&();#`+"`") {
-			val.Value = fmt.Sprintf("'%v'", val.Value)
+		if strings.ContainsAny(val.Value, ` ()[]{}*$?\"|<>&;#`+"`") {
+			if strings.Contains(val.Value, `\`) {
+				val.Value = fmt.Sprintf("r'%v'", val.Value) // backslash needs raw string
+			} else {
+				val.Value = fmt.Sprintf("'%v'", val.Value)
+			}
 		}
 		vals[index] = richCompletion{Value: val.Value, Display: val.Display, Description: val.Description}
 	}

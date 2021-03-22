@@ -40,6 +40,10 @@ func Snippet(cmd *cobra.Command) string {
             begidx = begidx - len(word)
             if line[begidx-1] == " ":
                 break
+    
+    for index, item in enumerate(wordsNonPosix):
+        if item.startswith("r'"):
+            words[index] = words[index][1:] # fix rawstring not handled by shlex
 
     current=words[-1]
     previous=words[-2]

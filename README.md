@@ -8,13 +8,13 @@
 
 Completion script generator for [cobra] with support for:
 
-- [Bash](https://www.gnu.org/software/bash/manual/html_node/A-Programmable-Completion-Example.html)
-- [Elvish](https://elv.sh/ref/edit.html#editcompletionarg-completer)
-- [Fish](https://fishshell.com/docs/current/#writing-your-own-completions)
-- [Oil](http://www.oilshell.org/blog/2018/10/10.html)
-- [Powershell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/register-argumentcompleter)
-- [Xonsh](https://xon.sh/tutorial_completers.html#writing-a-new-completer)
-- [Zsh](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org)
+- [Bash](https://www.gnu.org/software/bash/)
+- [Elvish](https://elv.sh/)
+- [Fish](https://fishshell.com/)
+- [Oil](http://www.oilshell.org/)
+- [Powershell](https://microsoft.com/powershell)
+- [Xonsh](https://xon.sh/)
+- [Zsh](https://www.zsh.org/)
 
 
 ## Status

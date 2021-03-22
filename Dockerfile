@@ -1,4 +1,4 @@
-FROM cimg/go:1.15 as base
+FROM cimg/go:1.16.2 as base
 USER root
 
 FROM base as bat
@@ -32,6 +32,7 @@ RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_$
 
 FROM base as oil
 ARG version=0.8.8
+RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
  && cd oil-*/ \
  && ./configure \

@@ -8,20 +8,8 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
+	"\t", ``,
 )
 
 func Sanitize(values ...string) []string {

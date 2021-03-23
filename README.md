@@ -11,7 +11,7 @@ Completion script generator for [cobra] with support for:
 - [Bash](https://www.gnu.org/software/bash/)
 - [Elvish](https://elv.sh/)
 - [Fish](https://fishshell.com/)
-- [Nushell](https://www.nushell.sh/) ([experimental](https://asciinema.org/a/397171))
+- [Nushell](https://www.nushell.sh/) ([experimental](https://github.com/rsteube/carapace/issues/89))
 - [Oil](http://www.oilshell.org/)
 - [Powershell](https://microsoft.com/powershell)
 - [Xonsh](https://xon.sh/)

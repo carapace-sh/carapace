@@ -24,8 +24,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-var actionMap ActionMap = make(ActionMap)
-
 type Carapace struct {
 	cmd *cobra.Command
 }
@@ -38,23 +36,15 @@ func Gen(cmd *cobra.Command) *Carapace {
 }
 
 func (c Carapace) PositionalCompletion(action ...Action) {
-	for index, a := range action {
-		actionMap[uid.Positional(c.cmd, index+1)] = a
-	}
+	storage.get(c.cmd).positional = action
 }
 
 func (c Carapace) PositionalAnyCompletion(action Action) {
-	actionMap[uid.Positional(c.cmd, 0)] = action
+	storage.get(c.cmd).positionalAny = action
 }
 
 func (c Carapace) FlagCompletion(actions ActionMap) {
-	for name, action := range actions {
-		if flag := c.cmd.LocalFlags().Lookup(name); flag == nil {
-			fmt.Fprintf(os.Stderr, "unknown flag: %v\n", name)
-		} else {
-			actionMap[uid.Flag(c.cmd, flag)] = action
-		}
-	}
+	storage.get(c.cmd).flag = actions
 }
 
 func (c Carapace) Standalone() {
@@ -126,7 +116,8 @@ func addCompletionCommand(cmd *cobra.Command) {
 				if len(args) == 1 {
 					switch args[0] {
 					case "debug":
-						for uid, action := range actionMap {
+						// TODO broken, not indexed by uid anymore
+						for uid, action := range storage {
 							fmt.Printf("%v:\t%v\n", uid, action)
 						}
 					default:
@@ -154,32 +145,31 @@ func addCompletionCommand(cmd *cobra.Command) {
 						// TODO needs more cleanup and tests
 						var targetAction Action
 						if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" { // previous arg is a flag and needs a value
-							targetAction, _ = actionMap[uid.Flag(targetCmd, flag)]
+							targetAction = storage.getFlag(targetCmd, flag.Name)
 						} else if strings.HasPrefix(current, "-") { // assume flag
 							if strings.Contains(current, "=") { // complete value for optarg flag
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
-									if a, ok := actionMap[uid.Flag(targetCmd, flag)]; ok {
-										// TODO no value for oil (elvish works)
-										splitted := strings.SplitN(current, "=", 2)
-										context.CallbackValue = splitted[1]
-										targetAction = a.Invoke(context).Prefix(splitted[0] + "=").ToA()
-									}
+									a := storage.getFlag(targetCmd, flag.Name)
+									// TODO no value for oil (elvish works)
+									splitted := strings.SplitN(current, "=", 2)
+									context.CallbackValue = splitted[1]
+									targetAction = a.Invoke(context).Prefix(splitted[0] + "=").ToA()
 								}
 							} else { // complete flagnames
 								targetAction = actionFlags(targetCmd)
 							}
 						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
 							subcommandA := actionSubcommands(targetCmd)
-							if _, a, ok := findAction(targetCmd, targetArgs); ok {
-								subcommandA = a.Invoke(context).Merge(subcommandA.Invoke(context)).ToA()
-							}
+							a := findAction(targetCmd, targetArgs)
+							subcommandA = a.Invoke(context).Merge(subcommandA.Invoke(context)).ToA()
 							targetAction = subcommandA
 						} else {
-							_, targetAction, _ = findAction(targetCmd, targetArgs)
+							targetAction = findAction(targetCmd, targetArgs)
 						}
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), targetAction.Invoke(context).value(shell, context.CallbackValue))
 					default:
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))
+						// TODO disable support for direct uid invocation
+						//fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))
 					}
 				}
 			}
@@ -191,22 +181,18 @@ func addCompletionCommand(cmd *cobra.Command) {
 	})
 }
 
-func findAction(targetCmd *cobra.Command, targetArgs []string) (id string, action Action, ok bool) {
+func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
+	// TODO handle Action not found
 	if len(targetArgs) == 0 {
-		id = uid.Positional(targetCmd, 1)
+		return storage.getPositional(targetCmd, 0)
 	} else {
 		lastArg := targetArgs[len(targetArgs)-1]
-		if strings.HasSuffix(lastArg, " ") {
-			id = uid.Positional(targetCmd, len(targetArgs)+1)
+		if strings.HasSuffix(lastArg, " ") { // TODO is this still correct/needed?
+			return storage.getPositional(targetCmd, len(targetArgs))
 		} else {
-			id = uid.Positional(targetCmd, len(targetArgs))
+			return storage.getPositional(targetCmd, len(targetArgs)-1)
 		}
 	}
-	if action, ok = actionMap[id]; !ok {
-		id = uid.Positional(targetCmd, 0)
-		action, ok = actionMap[id]
-	}
-	return
 }
 
 func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
@@ -288,4 +274,18 @@ func initLogger() (err error) {
 		}
 	}
 	return
+}
+
+type testing interface {
+	Error(args ...interface{})
+}
+
+// Test verifies the configuration (e.g. flag name exists)
+//   func TestCarapace(t *testing.T) {
+//       carapace.Test(t)
+//   }
+func Test(t testing) {
+	for _, e := range storage.check() {
+		testing(t).Error(e)
+	}
 }

@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/rsteube/carapace"
 )
 
 func doComplete(t *testing.T, shell string, cmdline string, contained ...string) {
@@ -175,4 +177,8 @@ func TestZsh(t *testing.T) {
 	for cmdline, text := range tests {
 		doComplete(t, "zsh", cmdline, text)
 	}
+}
+
+func TestCarapace(t *testing.T) {
+	carapace.Test(t)
 }

@@ -31,7 +31,7 @@ services:
   
   oil:
     <<: *base
-    command: osh
+    command: osh --completion-display minimal
 
   powershell:
     <<: *base

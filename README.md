@@ -11,6 +11,7 @@ Completion script generator for [cobra] with support for:
 - [Bash](https://www.gnu.org/software/bash/)
 - [Elvish](https://elv.sh/)
 - [Fish](https://fishshell.com/)
+- [Ion](https://doc.redox-os.org/ion-manual/html/) ([experimental](https://github.com/rsteube/carapace/issues/88))
 - [Nushell](https://www.nushell.sh/) ([experimental](https://github.com/rsteube/carapace/issues/89))
 - [Oil](http://www.oilshell.org/)
 - [Powershell](https://microsoft.com/powershell)
@@ -83,7 +84,7 @@ or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
 docker-compose pull
 docker-compose run --rm build
-docker-compose run --rm [bash|elvish|fish|oil|powershell|xonsh|zsh]
+docker-compose run --rm [bash|elvish|fish|ion|nushell|oil|powershell|xonsh|zsh]
 
 example <TAB>
 ```

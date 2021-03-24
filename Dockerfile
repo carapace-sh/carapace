@@ -30,6 +30,12 @@ ARG version=0.28.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \
  && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
+FROM rust as nu-poc
+ARG version=carapace
+RUN git clone --single-branch --branch "${version}" --depth 1 https://github.com/rsteube/nushell.git \
+ && cd nushell \
+ && cargo build --release
+
 FROM base as oil
 ARG version=0.8.8
 RUN apt-get update && apt-get install -y libreadline-dev
@@ -74,7 +80,8 @@ COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
 COPY --from=ion /ion/target/release/ion /usr/local/bin/
-COPY --from=nu /usr/local/bin/* /usr/local/bin/
+#COPY --from=nu /usr/local/bin/* /usr/local/bin/
+COPY --from=nu-poc /nushell/target/release/nu /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/

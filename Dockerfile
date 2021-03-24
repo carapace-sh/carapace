@@ -25,12 +25,20 @@ RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.red
  && sudo make install prefix=/usr \
  && sudo make update-shells prefix=/usr
 
-FROM base as nu
+FROM rust as ion-poc
+ARG version=carapace
+RUN git clone --single-branch --branch "${version}" --depth 1 https://github.com/rsteube/ion.git \
+ && cd ion \
+ && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
+ && sudo make install prefix=/usr \
+ && sudo make update-shells prefix=/usr
+
+FROM base as nushell
 ARG version=0.28.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \
  && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
-FROM rust as nu-poc
+FROM rust as nushell-poc
 ARG version=carapace
 RUN git clone --single-branch --branch "${version}" --depth 1 https://github.com/rsteube/nushell.git \
  && cd nushell \
@@ -79,9 +87,10 @@ RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
-COPY --from=ion /ion/target/release/ion /usr/local/bin/
-#COPY --from=nu /usr/local/bin/* /usr/local/bin/
-COPY --from=nu-poc /nushell/target/release/nu /usr/local/bin/
+#COPY --from=ion /ion/target/release/ion /usr/local/bin/
+COPY --from=ion-poc /ion/target/release/ion /usr/local/bin/
+#COPY --from=nushell /usr/local/bin/* /usr/local/bin/
+COPY --from=nushell-poc /nushell/target/release/nu /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/

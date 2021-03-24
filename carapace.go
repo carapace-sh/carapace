@@ -15,6 +15,8 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
+	"github.com/rsteube/carapace/internal/ion"
+	"github.com/rsteube/carapace/internal/nushell"
 	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
 	"github.com/rsteube/carapace/internal/uid"
@@ -69,6 +71,10 @@ func (c Carapace) Snippet(shell string) (string, error) {
 		snippet = elvish.Snippet
 	case "fish":
 		snippet = fish.Snippet
+	case "ion":
+		snippet = ion.Snippet
+	case "nushell":
+		snippet = nushell.Snippet
 	case "oil":
 		snippet = oil.Snippet
 	case "powershell":
@@ -78,7 +84,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
+		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell','oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
 	}
 	return snippet(c.cmd.Root()), nil
 }
@@ -212,6 +218,8 @@ func determineShell() string {
 			return "elvish"
 		case "fish":
 			return "fish"
+		case "ion":
+			return "ion"
 		case "nu":
 			return "nushell"
 		case "oil":

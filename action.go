@@ -15,6 +15,7 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/fish"
+	"github.com/rsteube/carapace/internal/ion"
 	"github.com/rsteube/carapace/internal/nushell"
 	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
@@ -31,6 +32,7 @@ type Action struct {
 	bash       func(callbackValue string) string
 	elvish     func(callbackValue string) string
 	fish       func(callbackValue string) string
+	ion        func(callbackValue string) string
 	nushell    func(callbackValue string) string
 	oil        func(callbackValue string) string
 	powershell func(callbackValue string) string
@@ -196,6 +198,8 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 		f = a.fish
 	case "elvish":
 		f = a.elvish
+	case "ion":
+		f = a.ion
 	case "nushell":
 		f = a.nushell
 	case "oil":
@@ -324,6 +328,7 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 		bash:       func(callbackValue string) string { return bash.ActionRawValues(callbackValue, rawValues...) },
 		elvish:     func(callbackValue string) string { return elvish.ActionRawValues(callbackValue, rawValues...) },
 		fish:       func(callbackValue string) string { return fish.ActionRawValues(callbackValue, rawValues...) },
+		ion:        func(callbackValue string) string { return ion.ActionRawValues(callbackValue, rawValues) },
 		nushell:    func(callbackValue string) string { return nushell.ActionRawValues(callbackValue, rawValues) },
 		oil:        func(callbackValue string) string { return oil.ActionRawValues(callbackValue, rawValues...) },
 		powershell: func(callbackValue string) string { return powershell.ActionRawValues(callbackValue, rawValues...) },

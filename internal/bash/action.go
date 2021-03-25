@@ -9,20 +9,33 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
+	"\r", ``,
+	"\t", ``,
+)
+
+var quoter = strings.NewReplacer(
+	// seems readline provides quotation only for the filename completion (which would add suffixes) so do that here
+	`&`, `\&`,
+	`<`, `\<`,
+	`>`, `\>`,
+	"`", "\\`",
+	`'`, `\'`,
+	`"`, `\"`,
+	`{`, `\{`,
+	`}`, `\}`,
+	`$`, `\$`,
+	`#`, `\#`,
+	`|`, `\|`,
+	`?`, `\?`,
+	`(`, `\(`,
+	`)`, `\)`,
+	`;`, `\;`,
+	` `, `\ `,
+	`[`, `\[`,
+	`]`, `\]`,
+	`*`, `\*`,
+	`\`, `\\`,
 )
 
 func Sanitize(values ...string) []string {
@@ -31,10 +44,6 @@ func Sanitize(values ...string) []string {
 		sanitized[index] = sanitizer.Replace(value)
 	}
 	return sanitized
-}
-
-func EscapeSpace(s string) string {
-	return strings.Replace(s, " ", `\ `, -1)
 }
 
 func commonPrefix(a, b string) string {
@@ -100,7 +109,7 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
 		if len(filtered) == 1 {
-			vals[index] = EscapeSpace(sanitizer.Replace(val.Value))
+			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {
 			if val.Description != "" {
 				vals[index] = fmt.Sprintf("%v (%v)", val.Display, sanitizer.Replace(val.Description))

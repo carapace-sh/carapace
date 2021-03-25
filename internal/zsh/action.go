@@ -8,23 +8,10 @@ import (
 )
 
 var sanitizer = strings.NewReplacer(
-	`$`, ``,
-	"`", ``,
 	"\n", ``,
-	`\`, ``,
-	`"`, ``,
-	`'`, ``,
-	"`", ``,
-	`|`, ``,
-	`>`, ``,
-	`<`, ``,
-	`&`, ``,
-	`(`, ``,
-	`)`, ``,
-	`;`, ``,
-	`#`, ``,
-	`[`, `\[`,
-	`]`, `\]`,
+	"\r", ``,
+	"\t", ``,
+	`'`, `'\''`,
 )
 
 func Sanitize(values ...string) []string {
@@ -33,10 +20,6 @@ func Sanitize(values ...string) []string {
 		sanitized[index] = sanitizer.Replace(value)
 	}
 	return sanitized
-}
-
-func EscapeSpace(s string) string {
-	return strings.Replace(s, " ", `\ `, -1)
 }
 
 func ActionRawValues(callbackValue string, values ...common.RawValue) string {
@@ -50,10 +33,14 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
+		val.Value = sanitizer.Replace(val.Value)
+		val.Display = sanitizer.Replace(val.Display)
+		val.Description = sanitizer.Replace(val.Description)
+
 		if strings.TrimSpace(val.Description) == "" {
-			vals[index] = fmt.Sprintf("%v\t%v", EscapeSpace(sanitizer.Replace(val.Value)), sanitizer.Replace(val.Display))
+			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v (%v)", EscapeSpace(sanitizer.Replace(val.Value)), sanitizer.Replace(val.Display), sanitizer.Replace(val.Description))
+			vals[index] = fmt.Sprintf("%v\t%v (%v)", val.Value, val.Display, val.Description)
 		}
 	}
 	return strings.Join(vals, "\n")

@@ -100,7 +100,6 @@ RUN ln -s /carapace/example/example /usr/local/bin/example
 # bash
 RUN echo -e "\n\
 PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
-source /usr/share/bash-completion/bash_completion \n\
 source <(example _carapace)" \
        > ~/.bashrc
 

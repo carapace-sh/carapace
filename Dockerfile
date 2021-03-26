@@ -17,32 +17,20 @@ ARG version=0.155.2
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
  && mv goreleaser /usr/local/bin/goreleaser
 
-FROM rust as ion
-ARG version=master
-RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.redox-os.org/redox-os/ion/ \
- && cd ion \
- && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
- && sudo make install prefix=/usr \
- && sudo make update-shells prefix=/usr
+FROM rsteube/ion-poc as ion-poc
+#FROM rust as ion
+#ARG version=master
+#RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.redox-os.org/redox-os/ion/ \
+# && cd ion \
+# && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
+# && sudo make install prefix=/usr \
+# && sudo make update-shells prefix=/usr
 
-FROM rust as ion-poc
-ARG version=carapace
-RUN git clone --single-branch --branch "${version}" --depth 1 https://github.com/rsteube/ion.git \
- && cd ion \
- && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
- && sudo make install prefix=/usr \
- && sudo make update-shells prefix=/usr
-
-FROM base as nushell
-ARG version=0.28.0
-RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \
- && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
-
-FROM rust as nushell-poc
-ARG version=carapace
-RUN git clone --single-branch --branch "${version}" --depth 1 https://github.com/rsteube/nushell.git \
- && cd nushell \
- && cargo build --release
+FROM rsteube/nushell-poc as nushell-poc
+#FROM base as nushell
+#ARG version=0.28.0
+#RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \
+# && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
 FROM base as oil
 ARG version=0.8.8
@@ -88,9 +76,9 @@ COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
 #COPY --from=ion /ion/target/release/ion /usr/local/bin/
-COPY --from=ion-poc /ion/target/release/ion /usr/local/bin/
+COPY --from=ion-poc /usr/local/bin/ion /usr/local/bin/
 #COPY --from=nushell /usr/local/bin/* /usr/local/bin/
-COPY --from=nushell-poc /nushell/target/release/nu /usr/local/bin/
+COPY --from=nushell-poc /usr/local/bin/nu /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/

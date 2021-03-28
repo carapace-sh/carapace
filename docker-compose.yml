@@ -5,6 +5,8 @@ services:
     build: .
     image: rsteube/carapace
     command: sh -c 'cd /carapace/example && go build .'
+    environment:
+      TARGET: /carapace/example/example
     volumes:
       - '.:/carapace/'
       - 'go:/home/circleci/go/'

@@ -88,7 +88,7 @@ RUN ln -s /carapace/example/example /usr/local/bin/example
 # bash
 RUN echo -e "\n\
 PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
-source <(example _carapace)" \
+source <(\${TARGET} _carapace)" \
        > ~/.bashrc
 
 # fish
@@ -100,14 +100,14 @@ function fish_prompt \n\
     set_color normal\n\
 end\n\
 mkdir -p ~/.config/fish/completions\n\
-example _carapace fish | source" \
+\$TARGET _carapace fish | source" \
        > ~/.config/fish/config.fish
 
 # elvish
 RUN mkdir -p ~/.elvish/lib \
  && echo -e "\
 edit:prompt = { printf  'carapace-elvish ' } \n\
-eval (example _carapace|slurp)" \
+eval (\$E:TARGET _carapace|slurp)" \
   > ~/.elvish/rc.elv
 
 # ion
@@ -122,7 +122,7 @@ end" \
 RUN mkdir -p ~/.config/oil \
  && echo -e "\n\
 PS1='carapace-oil '\n\
-source <(example _carapace)" \
+source <(\${TARGET} _carapace)" \
        > ~/.config/oil/oshrc
 
 # powershell
@@ -130,7 +130,7 @@ RUN mkdir -p ~/.config/powershell \
  && echo -e "\n\
 function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
-example _carapace | out-string | Invoke-Expression" \
+& \$Env:TARGET _carapace | out-string | Invoke-Expression" \
        > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 
 # xonsh
@@ -138,7 +138,7 @@ RUN mkdir -p ~/.config/xonsh \
  && echo -e "\n\
 \$PROMPT='carapace-xonsh '\n\
 \$COMPLETIONS_CONFIRM=True\n\
-exec(\$(example _carapace xonsh))"\
+exec(\$(\$TARGET _carapace xonsh))"\
   > ~/.config/xonsh/rc.xsh
 
 # zsh
@@ -149,4 +149,11 @@ zstyle ':completion:*' menu select \n\
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\
 \n\
 autoload -U compinit && compinit \n\
-source <(example _carapace zsh)"  > ~/.zshrc
+source <(\$TARGET _carapace zsh)"  > ~/.zshrc
+
+RUN echo -e "#"'!'"/bin/bash\n\
+export PATH=\${PATH}:\$(dirname \${TARGET})\n\
+exec \"\$@\"" \
+       > /entrypoint.sh \
+ && chmod a+x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]

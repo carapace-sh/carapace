@@ -28,17 +28,9 @@ import (
 
 // Action indicates how to complete a flag or positional argument
 type Action struct {
-	rawValues  []common.RawValue
-	bash       func(callbackValue string) string
-	elvish     func(callbackValue string) string
-	fish       func(callbackValue string) string
-	ion        func(callbackValue string) string
-	nushell    func(callbackValue string) string
-	oil        func(callbackValue string) string
-	powershell func(callbackValue string) string
-	xonsh      func(callbackValue string) string
-	zsh        func(callbackValue string) string
-	callback   CompletionCallback
+	rawValues []common.RawValue
+	callback  CompletionCallback
+	nospace   bool
 }
 
 type ActionMap map[string]Action
@@ -122,7 +114,12 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction(actionRawValues(rawValues...))
+	return InvokedAction(actionRawValues(rawValues...).noSpace(a.nospace))
+}
+
+func (a Action) noSpace(state bool) Action {
+	a.nospace = a.nospace || state
+	return a
 }
 
 func (a InvokedAction) Filter(values []string) InvokedAction {
@@ -136,7 +133,7 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction(actionRawValues(filtered...))
+	return InvokedAction(actionRawValues(filtered...).noSpace(a.nospace))
 }
 
 func (a InvokedAction) Prefix(prefix string) InvokedAction {
@@ -177,45 +174,40 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 			vals = append(vals, val, description)
 		}
 
-		return ActionValuesDescribed(vals...)
+		return ActionValuesDescribed(vals...).noSpace(true)
 	})
 }
 
 func (a Action) nestedAction(c Context, maxDepth int) Action {
 	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
-		return a.callback(c).nestedAction(c, maxDepth-1)
+		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace)
 	} else {
 		return a
 	}
 }
 
 func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
-	var f func(callbackValue string) string
 	switch shell {
 	case "bash":
-		f = a.bash
+		return bash.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "fish":
-		f = a.fish
+		return fish.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "elvish":
-		f = a.elvish
+		return elvish.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "ion":
-		f = a.ion
+		return ion.ActionRawValues(callbackValue, a.nospace, a.rawValues)
 	case "nushell":
-		f = a.nushell
+		return nushell.ActionRawValues(callbackValue, a.nospace, a.rawValues)
 	case "oil":
-		f = a.oil
+		return oil.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "powershell":
-		f = a.powershell
+		return powershell.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "xonsh":
-		f = a.xonsh
+		return xonsh.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "zsh":
-		f = a.zsh
-	}
-
-	if f == nil {
+		return zsh.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
+	default:
 		return ""
-	} else {
-		return f(callbackValue)
 	}
 }
 
@@ -232,14 +224,14 @@ func ActionBool() Action {
 // ActionDirectories completes directories
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/")
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true)
 	})
 }
 
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/")
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true)
 	})
 }
 
@@ -324,16 +316,7 @@ func ActionValuesDescribed(values ...string) Action {
 
 func actionRawValues(rawValues ...common.RawValue) Action {
 	return Action{
-		rawValues:  rawValues,
-		bash:       func(callbackValue string) string { return bash.ActionRawValues(callbackValue, rawValues...) },
-		elvish:     func(callbackValue string) string { return elvish.ActionRawValues(callbackValue, rawValues...) },
-		fish:       func(callbackValue string) string { return fish.ActionRawValues(callbackValue, rawValues...) },
-		ion:        func(callbackValue string) string { return ion.ActionRawValues(callbackValue, rawValues) },
-		nushell:    func(callbackValue string) string { return nushell.ActionRawValues(callbackValue, rawValues) },
-		oil:        func(callbackValue string) string { return oil.ActionRawValues(callbackValue, rawValues...) },
-		powershell: func(callbackValue string) string { return powershell.ActionRawValues(callbackValue, rawValues...) },
-		xonsh:      func(callbackValue string) string { return xonsh.ActionRawValues(callbackValue, rawValues...) },
-		zsh:        func(callbackValue string) string { return zsh.ActionRawValues(callbackValue, rawValues...) },
+		rawValues: rawValues,
 	}
 }
 
@@ -343,10 +326,8 @@ var skipCache bool
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
 	return ActionCallback(func(c Context) Action {
-		return ActionCallback(func(c Context) Action {
-			skipCache = true                                                                          // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
-			return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA() // needs to be prefixed with current callback value to not be filtered out
-		})
+		skipCache = true                                                                                        // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
+		return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true) // needs to be prefixed with current callback value to not be filtered out
 	})
 }
 
@@ -367,7 +348,7 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 		}
 		c.Parts = parts
 
-		return callback(c).Invoke(c).Prefix(prefix).ToA()
+		return callback(c).Invoke(c).Prefix(prefix).ToA().noSpace(true)
 	})
 }
 
@@ -418,7 +399,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		if isShorthandSeries {
 			matches := re.FindStringSubmatch(c.CallbackValue)
 			parts := strings.Split(matches[1], "")
-			return ActionValuesDescribed(vals...).Invoke(c).Filter(parts).Prefix(c.CallbackValue).ToA()
+			return ActionValuesDescribed(vals...).Invoke(c).Filter(parts).Prefix(c.CallbackValue).ToA().noSpace(true)
 		} else {
 			return ActionValuesDescribed(vals...)
 		}

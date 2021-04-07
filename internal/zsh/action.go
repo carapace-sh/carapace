@@ -22,7 +22,7 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {
@@ -34,6 +34,9 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
 		val.Value = sanitizer.Replace(val.Value)
+		if nospace {
+			val.Value = val.Value + "\001"
+		}
 		val.Display = sanitizer.Replace(val.Display)
 		val.Description = sanitizer.Replace(val.Description)
 

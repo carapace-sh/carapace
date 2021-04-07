@@ -76,7 +76,9 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 	return
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
+const nospaceIndicator = "\001"
+
+func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	lastSegment := callbackValue // last segment of callbackValue split by COMP_WORDBREAKS
@@ -99,7 +101,7 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 		// When all display values have the same prefix bash will insert is as partial completion (which skips prefixes/formatting).
 		if valuePrefix := commonValuePrefix(filtered...); lastSegment != valuePrefix {
 			// replace values with common value prefix (`\001` is removed in snippet and compopt nospace will be set)
-			filtered = common.RawValuesFrom(commonValuePrefix(filtered...) + "\001")
+			filtered = common.RawValuesFrom(commonValuePrefix(filtered...) + nospaceIndicator)
 		} else {
 			// prevent insertion of partial display values by prefixing one with space
 			filtered[0].Display = " " + filtered[0].Display
@@ -108,6 +110,10 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
+		if nospace && !strings.HasSuffix(val.Value, nospaceIndicator) {
+			val.Value = val.Value + nospaceIndicator
+		}
+
 		if len(filtered) == 1 {
 			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {

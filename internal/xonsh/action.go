@@ -28,7 +28,7 @@ type richCompletion struct {
 	Description string
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {
@@ -48,6 +48,11 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 				val.Value = fmt.Sprintf("'%v'", val.Value)
 			}
 		}
+
+		if !nospace {
+			val.Value = val.Value + " "
+		}
+
 		vals[index] = richCompletion{Value: val.Value, Display: val.Display, Description: val.Description}
 	}
 	m, _ := json.Marshal(vals)

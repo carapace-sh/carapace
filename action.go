@@ -104,17 +104,19 @@ func (a Action) Invoke(c Context) InvokedAction {
 
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	uniqueRawValues := make(map[string]common.RawValue)
+	nospace := a.nospace
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
+		nospace = a.nospace || other.nospace
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction(actionRawValues(rawValues...).noSpace(a.nospace))
+	return InvokedAction(actionRawValues(rawValues...).noSpace(nospace))
 }
 
 func (a Action) noSpace(state bool) Action {

@@ -28,12 +28,16 @@ type suggestion struct {
 	Display string
 }
 
-func ActionRawValues(callbackValue string, values common.RawValues) string {
+func ActionRawValues(callbackValue string, nospace bool, values common.RawValues) string {
 	filtered := values.FilterPrefix(callbackValue)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]suggestion, len(filtered))
 	for index, val := range sanitize(filtered) {
+		if !nospace {
+			val.Value = val.Value + " "
+		}
+
 		if val.Description == "" {
 			vals[index] = suggestion{Value: val.Value, Display: val.Display}
 		} else {

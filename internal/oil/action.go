@@ -20,7 +20,7 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {

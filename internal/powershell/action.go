@@ -37,7 +37,7 @@ func ensureNotEmpty(s string) string {
 	return s
 }
 
-func ActionRawValues(callbackValue string, values ...common.RawValue) string {
+func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := common.ByValues(values).Filter(callbackValue)
 	sort.Sort(common.ByDisplay(filtered))
 
@@ -48,6 +48,10 @@ func ActionRawValues(callbackValue string, values ...common.RawValue) string {
 
 			if strings.ContainsAny(val.Value, ` {}()[]*$?\"|<>&(),;#`+"`") {
 				val.Value = fmt.Sprintf("'%v'", val.Value)
+			}
+
+			if !nospace {
+				val.Value = val.Value + " "
 			}
 
 			vals = append(vals, completionResult{

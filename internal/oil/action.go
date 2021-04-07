@@ -20,6 +20,8 @@ func Sanitize(values ...string) []string {
 	return sanitized
 }
 
+const nospaceIndicator = "\001"
+
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
@@ -32,6 +34,10 @@ func ActionRawValues(callbackValue string, nospace bool, values ...common.RawVal
 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
+		if nospace && !strings.HasSuffix(val.Value, nospaceIndicator) {
+			val.Value = val.Value + nospaceIndicator
+		}
+
 		if len(filtered) == 1 {
 			formattedVal := sanitizer.Replace(val.Value)
 			vals[index] = formattedVal

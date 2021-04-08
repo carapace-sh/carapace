@@ -386,6 +386,11 @@ func actionFlags(cmd *cobra.Command) Action {
 
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+					for _, shorthand := range []rune(c.CallbackValue[1:]) {
+						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.NoOptDefVal == "" {
+							return // abort shorthand flag series if a previous one is not bool and requires an argument (no default value)
+						}
+					}
 					vals = append(vals, f.Shorthand, f.Usage)
 				}
 			} else {

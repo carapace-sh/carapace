@@ -70,7 +70,7 @@ var tests = map[string]string{
 	`example action --optarg=`:           "blue",
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
 	`example action -o`:                                            "v",
-	`example action -ov`:                                           "d",
+	`example action -op`:                                           "d",
 	`example action -o `:                                           "p",
 	`example action -o positional`:                                 "positional1",
 	`example action -o=`:                                           "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag

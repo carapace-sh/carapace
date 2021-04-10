@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// Command creates a uid for given command
 func Command(cmd *cobra.Command) string {
 	names := make([]string, 0)
 	current := cmd
@@ -30,6 +31,7 @@ func Command(cmd *cobra.Command) string {
 	return "_" + strings.Join(reverse, "__")
 }
 
+// Flag creates a uid for given flag
 func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
 	c := cmd
 	for c.HasParent() {
@@ -43,6 +45,7 @@ func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
 	return fmt.Sprintf("%v##%v", Command(c), flag.Name)
 }
 
+// Positional creates a uid for given positional argument
 func Positional(cmd *cobra.Command, position int) string {
 	// TODO complete function
 	return fmt.Sprintf("%v#%v", Command(cmd), position)
@@ -60,6 +63,7 @@ func find(cmd *cobra.Command, uid string) *cobra.Command {
 	return c
 }
 
+// Executable returns the name of the executable
 func Executable() string {
 	if executable, err := os.Executable(); err != nil {
 		return "echo" // safe fallback that should never happen

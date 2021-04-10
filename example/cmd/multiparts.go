@@ -25,13 +25,13 @@ func init() {
 	rootCmd.AddCommand(multipartsCmd)
 
 	carapace.Gen(multipartsCmd).FlagCompletion(carapace.ActionMap{
-		"at":        ActionMultipartsTest("@"),
-		"colon":     ActionMultipartsTest(":"),
-		"comma":     ActionMultipartsTest(","),
-		"dot":       ActionMultipartsTest("."),
-		"dotdotdot": ActionMultipartsTest("..."),
-		"equals":    ActionMultipartsTest("="),
-		"slash":     ActionMultipartsTest("/"),
+		"at":        actionMultipartsTest("@"),
+		"colon":     actionMultipartsTest(":"),
+		"comma":     actionMultipartsTest(","),
+		"dot":       actionMultipartsTest("."),
+		"dotdotdot": actionMultipartsTest("..."),
+		"equals":    actionMultipartsTest("="),
+		"slash":     actionMultipartsTest("/"),
 		"none": carapace.ActionMultiParts("", func(c carapace.Context) carapace.Action {
 			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(strings.Split(c.CallbackValue, "")).ToA()
 		}),
@@ -67,21 +67,21 @@ func init() {
 	)
 }
 
-func ActionMultipartsTest(divider string) carapace.Action {
+func actionMultipartsTest(divider string) carapace.Action {
 	return carapace.ActionMultiParts(divider, func(c carapace.Context) carapace.Action {
 		switch len(c.Parts) {
 		case 0:
-			return ActionTestValues().Invoke(c).Suffix(divider).ToA()
+			return actionTestValues().Invoke(c).Suffix(divider).ToA()
 		case 1:
-			return ActionTestValues().Invoke(c).Filter(c.Parts).Suffix(divider).ToA()
+			return actionTestValues().Invoke(c).Filter(c.Parts).Suffix(divider).ToA()
 		case 2:
-			return ActionTestValues().Invoke(c).Filter(c.Parts).ToA()
+			return actionTestValues().Invoke(c).Filter(c.Parts).ToA()
 		default:
 			return carapace.ActionValues()
 		}
 	})
 }
 
-func ActionTestValues() carapace.Action {
+func actionTestValues() carapace.Action {
 	return carapace.ActionValuesDescribed("first", "first value", "second", "second value", "third with space", "third value", "fourth", "fourth value")
 }

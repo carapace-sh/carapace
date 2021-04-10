@@ -20,11 +20,14 @@ func init() {
 		"required": carapace.ActionValues("valid", "invalid"),
 	})
 
-	carapace.Gen(conditionCmd).PositionalCompletion(carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-		if conditionCmd.Flag("required").Value.String() == "valid" {
-			return carapace.ActionValues("condition fulfilled")
-		} else {
-			return carapace.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
-		}
-	}))
+	carapace.Gen(conditionCmd).PositionalCompletion(
+		carapace.ActionCallback(func(c carapace.Context) (result carapace.Action) {
+			if conditionCmd.Flag("required").Value.String() == "valid" {
+				result = carapace.ActionValues("condition fulfilled")
+			} else {
+				result = carapace.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
+			}
+			return
+		}),
+	)
 }

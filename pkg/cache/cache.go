@@ -7,15 +7,18 @@ import (
 	"strings"
 )
 
-type CacheKey func() (string, error)
+// Key provides a cache key
+type Key func() (string, error)
 
-func String(s ...string) CacheKey {
+// String creates a CacheKey for given strings
+func String(s ...string) Key {
 	return func() (string, error) {
 		return strings.Join(s, "\n"), nil
 	}
 }
 
-func FileChecksum(file string) CacheKey {
+// FileChecksum creates a CacheKey for given file
+func FileChecksum(file string) Key {
 	return func() (checksum string, err error) {
 		var content []byte
 		if content, err = ioutil.ReadFile(file); err == nil {

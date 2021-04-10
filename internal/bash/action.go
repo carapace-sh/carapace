@@ -70,6 +70,7 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 
 const nospaceIndicator = "\001"
 
+// ActionRawValues formats values for bash
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 

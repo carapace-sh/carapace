@@ -17,6 +17,7 @@ import (
 	"github.com/rsteube/carapace/pkg/cache"
 )
 
+// Write persistests given values to file as json
 func Write(file string, rawValues []common.RawValue) (err error) {
 	var m []byte
 	if m, err = json.Marshal(rawValues); err == nil {
@@ -25,6 +26,7 @@ func Write(file string, rawValues []common.RawValue) (err error) {
 	return
 }
 
+// Load loads values from file unless modification date exceeds timeout
 func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err error) {
 	var content []byte
 	var stat os.FileInfo
@@ -38,6 +40,7 @@ func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err 
 	return
 }
 
+// TempDir creates a temporary folder for current user and returns the path
 func TempDir(name string) (dir string, err error) {
 	var u *user.User
 	if u, err = user.Current(); err == nil {
@@ -50,23 +53,24 @@ func TempDir(name string) (dir string, err error) {
 	return
 }
 
+// File returns the cache filename for given values
 // TODO cleanup
-func File(callerFile string, callerLine int, keys ...cache.CacheKey) (file string, err error) {
-	uid := Uid(callerFile, strconv.Itoa(callerLine))
+func File(callerFile string, callerLine int, keys ...cache.Key) (file string, err error) {
+	uid := uidKeys(callerFile, strconv.Itoa(callerLine))
 	ids := make([]string, 0)
 	for _, key := range keys {
-		if id, err := key(); err != nil {
+		id, err := key()
+		if err != nil {
 			return "", err
-		} else {
-			ids = append(ids, id)
 		}
+		ids = append(ids, id)
 	}
 	if dir, err := TempDir(uid); err == nil {
-		file = dir + "/" + Uid(ids...)
+		file = dir + "/" + uidKeys(ids...)
 	}
 	return
 }
 
-func Uid(keys ...string) string {
+func uidKeys(keys ...string) string {
 	return fmt.Sprintf("%x", sha1.Sum([]byte(strings.Join(keys, "\001"))))
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Snippet creates the powershell completion script
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`using namespace System.Management.Automation
 using namespace System.Management.Automation.Language

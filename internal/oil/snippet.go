@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Snippet creates the oil completion script
 func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/osh
 _%v_completion() {

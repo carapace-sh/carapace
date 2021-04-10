@@ -50,7 +50,7 @@ type Context struct {
 type CompletionCallback func(c Context) Action
 
 // Cache cashes values of a CompletionCallback for given duration and keys
-func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
+func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 	// TODO static actions are using callback now as well (for performance) - probably best to add a `static` bool to Action for this and check that here
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
@@ -244,51 +244,51 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		folder := filepath.Dir(c.CallbackValue)
 		expandedFolder := folder
 		if strings.HasPrefix(c.CallbackValue, "~") {
-			if homedir, err := os.UserHomeDir(); err != nil {
+			homedir, err := os.UserHomeDir()
+			if err != nil {
 				return ActionMessage(err.Error())
-			} else {
-				expandedFolder = filepath.Dir(homedir + "/" + c.CallbackValue[1:])
 			}
+			expandedFolder = filepath.Dir(homedir + "/" + c.CallbackValue[1:])
 		}
 
-		if files, err := ioutil.ReadDir(expandedFolder); err != nil {
+		files, err := ioutil.ReadDir(expandedFolder)
+		if err != nil {
 			return ActionMessage(err.Error())
-		} else {
-			if folder == "." {
-				folder = ""
-			} else if !strings.HasSuffix(folder, "/") {
-				folder = folder + "/"
-			}
-
-			showHidden := c.CallbackValue != "" &&
-				!strings.HasSuffix(c.CallbackValue, "/") &&
-				strings.HasPrefix(filepath.Base(c.CallbackValue), ".")
-
-			vals := make([]string, 0, len(files))
-			for _, file := range files {
-				if !showHidden && strings.HasPrefix(file.Name(), ".") {
-					continue
-				}
-
-				if file.IsDir() {
-					vals = append(vals, folder+file.Name()+"/")
-				} else if !dirOnly {
-					if len(fileSuffixes) == 0 {
-						fileSuffixes = []string{""}
-					}
-					for _, suffix := range fileSuffixes {
-						if strings.HasSuffix(file.Name(), suffix) {
-							vals = append(vals, folder+file.Name())
-							break
-						}
-					}
-				}
-			}
-			if strings.HasPrefix(c.CallbackValue, "./") {
-				return ActionValues(vals...).Invoke(Context{}).Prefix("./").ToA()
-			}
-			return ActionValues(vals...)
 		}
+		if folder == "." {
+			folder = ""
+		} else if !strings.HasSuffix(folder, "/") {
+			folder = folder + "/"
+		}
+
+		showHidden := c.CallbackValue != "" &&
+			!strings.HasSuffix(c.CallbackValue, "/") &&
+			strings.HasPrefix(filepath.Base(c.CallbackValue), ".")
+
+		vals := make([]string, 0, len(files))
+		for _, file := range files {
+			if !showHidden && strings.HasPrefix(file.Name(), ".") {
+				continue
+			}
+
+			if file.IsDir() {
+				vals = append(vals, folder+file.Name()+"/")
+			} else if !dirOnly {
+				if len(fileSuffixes) == 0 {
+					fileSuffixes = []string{""}
+				}
+				for _, suffix := range fileSuffixes {
+					if strings.HasSuffix(file.Name(), suffix) {
+						vals = append(vals, folder+file.Name())
+						break
+					}
+				}
+			}
+		}
+		if strings.HasPrefix(c.CallbackValue, "./") {
+			return ActionValues(vals...).Invoke(Context{}).Prefix("./").ToA()
+		}
+		return ActionValues(vals...)
 	})
 }
 

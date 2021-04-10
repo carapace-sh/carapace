@@ -12,6 +12,7 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
+// ActionRawValues formats values for fish
 func ActionRawValues(callbackValues string, nospace bool, values ...common.RawValue) string {
 	vals := make([]string, len(values))
 	for index, val := range values {

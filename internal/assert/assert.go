@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// Equal calls t.Error if given strings are not equal
 func Equal(t *testing.T, expected string, actual string) {
 	if expected != actual {
 		// TODO handle err

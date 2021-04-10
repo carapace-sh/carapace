@@ -38,9 +38,8 @@ func (s _storage) getPositional(cmd *cobra.Command, pos int) Action {
 	// TODO nil check?
 	if len(entry.positional) > pos {
 		return entry.positional[pos]
-	} else {
-		return entry.positionalAny
 	}
+	return entry.positionalAny
 }
 
 // TODO implicit execution during build - go:generate possible?

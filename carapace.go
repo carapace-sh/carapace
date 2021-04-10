@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,10 +25,12 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// Carapace wraps cobra.Command to define completions
 type Carapace struct {
 	cmd *cobra.Command
 }
 
+// Gen initialized Carapace for given command
 func Gen(cmd *cobra.Command) *Carapace {
 	addCompletionCommand(cmd)
 	return &Carapace{
@@ -37,18 +38,22 @@ func Gen(cmd *cobra.Command) *Carapace {
 	}
 }
 
+// PositionalCompletion defines completion for positional arguments using a list of Actions
 func (c Carapace) PositionalCompletion(action ...Action) {
 	storage.get(c.cmd).positional = action
 }
 
+// PositionalAnyCompletion defines completion for any positional argument not already defined
 func (c Carapace) PositionalAnyCompletion(action Action) {
 	storage.get(c.cmd).positionalAny = action
 }
 
+// FlagCompletion defines completion for flags using a map consisting of name and Action
 func (c Carapace) FlagCompletion(actions ActionMap) {
 	storage.get(c.cmd).flag = actions
 }
 
+// Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command)
 func (c Carapace) Standalone() {
 	// TODO probably needs to be done for each subcommand
 	if c.cmd.Root().Flag("help") != nil {
@@ -58,6 +63,7 @@ func (c Carapace) Standalone() {
 	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
+// Snippet creates completion script for given shell
 func (c Carapace) Snippet(shell string) (string, error) {
 	var snippet func(cmd *cobra.Command) string
 
@@ -84,7 +90,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return "", errors.New(fmt.Sprintf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell','oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell))
+		return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell','oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell)
 	}
 	return snippet(c.cmd.Root()), nil
 }
@@ -191,14 +197,13 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
 	// TODO handle Action not found
 	if len(targetArgs) == 0 {
 		return storage.getPositional(targetCmd, 0)
-	} else {
-		lastArg := targetArgs[len(targetArgs)-1]
-		if strings.HasSuffix(lastArg, " ") { // TODO is this still correct/needed?
-			return storage.getPositional(targetCmd, len(targetArgs))
-		} else {
-			return storage.getPositional(targetCmd, len(targetArgs)-1)
-		}
 	}
+
+	lastArg := targetArgs[len(targetArgs)-1]
+	if strings.HasSuffix(lastArg, " ") { // TODO is this still correct/needed?
+		return storage.getPositional(targetCmd, len(targetArgs))
+	}
+	return storage.getPositional(targetCmd, len(targetArgs)-1)
 }
 
 func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
@@ -242,21 +247,21 @@ func determineShell() string {
 }
 
 func processExecutables() []string {
-	if runtime.GOOS == "windows" {
-		return []string{"powershell.exe"} // TODO hardcoded for now, but there might be elvish or sth. else on window
-	} else {
-		if output, err := exec.Command("ps", "-o", "comm").Output(); err != nil {
-			return []string{}
-		} else {
+	if runtime.GOOS != "windows" {
+		if output, err := exec.Command("ps", "-o", "comm").Output(); err == nil {
 			lines := strings.Split(string(output), "\n")[1:]      // skip header
 			for i, j := 0, len(lines)-1; i < j; i, j = i+1, j-1 { // reverse slice
 				lines[i], lines[j] = lines[j], lines[i]
 			}
 			return lines
 		}
+		return []string{}
 	}
+	return []string{"powershell.exe"} // TODO hardcoded for now, but there might be elvish or sth. else on window
 }
 
+// IsCallback returns true if current program invocation is a callback
+// TODO update as everything is a callbcck now
 func IsCallback() bool {
 	return len(os.Args) > 3 && os.Args[1] == "_carapace" && os.Args[3] != "state"
 }

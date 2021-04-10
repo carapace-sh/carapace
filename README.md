@@ -6,7 +6,7 @@
 [![GoReportCard](https://goreportcard.com/badge/github.com/rsteube/carapace)](https://goreportcard.com/report/github.com/rsteube/carapace)
 [![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/rsteube/carapace)](https://hub.docker.com/r/rsteube/carapace)
 
-Completion script generator for [cobra] with support for:
+Command-line completion generator for [cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/)
 - [Elvish](https://elv.sh/)

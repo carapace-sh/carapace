@@ -29,8 +29,9 @@ func ensureNotEmpty(s string) string {
 	return s
 }
 
+// ActionRawValues formats values for powershell
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
-	filtered := common.ByValues(values).Filter(callbackValue)
+	filtered := common.ByValue(values).Filter(callbackValue)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]completionResult, 0, len(filtered))

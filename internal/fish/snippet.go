@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Snippet creates the fish completion script
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`function _%v_quote_suffix
   if not commandline -cp | xargs echo 2>/dev/null >/dev/null

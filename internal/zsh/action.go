@@ -14,6 +14,7 @@ var sanitizer = strings.NewReplacer(
 	`'`, `'\''`,
 )
 
+// ActionRawValues formats values for zsh
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 

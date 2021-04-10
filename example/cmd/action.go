@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/example/cmd/action"
+	"github.com/rsteube/carapace/example/cmd/action/net"
+	"github.com/rsteube/carapace/example/cmd/action/os"
 	"github.com/spf13/cobra"
 )
 
@@ -32,14 +33,14 @@ func init() {
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files":            carapace.ActionFiles(".go", "go.mod", ".txt"),
 		"directories":      carapace.ActionDirectories(),
-		"groups":           action.ActionGroups(),
+		"groups":           os.ActionGroups(),
 		"message":          carapace.ActionMessage("message example"),
-		"net_interfaces":   action.ActionNetInterfaces(),
-		"usergroup":        action.ActionUserGroup(),
-		"users":            action.ActionUsers(),
+		"net_interfaces":   net.ActionNetInterfaces(),
+		"usergroup":        os.ActionUserGroup(),
+		"users":            os.ActionUsers(),
 		"values":           carapace.ActionValues("values", "example"),
 		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
-		"kill":             action.ActionKillSignals(),
+		"kill":             os.ActionKillSignals(),
 		"optarg":           carapace.ActionValues("blue", "red", "green", "yellow"),
 	})
 

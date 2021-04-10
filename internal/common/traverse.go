@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TraverseLenient traverses the command tree but filters errors regarding arguments currently being completed
 func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
 	a := args
 

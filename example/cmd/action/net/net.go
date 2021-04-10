@@ -1,4 +1,4 @@
-package action
+package net
 
 import (
 	"os/exec"
@@ -8,10 +8,11 @@ import (
 	"github.com/rsteube/carapace"
 )
 
+// ActionNetInterfaces completes net interfaces
 func ActionNetInterfaces() carapace.Action {
-	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+	return carapace.ActionCallback(func(c carapace.Context) (result carapace.Action) {
 		if output, err := exec.Command("ifconfig").Output(); err != nil {
-			return carapace.ActionMessage(err.Error())
+			result = carapace.ActionMessage(err.Error())
 		} else {
 			interfaces := []string{}
 			r := regexp.MustCompile("^[0-9a-zA-Z]")
@@ -20,7 +21,8 @@ func ActionNetInterfaces() carapace.Action {
 					interfaces = append(interfaces, strings.Split(line, ":")[0])
 				}
 			}
-			return carapace.ActionValues(interfaces...)
+			result = carapace.ActionValues(interfaces...)
 		}
+		return
 	})
 }

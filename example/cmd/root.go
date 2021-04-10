@@ -10,6 +10,7 @@ var rootCmd = &cobra.Command{
 	Short: "example completion",
 }
 
+// Execute executes cmd
 func Execute() error {
 	return rootCmd.Execute()
 }

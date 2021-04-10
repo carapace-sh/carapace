@@ -28,6 +28,7 @@ type suggestion struct {
 	Display string
 }
 
+// ActionRawValues formats values for nushell
 func ActionRawValues(callbackValue string, nospace bool, values common.RawValues) string {
 	filtered := values.FilterPrefix(callbackValue)
 	sort.Sort(common.ByDisplay(filtered))

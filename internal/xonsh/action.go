@@ -20,6 +20,7 @@ type richCompletion struct {
 	Description string
 }
 
+// ActionRawValues formats values for xonsh
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 

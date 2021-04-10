@@ -28,6 +28,7 @@ type complexCandidate struct {
 	CodeSuffix string
 }
 
+// ActionRawValues formats values for elvish
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	suffix := " "
 	if nospace {

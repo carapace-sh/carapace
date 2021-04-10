@@ -14,14 +14,6 @@ var sanitizer = strings.NewReplacer(
 	`'`, `'\''`,
 )
 
-func Sanitize(values ...string) []string {
-	sanitized := make([]string, len(values))
-	for index, value := range values {
-		sanitized[index] = sanitizer.Replace(value)
-	}
-	return sanitized
-}
-
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 

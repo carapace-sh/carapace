@@ -14,14 +14,6 @@ var sanitizer = strings.NewReplacer( // TODO
 	`'`, `\'`,
 )
 
-func Sanitize(values ...string) []string {
-	sanitized := make([]string, len(values))
-	for index, value := range values {
-		sanitized[index] = sanitizer.Replace(value)
-	}
-	return sanitized
-}
-
 type richCompletion struct {
 	Value       string
 	Display     string

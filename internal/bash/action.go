@@ -38,14 +38,6 @@ var quoter = strings.NewReplacer(
 	`\`, `\\`,
 )
 
-func Sanitize(values ...string) []string {
-	sanitized := make([]string, len(values))
-	for index, value := range values {
-		sanitized[index] = sanitizer.Replace(value)
-	}
-	return sanitized
-}
-
 func commonPrefix(a, b string) string {
 	i := 0
 	for i < len(a) && i < len(b) && a[i] == b[i] {

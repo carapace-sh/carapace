@@ -12,14 +12,6 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
-func Sanitize(values ...string) []string {
-	sanitized := make([]string, len(values))
-	for index, value := range values {
-		sanitized[index] = sanitizer.Replace(value)
-	}
-	return sanitized
-}
-
 const nospaceIndicator = "\001"
 
 func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {

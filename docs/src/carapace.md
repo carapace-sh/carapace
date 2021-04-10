@@ -1,10 +1,12 @@
 # carapace
 
-[carapace] is a shell completion script generator for [spf13/cobra] with support for:
+[carapace] is a command-line completion generator for [spf13/cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/)
 - [Elvish](https://elv.sh/)
 - [Fish](https://fishshell.com/)
+- [Ion](https://doc.redox-os.org/ion-manual/html/) ([experimental](https://github.com/rsteube/carapace/issues/88))
+- [Nushell](https://www.nushell.sh/) ([experimental](https://github.com/rsteube/carapace/issues/89))
 - [Oil](http://www.oilshell.org/)
 - [Powershell](https://microsoft.com/powershell)
 - [Xonsh](https://xon.sh/)

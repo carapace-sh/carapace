@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,25 +33,10 @@ type Action struct {
 	skipcache bool
 }
 
+// ActionMap maps Actions to an identifier
 type ActionMap map[string]Action
 
-func (a ActionMap) invokeCallback(uid string, context Context) Action {
-	if action, ok := a[uid]; ok {
-		if action.callback != nil {
-			return action.callback(context)
-		}
-	}
-	return ActionMessage(fmt.Sprintf("callback %v unknown", uid))
-}
-
-func (a ActionMap) shell(shell string, c Context) map[string]string {
-	actions := make(map[string]string, len(a))
-	for key, value := range map[string]Action(a) {
-		actions[key] = value.Invoke(c).value(shell, c.CallbackValue)
-	}
-	return actions
-}
-
+// Context provides information during completion
 type Context struct {
 	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
 	CallbackValue string
@@ -62,8 +46,10 @@ type Context struct {
 	Parts []string
 }
 
+// CompletionCallback is executed during completion of associated flag or positional argument
 type CompletionCallback func(c Context) Action
 
+// Cache cashes values of a CompletionCallback for given duration and keys
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 	// TODO static actions are using callback now as well (for performance) - probably best to add a `static` bool to Action for this and check that here
 	if a.callback != nil { // only relevant for callback actions
@@ -73,13 +59,12 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 			if cacheFile, err := cache.File(file, line, keys...); err == nil {
 				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
 					return actionRawValues(rawValues...)
-				} else {
-					invokedAction := (Action{callback: cachedCallback}).Invoke(c)
-					if !invokedAction.skipcache {
-						_ = cache.Write(cacheFile, invokedAction.rawValues)
-					}
-					return invokedAction.ToA()
 				}
+				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
+				if !invokedAction.skipcache {
+					_ = cache.Write(cacheFile, invokedAction.rawValues)
+				}
+				return invokedAction.ToA()
 			}
 			return cachedCallback(c)
 		}
@@ -87,6 +72,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 	return a
 }
 
+// InvokedAction is a logical alias for an Action whose (nested) callback was invoked
 type InvokedAction Action
 
 // Invoke executes the callback of an action if it exists (supports nesting)
@@ -205,9 +191,8 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 func (a Action) nestedAction(c Context, maxDepth int) Action {
 	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
 		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache)
-	} else {
-		return a
 	}
+	return a
 }
 
 func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
@@ -238,11 +223,6 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 // ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{callback: callback}
-}
-
-// ActionBool completes true/false
-func actionBool() Action {
-	return ActionValues("true", "false")
 }
 
 // ActionDirectories completes directories
@@ -306,9 +286,8 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 			if strings.HasPrefix(c.CallbackValue, "./") {
 				return ActionValues(vals...).Invoke(Context{}).Prefix("./").ToA()
-			} else {
-				return ActionValues(vals...)
 			}
+			return ActionValues(vals...)
 		}
 	})
 }
@@ -406,7 +385,7 @@ func actionFlags(cmd *cobra.Command) Action {
 
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					for _, shorthand := range []rune(c.CallbackValue[1:]) {
+					for _, shorthand := range c.CallbackValue[1:] {
 						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.NoOptDefVal == "" {
 							return // abort shorthand flag series if a previous one is not bool and requires an argument (no default value)
 						}
@@ -427,8 +406,7 @@ func actionFlags(cmd *cobra.Command) Action {
 			matches := re.FindStringSubmatch(c.CallbackValue)
 			parts := strings.Split(matches[1], "")
 			return ActionValuesDescribed(vals...).Invoke(c).Filter(parts).Prefix(c.CallbackValue).ToA().noSpace(true)
-		} else {
-			return ActionValuesDescribed(vals...)
 		}
+		return ActionValuesDescribed(vals...)
 	})
 }

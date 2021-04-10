@@ -14,8 +14,9 @@ func ActionNetInterfaces() carapace.Action {
 			return carapace.ActionMessage(err.Error())
 		} else {
 			interfaces := []string{}
+			r := regexp.MustCompile("^[0-9a-zA-Z]")
 			for _, line := range strings.Split(string(output), "\n") {
-				if matches, _ := regexp.MatchString("^[0-9a-zA-Z]", line); matches {
+				if r.MatchString(line) {
 					interfaces = append(interfaces, strings.Split(line, ":")[0])
 				}
 			}

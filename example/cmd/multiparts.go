@@ -83,5 +83,5 @@ func ActionMultipartsTest(divider string) carapace.Action {
 }
 
 func ActionTestValues() carapace.Action {
-	return carapace.ActionValuesDescribed("first", "first value", "second", "second value", "third with space", "third value", "fourth", "fouth value")
+	return carapace.ActionValuesDescribed("first", "first value", "second", "second value", "third with space", "third value", "fourth", "fourth value")
 }

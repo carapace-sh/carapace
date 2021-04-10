@@ -284,7 +284,7 @@ func initLogger() (err error) {
 	return
 }
 
-type testing interface {
+type testingT interface {
 	Error(args ...interface{})
 }
 
@@ -292,8 +292,8 @@ type testing interface {
 //   func TestCarapace(t *testing.T) {
 //       carapace.Test(t)
 //   }
-func Test(t testing) {
+func Test(t testingT) {
 	for _, e := range storage.check() {
-		testing(t).Error(e)
+		testingT(t).Error(e)
 	}
 }

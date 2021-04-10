@@ -22,7 +22,6 @@ func init() {
 	rootCmd.Flags().StringArrayP("array", "a", []string{}, "multiflag")
 
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
-		"toggle":         carapace.ActionBool(),
 		"persistentFlag": carapace.ActionValues("p1", "p2", "p3"),
 	})
 }

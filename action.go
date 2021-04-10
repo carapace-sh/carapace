@@ -31,6 +31,7 @@ type Action struct {
 	rawValues []common.RawValue
 	callback  CompletionCallback
 	nospace   bool
+	skipcache bool
 }
 
 type ActionMap map[string]Action
@@ -73,13 +74,10 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.CacheKey) Action {
 				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
 					return actionRawValues(rawValues...)
 				} else {
-					oldState := skipCache
-					skipCache = false // TODO find a better solution for this
 					invokedAction := (Action{callback: cachedCallback}).Invoke(c)
-					if !skipCache {
+					if !invokedAction.skipcache {
 						_ = cache.Write(cacheFile, invokedAction.rawValues)
 					}
-					skipCache = oldState || skipCache
 					return invokedAction.ToA()
 				}
 			}
@@ -105,22 +103,29 @@ func (a Action) Invoke(c Context) InvokedAction {
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	uniqueRawValues := make(map[string]common.RawValue)
 	nospace := a.nospace
+	skipcache := a.skipcache
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
 		nospace = a.nospace || other.nospace
+		skipcache = a.skipcache || other.skipcache
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction(actionRawValues(rawValues...).noSpace(nospace))
+	return InvokedAction(actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache))
 }
 
 func (a Action) noSpace(state bool) Action {
 	a.nospace = a.nospace || state
+	return a
+}
+
+func (a Action) skipCache(state bool) Action {
+	a.skipcache = a.skipcache || state
 	return a
 }
 
@@ -135,7 +140,7 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction(actionRawValues(filtered...).noSpace(a.nospace))
+	return InvokedAction(actionRawValues(filtered...).noSpace(a.nospace).skipCache(a.skipcache))
 }
 
 func (a InvokedAction) Prefix(prefix string) InvokedAction {
@@ -182,7 +187,7 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 
 func (a Action) nestedAction(c Context, maxDepth int) Action {
 	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
-		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace)
+		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache)
 	} else {
 		return a
 	}
@@ -219,7 +224,7 @@ func ActionCallback(callback CompletionCallback) Action {
 }
 
 // ActionBool completes true/false
-func ActionBool() Action {
+func actionBool() Action {
 	return ActionValues("true", "false")
 }
 
@@ -322,14 +327,12 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 	}
 }
 
-// TODO move this into Action and update Merge/Suffix/Prefix functions to keep the state if true
-var skipCache bool
-
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
 	return ActionCallback(func(c Context) Action {
-		skipCache = true                                                                                        // TODO find a better solution - any call to ActionMessage i assumed to be an error for now
-		return ActionValuesDescribed("_", "", "ERR", msg).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true) // needs to be prefixed with current callback value to not be filtered out
+		return ActionValuesDescribed("_", "", "ERR", msg).
+			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
+			noSpace(true).skipCache(true)
 	})
 }
 

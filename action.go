@@ -44,6 +44,9 @@ type Context struct {
 	Args []string
 	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
 	Parts []string
+	// Keys contains the splitted Parts of a parent ActionMultiParts during an ActionMultiParts
+	// TODO experimental
+	Keys []string
 }
 
 // CompletionCallback is executed during completion of associated flag or positional argument
@@ -82,6 +85,9 @@ func (a Action) Invoke(c Context) InvokedAction {
 	}
 	if c.Parts == nil {
 		c.Parts = []string{}
+	}
+	if c.Keys == nil {
+		c.Keys = []string{}
 	}
 	return InvokedAction(a.nestedAction(c, 10))
 }
@@ -335,6 +341,13 @@ func ActionMessage(msg string) Action {
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
+		if len(c.Parts) != 0 {
+			c.Keys = make([]string, len(c.Parts))
+			for index, entry := range c.Parts {
+				c.Keys[index] = strings.Split(entry, divider)[0]
+			}
+		}
+
 		index := strings.LastIndex(c.CallbackValue, string(divider))
 		prefix := ""
 		if len(divider) == 0 {

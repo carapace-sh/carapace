@@ -25,15 +25,11 @@ carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 [`ActionMultiParts`] can be nested as well, e.g. completing multiple `KEY=VALUE` pairs separated by `,`.
 
 ```go
-carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
+carapace.ActionMultiParts(",", func(c carapace.Context) carapace.Action {
 	return carapace.ActionMultiParts("=", func(c carapace.Context) carapace.Action {
 		switch len(c.Parts) {
 		case 0:
-			keys := make([]string, len(cEntries.Parts))
-			for index, entry := range cEntries.Parts {
-				keys[index] = strings.Split(entry, "=")[0]
-			}
-			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys).Suffix("=").ToA()
+			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(c.Keys).Suffix("=").ToA()
 		case 1:
 			switch c.Parts[0] {
 			case "FILE":

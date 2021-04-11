@@ -339,12 +339,13 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 		prefix := ""
 		if len(divider) == 0 {
 			prefix = c.CallbackValue
+			c.CallbackValue = ""
 		} else if index != -1 {
 			prefix = c.CallbackValue[0 : index+len(divider)]
 			c.CallbackValue = c.CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
-		if len(parts) > 0 {
+		if len(parts) > 0 && len(divider) > 0 {
 			parts = parts[0 : len(parts)-1]
 		}
 		c.Parts = parts

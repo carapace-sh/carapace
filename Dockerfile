@@ -33,7 +33,7 @@ FROM rsteube/nushell-poc as nushell-poc
 # && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
 FROM base as oil
-ARG version=0.8.8
+ARG version=0.8.9
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
  && cd oil-*/ \

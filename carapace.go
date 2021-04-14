@@ -50,7 +50,13 @@ func (c Carapace) PositionalAnyCompletion(action Action) {
 
 // FlagCompletion defines completion for flags using a map consisting of name and Action
 func (c Carapace) FlagCompletion(actions ActionMap) {
-	storage.get(c.cmd).flag = actions
+	if e := storage.get(c.cmd); e.flag == nil {
+		e.flag = actions
+	} else {
+		for name, action := range actions {
+			e.flag[name] = action
+		}
+	}
 }
 
 // Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command)

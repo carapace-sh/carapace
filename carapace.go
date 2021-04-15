@@ -32,10 +32,15 @@ type Carapace struct {
 
 // Gen initialized Carapace for given command
 func Gen(cmd *cobra.Command) *Carapace {
-	addCompletionCommand(cmd)
 	return &Carapace{
 		cmd: cmd,
 	}
+}
+
+// Root marks the command as root and adds the hidden completion command (`_carapace`)
+func (c Carapace) Root() {
+	// there is no PreExecC hook in cobra so this needs to be done explicitly
+	addCompletionCommand(c.cmd)
 }
 
 // PositionalCompletion defines completion for positional arguments using a list of Actions
@@ -62,11 +67,12 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 // Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command)
 func (c Carapace) Standalone() {
 	// TODO probably needs to be done for each subcommand
-	if c.cmd.Root().Flag("help") != nil {
-		c.cmd.Root().Flags().Bool("help", false, "skip")
-		c.cmd.Root().Flag("help").Hidden = true
+	// TODO still needed?
+	if c.cmd.Flag("help") != nil {
+		c.cmd.Flags().Bool("help", false, "skip")
+		c.cmd.Flag("help").Hidden = true
 	}
-	c.cmd.Root().SetHelpCommand(&cobra.Command{Hidden: true})
+	c.cmd.SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
 // Snippet creates completion script for given shell
@@ -113,12 +119,12 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 }
 
 func addCompletionCommand(cmd *cobra.Command) {
-	for _, c := range cmd.Root().Commands() {
+	for _, c := range cmd.Commands() {
 		if c.Name() == "_carapace" {
 			return
 		}
 	}
-	cmd.Root().AddCommand(&cobra.Command{
+	cmd.AddCommand(&cobra.Command{
 		Use:    "_carapace",
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {

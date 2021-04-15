@@ -1,6 +1,6 @@
 # Hidden Subcommand
 
-When [`carapace.Gen`](https://pkg.go.dev/github.com/rsteube/carapace#Gen) is invoked a hidden command (`_carapace`) is added to the root command unless it already exists. This handles completion script generation and [callbacks](../action/actionCallback.md).
+When [`Root()`](https://pkg.go.dev/github.com/rsteube/carapace#Carapace.Root) is invoked a hidden command (`_carapace`) is added. This handles completion script generation and [callbacks](../action/actionCallback.md).
 
 
 ## Completion

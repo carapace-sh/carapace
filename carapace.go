@@ -32,15 +32,10 @@ type Carapace struct {
 
 // Gen initialized Carapace for given command
 func Gen(cmd *cobra.Command) *Carapace {
+	addCompletionCommand(cmd)
 	return &Carapace{
 		cmd: cmd,
 	}
-}
-
-// Root marks the command as root and adds the hidden completion command (`_carapace`)
-func (c Carapace) Root() {
-	// there is no PreExecC hook in cobra so this needs to be done explicitly
-	addCompletionCommand(c.cmd)
 }
 
 // PositionalCompletion defines completion for positional arguments using a list of Actions

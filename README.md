@@ -25,14 +25,14 @@ Command-line completion generator for [cobra] with support for:
 
 ## Usage
 
-Calling `carapace.Gen(rootCmd).Root()` on the root command is sufficient to enable completion script generation using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).
+Calling `carapace.Gen` on the root command is sufficient to enable completion script generation using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).
 
 ```go
 import (
     "github.com/rsteube/carapace"
 )
 
-carapace.Gen(myCmd)
+carapace.Gen(rootCmd)
 ```
 
 ## Standalone Mode

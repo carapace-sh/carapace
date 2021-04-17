@@ -25,6 +25,4 @@ func init() {
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
 		"persistentFlag": carapace.ActionValues("p1", "p2", "p3"),
 	})
-
-	carapace.Gen(rootCmd).Root()
 }

@@ -33,7 +33,7 @@ func init() {
 		"equals":    actionMultipartsTest("="),
 		"slash":     actionMultipartsTest("/"),
 		"none": carapace.ActionMultiParts("", func(c carapace.Context) carapace.Action {
-			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(strings.Split(c.CallbackValue, "")).ToA()
+			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(c.Parts).ToA()
 		}),
 	})
 

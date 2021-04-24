@@ -268,9 +268,8 @@ func processExecutables() []string {
 }
 
 // IsCallback returns true if current program invocation is a callback
-// TODO update as everything is a callbcck now
 func IsCallback() bool {
-	return len(os.Args) > 3 && os.Args[1] == "_carapace" && os.Args[3] != "state"
+	return len(os.Args) > 1 && os.Args[1] == "_carapace"
 }
 
 var logger = log.New(ioutil.Discard, "", log.Flags())

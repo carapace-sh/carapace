@@ -36,7 +36,7 @@ func ActionRawValues(callbackValue string, nospace bool, values ...common.RawVal
 		if strings.TrimSpace(val.Description) == "" {
 			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v (%v)", val.Value, val.Display, val.Description)
+			vals[index] = fmt.Sprintf("%v\t%v (%v)", val.Value, val.Display, val.TrimmedDescription())
 		}
 	}
 	return strings.Join(vals, "\n")

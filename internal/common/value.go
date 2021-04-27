@@ -9,6 +9,17 @@ type RawValue struct {
 	Description string
 }
 
+// TrimmedDescription returns the trimmed description
+func (r RawValue) TrimmedDescription() string {
+	maxLength := 80
+	description := strings.SplitN(r.Description, "\n", 2)[0]
+	description = strings.TrimSpace(r.Description)
+	if len(description) > maxLength {
+		description = description[:maxLength-3] + "..."
+	}
+	return description
+}
+
 // RawValues is an alias for []RawValue
 type RawValues []RawValue
 

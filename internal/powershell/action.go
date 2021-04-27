@@ -50,7 +50,7 @@ func ActionRawValues(callbackValue string, nospace bool, values ...common.RawVal
 			vals = append(vals, completionResult{
 				CompletionText: val.Value,
 				ListItemText:   ensureNotEmpty(sanitizer.Replace(val.Display)),
-				ToolTip:        ensureNotEmpty(sanitizer.Replace(val.Description)),
+				ToolTip:        ensureNotEmpty(sanitizer.Replace(val.TrimmedDescription())),
 			})
 		}
 	}

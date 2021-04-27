@@ -46,7 +46,7 @@ func ActionRawValues(callbackValue string, nospace bool, values ...common.RawVal
 			val.Value = val.Value + " "
 		}
 
-		vals[index] = richCompletion{Value: val.Value, Display: val.Display, Description: val.Description}
+		vals[index] = richCompletion{Value: val.Value, Display: val.Display, Description: val.TrimmedDescription()}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

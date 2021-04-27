@@ -42,7 +42,7 @@ func ActionRawValues(callbackValue string, nospace bool, values common.RawValues
 		if val.Description == "" {
 			vals[index] = suggestion{Value: val.Value, Display: val.Display}
 		} else {
-			vals[index] = suggestion{Value: val.Value, Display: fmt.Sprintf(`%v (%v)`, val.Display, val.Description)}
+			vals[index] = suggestion{Value: val.Value, Display: fmt.Sprintf(`%v (%v)`, val.Display, val.TrimmedDescription())}
 		}
 	}
 	m, _ := json.Marshal(vals)

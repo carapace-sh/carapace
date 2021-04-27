@@ -1,8 +1,10 @@
 package carapace
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -223,6 +225,29 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 // ActionCallback invokes a go function during completion
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{callback: callback}
+}
+
+// ActionExecCommand invokes given command and transforms its output using given function on success or returns ActionMessage with the first line of stderr if available.
+//   carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
+//     lines := strings.Split(string(output), "\n")
+//     return carapace.ActionValues(lines[:len(lines)-1]...)
+//   })
+func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Action) Action {
+	return func(f func(output []byte) Action) Action {
+		return ActionCallback(func(c Context) Action {
+			var stdout, stderr bytes.Buffer
+			cmd := exec.Command(name, arg...)
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			if err := cmd.Run(); err != nil {
+				if firstLine := strings.SplitN(stderr.String(), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
+					return ActionMessage(firstLine)
+				}
+				return ActionMessage(err.Error())
+			}
+			return f(stdout.Bytes())
+		})
+	}
 }
 
 // ActionDirectories completes directories

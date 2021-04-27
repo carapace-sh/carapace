@@ -17,7 +17,7 @@ func sanitize(values []common.RawValue) []common.RawValue {
 	for index, v := range values {
 		(&values[index]).Value = sanitizer.Replace(v.Value)
 		(&values[index]).Display = sanitizer.Replace(v.Display)
-		(&values[index]).Description = sanitizer.Replace(v.Description)
+		(&values[index]).Description = sanitizer.Replace(v.TrimmedDescription())
 	}
 	return values
 }

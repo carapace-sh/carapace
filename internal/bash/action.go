@@ -111,7 +111,7 @@ func ActionRawValues(callbackValue string, nospace bool, values ...common.RawVal
 			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {
 			if val.Description != "" {
-				vals[index] = fmt.Sprintf("%v (%v)", val.Display, sanitizer.Replace(val.Description))
+				vals[index] = fmt.Sprintf("%v (%v)", val.Display, sanitizer.Replace(val.TrimmedDescription()))
 			} else {
 				vals[index] = val.Display
 			}

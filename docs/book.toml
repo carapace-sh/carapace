@@ -8,4 +8,4 @@ title = "carapace"
 [output.html]
 default-theme = "Coal"
 
-[output.linkcheck]
+#[output.linkcheck]

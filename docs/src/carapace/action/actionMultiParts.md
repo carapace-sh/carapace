@@ -18,8 +18,6 @@ carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 - values **must not** contain the separator as a simple `strings.Split()` is used to separate the parts
 - it is however **allowed as suffix** to enable fluent tab completion (like `/` for a directory)
 
-> There are still some [issues](https://github.com/rsteube/carapace/issues?q=is%3Aissue+is%3Aopen+ActionMultiParts+) with this so a couple of edge cases might not work
-
 ## Nesting
 
 [`ActionMultiParts`] can be nested as well, e.g. completing multiple `KEY=VALUE` pairs separated by `,`.

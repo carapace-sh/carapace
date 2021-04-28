@@ -1,5 +1,7 @@
 # Uid
 
+> deprecated
+
 Uids are generated to identify corresponding completions:
 
 - positional arguments

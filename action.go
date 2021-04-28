@@ -2,9 +2,9 @@ package carapace
 
 import (
 	"bytes"
+	exec "golang.org/x/sys/execabs"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"

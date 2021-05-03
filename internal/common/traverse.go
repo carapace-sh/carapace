@@ -25,6 +25,13 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 	}
 
 	err = targetCmd.ParseFlags(targetArgs)
+	for _, name := range append(targetCmd.Aliases, targetCmd.Name()) {
+		if len(args) > 0 &&
+			name == args[len(args)-1] &&
+			len(targetCmd.Flags().Args()) == 0 {
+			targetCmd = targetCmd.Parent() // when argument currently being completed is fully matching a subcommand it will be returned, so fix this to parent
+		}
+	}
 	return targetCmd, targetCmd.Flags().Args(), filterError(args, err)
 }
 

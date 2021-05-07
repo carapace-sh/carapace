@@ -133,18 +133,10 @@ func addCompletionCommand(cmd *cobra.Command) {
 				}
 			} else {
 				if len(args) == 1 {
-					switch args[0] {
-					case "debug":
-						// TODO broken, not indexed by uid anymore
-						for uid, action := range storage {
-							fmt.Printf("%v:\t%v\n", uid, action)
-						}
-					default:
-						if s, err := Gen(cmd).Snippet(args[0]); err != nil {
-							fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
-						} else {
-							fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
-						}
+					if s, err := Gen(cmd).Snippet(args[0]); err != nil {
+						fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
+					} else {
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
 					}
 				} else {
 					shell := args[0]
@@ -177,13 +169,16 @@ func addCompletionCommand(cmd *cobra.Command) {
 							} else { // complete flagnames
 								targetAction = actionFlags(targetCmd)
 							}
-						} else if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
-							subcommandA := actionSubcommands(targetCmd)
-							a := findAction(targetCmd, targetArgs)
-							subcommandA = a.Invoke(context).Merge(subcommandA.Invoke(context)).ToA()
-							targetAction = subcommandA
 						} else {
+							if len(context.Args) > 0 {
+								context.Args = context.Args[:len(context.Args)-1] // current word being completed is a positional so remove it from context.Args
+							}
+
 							targetAction = findAction(targetCmd, targetArgs)
+							if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
+								subcommandA := actionSubcommands(targetCmd).Invoke(context)
+								targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
+							}
 						}
 						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), targetAction.Invoke(context).value(shell, context.CallbackValue))
 					default:

@@ -30,8 +30,8 @@ func ensureNotEmpty(s string) string {
 }
 
 // ActionRawValues formats values for powershell
-func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
-	filtered := common.ByValue(values).Filter(callbackValue)
+func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
+	filtered := common.ByValue(values).Filter(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]completionResult, 0, len(filtered))

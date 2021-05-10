@@ -71,19 +71,19 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 const nospaceIndicator = "\001"
 
 // ActionRawValues formats values for bash
-func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
-	lastSegment := callbackValue // last segment of callbackValue split by COMP_WORDBREAKS
+	lastSegment := currentWord // last segment of currentWord split by COMP_WORDBREAKS
 
 	for _, r := range values {
-		if strings.HasPrefix(r.Value, callbackValue) {
+		if strings.HasPrefix(r.Value, currentWord) {
 			// TODO optimize
 			if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
 				wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
-				if index := strings.LastIndexAny(callbackValue, wordbreaks); index != -1 {
-					r.Value = strings.TrimPrefix(r.Value, callbackValue[:index+1])
-					lastSegment = callbackValue[index+1:]
+				if index := strings.LastIndexAny(currentWord, wordbreaks); index != -1 {
+					r.Value = strings.TrimPrefix(r.Value, currentWord[:index+1])
+					lastSegment = currentWord[index+1:]
 				}
 			}
 			filtered = append(filtered, r)

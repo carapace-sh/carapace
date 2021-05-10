@@ -15,12 +15,12 @@ var sanitizer = strings.NewReplacer(
 const nospaceIndicator = "\001"
 
 // ActionRawValues formats values for oil
-func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {
 		// TODO should rather access callbackvalue (circular dependency) - seems to work though so good enough for now
-		if strings.HasPrefix(r.Value, callbackValue) {
+		if strings.HasPrefix(r.Value, currentWord) {
 			filtered = append(filtered, r)
 		}
 	}

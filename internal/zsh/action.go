@@ -15,11 +15,11 @@ var sanitizer = strings.NewReplacer(
 )
 
 // ActionRawValues formats values for zsh
-func ActionRawValues(callbackValue string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {
-		if strings.HasPrefix(r.Value, callbackValue) {
+		if strings.HasPrefix(r.Value, currentWord) {
 			filtered = append(filtered, r)
 		}
 	}

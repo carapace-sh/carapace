@@ -29,8 +29,8 @@ type suggestion struct {
 }
 
 // ActionRawValues formats values for nushell
-func ActionRawValues(callbackValue string, nospace bool, values common.RawValues) string {
-	filtered := values.FilterPrefix(callbackValue)
+func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]suggestion, len(filtered))

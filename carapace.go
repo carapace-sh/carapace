@@ -147,7 +147,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 					targetCmd, targetArgs, err := findTarget(cmd, args)
 					context := Context{CallbackValue: current, Args: targetArgs}
 					if err != nil {
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Invoke(context).value(shell, context.CallbackValue))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), ActionMessage(err.Error()).Invoke(context).value(shell, current))
 						return
 					}
 
@@ -180,7 +180,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 								targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
 							}
 						}
-						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), targetAction.Invoke(context).value(shell, context.CallbackValue))
+						fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), targetAction.Invoke(context).value(shell, current))
 					default:
 						// TODO disable support for direct uid invocation
 						//fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))

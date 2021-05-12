@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -67,6 +68,11 @@ func filterError(args []string, err error) error {
 
 		if strings.HasPrefix(previous, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", previous[len(previous)-1:], previous[len(previous)-1:]) {
 			// ignore shorthand flag argument currently being completed
+			return nil
+		}
+
+		if re := regexp.MustCompile(`invalid argument ".*" for "(?P<flag>.*)" flag:.*`); re.MatchString(msg) && previous == re.FindStringSubmatch(msg)[1] {
+			// ignore invalid argument for flag currently being completed (e.g. empty IntSlice)
 			return nil
 		}
 	}

@@ -18,6 +18,7 @@ func init() {
 	testCmd.Flags().StringP("optarg", "o", "", "optarg flag")
 	testCmd.Flags().StringP("string", "s", "", "string flag")
 	testCmd.Flags().BoolP("bool", "b", false, "bool flag")
+	testCmd.Flags().IntSlice("intslice", []int{}, "intlice flag")
 
 	testSubCmd.Flags().StringP("suboptarg", "o", "", "optarg flag")
 	testSubCmd.Flags().StringP("substring", "s", "", "string flag")
@@ -65,4 +66,12 @@ func TestShortFlagChainNoArg(t *testing.T) {
 
 func TestShortFlagChainEmptyArg(t *testing.T) {
 	testTraverseLenient(t, "test", "-bs", "")
+}
+
+func TestIntSliceEmptyArg(t *testing.T) {
+	testTraverseLenient(t, "test", "--intslice", "")
+}
+
+func TestIntSliceIncompleteArg(t *testing.T) {
+	testTraverseLenient(t, "test", "--intslice", "1,")
 }

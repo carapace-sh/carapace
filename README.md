@@ -94,6 +94,7 @@ example <TAB>
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
 - [gh](https://github.com/rsteube/gh) github cli with added completions (fork)
 - [lab](https://github.com/zaquestion/lab) cli client for GitLab
+- [glab](https://github.com/rsteube/glab) cli client for GitLab (fork)
 - [pulumi](https://github.com/rsteube/pulumi) pulumi cli with added completions (fork)
 
 [cobra]:https://github.com/spf13/cobra

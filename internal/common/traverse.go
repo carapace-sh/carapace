@@ -71,7 +71,7 @@ func filterError(args []string, err error) error {
 			return nil
 		}
 
-		if re := regexp.MustCompile(`invalid argument ".*" for "(?P<flag>.*)" flag:.*`); re.MatchString(msg) && previous == re.FindStringSubmatch(msg)[1] {
+		if re := regexp.MustCompile(`invalid argument ".*" for "(?P<shorthand>-., )?(?P<flag>.*)" flag:.*`); re.MatchString(msg) && previous == re.FindStringSubmatch(msg)[2] {
 			// ignore invalid argument for flag currently being completed (e.g. empty IntSlice)
 			return nil
 		}

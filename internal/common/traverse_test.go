@@ -14,10 +14,14 @@ var testSubCmd = &cobra.Command{
 	Use: "sub",
 }
 
+var intVar int
+
 func init() {
 	testCmd.Flags().StringP("optarg", "o", "", "optarg flag")
 	testCmd.Flags().StringP("string", "s", "", "string flag")
 	testCmd.Flags().BoolP("bool", "b", false, "bool flag")
+	testCmd.Flags().IntP("int", "i", 0, "int flag")
+	testCmd.Flags().IntVar(&intVar, "intvar", 0, "int flag")
 	testCmd.Flags().IntSlice("intslice", []int{}, "intlice flag")
 
 	testSubCmd.Flags().StringP("suboptarg", "o", "", "optarg flag")
@@ -66,6 +70,14 @@ func TestShortFlagChainNoArg(t *testing.T) {
 
 func TestShortFlagChainEmptyArg(t *testing.T) {
 	testTraverseLenient(t, "test", "-bs", "")
+}
+
+func TestIntEmptyArg(t *testing.T) {
+	testTraverseLenient(t, "test", "--int", "")
+}
+
+func TestIntVarEmptyArg(t *testing.T) {
+	testTraverseLenient(t, "test", "--intvar", "")
 }
 
 func TestIntSliceEmptyArg(t *testing.T) {

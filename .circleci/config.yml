@@ -82,6 +82,7 @@ workflows:
   main:
     jobs:
       - go-current
+      - pflag-fork
       - doc:
           filters:
             branches:

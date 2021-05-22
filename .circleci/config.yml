@@ -39,6 +39,17 @@ jobs:
       - run:
           name: "Check formatting"
           command: diff -u <(echo -n) <(gofmt -d -s .)
+  pflag-fork:
+    docker:
+      - image: rsteube/carapace
+        environment:
+          GO111MODULE: "on"
+    steps:
+      - checkout
+      - run:
+          name: "replace pflag with fork"
+          command: echo 'replace github.com/spf13/pflag => github.com/cornfeedhobo/pflag v1.1.0' >> go.mod
+      - run_tests
   doc:
     docker:
       - image: rsteube/carapace
@@ -71,6 +82,7 @@ workflows:
   main:
     jobs:
       - go-current
+      - pflag-fork
       - doc:
           filters:
             branches:

@@ -18,9 +18,13 @@ var sanitizer = strings.NewReplacer(
 func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
 	filtered := make([]common.RawValue, 0)
 
+	maxLength := 0
 	for _, r := range values {
 		if strings.HasPrefix(r.Value, currentWord) {
 			filtered = append(filtered, r)
+			if length := len(r.Display); length > maxLength {
+				maxLength = length
+			}
 		}
 	}
 
@@ -36,7 +40,7 @@ func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue
 		if strings.TrimSpace(val.Description) == "" {
 			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v (%v)", val.Value, val.Display, val.TrimmedDescription())
+			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
 		}
 	}
 	return strings.Join(vals, "\n")

@@ -24,7 +24,7 @@ function _example_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%$'\001'*})
 
-  compadd -S "${suffix}" -d descriptions -a -- vals
+  compadd -l -S "${suffix}" -d descriptions -a -- vals
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

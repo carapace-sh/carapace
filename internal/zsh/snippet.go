@@ -35,7 +35,7 @@ function _%v_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%%%$'\001'*})
 
-  compadd -S "${suffix}" -d descriptions -a -- vals
+  compadd -l -S "${suffix}" -d descriptions -a -- vals
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

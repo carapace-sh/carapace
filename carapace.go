@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
-	"runtime"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/bash"
@@ -21,6 +19,7 @@ import (
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
+	"github.com/rsteube/carapace/pkg/ps"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -75,7 +74,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	var snippet func(cmd *cobra.Command) string
 
 	if shell == "" {
-		shell = determineShell()
+		shell = ps.DetermineShell()
 	}
 	switch shell {
 	case "bash":
@@ -126,7 +125,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			logger.Println(os.Args) // TODO replace last with '' if empty
 
 			if len(args) == 0 {
-				if s, err := Gen(cmd).Snippet(determineShell()); err != nil {
+				if s, err := Gen(cmd).Snippet(ps.DetermineShell()); err != nil {
 					fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
 				} else {
 					fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
@@ -216,52 +215,6 @@ func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, er
 	return common.TraverseLenient(cmd, origArg)
 }
 
-func determineShell() string {
-	for _, executable := range processExecutables() {
-		switch executable {
-		case "bash":
-			return "bash"
-		case "elvish":
-			return "elvish"
-		case "fish":
-			return "fish"
-		case "ion":
-			return "ion"
-		case "nu":
-			return "nushell"
-		case "oil":
-			return "oil"
-		case "osh":
-			return "oil"
-		case "powershell.exe":
-			return "powershell"
-		case "pwsh":
-			return "powershell"
-		case "pwsh.exe":
-			return "powershell"
-		case "xonsh":
-			return "xonsh"
-		case "zsh":
-			return "zsh"
-		}
-	}
-	return ""
-}
-
-func processExecutables() []string {
-	if runtime.GOOS != "windows" {
-		if output, err := exec.Command("ps", "-o", "comm").Output(); err == nil {
-			lines := strings.Split(string(output), "\n")[1:]      // skip header
-			for i, j := 0, len(lines)-1; i < j; i, j = i+1, j-1 { // reverse slice
-				lines[i], lines[j] = lines[j], lines[i]
-			}
-			return lines
-		}
-		return []string{}
-	}
-	return []string{"powershell.exe"} // TODO hardcoded for now, but there might be elvish or sth. else on window
-}
-
 // IsCallback returns true if current program invocation is a callback
 func IsCallback() bool {
 	return len(os.Args) > 1 && os.Args[1] == "_carapace"
@@ -283,7 +236,7 @@ func initLogger() (err error) {
 		var logfileWriter io.Writer
 		if logfileWriter, err = os.OpenFile(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
 			Lmsgprefix := 1 << 6
-			logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|Lmsgprefix)
+			logger = log.New(logfileWriter, ps.DetermineShell()+" ", log.Flags()|Lmsgprefix)
 			//logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|log.Lmsgprefix)
 		}
 	}

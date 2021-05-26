@@ -92,7 +92,6 @@ example <TAB>
 ## Projects
 
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
-- [gh](https://github.com/rsteube/gh) github cli with added completions (fork)
 - [glab](https://github.com/rsteube/glab) cli client for GitLab (fork)
 - [go-jira-cli](https://github.com/rsteube/go-jira-cli) simple jira command line client
 - [lab](https://github.com/zaquestion/lab) cli client for GitLab

@@ -2,7 +2,6 @@ package carapace
 
 import (
 	"bytes"
-	exec "golang.org/x/sys/execabs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,6 +9,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	exec "golang.org/x/sys/execabs"
 
 	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/cache"
@@ -185,7 +186,6 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 		for val, description := range uniqueVals {
 			vals = append(vals, val, description)
 		}
-
 		return ActionValuesDescribed(vals...).noSpace(true)
 	})
 }

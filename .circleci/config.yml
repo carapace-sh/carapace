@@ -28,13 +28,27 @@ commands:
           command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
 
 jobs:
-  go-current:
+  current:
     docker:
       - image: rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
       - checkout
+      - run_tests
+      - run:
+          name: "Check formatting"
+          command: diff -u <(echo -n) <(gofmt -d -s .)
+  latest:
+    docker:
+      - image: rsteube/carapace
+        environment:
+          GO111MODULE: "on"
+    steps:
+      - checkout
+      - run:
+          name: "Upgrade dependencies"
+          command: "go get -u"
       - run_tests
       - run:
           name: "Check formatting"
@@ -81,7 +95,8 @@ workflows:
   version: 2
   main:
     jobs:
-      - go-current
+      - current
+      - latest
       - pflag-fork
       - doc:
           filters:

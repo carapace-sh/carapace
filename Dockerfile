@@ -1,4 +1,4 @@
-FROM cimg/go:1.16.2 as base
+FROM cimg/go:1.16.5 as base
 USER root
 
 FROM base as bat
@@ -13,7 +13,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
  && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=0.155.2
+ARG version=0.171.0
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
  && mv goreleaser /usr/local/bin/goreleaser
 

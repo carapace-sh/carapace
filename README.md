@@ -95,6 +95,5 @@ example <TAB>
 - [glab](https://github.com/rsteube/glab) cli client for GitLab (fork)
 - [go-jira-cli](https://github.com/rsteube/go-jira-cli) simple jira command line client
 - [lab](https://github.com/zaquestion/lab) cli client for GitLab
-- [pulumi](https://github.com/rsteube/pulumi) pulumi cli with added completions (fork)
 
 [cobra]:https://github.com/spf13/cobra

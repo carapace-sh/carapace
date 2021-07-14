@@ -420,7 +420,11 @@ func actionFlags(cmd *cobra.Command) Action {
 				}
 			} else {
 				if !common.IsShorthandOnly(f) {
-					vals = append(vals, "--"+f.Name, f.Usage)
+					if opts.LongShorthand {
+						vals = append(vals, "-"+f.Name, f.Usage)
+					} else {
+						vals = append(vals, "--"+f.Name, f.Usage)
+					}
 				}
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					vals = append(vals, "-"+f.Shorthand, f.Usage)

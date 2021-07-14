@@ -45,7 +45,8 @@ func Override(o Opts) {
 		}
 	}
 
-	if o.OptArgDelimiter != "=" {
+	if o.OptArgDelimiter != "=" &&
+		o.OptArgDelimiter != "" {
 		opts.OptArgDelimiter = o.OptArgDelimiter
 		for index, arg := range os.Args {
 			if strings.HasPrefix(arg, "--") {

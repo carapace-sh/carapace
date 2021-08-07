@@ -26,7 +26,12 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make install prefix=/usr \
 # && sudo make update-shells prefix=/usr
 
-FROM rsteube/nushell-poc as nushell-poc
+FROM bash as nushell-poc
+RUN apk add --no-cache curl
+ARG version=0.35.0-carapace
+RUN curl -L https://github.com/rsteube/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz \
+  | tar -C /usr/local/bin/ --strip-components=2  -xvz nu_${version//./_}_linux/nushell-${version}/nu \
+ && chmod +x /usr/local/bin/nu
 #FROM base as nushell
 #ARG version=0.28.0
 #RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz | tar -xvz \

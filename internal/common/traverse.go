@@ -25,6 +25,10 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 		return targetCmd, targetArgs, filterError(args, err)
 	}
 
+	if targetCmd.DisableFlagParsing {
+		return targetCmd, targetArgs, nil // TODO might need to consider logic below regarding parent command as well
+	}
+
 	err = targetCmd.ParseFlags(targetArgs)
 	for _, name := range append(targetCmd.Aliases, targetCmd.Name()) {
 		if len(args) > 0 &&

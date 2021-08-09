@@ -22,6 +22,7 @@
     - [Suffix](./carapace/invokedAction/suffix.md)
     - [ToA](./carapace/invokedAction/toA.md)
     - [ToMultiPartsA](./carapace/invokedAction/toMultiPartsA.md)
+  - [Batch](./carapace/batch.md)
   - [Cache](./carapace/cache.md)
   - [Standalone](./carapace/standalone.md)
     - [caraparse](./carapace/standalone/caraparse.md)

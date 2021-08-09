@@ -1,6 +1,6 @@
 # Anatomy of a shell CLI
 
-See [Anatomy_of_a_shell_CLI](https://en.wikipedia.org/wiki/Command-line_interface#Anatomy_of_a_shell_CLI) for a detailed description.
+See [Anatomy_of_a_shell_CLI](https://en.wikipedia.org/wiki/Command-line_interface#Anatomy_of_a_shell_CLI) for a detailed (and accurate) description.
 
 ## Parameters
 Generally a command accepts 0..n parameters:

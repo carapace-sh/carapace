@@ -166,9 +166,9 @@ func addCompletionCommand(cmd *cobra.Command) {
 					case "_":
 						// TODO needs more cleanup and tests
 						var targetAction Action
-						if flag := lookupFlag(targetCmd, previous); flag != nil && flag.NoOptDefVal == "" { // previous arg is a flag and needs a value
+						if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" { // previous arg is a flag and needs a value
 							targetAction = storage.getFlag(targetCmd, flag.Name)
-						} else if strings.HasPrefix(current, "-") { // assume flag
+						} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") { // assume flag
 							if strings.Contains(current, "=") { // complete value for optarg flag
 								if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 									a := storage.getFlag(targetCmd, flag.Name)

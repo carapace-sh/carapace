@@ -3,6 +3,7 @@ package common
 import (
 	"testing"
 
+	"github.com/rsteube/carapace/internal/assert"
 	"github.com/spf13/cobra"
 )
 
@@ -12,6 +13,11 @@ var testCmd = &cobra.Command{
 
 var testSubCmd = &cobra.Command{
 	Use: "sub",
+}
+
+var testSub2Cmd = &cobra.Command{
+	Use:                "sub2",
+	DisableFlagParsing: true,
 }
 
 var intVar int
@@ -28,12 +34,15 @@ func init() {
 	testSubCmd.Flags().StringP("substring", "s", "", "string flag")
 	testSubCmd.Flags().BoolP("subbool", "b", false, "bool flag")
 	testCmd.AddCommand(testSubCmd)
+
+	testCmd.AddCommand(testSub2Cmd)
 }
 
-func testTraverseLenient(t *testing.T, args ...string) {
-	if _, _, err := TraverseLenient(testCmd, args); err != nil {
+func testTraverseLenient(t *testing.T, args ...string) (targetCmd *cobra.Command, targetArgs []string, err error) {
+	if targetCmd, targetArgs, err = TraverseLenient(testCmd, args); err != nil {
 		t.Error(err.Error())
 	}
+	return
 }
 
 func TestNoArg(t *testing.T) {
@@ -45,45 +54,50 @@ func TestEmptyArg(t *testing.T) {
 }
 
 func TestLongFlagIncomplete(t *testing.T) {
-	testTraverseLenient(t, "test", "--stri")
+	testTraverseLenient(t, "--stri")
 }
 
 func TestLongFlagNoArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--string")
+	testTraverseLenient(t, "--string")
 }
 
 func TestLongFlagEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--string", "")
+	testTraverseLenient(t, "--string", "")
 }
 
 func TestShortFlagNoArg(t *testing.T) {
-	testTraverseLenient(t, "test", "-s")
+	testTraverseLenient(t, "-s")
 }
 
 func TestShortFlagEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "-s", "")
+	testTraverseLenient(t, "-s", "")
 }
 
 func TestShortFlagChainNoArg(t *testing.T) {
-	testTraverseLenient(t, "test", "-bs")
+	testTraverseLenient(t, "-bs")
 }
 
 func TestShortFlagChainEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "-bs", "")
+	testTraverseLenient(t, "-bs", "")
 }
 
 func TestIntEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--int", "")
+	testTraverseLenient(t, "--int", "")
 }
 
 func TestIntVarEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--intvar", "")
+	testTraverseLenient(t, "--intvar", "")
 }
 
 func TestIntSliceEmptyArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--intslice", "")
+	testTraverseLenient(t, "--intslice", "")
 }
 
 func TestIntSliceIncompleteArg(t *testing.T) {
-	testTraverseLenient(t, "test", "--intslice", "1,")
+	testTraverseLenient(t, "--intslice", "1,")
+}
+
+func TestDisabledFlagParsing(t *testing.T) {
+	_, args, _ := testTraverseLenient(t, "sub2", "--arg")
+	assert.Equal(t, args[0], "--arg") // TODO test whole slice
 }

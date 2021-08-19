@@ -77,8 +77,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 
 // NoSpace disables space suffix
 func (a Action) NoSpace() Action {
-	a.nospace = true
-	return a
+	return a.noSpace(true)
 }
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked

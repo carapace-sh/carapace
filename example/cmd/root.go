@@ -8,6 +8,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "example",
 	Short: "example completion",
+	CompletionOptions: cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	},
 }
 
 // Execute executes cmd

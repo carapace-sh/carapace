@@ -69,6 +69,9 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 
 // Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command)
 func (c Carapace) Standalone() {
+	c.cmd.CompletionOptions = cobra.CompletionOptions{
+		DisableDefaultCmd: true,
+	}
 	// TODO probably needs to be done for each subcommand
 	// TODO still needed?
 	if c.cmd.Flag("help") != nil {
@@ -115,7 +118,7 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 
 	if strings.HasPrefix(arg, "--") {
 		flag = cmd.Flags().Lookup(nameOrShorthand)
-	} else if strings.HasPrefix(arg, "-") {
+	} else if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
 		flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
 	}
 	return

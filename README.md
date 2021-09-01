@@ -15,6 +15,7 @@ Command-line completion generator for [cobra] with support for:
 - [Nushell](https://www.nushell.sh/) ([experimental](https://github.com/rsteube/carapace/issues/89))
 - [Oil](http://www.oilshell.org/)
 - [Powershell](https://microsoft.com/powershell)
+- [Tcsh](https://www.tcsh.org/) (experimental)
 - [Xonsh](https://xon.sh/)
 - [Zsh](https://www.zsh.org/)
 
@@ -68,6 +69,10 @@ source <(example _carapace oil)
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 $env:PATH += ":$pwd"
 example _carapace powershell | out-string | Invoke-Expression
+
+# tcsh
+set autolist
+eval `example _carapace tcsh`
 
 # xonsh
 $PATH.append($(pwd))

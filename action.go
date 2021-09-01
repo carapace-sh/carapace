@@ -21,6 +21,7 @@ import (
 	"github.com/rsteube/carapace/internal/nushell"
 	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
+	"github.com/rsteube/carapace/internal/tcsh"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
@@ -218,6 +219,8 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 		return oil.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "powershell":
 		return powershell.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
+	case "tcsh":
+		return tcsh.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "xonsh":
 		return xonsh.ActionRawValues(callbackValue, a.nospace, a.rawValues...)
 	case "zsh":

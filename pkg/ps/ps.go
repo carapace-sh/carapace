@@ -33,6 +33,8 @@ func DetermineShell() string {
 			return "powershell"
 		case "pwsh":
 			return "powershell"
+		case "tcsh":
+			return "tcsh"
 		case "xonsh":
 			return "xonsh"
 		case "zsh":

@@ -16,6 +16,7 @@ import (
 	"github.com/rsteube/carapace/internal/nushell"
 	"github.com/rsteube/carapace/internal/oil"
 	"github.com/rsteube/carapace/internal/powershell"
+	"github.com/rsteube/carapace/internal/tcsh"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/internal/xonsh"
 	"github.com/rsteube/carapace/internal/zsh"
@@ -103,12 +104,14 @@ func (c Carapace) Snippet(shell string) (string, error) {
 		snippet = oil.Snippet
 	case "powershell":
 		snippet = powershell.Snippet
+	case "tcsh":
+		snippet = tcsh.Snippet
 	case "xonsh":
 		snippet = xonsh.Snippet
 	case "zsh":
 		snippet = zsh.Snippet
 	default:
-		return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell','oil', 'powershell', 'xonsh' or 'zsh' [was: %v]", shell)
+		return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
 	}
 	return snippet(c.cmd.Root()), nil
 }

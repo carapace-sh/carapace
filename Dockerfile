@@ -1,4 +1,4 @@
-FROM cimg/go:1.16.5 as base
+FROM cimg/go:1.17 as base
 USER root
 
 FROM base as bat

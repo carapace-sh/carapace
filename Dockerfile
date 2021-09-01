@@ -69,6 +69,7 @@ RUN apt-get update \
                        elvish \
                        powershell \
                        python3-pip \
+                       tcsh \
                        zsh \
                        expect
 
@@ -137,6 +138,13 @@ function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
 & \$Env:TARGET _carapace | out-string | Invoke-Expression" \
        > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
+
+# oil
+RUN  echo -e "\n\
+set prompt = 'carapace-tcsh '\n\
+set autolist\n\
+eval "'`'"\${TARGET} _carapace"'`'"" \
+       > ~/.tcshrc
 
 # xonsh
 RUN mkdir -p ~/.config/xonsh \

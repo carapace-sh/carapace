@@ -89,7 +89,7 @@ or use [docker-compose](https://docs.docker.com/compose/):
 ```sh
 docker-compose pull
 docker-compose run --rm build
-docker-compose run --rm [bash|elvish|fish|ion|nushell|oil|powershell|xonsh|zsh]
+docker-compose run --rm [bash|elvish|fish|ion|nushell|oil|powershell|tcsh|xonsh|zsh]
 
 example <TAB>
 ```

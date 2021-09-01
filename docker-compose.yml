@@ -39,6 +39,10 @@ services:
     <<: *base
     command: pwsh
   
+  tcsh:
+    <<: *base
+    command: tcsh
+
   xonsh: 
     <<: *base
     command: xonsh

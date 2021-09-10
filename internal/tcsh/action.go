@@ -103,10 +103,6 @@ func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue
 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
-		//if nospace && !strings.HasSuffix(val.Value, nospaceIndicator) {
-		//	val.Value = val.Value + nospaceIndicator
-		//}
-
 		if len(filtered) == 1 {
 			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {

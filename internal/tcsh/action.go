@@ -107,9 +107,10 @@ func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue
 			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {
 			if val.Description != "" {
-				vals[index] = fmt.Sprintf("%v_(%v)", val.Display, strings.Replace(sanitizer.Replace(val.TrimmedDescription()), " ", "_", -1))
+				// TODO seems actual value needs to be used or it won't be shown if the prefix doesn't match
+				vals[index] = fmt.Sprintf("%v_(%v)", quoter.Replace(sanitizer.Replace(val.Value)), strings.Replace(sanitizer.Replace(val.TrimmedDescription()), " ", "_", -1))
 			} else {
-				vals[index] = val.Display
+				vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 			}
 		}
 	}

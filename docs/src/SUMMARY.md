@@ -38,6 +38,7 @@
     - [Nushell](./development/shells/nushell.md)
     - [Oil](./development/shells/oil.md)
     - [Powershell](./development/shells/powershell.md)
+    - [Tcsh](./development/shells/tcsh.md)
     - [Xonsh](./development/shells/xonsh.md)
     - [Zsh](./development/shells/zsh.md)
   - [Testing](./development/testing.md)

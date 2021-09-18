@@ -4,6 +4,9 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -23,6 +26,20 @@ func FileChecksum(file string) Key {
 		var content []byte
 		if content, err = ioutil.ReadFile(file); err == nil {
 			checksum = fmt.Sprintf("%x", sha1.Sum(content))
+		}
+		return
+	}
+}
+
+// FileStats creates a CacheKey for given file
+func FileStats(file string) Key {
+	return func() (checksum string, err error) {
+		var path string
+		if path, err = filepath.Abs(file); err == nil {
+			var info os.FileInfo
+			if info, err = os.Stat(file); err == nil {
+				return String(path, strconv.FormatInt(info.Size(), 10), info.ModTime().String())()
+			}
 		}
 		return
 	}

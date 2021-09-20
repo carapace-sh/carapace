@@ -1,9 +1,9 @@
 package os
 
 import (
+	exec "golang.org/x/sys/execabs"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/rsteube/carapace"

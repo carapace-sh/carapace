@@ -1,9 +1,9 @@
 package assert
 
 import (
+	exec "golang.org/x/sys/execabs"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"testing"
 )
 

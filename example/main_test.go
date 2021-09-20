@@ -2,8 +2,8 @@ package main
 
 import (
 	"bytes"
+	exec "golang.org/x/sys/execabs"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 

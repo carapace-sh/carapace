@@ -26,6 +26,16 @@ func (b batch) Invoke(c Context) invokedBatch {
 	return invokedActions
 }
 
+// ToA converts the batch to a implicitly merged action which is a shortcut for:
+//   ActionCallback(func(c Context) Action {
+//	 	return batch.Invoke(c).Merge().ToA()
+//	 })
+func (b batch) ToA() Action {
+	return ActionCallback(func(c Context) Action {
+		return b.Invoke(c).Merge().ToA()
+	})
+}
+
 // Merge merges Actions of a batch
 func (b invokedBatch) Merge() InvokedAction {
 	switch len(b) {

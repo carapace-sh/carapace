@@ -1,4 +1,5 @@
 FROM cimg/go:1.17 as base
+LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 
 FROM base as bat

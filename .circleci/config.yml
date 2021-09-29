@@ -30,7 +30,7 @@ commands:
 jobs:
   current:
     docker:
-      - image: ghcr.io/rsteube/carapace:master
+      - image: ghcr.io/rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
@@ -41,7 +41,7 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   latest:
     docker:
-      - image: ghcr.io/rsteube/carapace:master
+      - image: ghcr.io/rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
@@ -55,7 +55,7 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   pflag-fork:
     docker:
-      - image: ghcr.io/rsteube/carapace:master
+      - image: ghcr.io/rsteube/carapace
         environment:
           GO111MODULE: "on"
     steps:
@@ -66,7 +66,7 @@ jobs:
       - run_tests
   doc:
     docker:
-      - image: ghcr.io/rsteube/carapace:master
+      - image: ghcr.io/rsteube/carapace
     steps:
       - checkout
       - run:
@@ -93,17 +93,17 @@ jobs:
       - setup_remote_docker
       - run:
           name: "Build application Docker image"
-          command: docker build . -t "ghcr.io/rsteube/carapace:${CIRCLE_BRANCH/v/}"
+          command: docker build . -t "ghcr.io/rsteube/carapace:${CIRCLE_TAG-latest}"
       - deploy:
           name: "Push application Docker image"
           command: |
               echo $GITHUB_TOKEN | docker login ghcr.io -u rsteube --password-stdin
-              docker push "ghcr.io/rsteube/carapace:${CIRCLE_BRANCH/v/}"
+              docker push "ghcr.io/rsteube/carapace:${CIRCLE_TAG-latest}"
 
 
   release:
     docker:
-      - image: ghcr.io/rsteube/carapace:master
+      - image: ghcr.io/rsteube/carapace
     steps:
       - checkout
       - run: cd example && goreleaser

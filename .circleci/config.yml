@@ -30,7 +30,7 @@ commands:
 jobs:
   current:
     docker:
-      - image: rsteube/carapace
+      - image: ghcr.io/rsteube/carapace:master
         environment:
           GO111MODULE: "on"
     steps:
@@ -41,7 +41,7 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   latest:
     docker:
-      - image: rsteube/carapace
+      - image: ghcr.io/rsteube/carapace:master
         environment:
           GO111MODULE: "on"
     steps:
@@ -55,7 +55,7 @@ jobs:
           command: diff -u <(echo -n) <(gofmt -d -s .)
   pflag-fork:
     docker:
-      - image: rsteube/carapace
+      - image: ghcr.io/rsteube/carapace:master
         environment:
           GO111MODULE: "on"
     steps:
@@ -66,7 +66,7 @@ jobs:
       - run_tests
   doc:
     docker:
-      - image: rsteube/carapace
+      - image: ghcr.io/rsteube/carapace:master
     steps:
       - checkout
       - run:
@@ -84,9 +84,26 @@ jobs:
             git add .
             git commit -m "Initial commit [ci skip]"
             git push --force https://rsteube:${GITHUB_TOKEN}@github.com/rsteube/carapace.git master:gh-pages
+  image:
+    working_directory: /app
+    docker:
+      - image: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build application Docker image"
+          command: docker build . -t "ghcr.io/rsteube/carapace:${CIRCLE_BRANCH/v/}"
+      - deploy:
+          name: "Push application Docker image"
+          command: |
+              echo $GITHUB_TOKEN | docker login ghcr.io -u rsteube --password-stdin
+              docker push "ghcr.io/rsteube/carapace:${CIRCLE_BRANCH/v/}"
+
+
   release:
     docker:
-      - image: rsteube/carapace
+      - image: ghcr.io/rsteube/carapace:master
     steps:
       - checkout
       - run: cd example && goreleaser
@@ -104,6 +121,12 @@ workflows:
               only: /master/
             tags:
               ignore: /.*/
+      - image:
+          filters:
+            branches:
+              only: /master/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
   tags:
     jobs:
       - release:

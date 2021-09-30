@@ -25,7 +25,7 @@ Function _example_completer {
       if ($t.get_Length() -eq 0){
         $t = '""'
       }
-      $elems += $t
+      $elems += $t.replace('`,', ',') # quick fix
     }
 
     $completions = @(

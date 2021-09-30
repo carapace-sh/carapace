@@ -13,12 +13,19 @@ func Snippet(cmd *cobra.Command) string {
 using namespace System.Management.Automation.Language
 Function _%v_completer {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
-    param($wordToComplete, $commandAst) #, $cursorPosition)
+    param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
 
     # double quoted value works but seems single quoted needs some fixing (e.g. "example 'acti" -> "example acti")
     $elems = $commandElements | ForEach-Object {
-       $t =$_.Extent.Text
+      if ($_.Extent.StartOffset -gt $cursorPosition) {
+          break
+      }
+      $t = $_.Extent.Text
+      if ($_.Extent.EndOffset -gt $cursorPosition) {
+          $t = $t.Substring(0, $_.Extent.Text.get_Length() - ($_.Extent.EndOffset - $cursorPosition))
+      }
+
        if ($t.Substring(0,1) -eq "'"){
          $t = $t.Substring(1)
        }

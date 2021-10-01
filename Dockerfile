@@ -29,7 +29,7 @@ FROM rsteube/ion-poc as ion-poc
 
 FROM bash as nushell-poc
 RUN apk add --no-cache curl
-ARG version=0.37.0-32581497_carapace3
+ARG version=0.37.0-d39581692_carapace
 RUN curl -L https://github.com/rsteube/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz \
   | tar -C /usr/local/bin/ --strip-components=2  -xvz nu_${version//./_}_linux/nushell-${version}/nu \
   && chmod +x /usr/local/bin/nu

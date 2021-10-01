@@ -21,8 +21,8 @@ var quoter = strings.NewReplacer(
 	"`", "\\`",
 	`'`, `\'`,
 	`"`, `\"`,
-	`{`, `\{`,
-	`}`, `\}`,
+	`{`, ``, // TODO seems escaping is not working
+	`}`, ``, // TODO seems escaping is not working
 	`$`, `\$`,
 	`#`, `\#`,
 	`|`, `\|`,

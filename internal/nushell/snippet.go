@@ -1,10 +1,13 @@
 package nushell
 
 import (
+	"fmt"
+
+	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
 
 // Snippet creates the nushell completion script
 func Snippet(cmd *cobra.Command) string {
-	return ""
+	return fmt.Sprintf("config set carapace.%v [%v _carapace nushell _]", cmd.Name(), uid.Executable())
 }

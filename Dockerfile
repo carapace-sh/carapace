@@ -59,6 +59,11 @@ RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/m
   && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
   && mv mdbook* /usr/local/bin/
 
+FROM base as codecov
+ARG version=0.1.3
+RUN curl -L "https://github.com/codecov/uploader/releases/download/v${version}/codecov-linux" > /usr/local/bin/codecov \
+  && chmod +x /usr/local/bin/codecov
+
 FROM base
 RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
   && dpkg -i packages-microsoft-prod.deb \
@@ -89,91 +94,92 @@ COPY --from=nushell-poc /usr/local/bin/nu /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/
+COPY --from=codecov /usr/local/bin/* /usr/local/bin/
 
 RUN ln -s /carapace/example/example /usr/local/bin/example
 
 # bash
 RUN echo -e "\n\
-PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
-source <(\${TARGET} _carapace)" \
+  PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
+  source <(\${TARGET} _carapace)" \
   > ~/.bashrc
 
 # fish
 RUN mkdir -p ~/.config/fish \
   && echo -e "\n\
-function fish_prompt \n\
-set_color cyan \n\
-echo -n 'carapace-fish ' \n\
-set_color normal\n\
-end\n\
-mkdir -p ~/.config/fish/completions\n\
-\$TARGET _carapace fish | source" \
+  function fish_prompt \n\
+  set_color cyan \n\
+  echo -n 'carapace-fish ' \n\
+  set_color normal\n\
+  end\n\
+  mkdir -p ~/.config/fish/completions\n\
+  \$TARGET _carapace fish | source" \
   > ~/.config/fish/config.fish
 
 # elvish
 RUN mkdir -p ~/.elvish/lib \
   && echo -e "\
-edit:prompt = { printf  'carapace-elvish ' } \n\
-eval (\$E:TARGET _carapace|slurp)" \
+  edit:prompt = { printf  'carapace-elvish ' } \n\
+  eval (\$E:TARGET _carapace|slurp)" \
   > ~/.elvish/rc.elv
 
 # ion
 RUN mkdir -p ~/.config/ion \
   && echo -e "\
-fn PROMPT\n\
-printf 'carapace-ion '\n\
-end" \
+  fn PROMPT\n\
+  printf 'carapace-ion '\n\
+  end" \
   > ~/.config/ion/initrc
 
 
 RUN mkdir -p ~/.config/nu \
   && echo -e "\
-prompt = 'echo \"carapace-nushell \"'" \
+  prompt = 'echo \"carapace-nushell \"'" \
   > ~/.config/nu/config.toml
 
 # oil
 RUN mkdir -p ~/.config/oil \
   && echo -e "\n\
-PS1='carapace-oil '\n\
-source <(\${TARGET} _carapace)" \
+  PS1='carapace-oil '\n\
+  source <(\${TARGET} _carapace)" \
   > ~/.config/oil/oshrc
 
 # powershell
 RUN mkdir -p ~/.config/powershell \
   && echo -e "\n\
-function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
-& \$Env:TARGET _carapace | out-string | Invoke-Expression" \
+  function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
+  Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
+  & \$Env:TARGET _carapace | out-string | Invoke-Expression" \
   > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 
 # oil
 RUN  echo -e "\n\
-set prompt = 'carapace-tcsh '\n\
-set autolist\n\
-eval "'`'"\${TARGET} _carapace"'`'"" \
+  set prompt = 'carapace-tcsh '\n\
+  set autolist\n\
+  eval "'`'"\${TARGET} _carapace"'`'"" \
   > ~/.tcshrc
 
 # xonsh
 RUN mkdir -p ~/.config/xonsh \
   && echo -e "\n\
-\$PROMPT='carapace-xonsh '\n\
-\$COMPLETIONS_CONFIRM=True\n\
-exec(\$(\$TARGET _carapace xonsh))"\
+  \$PROMPT='carapace-xonsh '\n\
+  \$COMPLETIONS_CONFIRM=True\n\
+  exec(\$(\$TARGET _carapace xonsh))"\
   > ~/.config/xonsh/rc.xsh
 
 # zsh
 RUN echo -e "\n\
-PS1=$'%{\e[0;36m%}carapace-zsh %{\e[0m%}'\n\
-\n\
-zstyle ':completion:*' menu select \n\
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\
-\n\
-autoload -U compinit && compinit \n\
-source <(\$TARGET _carapace zsh)"  > ~/.zshrc
+  PS1=$'%{\e[0;36m%}carapace-zsh %{\e[0m%}'\n\
+  \n\
+  zstyle ':completion:*' menu select \n\
+  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\
+  \n\
+  autoload -U compinit && compinit \n\
+  source <(\$TARGET _carapace zsh)"  > ~/.zshrc
 
 RUN echo -e "#"'!'"/bin/bash\n\
-export PATH=\${PATH}:\$(dirname \${TARGET})\n\
-exec \"\$@\"" \
+  export PATH=\${PATH}:\$(dirname \${TARGET})\n\
+  exec \"\$@\"" \
   > /entrypoint.sh \
   && chmod a+x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]

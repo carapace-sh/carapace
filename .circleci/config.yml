@@ -7,7 +7,7 @@ commands:
           name: "build"
           command: |
             go get -t -v ./...
-            PATH=$PATH:$PWD/bin go test -v ./...
+            PATH=$PATH:$PWD/bin go test -coverprofile=coverage.out -v ./...
             go build
             go vet
             cd example
@@ -26,6 +26,11 @@ commands:
       - run:
           name: "shellcheck zsh"
           command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
+  codecov:
+    steps:
+      - run:
+          name: "upload coverage"
+          command: codecov
 
 jobs:
   current:
@@ -36,6 +41,7 @@ jobs:
     steps:
       - checkout
       - run_tests
+      - codecov
       - run:
           name: "Check formatting"
           command: diff -u <(echo -n) <(gofmt -d -s .)

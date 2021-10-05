@@ -4,6 +4,7 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/rsteube/carapace)](https://pkg.go.dev/github.com/rsteube/carapace)
 [![documentation](https://img.shields.io/badge/documentation-grey)](https://rsteube.github.io/carapace/)
 [![GoReportCard](https://goreportcard.com/badge/github.com/rsteube/carapace)](https://goreportcard.com/report/github.com/rsteube/carapace)
+[![codecov](https://codecov.io/gh/rsteube/carapace/branch/master/graph/badge.svg?token=OQAYYTIJ2J)](https://codecov.io/gh/rsteube/carapace)
 
 Command-line completion generator for [cobra] with support for:
 

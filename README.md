@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/rsteube/carapace.svg?style=svg)](https://circleci.com/gh/rsteube/carapace)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/rsteube/carapace)](https://pkg.go.dev/github.com/rsteube/carapace)
-[![documentation](https://img.shields.io/badge/documentation-grey)](https://rsteube.github.io/carapace/)
+[![documentation](https://img.shields.io/badge/&zwnj;-documentation-blue?logo=gitbook)](https://rsteube.github.io/carapace/)
 [![GoReportCard](https://goreportcard.com/badge/github.com/rsteube/carapace)](https://goreportcard.com/report/github.com/rsteube/carapace)
 [![codecov](https://codecov.io/gh/rsteube/carapace/branch/master/graph/badge.svg?token=OQAYYTIJ2J)](https://codecov.io/gh/rsteube/carapace)
 

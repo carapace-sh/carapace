@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"testing"
 
@@ -106,6 +107,8 @@ func TestActionFiles(t *testing.T) {
 }
 
 func TestActionFilesChdir(t *testing.T) {
+	oldWd, _ := os.Getwd()
+
 	assertEqual(t,
 		ActionValuesDescribed("ERR", "stat nonexistent: no such file or directory", "_", "").noSpace(true).skipCache(true).Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
@@ -120,6 +123,10 @@ func TestActionFilesChdir(t *testing.T) {
 		ActionValues("action.go", "snippet.go").noSpace(true).Invoke(Context{}).Prefix("elvish/"),
 		ActionFiles().Chdir("internal").Invoke(Context{CallbackValue: "elvish/"}),
 	)
+
+	if newWd, _ := os.Getwd(); oldWd != newWd {
+		t.Error("workdir should not be changed")
+	}
 }
 
 func TestActionMessage(t *testing.T) {

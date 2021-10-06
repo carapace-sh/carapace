@@ -105,6 +105,23 @@ func TestActionFiles(t *testing.T) {
 	)
 }
 
+func TestActionFilesChdir(t *testing.T) {
+	assertEqual(t,
+		ActionValuesDescribed("ERR", "stat nonexistent: no such file or directory", "_", "").noSpace(true).skipCache(true).Invoke(Context{}),
+		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
+	)
+
+	assertEqual(t,
+		ActionValuesDescribed("ERR", "go.mod is not a directory", "_", "").noSpace(true).skipCache(true).Invoke(Context{}),
+		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
+	)
+
+	assertEqual(t,
+		ActionValues("action.go", "snippet.go").noSpace(true).Invoke(Context{}).Prefix("elvish/"),
+		ActionFiles().Chdir("internal").Invoke(Context{CallbackValue: "elvish/"}),
+	)
+}
+
 func TestActionMessage(t *testing.T) {
 	assertEqual(t,
 		ActionValuesDescribed("_", "", "ERR", "example message").noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),

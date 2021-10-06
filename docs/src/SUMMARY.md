@@ -15,6 +15,7 @@
     - [ActionMultiParts](./carapace/action/actionMultiParts.md)
     - [ActionExecCommand](./carapace/action/actionExecCommand.md)
     - [Custom](./carapace/action/custom.md)
+    - [Chdir](./carapace/action/chDir.md)
   - [InvokedAction](./carapace/invokedAction.md)
     - [Filter](./carapace/invokedAction/filter.md)
     - [Merge](./carapace/invokedAction/merge.md)

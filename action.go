@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -79,6 +80,39 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 // NoSpace disables space suffix
 func (a Action) NoSpace() Action {
 	return a.noSpace(true)
+}
+
+// Chdir changes the current working directory to the named directory during invocation.
+func (a Action) Chdir(dir string) Action {
+	return ActionCallback(func(c Context) Action {
+		if dir == "" || dir == "." {
+			return a // do nothing on current dir
+		}
+
+		file, err := os.Stat(dir)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+		if !file.IsDir() {
+			return ActionMessage(fmt.Sprintf("%v is not a directory", dir))
+		}
+
+		current, err := os.Getwd()
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		if err := os.Chdir(dir); err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		a := a.Invoke(c).ToA()
+
+		if err := os.Chdir(current); err != nil {
+			return ActionMessage(err.Error())
+		}
+		return a
+	})
 }
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked

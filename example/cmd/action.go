@@ -31,7 +31,9 @@ func init() {
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
-		"files":            carapace.ActionFiles(".go", "go.mod", ".txt"),
+		"files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionFiles(".go", "go.mod", ".txt").Chdir(actionCmd.Flag("directories").Value.String())
+		}),
 		"directories":      carapace.ActionDirectories(),
 		"groups":           os.ActionGroups(),
 		"message":          carapace.ActionMessage("message example"),

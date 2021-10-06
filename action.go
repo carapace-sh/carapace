@@ -89,6 +89,14 @@ func (a Action) Chdir(dir string) Action {
 			return a // do nothing on current dir
 		}
 
+		if strings.HasPrefix(dir, "~") {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
+			dir = strings.Replace(dir, "~", home, 1)
+		}
+
 		file, err := os.Stat(dir)
 		if err != nil {
 			return ActionMessage(err.Error())

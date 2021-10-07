@@ -15,7 +15,7 @@ var sanitizer = strings.NewReplacer(
 const nospaceIndicator = "\001"
 
 // ActionRawValues formats values for oil
-func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {

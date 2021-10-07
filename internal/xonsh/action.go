@@ -21,7 +21,7 @@ type richCompletion struct {
 }
 
 // ActionRawValues formats values for xonsh
-func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {

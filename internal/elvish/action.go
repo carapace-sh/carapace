@@ -29,7 +29,7 @@ type complexCandidate struct {
 }
 
 // ActionRawValues formats values for elvish
-func ActionRawValues(currentWord string, nospace bool, values ...common.RawValue) string {
+func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	suffix := " "
 	if nospace {
 		suffix = ""

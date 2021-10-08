@@ -10,7 +10,7 @@ func Batch(actions ...Action) batch {
 	return batch(actions)
 }
 
-// Invoke invokes contained Actions of the batch using groutines
+// Invoke invokes contained Actions of the batch using goroutines
 func (b batch) Invoke(c Context) invokedBatch {
 	invokedActions := make([]InvokedAction, len(b))
 	functions := make([]func(), len(b))
@@ -26,10 +26,10 @@ func (b batch) Invoke(c Context) invokedBatch {
 	return invokedActions
 }
 
-// ToA converts the batch to a implicitly merged action which is a shortcut for:
+// ToA converts the batch to an implicitly merged action which is a shortcut for:
 //   ActionCallback(func(c Context) Action {
-//	 	return batch.Invoke(c).Merge().ToA()
-//	 })
+//   	return batch.Invoke(c).Merge().ToA()
+//   })
 func (b batch) ToA() Action {
 	return ActionCallback(func(c Context) Action {
 		return b.Invoke(c).Merge().ToA()

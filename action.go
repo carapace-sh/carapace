@@ -23,6 +23,9 @@ type Action struct {
 // ActionMap maps Actions to an identifier
 type ActionMap map[string]Action
 
+// CompletionCallback is executed during completion of associated flag or positional argument
+type CompletionCallback func(c Context) Action
+
 // Context provides information during completion
 type Context struct {
 	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
@@ -32,9 +35,6 @@ type Context struct {
 	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
 	Parts []string
 }
-
-// CompletionCallback is executed during completion of associated flag or positional argument
-type CompletionCallback func(c Context) Action
 
 // Cache cashes values of a CompletionCallback for given duration and keys
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
@@ -71,7 +71,10 @@ func (a Action) Invoke(c Context) InvokedAction {
 }
 
 func (a Action) nestedAction(c Context, maxDepth int) Action {
-	if a.rawValues == nil && a.callback != nil && maxDepth > 0 {
+	if maxDepth < 0 {
+		return ActionMessage("maximum recursion depth exceeded")
+	}
+	if a.rawValues == nil && a.callback != nil {
 		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache)
 	}
 	return a

@@ -84,36 +84,25 @@ func (c Carapace) Standalone() {
 
 // Snippet creates completion script for given shell
 func (c Carapace) Snippet(shell string) (string, error) {
-	var snippet func(cmd *cobra.Command) string
-
 	if shell == "" {
 		shell = ps.DetermineShell()
 	}
-	switch shell {
-	case "bash":
-		snippet = bash.Snippet
-	case "elvish":
-		snippet = elvish.Snippet
-	case "fish":
-		snippet = fish.Snippet
-	case "ion":
-		snippet = ion.Snippet
-	case "nushell":
-		snippet = nushell.Snippet
-	case "oil":
-		snippet = oil.Snippet
-	case "powershell":
-		snippet = powershell.Snippet
-	case "tcsh":
-		snippet = tcsh.Snippet
-	case "xonsh":
-		snippet = xonsh.Snippet
-	case "zsh":
-		snippet = zsh.Snippet
-	default:
-		return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
+	shellSnippets := map[string]func(cmd *cobra.Command) string{
+		"bash":       bash.Snippet,
+		"fish":       fish.Snippet,
+		"elvish":     elvish.Snippet,
+		"ion":        ion.Snippet,
+		"nushell":    nushell.Snippet,
+		"oil":        oil.Snippet,
+		"powershell": powershell.Snippet,
+		"tcsh":       tcsh.Snippet,
+		"xonsh":      xonsh.Snippet,
+		"zsh":        zsh.Snippet,
 	}
-	return snippet(c.cmd.Root()), nil
+	if s, ok := shellSnippets[shell]; ok {
+		return s(c.cmd.Root()), nil
+	}
+	return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {

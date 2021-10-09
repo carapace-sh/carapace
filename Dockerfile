@@ -135,7 +135,7 @@ RUN mkdir -p ~/.config/ion \
 RUN mkdir -p ~/.config/nu \
   && echo -e "\
   prompt = 'echo \"carapace-nushell \"' \n\
-  startup = [\"example _carapace | save /tmp/carapace.nu\", \"source /tmp/carapace.nu\"]" \
+  startup = [\"ln -s (\$nu.env.TARGET) /tmp/target\", \"/tmp/target _carapace | save /tmp/carapace.nu\", \"source /tmp/carapace.nu\"]" \
   > ~/.config/nu/config.toml
 
 # oil

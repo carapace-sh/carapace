@@ -29,7 +29,7 @@ FROM rsteube/ion-poc as ion-poc
 
 FROM bash as nushell-poc
 RUN apk add --no-cache curl
-ARG version=0.37.0-d39581692_carapace
+ARG version=0.37.0-d39581692_carapace2
 RUN curl -L https://github.com/rsteube/nushell/releases/download/${version}/nu_${version//./_}_linux.tar.gz \
   | tar -C /usr/local/bin/ --strip-components=2  -xvz nu_${version//./_}_linux/nushell-${version}/nu \
   && chmod +x /usr/local/bin/nu
@@ -131,10 +131,11 @@ RUN mkdir -p ~/.config/ion \
   end" \
   > ~/.config/ion/initrc
 
-
+# nushell
 RUN mkdir -p ~/.config/nu \
   && echo -e "\
-  prompt = 'echo \"carapace-nushell \"'" \
+  prompt = 'echo \"carapace-nushell \"' \n\
+  startup = [\"example _carapace | save /tmp/carapace.nu\", \"source /tmp/carapace.nu\"]" \
   > ~/.config/nu/config.toml
 
 # oil

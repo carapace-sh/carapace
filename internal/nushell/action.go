@@ -24,8 +24,8 @@ func sanitize(values []common.RawValue) []common.RawValue {
 }
 
 type suggestion struct {
-	Value   string
-	Display string
+	Display     string `json:"display"`
+	Replacement string `json:"replacement"`
 }
 
 // ActionRawValues formats values for nushell
@@ -44,9 +44,9 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		}
 
 		if val.Description == "" {
-			vals[index] = suggestion{Value: val.Value, Display: val.Display}
+			vals[index] = suggestion{Display: val.Display, Replacement: val.Value}
 		} else {
-			vals[index] = suggestion{Value: val.Value, Display: fmt.Sprintf(`%v (%v)`, val.Display, val.TrimmedDescription())}
+			vals[index] = suggestion{Display: fmt.Sprintf(`%v (%v)`, val.Display, val.TrimmedDescription()), Replacement: val.Value}
 		}
 	}
 	m, _ := json.Marshal(vals)

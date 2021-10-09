@@ -9,5 +9,5 @@ import (
 
 // Snippet creates the nushell completion script
 func Snippet(cmd *cobra.Command) string {
-	return fmt.Sprintf("config set carapace.%v [%v _carapace nushell _]", cmd.Name(), uid.Executable())
+	return fmt.Sprintf("config set completion.%v [%v _carapace nushell _]", cmd.Name(), uid.Executable())
 }

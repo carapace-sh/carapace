@@ -21,12 +21,20 @@ eval (command _carapace | slurp)
 # fish
 command _carapace | source
 
+# nushell [needs fork: https://github.com/rsteube/nushell]
+command _carapace nushell | save out.nu
+source out.nu
+
 # oil
 source <(command _carapace)
 
 # powershell
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 command _carapace | Out-String | Invoke-Expression
+
+# tcsh
+set autolist
+eval `command _carapace tcsh`
 
 # xonsh
 COMPLETIONS_CONFIRM=True

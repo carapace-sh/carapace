@@ -35,7 +35,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	vals := make([]suggestion, len(filtered))
 	for index, val := range sanitize(filtered) {
-		if strings.ContainsAny(val.Value, ` {}()[]$"|;#`+"`") {
+		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {
 			val.Value = fmt.Sprintf("'%v'", val.Value)
 		}
 

@@ -3,6 +3,7 @@ package carapace
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -123,6 +124,28 @@ func (a Action) Chdir(dir string) Action {
 			return ActionMessage(err.Error())
 		}
 		return a
+	})
+}
+
+// Supress suppresses specific error messages using regular expressions
+func (a Action) Supress(expr ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for _, rawValue := range invoked.rawValues {
+			if rawValue.Value == "ERR" {
+				for _, e := range expr {
+					r, err := regexp.Compile(e)
+					if err != nil {
+						return ActionMessage(err.Error())
+					}
+					if r.MatchString(rawValue.Description) {
+						invoked = invoked.Filter([]string{"ERR", "_"}) // filter out error msg
+						break
+					}
+				}
+			}
+		}
+		return invoked.ToA()
 	})
 }
 

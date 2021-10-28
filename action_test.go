@@ -136,6 +136,16 @@ func TestActionMessage(t *testing.T) {
 	)
 }
 
+func TestActionMessageSuppress(t *testing.T) {
+	assertEqual(t,
+		Batch(
+			ActionMessage("example message").Supress("example"),
+			ActionValues("test"),
+		).ToA().Invoke(Context{}),
+		ActionValues("test").noSpace(true).skipCache(true).Invoke(Context{}),
+	)
+}
+
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
 		ActionMessage("go unknown: unknown command").noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),

@@ -48,8 +48,8 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
-		nospace = a.nospace || other.nospace
-		skipcache = a.skipcache || other.skipcache
+		nospace = nospace || other.nospace
+		skipcache = skipcache || other.skipcache
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))

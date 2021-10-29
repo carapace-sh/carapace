@@ -131,19 +131,30 @@ func (a Action) Chdir(dir string) Action {
 func (a Action) Supress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
+		filter := false
 		for _, rawValue := range invoked.rawValues {
-			if rawValue.Value == "ERR" {
+			if rawValue.Display == "ERR" {
 				for _, e := range expr {
 					r, err := regexp.Compile(e)
 					if err != nil {
 						return ActionMessage(err.Error())
 					}
 					if r.MatchString(rawValue.Description) {
-						invoked = invoked.Filter([]string{"ERR", "_"}) // filter out error msg
+						filter = true
 						break
 					}
 				}
 			}
+		}
+
+		if filter {
+			filtered := make([]common.RawValue, 0)
+			for _, r := range invoked.rawValues {
+				if r.Display != "ERR" && r.Display != "_" {
+					filtered = append(filtered, r)
+				}
+			}
+			invoked.rawValues = filtered
 		}
 		return invoked.ToA()
 	})

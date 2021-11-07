@@ -26,9 +26,11 @@ func TestActionCallback(t *testing.T) {
 		})
 	})
 	expected := InvokedAction{
-		rawValues: common.RawValuesFrom("a", "b", "c"),
-		nospace:   false,
-		skipcache: false,
+		Action{
+			rawValues: common.RawValuesFrom("a", "b", "c"),
+			nospace:   false,
+			skipcache: false,
+		},
 	}
 	actual := a.Invoke(Context{})
 	assertEqual(t, expected, actual)

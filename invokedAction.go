@@ -17,7 +17,9 @@ import (
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked
-type InvokedAction Action
+type InvokedAction struct {
+	Action
+}
 
 // Filter filters given values (this should be done before any call to Prefix/Suffix as those alter the values being filtered)
 //   a := carapace.ActionValues("A", "B", "C").Invoke(c)
@@ -33,7 +35,7 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction(actionRawValues(filtered...).noSpace(a.nospace).skipCache(a.skipcache))
+	return InvokedAction{actionRawValues(filtered...).noSpace(a.nospace).skipCache(a.skipcache)}
 }
 
 // Merge merges InvokedActions (existing values are overwritten)
@@ -56,7 +58,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction(actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache))
+	return InvokedAction{actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache)}
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
@@ -81,7 +83,7 @@ func (a InvokedAction) Suffix(suffix string) InvokedAction {
 
 // ToA casts an InvokedAction to Action
 func (a InvokedAction) ToA() Action {
-	return Action(a)
+	return a.Action
 }
 
 // ToMultiPartsA create an ActionMultiParts from values with given divider

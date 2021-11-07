@@ -68,7 +68,7 @@ func (a Action) Invoke(c Context) InvokedAction {
 	if c.Parts == nil {
 		c.Parts = []string{}
 	}
-	return InvokedAction(a.nestedAction(c, 10))
+	return InvokedAction{a.nestedAction(c, 10)}
 }
 
 func (a Action) nestedAction(c Context, maxDepth int) Action {

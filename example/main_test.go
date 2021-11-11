@@ -34,7 +34,10 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 			)
 			cmd = exec.Command("./_test/invoke_powershell", replacer.Replace(cmdline))
 		case "xonsh":
-			cmd = exec.Command("./_test/invoke_xonsh", cmdline)
+			replacer := strings.NewReplacer(
+				`\ `, `" "`, // TODO simple escape fix
+			)
+			cmd = exec.Command("./_test/invoke_xonsh", replacer.Replace(cmdline))
 		case "zsh":
 			cmd = exec.Command("./_test/invoke_zsh", cmdline)
 		}

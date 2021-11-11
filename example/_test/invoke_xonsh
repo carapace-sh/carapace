@@ -9,7 +9,7 @@ spawn mkdir /tmp/carapace-fakehome
 spawn touch /tmp/carapace-fakehome/.xonshrc
 
 spawn xonsh -i --shell-type dumb
-send "exec(\$(example _carapace xonsh)); echo EXPECT_START; _example_completer('', '$CMDLINE' , 0, len('$CMDLINE'), ''); echo EXPECT_END"
+send "exec(\$(example _carapace xonsh)); from xonsh.parsers.completion_context import *; echo EXPECT_START;_example_completer(CompletionContextParser().parse('$CMDLINE', len('$CMDLINE'), None)); echo EXPECT_END"
 send "\r"
 expect -re "EXPECT_START\r\n(.*?)EXPECT_END"
 puts "$expect_out(1,string)"

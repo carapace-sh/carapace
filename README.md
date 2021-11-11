@@ -78,6 +78,7 @@ set autolist
 eval `example _carapace tcsh`
 
 # xonsh
+$COMPLETION_QUERY_LIMIT = 500 # increase limit
 $PATH.append($(pwd))
 exec($(example _carapace xonsh))
 

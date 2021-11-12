@@ -20,13 +20,18 @@ def _%v_completer(context):
         from json import loads
         from subprocess import Popen, PIPE
         from xonsh.completers.tools import RichCompletion
-        output, _ = Popen(['%v', '_carapace', 'xonsh', '_', *[a.value for a in context.args], context.prefix], stdout=PIPE, stderr=PIPE).communicate()
+        
+        def fix_prefix(s):
+            """quick fix for partially quoted prefix completion ('prefix',<TAB>)"""
+            return s.translate(str.maketrans('', '', '\'"'))
+
+        output, _ = Popen(['%v', '_carapace', 'xonsh', '_', *[a.value for a in context.args], fix_prefix(context.prefix)], stdout=PIPE, stderr=PIPE).communicate()
         try:
-            result = {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=len(context.raw_prefix)) for c in loads(output)}
+            result = {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=len(context.raw_prefix), append_closing_quote=False) for c in loads(output)}
         except:
             result = {}
         if len(result) == 0:
-            result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix))}
+            result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
         return result
 
 

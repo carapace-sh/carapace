@@ -34,13 +34,19 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 			cmd.Stderr = &stderr
 			if err := cmd.Run(); err != nil {
 				if firstLine := strings.SplitN(stderr.String(), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
-					return ActionMessage(firstLine)
+					return ActionMessage(stripAnsi(firstLine))
 				}
 				return ActionMessage(err.Error())
 			}
 			return f(stdout.Bytes())
 		})
 	}
+}
+
+// strip ANSI color escape codes from string (source: https://github.com/acarl005/stripansi)
+func stripAnsi(str string) string {
+	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
+	return re.ReplaceAllString(str, "")
 }
 
 // ActionDirectories completes directories

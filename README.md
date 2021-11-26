@@ -19,11 +19,6 @@ Command-line completion generator for [cobra] with support for:
 - [Xonsh](https://xon.sh/)
 - [Zsh](https://www.zsh.org/)
 
-
-## Status
-
-**WIP**: works, but expect some api changes and small hiccups like a special character not yet escaped
-
 ## Usage
 
 Calling `carapace.Gen` on the root command is sufficient to enable completion script generation using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).

@@ -17,8 +17,9 @@ func registerValidArgsFunction(cmd *cobra.Command) {
 
 func registerFlagCompletion(cmd *cobra.Command, actions ActionMap) {
 	for name, action := range actions {
+		a := action
 		cmd.RegisterFlagCompletionFunc(name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			action := action.Invoke(Context{Args: args, CallbackValue: toComplete})
+			action := a.Invoke(Context{Args: args, CallbackValue: toComplete})
 			return cobraValuesFor(action), cobraDirectiveFor(action)
 		})
 	}
@@ -39,7 +40,7 @@ func cobraValuesFor(action InvokedAction) []string {
 func cobraDirectiveFor(action InvokedAction) cobra.ShellCompDirective {
 	directive := cobra.ShellCompDirectiveNoFileComp
 	if action.nospace {
-		directive = cobra.ShellCompDirectiveNoSpace
+		directive = directive & cobra.ShellCompDirectiveNoSpace
 	}
 	if action.skipcache {
 		directive = directive & cobra.ShellCompDirectiveError

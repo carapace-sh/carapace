@@ -11,6 +11,7 @@ var actionCmd = &cobra.Command{
 	Use:     "action",
 	Short:   "action example",
 	Aliases: []string{"alias"},
+	Run:     func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

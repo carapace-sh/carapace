@@ -204,15 +204,16 @@ func actionFlags(cmd *cobra.Command) Action {
 
 			if f.Changed &&
 				!strings.Contains(f.Value.Type(), "Slice") &&
-				!strings.Contains(f.Value.Type(), "Array") {
+				!strings.Contains(f.Value.Type(), "Array") &&
+				f.Value.Type() != "count" {
 				return // don't repeat flag
 			}
 
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					for _, shorthand := range c.CallbackValue[1:] {
-						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.NoOptDefVal == "" {
-							return // abort shorthand flag series if a previous one is not bool and requires an argument (no default value)
+						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
+							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
 					vals = append(vals, f.Shorthand, f.Usage)
@@ -232,9 +233,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		})
 
 		if isShorthandSeries {
-			matches := re.FindStringSubmatch(c.CallbackValue)
-			parts := strings.Split(matches[1], "")
-			return ActionValuesDescribed(vals...).Invoke(c).Filter(parts).Prefix(c.CallbackValue).ToA().noSpace(true)
+			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true)
 		}
 		return ActionValuesDescribed(vals...)
 	})

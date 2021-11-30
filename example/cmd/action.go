@@ -17,6 +17,7 @@ var actionCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(actionCmd)
 
+	actionCmd.Flags().CountP("count", "c", "count flag")
 	actionCmd.Flags().StringP("files", "f", "", "files flag")
 	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("groups", "g", "", "groups flag")

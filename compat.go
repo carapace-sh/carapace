@@ -41,10 +41,10 @@ func cobraValuesFor(action InvokedAction) []string {
 func cobraDirectiveFor(action InvokedAction) cobra.ShellCompDirective {
 	directive := cobra.ShellCompDirectiveNoFileComp
 	if action.nospace {
-		directive = directive & cobra.ShellCompDirectiveNoSpace
+		directive = directive | cobra.ShellCompDirectiveNoSpace
 	}
 	if action.skipcache {
-		directive = directive & cobra.ShellCompDirectiveError
+		directive = directive | cobra.ShellCompDirectiveError
 	}
 	return directive
 }

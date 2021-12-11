@@ -9,6 +9,7 @@ var conditionCmd = &cobra.Command{
 	Use:   "condition",
 	Short: "condition example",
 	Long:  `Simple condition examples.`,
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

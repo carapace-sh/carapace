@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func registerValidArgsFunction(cmd *cobra.Command) {
@@ -15,14 +16,14 @@ func registerValidArgsFunction(cmd *cobra.Command) {
 	}
 }
 
-func registerFlagCompletion(cmd *cobra.Command, actions ActionMap) {
-	for name, action := range actions {
-		a := action
-		cmd.RegisterFlagCompletionFunc(name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func registerFlagCompletion(cmd *cobra.Command) {
+	cmd.Flags().VisitAll(func(f *pflag.Flag) {
+		cmd.RegisterFlagCompletionFunc(f.Name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			a := storage.getFlag(cmd, f.Name)
 			action := a.Invoke(Context{Args: args, CallbackValue: toComplete})
 			return cobraValuesFor(action), cobraDirectiveFor(action)
 		})
-	}
+	})
 }
 
 func cobraValuesFor(action InvokedAction) []string {

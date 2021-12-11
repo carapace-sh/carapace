@@ -34,9 +34,12 @@ type Carapace struct {
 func Gen(cmd *cobra.Command) *Carapace {
 	addCompletionCommand(cmd)
 
-	if compat {
-		registerValidArgsFunction(cmd)
-	}
+	cobra.OnInitialize(func() {
+		if opts.BridgeCompletion {
+			registerValidArgsFunction(cmd)
+			registerFlagCompletion(cmd)
+		}
+	})
 
 	return &Carapace{
 		cmd: cmd,
@@ -55,10 +58,6 @@ func (c Carapace) PositionalAnyCompletion(action Action) {
 
 // FlagCompletion defines completion for flags using a map consisting of name and Action
 func (c Carapace) FlagCompletion(actions ActionMap) {
-	if compat {
-		registerFlagCompletion(c.cmd, actions)
-	}
-
 	if e := storage.get(c.cmd); e.flag == nil {
 		e.flag = actions
 	} else {
@@ -234,7 +233,6 @@ func IsCallback() bool {
 }
 
 var logger = log.New(ioutil.Discard, "", log.Flags())
-var compat bool
 
 func init() {
 	if _, enabled := os.LookupEnv("CARAPACE_LOG"); enabled {
@@ -242,7 +240,6 @@ func init() {
 			log.Fatal(err.Error())
 		}
 	}
-	_, compat = os.LookupEnv("CARAPACE_COMPAT") // TODO experimental
 }
 
 func initLogger() (err error) {

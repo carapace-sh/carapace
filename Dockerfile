@@ -119,7 +119,7 @@ RUN mkdir -p ~/.config/fish \
 # elvish
 RUN mkdir -p ~/.elvish/lib \
   && echo -e "\
-  edit:prompt = { printf  'carapace-elvish ' } \n\
+  set edit:prompt = { printf  'carapace-elvish ' } \n\
   eval (\$E:TARGET _carapace|slurp)" \
   > ~/.elvish/rc.elv
 

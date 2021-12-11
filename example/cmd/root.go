@@ -8,13 +8,13 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "example",
 	Short: "example completion",
-	CompletionOptions: cobra.CompletionOptions{
-		DisableDefaultCmd: true,
-	},
 }
 
 // Execute executes cmd
 func Execute() error {
+	carapace.Override(carapace.Opts{
+		BridgeCompletion: true,
+	})
 	return rootCmd.Execute()
 }
 

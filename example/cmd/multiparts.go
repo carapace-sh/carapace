@@ -10,6 +10,7 @@ import (
 var multipartsCmd = &cobra.Command{
 	Use:   "multiparts",
 	Short: "multiparts example",
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

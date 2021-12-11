@@ -18,6 +18,8 @@ type Opts struct {
 	//   "=" // tail --verbose=descriptor (default)
 	//   ":" // java -verbose:class
 	OptArgDelimiter string
+	// BridgeCompletion registers carapace completions to cobra's default completion
+	BridgeCompletion bool
 }
 
 func init() {
@@ -54,4 +56,6 @@ func Override(o Opts) {
 			}
 		}
 	}
+
+	opts.BridgeCompletion = o.BridgeCompletion
 }

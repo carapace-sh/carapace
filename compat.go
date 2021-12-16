@@ -44,7 +44,8 @@ func cobraDirectiveFor(action InvokedAction) cobra.ShellCompDirective {
 		directive = directive | cobra.ShellCompDirectiveNoSpace
 	}
 	if action.skipcache {
-		directive = directive | cobra.ShellCompDirectiveError
+		// TODO seems `ShellCompDirectiveError` causes a fallback to default file completion so it is now disabled
+		//directive = directive | cobra.ShellCompDirectiveError
 	}
 	return directive
 }

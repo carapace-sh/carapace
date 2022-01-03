@@ -2,7 +2,6 @@ package elvish
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -23,9 +22,10 @@ func sanitize(values []common.RawValue) []common.RawValue {
 }
 
 type complexCandidate struct {
-	Value      string
-	Display    string
-	CodeSuffix string
+	Value       string
+	Display     string
+	Description string
+	CodeSuffix  string
 }
 
 // ActionRawValues formats values for elvish
@@ -37,12 +37,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	vals := make([]complexCandidate, len(values))
 	for index, val := range sanitize(values) {
-		// TODO have a look at this again later: seems elvish does a good job quoting any problematic characterS so the sanitize step was removed
-		if val.Description == "" {
-			vals[index] = complexCandidate{Value: val.Value, Display: val.Display, CodeSuffix: suffix}
-		} else {
-			vals[index] = complexCandidate{Value: val.Value, Display: fmt.Sprintf(`%v (%v)`, val.Display, val.Description), CodeSuffix: suffix}
-		}
+		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

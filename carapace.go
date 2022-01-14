@@ -11,6 +11,7 @@ import (
 	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
+	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/fish"
 	"github.com/rsteube/carapace/internal/ion"
 	"github.com/rsteube/carapace/internal/nushell"
@@ -88,6 +89,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	}
 	shellSnippets := map[string]func(cmd *cobra.Command) string{
 		"bash":       bash.Snippet,
+		"export":     export.Snippet,
 		"fish":       fish.Snippet,
 		"elvish":     elvish.Snippet,
 		"ion":        ion.Snippet,

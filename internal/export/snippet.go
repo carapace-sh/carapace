@@ -2,7 +2,6 @@ package export
 
 import (
 	"encoding/json"
-
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -10,7 +9,8 @@ import (
 
 type command struct {
 	Name            string
-	Description     string
+	Short           string
+	Long            string    `json:",omitempty"`
 	Aliases         []string  `json:",omitempty"`
 	Commands        []command `json:",omitempty"`
 	LocalFlags      []flag    `json:",omitempty"`
@@ -20,7 +20,7 @@ type command struct {
 type flag struct {
 	Longhand    string `json:",omitempty"`
 	Shorthand   string `json:",omitempty"`
-	Description string
+	Usage       string
 	Type        string
 	NoOptDefVal string `json:",omitempty"`
 }
@@ -38,7 +38,7 @@ func convertFlag(f *pflag.Flag) flag {
 	return flag{
 		Longhand:    longhand,
 		Shorthand:   f.Shorthand,
-		Description: f.Usage,
+		Usage:       f.Usage,
 		Type:        f.Value.Type(),
 		NoOptDefVal: noOptDefVal,
 	}
@@ -46,9 +46,10 @@ func convertFlag(f *pflag.Flag) flag {
 
 func convert(cmd *cobra.Command) command {
 	c := command{
-		Name:        cmd.Name(),
-		Description: cmd.Short,
-		Aliases:     cmd.Aliases,
+		Name:    cmd.Name(),
+		Short:   cmd.Short,
+		Long:    cmd.Long,
+		Aliases: cmd.Aliases,
 	}
 
 	lflags := make([]flag, 0)

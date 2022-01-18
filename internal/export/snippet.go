@@ -2,6 +2,7 @@ package export
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/spf13/cobra"
@@ -11,6 +12,7 @@ import (
 type command struct {
 	Name            string
 	Description     string
+	Url             string    `json:",omitempty"`
 	Aliases         []string  `json:",omitempty"`
 	Commands        []command `json:",omitempty"`
 	LocalFlags      []flag    `json:",omitempty"`
@@ -49,6 +51,11 @@ func convert(cmd *cobra.Command) command {
 		Name:        cmd.Name(),
 		Description: cmd.Short,
 		Aliases:     cmd.Aliases,
+	}
+
+	if strings.HasPrefix(strings.ToLower(cmd.Long), "https://") ||
+		strings.HasPrefix(strings.ToLower(cmd.Long), "http://") {
+		c.Url = cmd.Long
 	}
 
 	lflags := make([]flag, 0)

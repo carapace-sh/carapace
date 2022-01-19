@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/rsteube/carapace/internal/assert"
 	"github.com/rsteube/carapace/internal/common"
@@ -15,6 +16,15 @@ func assertEqual(t *testing.T, expected, actual InvokedAction) {
 	sort.Sort(common.ByValue(actual.rawValues))
 
 	assert.Equal(t, fmt.Sprintf("%+v\n", expected), fmt.Sprintf("%+v\n", actual))
+}
+
+func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
+	sort.Sort(common.ByValue(expected.rawValues))
+	sort.Sort(common.ByValue(actual.rawValues))
+
+	if fmt.Sprintf("%+v\n", expected) == fmt.Sprintf("%+v\n", actual) {
+		t.Error("should be different")
+	}
 }
 
 func TestActionCallback(t *testing.T) {
@@ -34,6 +44,22 @@ func TestActionCallback(t *testing.T) {
 	}
 	actual := a.Invoke(Context{})
 	assertEqual(t, expected, actual)
+}
+
+func TestCache(t *testing.T) {
+	f := func() Action {
+		return ActionCallback(func(c Context) Action {
+			return ActionValues(time.Now().String())
+		}).Cache(5 * time.Millisecond)
+	}
+
+	a1 := f().Invoke(Context{})
+	a2 := f().Invoke(Context{})
+	assertEqual(t, a1, a2)
+
+	time.Sleep(5 * time.Millisecond)
+	a3 := f().Invoke(Context{})
+	assertNotEqual(t, a1, a3)
 }
 
 func TestSkipCache(t *testing.T) {

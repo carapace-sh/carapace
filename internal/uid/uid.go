@@ -1,14 +1,11 @@
 package uid
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 // Command creates a uid for given command
@@ -29,38 +26,6 @@ func Command(cmd *cobra.Command) string {
 	}
 
 	return "_" + strings.Join(reverse, "__")
-}
-
-// Flag creates a uid for given flag
-func Flag(cmd *cobra.Command, flag *pflag.Flag) string {
-	c := cmd
-	for c.HasParent() {
-		if c.LocalFlags().Lookup(flag.Name) != nil {
-			break
-		}
-		c = c.Parent()
-	}
-	// TODO ensure flag acually belongs to command (force error)
-	// TODO handle unknown flag error
-	return fmt.Sprintf("%v##%v", Command(c), flag.Name)
-}
-
-// Positional creates a uid for given positional argument
-func Positional(cmd *cobra.Command, position int) string {
-	// TODO complete function
-	return fmt.Sprintf("%v#%v", Command(cmd), position)
-}
-
-func find(cmd *cobra.Command, uid string) *cobra.Command {
-	var splitted []string
-	if splitted = strings.Split(uid[1:], "#"); len(splitted) == 0 { // TODO check for empty uid string
-		return nil
-	}
-	c, _, err := cmd.Root().Find(strings.Split(splitted[0], "__")[1:]) // TODO root if jut one arg
-	if err != nil {
-		log.Fatal(err)
-	}
-	return c
 }
 
 // Executable returns the name of the executable

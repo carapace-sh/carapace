@@ -50,14 +50,14 @@ func TestCache(t *testing.T) {
 	f := func() Action {
 		return ActionCallback(func(c Context) Action {
 			return ActionValues(time.Now().String())
-		}).Cache(5 * time.Millisecond)
+		}).Cache(10 * time.Millisecond)
 	}
 
 	a1 := f().Invoke(Context{})
 	a2 := f().Invoke(Context{})
 	assertEqual(t, a1, a2)
 
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(12 * time.Millisecond)
 	a3 := f().Invoke(Context{})
 	assertNotEqual(t, a1, a3)
 }

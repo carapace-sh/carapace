@@ -2,11 +2,13 @@ package carapace
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/rsteube/carapace/internal/assert"
+	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
 
@@ -133,4 +135,38 @@ func TestContext(t *testing.T) {
 		Parts:         []string{},
 	},
 		"first:second", "thi")
+}
+
+func TestStandalone(t *testing.T) {
+	cmd := &cobra.Command{}
+	if cmd.CompletionOptions.DisableDefaultCmd == true {
+		t.Fail()
+	}
+
+	Gen(cmd).Standalone()
+
+	if cmd.CompletionOptions.DisableDefaultCmd == false {
+		t.Fail()
+	}
+}
+
+func TestInitLogger(t *testing.T) {
+	initLogger()
+	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
+	if _, err := os.Stat(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable())); os.IsNotExist(err) {
+
+		t.Fail()
+	}
+}
+
+func TestIsCallback(t *testing.T) {
+	os.Args = []string{uid.Executable(), "subcommand"}
+	if IsCallback() {
+		t.Fail()
+	}
+
+	os.Args = []string{uid.Executable(), "_carapace"}
+	if !IsCallback() {
+		t.Fail()
+	}
 }

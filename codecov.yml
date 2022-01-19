@@ -1,2 +1,10 @@
 ignore:
-  - "example"
+  - "example/main.go"
+  - "example/cmd/action"
+  - "example/cmd/action.go"
+  - "example/cmd/batch.go"
+  - "example/cmd/callback.go"
+  - "example/cmd/condition.go"
+  - "example/cmd/injection.go"
+  - "example/cmd/multiparts.go"
+  - "example/cmd/root.go"

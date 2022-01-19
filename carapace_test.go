@@ -200,4 +200,12 @@ func TestSnippet(t *testing.T) {
 	if s, _ := Gen(cmd).Snippet("zsh"); !strings.Contains(s, "compdef") {
 		t.Error("zsh")
 	}
+
+	if _, err := Gen(cmd).Snippet("unknown"); err == nil {
+		t.Error("zsh")
+	}
+}
+
+func TestTest(t *testing.T) {
+	Test(t)
 }

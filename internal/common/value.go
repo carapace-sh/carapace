@@ -14,8 +14,8 @@ func (r RawValue) TrimmedDescription() string {
 	maxLength := 80
 	description := strings.SplitN(r.Description, "\n", 2)[0]
 	description = strings.TrimSpace(r.Description)
-	if len(description) > maxLength {
-		description = description[:maxLength-3] + "..."
+	if len([]rune(description)) > maxLength {
+		description = string([]rune(description)[:maxLength-3]) + "..."
 	}
 	return description
 }

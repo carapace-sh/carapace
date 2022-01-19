@@ -8,13 +8,15 @@ import (
 
 func TestGetFlag(t *testing.T) {
 	cmd := &cobra.Command{}
-	cmd.Flags().String("flag", "", "")
+	cmd.PersistentFlags().String("flag", "", "")
+	subcmd := &cobra.Command{}
+	cmd.AddCommand(subcmd)
 
 	Gen(cmd).FlagCompletion(ActionMap{
 		"flag": ActionValues("a", "b"),
 	})
 
-	assertEqual(t, ActionValues("a", "b").Invoke(Context{}), storage.getFlag(cmd, "flag").Invoke(Context{}))
+	assertEqual(t, ActionValues("a", "b").Invoke(Context{}), storage.getFlag(subcmd, "flag").Invoke(Context{}))
 }
 
 func TestGetPositional(t *testing.T) {

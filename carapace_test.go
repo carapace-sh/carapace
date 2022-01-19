@@ -170,3 +170,34 @@ func TestIsCallback(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSnippet(t *testing.T) {
+	cmd := &cobra.Command{}
+	if s, _ := Gen(cmd).Snippet("bash"); !strings.Contains(s, "#!/bin/bash") {
+		t.Error("bash failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("elvish"); !strings.Contains(s, "edit:completion") {
+		t.Error("elvish failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("fish"); !strings.Contains(s, "commandline") {
+		t.Error("fish failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("oil"); !strings.Contains(s, "#!/bin/osh") {
+		t.Error("oil failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("powershell"); !strings.Contains(s, "System.Management.Automation") {
+		t.Error("powershell failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("xonsh"); !strings.Contains(s, "@contextual_command_completer") {
+		t.Error("xonsh failed")
+	}
+
+	if s, _ := Gen(cmd).Snippet("zsh"); !strings.Contains(s, "compdef") {
+		t.Error("zsh")
+	}
+}

@@ -50,17 +50,6 @@ func (a ByValue) Len() int           { return len(a) }
 func (a ByValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
 func (a ByValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-// Filter filters values with given prefix
-func (a ByValue) Filter(prefix string) []RawValue {
-	filtered := make([]RawValue, 0, len(a))
-	for _, v := range a {
-		if strings.HasPrefix(v.Value, prefix) {
-			filtered = append(filtered, v)
-		}
-	}
-	return filtered
-}
-
 // ByDisplay alias to filter by display
 type ByDisplay []RawValue
 

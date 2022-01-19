@@ -1,6 +1,7 @@
 package uid
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/rsteube/carapace/internal/assert"
@@ -79,5 +80,11 @@ func TestFind(t *testing.T) {
 
 	if sub1 != find(root, "_root__sub1##someflag") {
 		t.Error(`"_root__sub1##someflag" should be sub1`)
+	}
+}
+
+func TestExecutable(t *testing.T) {
+	if !strings.HasSuffix(Executable(), ".test") {
+		t.Fail()
 	}
 }

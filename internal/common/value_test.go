@@ -1,6 +1,9 @@
 package common
 
-import "testing"
+import (
+	"sort"
+	"testing"
+)
 
 func TestTrimmedDescription(t *testing.T) {
 	r := RawValue{
@@ -43,4 +46,19 @@ func TestFilterPrefix(t *testing.T) {
 
 func equalRawValues(a, b RawValue) bool {
 	return a.Value == b.Value && a.Display == b.Display && a.Description == b.Description
+}
+
+func TestSort(t *testing.T) {
+	r := RawValuesFrom("3", "2", "1")
+	sort.Sort(ByValue(r))
+	if r[0].Value != "1" {
+		t.Fail()
+	}
+
+	r = RawValuesFrom("3", "2", "1")
+	sort.Sort(ByDisplay(r))
+	if r[0].Value != "1" {
+		t.Fail()
+	}
+
 }

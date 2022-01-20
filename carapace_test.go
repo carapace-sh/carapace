@@ -209,3 +209,15 @@ func TestSnippet(t *testing.T) {
 func TestTest(t *testing.T) {
 	Test(t)
 }
+
+func TestComplete(t *testing.T) {
+	cmd := &cobra.Command{
+		Use: "test",
+	}
+	cmd.Flags().BoolP("a", "1", false, "")
+	cmd.Flags().BoolP("b", "2", false, "")
+
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `[{"Value":"-12","Display":"2","CodeSuffix":""}]` {
+		t.Error(s)
+	}
+}

@@ -1,3 +1,4 @@
+// Package nushell provides Nushell completion
 package nushell
 
 import (

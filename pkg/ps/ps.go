@@ -1,3 +1,4 @@
+// Package ps provides shell determination by process name
 package ps
 
 import (
@@ -9,6 +10,9 @@ import (
 
 func DetermineShell() string {
 	process, err := ps.FindProcess(os.Getpid())
+	if err != nil {
+		return ""
+	}
 	for {
 		if process, err = ps.FindProcess(process.PPid()); err != nil || process == nil {
 			return ""

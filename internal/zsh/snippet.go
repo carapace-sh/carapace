@@ -1,3 +1,4 @@
+// Package zsh provides zsh completion
 package zsh
 
 import (

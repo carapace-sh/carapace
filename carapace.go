@@ -1,3 +1,4 @@
+// Package carapace is a command argument completion generator for spf13/cobra
 package carapace
 
 import (

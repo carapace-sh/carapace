@@ -1,3 +1,4 @@
+// Package powershell provides powershell completion
 package powershell
 
 import (

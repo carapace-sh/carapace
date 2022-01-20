@@ -1,3 +1,4 @@
+// Package cache provides disk cache for Actions
 package cache
 
 import (

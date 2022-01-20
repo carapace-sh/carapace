@@ -1,3 +1,4 @@
+// Package cache provides cache keys
 package cache
 
 import (

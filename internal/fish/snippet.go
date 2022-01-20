@@ -1,3 +1,4 @@
+// Package fish provides fish completion
 package fish
 
 import (

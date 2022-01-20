@@ -1,3 +1,4 @@
+// Package common code
 package common
 
 import "strings"
@@ -13,7 +14,7 @@ type RawValue struct {
 func (r RawValue) TrimmedDescription() string {
 	maxLength := 80
 	description := strings.SplitN(r.Description, "\n", 2)[0]
-	description = strings.TrimSpace(r.Description)
+	description = strings.TrimSpace(description)
 	if len([]rune(description)) > maxLength {
 		description = string([]rune(description)[:maxLength-3]) + "..."
 	}

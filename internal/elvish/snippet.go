@@ -1,3 +1,4 @@
+// Package elvish provides elvish completion
 package elvish
 
 import (

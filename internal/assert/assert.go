@@ -1,3 +1,4 @@
+// Package assert provides test helpers
 package assert
 
 import (

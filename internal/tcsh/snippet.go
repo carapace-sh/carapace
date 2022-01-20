@@ -1,3 +1,4 @@
+// Package tcsh provides tcsh completion
 package tcsh
 
 import (

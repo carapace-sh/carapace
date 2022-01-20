@@ -1,3 +1,4 @@
+// Package export provides command structure export
 package export
 
 import (

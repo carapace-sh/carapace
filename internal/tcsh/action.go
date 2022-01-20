@@ -67,8 +67,6 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 	return
 }
 
-const nospaceIndicator = "\001"
-
 // ActionRawValues formats values for bash
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)

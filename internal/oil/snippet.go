@@ -1,3 +1,4 @@
+// Package oil provides Oil completion
 package oil
 
 import (

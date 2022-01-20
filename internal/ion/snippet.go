@@ -1,3 +1,4 @@
+// Package ion provides Ion completion
 package ion
 
 import (

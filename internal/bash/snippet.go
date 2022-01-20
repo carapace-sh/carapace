@@ -1,3 +1,4 @@
+// Package bash provides bash completion
 package bash
 
 import (

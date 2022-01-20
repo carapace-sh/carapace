@@ -1,3 +1,4 @@
+// Package uid provides unique identifiers
 package uid
 
 import (

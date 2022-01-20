@@ -1,3 +1,4 @@
+// Package xonsh provides Xonsh completion
 package xonsh
 
 import (

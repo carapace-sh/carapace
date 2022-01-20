@@ -221,3 +221,19 @@ func TestComplete(t *testing.T) {
 		t.Error(s)
 	}
 }
+
+func TestCompleteOptarg(t *testing.T) {
+	cmd := &cobra.Command{
+		Use: "test",
+	}
+	cmd.Flags().String("opt", "", "")
+	cmd.Flag("opt").NoOptDefVal = " "
+
+	Gen(cmd).FlagCompletion(ActionMap{
+		"opt": ActionValuesDescribed("value", "description"),
+	})
+
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "--opt="}); err != nil || s != `[{"Value":"--opt=value","Display":"value (description)","CodeSuffix":" "}]` {
+		t.Error(s)
+	}
+}

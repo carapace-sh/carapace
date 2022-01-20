@@ -237,3 +237,13 @@ func TestCompleteOptarg(t *testing.T) {
 		t.Error(s)
 	}
 }
+
+func TestCompleteSnippet(t *testing.T) {
+	cmd := &cobra.Command{
+		Use: "test",
+	}
+
+	if s, err := complete(cmd, []string{"bash"}); err != nil || !strings.Contains(s, "#!/bin/bash") {
+		t.Error(s)
+	}
+}

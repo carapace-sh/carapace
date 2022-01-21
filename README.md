@@ -6,7 +6,7 @@
 [![GoReportCard](https://goreportcard.com/badge/github.com/rsteube/carapace)](https://goreportcard.com/report/github.com/rsteube/carapace)
 [![codecov](https://codecov.io/gh/rsteube/carapace/branch/master/graph/badge.svg?token=OQAYYTIJ2J)](https://codecov.io/gh/rsteube/carapace)
 
-Command-line completion generator for [cobra] with support for:
+Command argument completion generator for [cobra] with support for:
 
 - [Bash](https://www.gnu.org/software/bash/)
 - [Elvish](https://elv.sh/)

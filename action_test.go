@@ -103,12 +103,12 @@ func TestNoSpace(t *testing.T) {
 func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
 		ActionValues("example/", "docs/", "internal/", "pkg/").noSpace(true).Invoke(Context{}),
-		ActionDirectories().Invoke(Context{CallbackValue: ""}),
+		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
 		ActionValues("example/", "docs/", "internal/", "pkg/").noSpace(true).Invoke(Context{}).Prefix("./"),
-		ActionDirectories().Invoke(Context{CallbackValue: "./"}),
+		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
 	assertEqual(t,
@@ -125,7 +125,7 @@ func TestActionDirectories(t *testing.T) {
 func TestActionFiles(t *testing.T) {
 	assertEqual(t,
 		ActionValues("README.md", "example/", "docs/", "internal/", "pkg/").noSpace(true).Invoke(Context{}),
-		ActionFiles(".md").Invoke(Context{CallbackValue: ""}),
+		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,

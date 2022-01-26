@@ -130,7 +130,7 @@ func TestActionFiles(t *testing.T) {
 
 	assertEqual(t,
 		ActionValues("_test/", "cmd/", "main.go", "main_test.go").noSpace(true).Invoke(Context{}).Prefix("example/"),
-		ActionFiles().Invoke(Context{CallbackValue: "example/"}),
+		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
 }
 

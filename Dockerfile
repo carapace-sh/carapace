@@ -3,7 +3,7 @@ LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 
 FROM base as bat
-ARG version=0.18.3
+ARG version=0.19.0
 RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-x86_64-unknown-linux-gnu.tar.gz \
   | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v${version}-x86_64-unknown-linux-gnu/bat \
   && chmod +x /usr/local/bin/bat
@@ -14,7 +14,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=0.180.2
+ARG version=1.4.1
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
@@ -39,7 +39,7 @@ RUN curl -L https://github.com/rsteube/nushell/releases/download/${version}/nu_$
 # && mv nu_${version//./_}_linux/nushell-${version}/nu* /usr/local/bin
 
 FROM base as oil
-ARG version=0.9.2
+ARG version=0.9.6
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && cd oil-*/ \
@@ -54,13 +54,13 @@ RUN wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${versio
   && chmod +x /usr/local/bin/shellcheck
 
 FROM base as mdbook
-ARG version=0.4.12
+ARG version=0.4.15
 RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
   && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
   && mv mdbook* /usr/local/bin/
 
 FROM base as codecov
-ARG version=0.1.3
+ARG version=0.1.15
 RUN curl -L "https://github.com/codecov/uploader/releases/download/v${version}/codecov-linux" > /usr/local/bin/codecov \
   && chmod +x /usr/local/bin/codecov
 

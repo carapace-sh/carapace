@@ -44,4 +44,3 @@
     - [Xonsh](./development/shells/xonsh.md)
     - [Zsh](./development/shells/zsh.md)
   - [Testing](./development/testing.md)
-  - [Uid](./development/uid.md) 

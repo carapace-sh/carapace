@@ -153,11 +153,11 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		}
 	} else {
 		if len(args) == 1 {
-			if s, err := Gen(cmd).Snippet(args[0]); err != nil {
+			s, err := Gen(cmd).Snippet(args[0])
+			if err != nil {
 				return "", err
-			} else {
-				return s, nil
 			}
+			return s, nil
 		} else {
 			shell := args[0]
 			id := args[1]

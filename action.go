@@ -127,8 +127,8 @@ func (a Action) Chdir(dir string) Action {
 	})
 }
 
-// Supress suppresses specific error messages using regular expressions
-func (a Action) Supress(expr ...string) Action {
+// Suppress suppresses specific error messages using regular expressions
+func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		filter := false

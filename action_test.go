@@ -167,7 +167,7 @@ func TestActionMessage(t *testing.T) {
 func TestActionMessageSuppress(t *testing.T) {
 	assertEqual(t,
 		Batch(
-			ActionMessage("example message").Supress("example"),
+			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
 		ActionValues("test").noSpace(true).skipCache(true).Invoke(Context{}),

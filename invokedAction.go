@@ -6,6 +6,7 @@ import (
 	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
+	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/fish"
 	"github.com/rsteube/carapace/internal/ion"
 	"github.com/rsteube/carapace/internal/nushell"
@@ -117,6 +118,7 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 		"bash":       bash.ActionRawValues,
 		"fish":       fish.ActionRawValues,
 		"elvish":     elvish.ActionRawValues,
+		"export":     export.ActionRawValues,
 		"ion":        ion.ActionRawValues,
 		"nushell":    nushell.ActionRawValues,
 		"oil":        oil.ActionRawValues,

@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	exec "golang.org/x/sys/execabs"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/export"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -41,6 +43,22 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 			return f(stdout.Bytes())
 		})
 	}
+}
+
+// ActionExecCarapace is an experimental action for carapace-bin
+// TODO evaluate
+func ActionExecCarapace(cmd string, arg ...string) Action {
+	return ActionExecCommand(cmd, arg...)(func(output []byte) Action {
+		var e export.Export
+		if err := json.Unmarshal(output, &e); err != nil {
+			return ActionMessage(err.Error())
+		}
+		a := actionRawValues(e.RawValues...)
+		if e.Nospace {
+			a = a.NoSpace()
+		}
+		return a
+	})
 }
 
 // strip ANSI color escape codes from string (source: https://github.com/acarl005/stripansi)

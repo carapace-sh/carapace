@@ -45,10 +45,10 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 	}
 }
 
-// ActionExecCarapace is an experimental action for carapace-bin
+// ActionImport is an experimental action for carapace-bin
 // TODO evaluate
-func ActionExecCarapace(cmd string, arg ...string) Action {
-	return ActionExecCommand(cmd, arg...)(func(output []byte) Action {
+func ActionImport(output []byte) Action {
+	return ActionCallback(func(c Context) Action {
 		var e export.Export
 		if err := json.Unmarshal(output, &e); err != nil {
 			return ActionMessage(err.Error())

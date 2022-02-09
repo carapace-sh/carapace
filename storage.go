@@ -2,6 +2,8 @@ package carapace
 
 import (
 	"fmt"
+
+	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +14,8 @@ type entry struct {
 	flag          ActionMap
 	positional    []Action
 	positionalAny Action
+	dash          []Action
+	dashAny       Action
 }
 
 type _storage map[*cobra.Command]*entry
@@ -36,10 +40,17 @@ func (s _storage) getFlag(cmd *cobra.Command, name string) Action {
 func (s _storage) getPositional(cmd *cobra.Command, pos int) Action {
 	entry := s.get(cmd)
 	// TODO nil check?
-	if len(entry.positional) > pos {
-		return entry.positional[pos]
+	if !common.IsDash(cmd) {
+		if len(entry.positional) > pos {
+			return entry.positional[pos]
+		}
+		return entry.positionalAny
+	} else {
+		if len(entry.dash) > pos {
+			return entry.dash[pos]
+		}
+		return entry.dashAny
 	}
-	return entry.positionalAny
 }
 
 // TODO implicit execution during build - go:generate possible?

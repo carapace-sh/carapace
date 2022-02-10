@@ -52,4 +52,13 @@ func init() {
 		carapace.ActionValues("positional1", "p1"),
 		carapace.ActionValues("positional2", "p2"),
 	)
+
+	carapace.Gen(actionCmd).DashCompletion(
+		carapace.ActionValues("dash1", "d1"),
+		carapace.ActionValues("dash2", "d2"),
+	)
+
+	carapace.Gen(actionCmd).DashAnyCompletion(
+		carapace.ActionValues("dashAny", "dAny"),
+	)
 }

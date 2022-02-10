@@ -53,9 +53,19 @@ func (c Carapace) PositionalCompletion(action ...Action) {
 	storage.get(c.cmd).positional = action
 }
 
-// PositionalAnyCompletion defines completion for any positional argument not already defined
+// PositionalAnyCompletion defines completion for any positional arguments not already defined
 func (c Carapace) PositionalAnyCompletion(action Action) {
 	storage.get(c.cmd).positionalAny = action
+}
+
+// DashCompletion defines completion for positional arguments after dash (`--`) using a list of Actions
+func (c Carapace) DashCompletion(action ...Action) {
+	storage.get(c.cmd).dash = action
+}
+
+// DashAnyCompletion defines completion for any positional arguments after dash (`--`) not already defined
+func (c Carapace) DashAnyCompletion(action Action) {
+	storage.get(c.cmd).dashAny = action
 }
 
 // FlagCompletion defines completion for flags using a map consisting of name and Action
@@ -177,9 +187,9 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			case "_":
 				// TODO needs more cleanup and tests
 				var targetAction Action
-				if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" { // previous arg is a flag and needs a value
+				if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" && !common.IsDash(targetCmd) { // previous arg is a flag and needs a value
 					targetAction = storage.getFlag(targetCmd, flag.Name)
-				} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") { // assume flag
+				} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") && !common.IsDash(targetCmd) { // assume flag
 					if strings.Contains(current, "=") { // complete value for optarg flag
 						if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 							a := storage.getFlag(targetCmd, flag.Name)
@@ -199,10 +209,14 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 						context.Args = context.Args[:len(context.Args)-1] // current word being completed is a positional so remove it from context.Args
 					}
 
-					targetAction = findAction(targetCmd, targetArgs)
-					if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
-						subcommandA := actionSubcommands(targetCmd).Invoke(context)
-						targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
+					if common.IsDash(targetCmd) {
+						targetAction = findAction(targetCmd, targetArgs[targetCmd.ArgsLenAtDash():])
+					} else {
+						targetAction = findAction(targetCmd, targetArgs)
+						if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
+							subcommandA := actionSubcommands(targetCmd).Invoke(context)
+							targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
+						}
 					}
 				}
 				if opts.LongShorthand {

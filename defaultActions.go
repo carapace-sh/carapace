@@ -61,6 +61,41 @@ func ActionImport(output []byte) Action {
 	})
 }
 
+// ActionInvoke invokes an internal command
+//   var composeCmd = &cobra.Command{
+//   	Use:                "compose",
+//   	Short:              "Define and run multi-container applications with Docker",
+//   	Run:                func(cmd *cobra.Command, args []string) {},
+//   	DisableFlagParsing: true,
+//   }
+//
+//   func init() {
+//   	carapace.Gen(composeCmd).Standalone()
+//
+//   	rootCmd.AddCommand(composeCmd)
+//
+//   	carapace.Gen(composeCmd).PositionalAnyCompletion(
+//   		invoke.ActionInvokeCompleter(compose.Execute),
+//   	)
+//   }
+func ActionInvoke(f func() error) Action {
+	return ActionCallback(func(c Context) Action {
+		// TODO experimental
+		// TODO beware of carapace.Batch goroutines - is this safe? might need locking
+		old := os.Args
+		args := []string{"", "_carapace", "export", "_", ""}
+		args = append(args, c.Args...)
+		args = append(args, c.CallbackValue)
+		os.Args = args
+		output, err := common.CaptureStdout(f)
+		os.Args = old
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+		return ActionImport([]byte(output))
+	})
+}
+
 // strip ANSI color escape codes from string (source: https://github.com/acarl005/stripansi)
 func stripAnsi(str string) string {
 	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")

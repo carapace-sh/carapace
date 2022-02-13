@@ -83,7 +83,7 @@ func ActionInvoke(f func() error) Action {
 		// TODO experimental
 		// TODO beware of carapace.Batch goroutines - is this safe? might need locking
 		old := os.Args
-		args := []string{"", "_carapace", "export", "_", ""}
+		args := []string{"", "_carapace", "export", ""}
 		args = append(args, c.Args...)
 		args = append(args, c.CallbackValue)
 		os.Args = args

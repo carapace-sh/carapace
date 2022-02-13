@@ -12,7 +12,7 @@ def _example_completer(context):
             """quick fix for partially quoted prefix completion ('prefix',<TAB>)"""
             return s.translate(str.maketrans('', '', '\'"'))
 
-        output, _ = Popen(['example', '_carapace', 'xonsh', '_', *[a.value for a in context.args], fix_prefix(context.prefix)], stdout=PIPE, stderr=PIPE).communicate()
+        output, _ = Popen(['example', '_carapace', 'xonsh', *[a.value for a in context.args], fix_prefix(context.prefix)], stdout=PIPE, stderr=PIPE).communicate()
         try:
             result = {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=len(context.raw_prefix), append_closing_quote=False) for c in loads(output)}
         except:

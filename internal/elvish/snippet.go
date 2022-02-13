@@ -10,7 +10,7 @@ import (
 // Snippet creates the elvish completion script
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`set edit:completion:arg-completer[%v] = {|@arg|
-    %v _carapace elvish _ (all $arg) | from-json | all (one) | each {|c| edit:complex-candidate $c[Value] &display=$c[Display] &code-suffix=$c[CodeSuffix] }
+    %v _carapace elvish (all $arg) | from-json | all (one) | each {|c| edit:complex-candidate $c[Value] &display=$c[Display] &code-suffix=$c[CodeSuffix] }
 }
 `, cmd.Name(), uid.Executable())
 }

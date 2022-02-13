@@ -14,7 +14,7 @@ func Snippet(cmd *cobra.Command) string {
 _%v_completion() {
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'
-  mapfile -t COMPREPLY < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace oil "_")
+  mapfile -t COMPREPLY < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace oil)
   [[ "${COMPREPLY[@]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
   [[ ${COMPREPLY[0]} == *[/=@:.,$'\001'] ]] && compopt -o nospace
   # TODO use mapfile

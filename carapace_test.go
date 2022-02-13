@@ -47,7 +47,7 @@ func execCompletion(args ...string) (context Context) {
 
 	rootCmd.AddCommand(subCmd)
 
-	os.Args = append([]string{"root", "_carapace", "elvish", "_", "root"}, args...)
+	os.Args = append([]string{"root", "_carapace", "elvish", "root"}, args...)
 	rootCmd.Execute()
 	return
 }

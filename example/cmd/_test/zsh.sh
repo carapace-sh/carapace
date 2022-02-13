@@ -5,13 +5,13 @@ function _example_completion {
   # shellcheck disable=SC2207,SC2086,SC2154
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
     # shellcheck disable=SC2207,SC2086
-    local c=($(echo ${words}"''" | xargs example _carapace zsh _ ))
+    local c=($(echo ${words}"''" | xargs example _carapace zsh ))
   elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
     # shellcheck disable=SC2207,SC2086
-    local c=($(echo ${words} | sed "s/\$/'/" | xargs example _carapace zsh _ ))
+    local c=($(echo ${words} | sed "s/\$/'/" | xargs example _carapace zsh))
   else
     # shellcheck disable=SC2207,SC2086
-    local c=($(echo ${words} | sed 's/$/"/'  | xargs example _carapace zsh _ ))
+    local c=($(echo ${words} | sed 's/$/"/'  | xargs example _carapace zsh))
   fi
 
   # shellcheck disable=SC2034,2206

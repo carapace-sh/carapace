@@ -23,7 +23,7 @@ func Snippet(cmd *cobra.Command) string {
 end
 
 function _%v_callback
-  commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish _
+  commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish
 end
 
 complete -c %v -f

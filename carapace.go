@@ -170,7 +170,6 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			return s, nil
 		} else {
 			shell := args[0]
-			id := args[1]
 			current := args[len(args)-1]
 			previous := args[len(args)-2]
 
@@ -183,50 +182,44 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 				return ActionMessage(err.Error()).Invoke(context).value(shell, current), nil
 			}
 
-			switch id {
-			case "_":
-				// TODO needs more cleanup and tests
-				var targetAction Action
-				if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" && !common.IsDash(targetCmd) { // previous arg is a flag and needs a value
-					targetAction = storage.getFlag(targetCmd, flag.Name)
-				} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") && !common.IsDash(targetCmd) { // assume flag
-					if strings.Contains(current, "=") { // complete value for optarg flag
-						if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
-							a := storage.getFlag(targetCmd, flag.Name)
-							splitted := strings.SplitN(current, "=", 2)
-							context.CallbackValue = splitted[1]
-							if opts.LongShorthand {
-								splitted[0] = splitted[0][1:] // revert the added `-` so that the resulting prefix is correct
-							}
-							current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)                  // revert (potentially) overridden optarg divider for `.value()` invocation below
-							targetAction = a.Invoke(context).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
+			// TODO needs more cleanup and tests
+			var targetAction Action
+			if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" && !common.IsDash(targetCmd) { // previous arg is a flag and needs a value
+				targetAction = storage.getFlag(targetCmd, flag.Name)
+			} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") && !common.IsDash(targetCmd) { // assume flag
+				if strings.Contains(current, "=") { // complete value for optarg flag
+					if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
+						a := storage.getFlag(targetCmd, flag.Name)
+						splitted := strings.SplitN(current, "=", 2)
+						context.CallbackValue = splitted[1]
+						if opts.LongShorthand {
+							splitted[0] = splitted[0][1:] // revert the added `-` so that the resulting prefix is correct
 						}
-					} else { // complete flagnames
-						targetAction = actionFlags(targetCmd)
+						current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)                  // revert (potentially) overridden optarg divider for `.value()` invocation below
+						targetAction = a.Invoke(context).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
 					}
-				} else {
-					if len(context.Args) > 0 {
-						context.Args = context.Args[:len(context.Args)-1] // current word being completed is a positional so remove it from context.Args
-					}
+				} else { // complete flagnames
+					targetAction = actionFlags(targetCmd)
+				}
+			} else {
+				if len(context.Args) > 0 {
+					context.Args = context.Args[:len(context.Args)-1] // current word being completed is a positional so remove it from context.Args
+				}
 
-					if common.IsDash(targetCmd) {
-						targetAction = findAction(targetCmd, targetArgs[targetCmd.ArgsLenAtDash():])
-					} else {
-						targetAction = findAction(targetCmd, targetArgs)
-						if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
-							subcommandA := actionSubcommands(targetCmd).Invoke(context)
-							targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
-						}
+				if common.IsDash(targetCmd) {
+					targetAction = findAction(targetCmd, targetArgs[targetCmd.ArgsLenAtDash():])
+				} else {
+					targetAction = findAction(targetCmd, targetArgs)
+					if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {
+						subcommandA := actionSubcommands(targetCmd).Invoke(context)
+						targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
 					}
 				}
-				if opts.LongShorthand {
-					current = strings.TrimPrefix(current, "-")
-				}
-				return targetAction.Invoke(context).value(shell, current), nil
-			default:
-				// TODO disable support for direct uid invocation
-				//fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), actionMap.invokeCallback(id, context).Invoke(context).value(shell, context.CallbackValue))
 			}
+			if opts.LongShorthand {
+				current = strings.TrimPrefix(current, "-")
+			}
+			return targetAction.Invoke(context).value(shell, current), nil
 		}
 	}
 	return "", nil // TODO
@@ -247,8 +240,8 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
 
 func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
 	origArg := []string{}
-	if len(args) > 3 {
-		origArg = args[3:]
+	if len(args) > 2 {
+		origArg = args[2:]
 	}
 	return common.TraverseLenient(cmd, origArg)
 }

@@ -14,7 +14,7 @@ carapace.Gen(rootCmd).PositionalCompletion(
 
 ```go
 carapace.Gen(rootCmd).PositionalAnyCompletion(
-    carapace.ActionFiles(""),
+    carapace.ActionFiles(),
 )
 ```
 

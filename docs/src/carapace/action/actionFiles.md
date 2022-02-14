@@ -4,7 +4,7 @@
 
 ```go
 // all files
-carapace.ActionFiles(".go", "go.mod")
+carapace.ActionFiles()
 
 // files ending with `.go` or `go.mod`
 carapace.ActionFiles(".go", "go.mod")

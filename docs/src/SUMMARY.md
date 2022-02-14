@@ -29,6 +29,7 @@
     - [ToMultiPartsA](./carapace/invokedAction/toMultiPartsA.md)
   - [Batch](./carapace/batch.md)
   - [Cache](./carapace/cache.md)
+  - [Export](./carapace/export.md)
   - [Standalone](./carapace/standalone.md)
     - [caraparse](./carapace/standalone/caraparse.md)
     - [pflag](./carapace/standalone/pflag.md)

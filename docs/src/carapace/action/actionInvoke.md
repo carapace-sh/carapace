@@ -3,10 +3,10 @@
 [`ActionInvoke`] invokes a different command and parses it's output using [`ActionImport`].
 It does so by updating `os.Args` so that [Export] is called with the current context as arguments.
 
-E.g. in [`gh repo fork`] which allows additional git flags after dash.
+E.g. in [`gh repo clone`] which allows additional git flags after dash.
 
 ```sh
-gh repo fork [<repository>] [-- <gitflags>...] [flags]
+gh repo clone [<repository>] [-- <gitflags>...] [flags]
 ```
 
 Here, the context is updated so that only flags are completed and the `--branch` flag can list remote branches.
@@ -28,4 +28,4 @@ carapace.Gen(repo_cloneCmd).DashAnyCompletion(
 [`ActionInvoke`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionInvoke
 [`ActionImport`]:../action/actionImport.md
 [Export]:../export.md
-[`gh repo fork`]:https://github.com/rsteube/carapace-bin/blob/84717177317a9c9b1aa0d150d25d1b5c12cf9422/completers/gh_completer/cmd/repo_fork.go
+[`gh repo clone`]:https://github.com/rsteube/carapace-bin/blob/84717177317a9c9b1aa0d150d25d1b5c12cf9422/completers/gh_completer/cmd/repo_clone.go

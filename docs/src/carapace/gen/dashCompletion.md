@@ -26,27 +26,6 @@ carapace.Gen(rootCmd).DashAnyCompletion(
 ## Complete using different command
 
 [`DashAnyCompletion`] can be combined with [`ActionInvoke`] or [`ActionImport`] to complete the arguments after dash with a different completer.
-E.g. for `gh repo fork` which allows additional git flags after dash.
-
-```sh
-gh repo fork [<repository>] [-- <gitflags>...] [flags]
-```
-
-Here the context is updated so that only flags are completed and the `--branch` flag can complete remote branches.
-```go
-carapace.Gen(repo_cloneCmd).DashAnyCompletion(
-	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-		repo := ""
-		if args := repo_cloneCmd.Flags().Args(); len(args) > 0 {
-			repo = fmt.Sprintf("https://github.com/%v.git", args[0])
-		}
-		c.Args = append([]string{"clone", repo, ""}, c.Args...)
-		return carapace.ActionInvoke(git.Execute).Invoke(c).ToA()
-	}),
-)
-```
-
-[![asciicast](https://asciinema.org/a/468206.svg)](https://asciinema.org/a/468206)
 
 [`ActionInvoke`]:../action/actionInvoke.md
 [`ActionImport`]:../action/actionImport.md

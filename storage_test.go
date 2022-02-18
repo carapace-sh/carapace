@@ -36,6 +36,25 @@ func TestGetPositional(t *testing.T) {
 	assertEqual(t, ActionValues("pos", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
 }
 
+func TestGetDash(t *testing.T) {
+	cmd := &cobra.Command{}
+
+	Gen(cmd).DashCompletion(
+		ActionValues("dash", "1"),
+		ActionValues("dash", "2"),
+	)
+
+	Gen(cmd).DashAnyCompletion(
+		ActionValues("dash", "any"),
+	)
+
+	cmd.Flags().Parse([]string{"--", ""})
+
+	assertEqual(t, ActionValues("dash", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
+	assertEqual(t, ActionValues("dash", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))
+	assertEqual(t, ActionValues("dash", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
+}
+
 func TestCheck(t *testing.T) {
 	cmd := &cobra.Command{}
 	cmd.Flags().String("flag", "", "")

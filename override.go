@@ -42,6 +42,7 @@ func Override(o Opts) {
 		opts.LongShorthand = o.LongShorthand
 		for index, arg := range os.Args {
 			if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") {
+				// TODO needs solution compatible with ActionInvoke (not changing os.Args)
 				os.Args[index] = "-" + arg
 			}
 		}
@@ -52,6 +53,7 @@ func Override(o Opts) {
 		opts.OptArgDelimiter = o.OptArgDelimiter
 		for index, arg := range os.Args {
 			if strings.HasPrefix(arg, "--") {
+				// TODO needs solution compatible with ActionInvoke (not changing os.Args)
 				os.Args[index] = strings.Replace(arg, o.OptArgDelimiter, `=`, 1)
 			}
 		}

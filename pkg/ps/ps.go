@@ -21,6 +21,9 @@ func DetermineShell() string {
 
 		switch strings.SplitN(strings.TrimSuffix(process.Executable(), ".exe"), "-", 2)[0] {
 		case "bash":
+			if _, ok := os.LookupEnv("BLE_ATTACHED"); ok { // TODO env is not exported
+				return "bash-ble"
+			}
 			return "bash"
 		case "elvish":
 			return "elvish"

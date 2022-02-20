@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/bash_ble"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/export"
@@ -100,6 +101,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	}
 	shellSnippets := map[string]func(cmd *cobra.Command) string{
 		"bash":       bash.Snippet,
+		"bash-ble":   bash_ble.Snippet,
 		"export":     export.Snippet,
 		"fish":       fish.Snippet,
 		"elvish":     elvish.Snippet,
@@ -114,7 +116,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	if s, ok := shellSnippets[shell]; ok {
 		return s(c.cmd.Root()), nil
 	}
-	return "", fmt.Errorf("expected 'bash', 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
+	return "", fmt.Errorf("expected 'bash', bash-ble, 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {

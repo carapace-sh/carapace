@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/bash_ble"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/elvish"
 	"github.com/rsteube/carapace/internal/export"
@@ -116,6 +117,7 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
 	shellFuncs := map[string]func(currentWord string, nospace bool, values common.RawValues) string{
 		"bash":       bash.ActionRawValues,
+		"bash-ble":   bash_ble.ActionRawValues,
 		"fish":       fish.ActionRawValues,
 		"elvish":     elvish.ActionRawValues,
 		"export":     export.ActionRawValues,

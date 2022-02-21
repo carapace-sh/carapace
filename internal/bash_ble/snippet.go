@@ -3,31 +3,40 @@ package bash_ble
 
 import (
 	"fmt"
+	"regexp"
 
+	"github.com/rsteube/carapace/internal/bash"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
 
 // Snippet creates the bash-ble completion script
 func Snippet(cmd *cobra.Command) string {
-	result := fmt.Sprintf(`#!/bin/bash
-_%v_completion() {
-  bleopt complete_menu_style=desc
-  #export COMP_WORDBREAKS
+	bashSnippet := bash.Snippet(cmd)
+	bashSnippet = regexp.MustCompile("complete -F [^\n]+").ReplaceAllString(bashSnippet, "")
 
-  local compline="${COMP_LINE:0:${COMP_POINT}}"
-  local IFS=$'\n'
-  local c
-  mapfile -t c < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash-ble)
-  [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
+	result := fmt.Sprintf(`
+_%v_completion_ble() {
+  if [[ ${BLE_ATTACHED-} ]]; then
+    bleopt complete_menu_style=desc
 
-  for cand in "${c[@]}"; do
-    [ ! -z "$cand" ] && ble/complete/cand/yield mandb "${cand%%$'\t'*}" "${cand##*$'\t'}"
-  done
+    local compline="${COMP_LINE:0:${COMP_POINT}}"
+    local IFS=$'\n'
+    local c
+    mapfile -t c < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash-ble)
+    [[ "${c[*]}" == "" ]] && c=() # fix for mapfile creating a non-empty array from empty command output
+
+    local cand
+    for cand in "${c[@]}"; do
+      [ ! -z "$cand" ] && ble/complete/cand/yield mandb "${cand%%$'\t'*}" "${cand##*$'\t'}"
+    done
+  else
+    complete -F _%v_completion %v
+  fi
 }
 
-complete -F _%v_completion %v
-`, cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name())
+complete -F _%v_completion_ble %v
+`, cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
 
-	return result
+	return bashSnippet + result
 }

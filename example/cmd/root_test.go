@@ -22,6 +22,10 @@ func TestBash(t *testing.T) {
 	testScript(t, "bash", "./_test/bash.sh")
 }
 
+func TestBashBle(t *testing.T) {
+	testScript(t, "bash-ble", "./_test/bash-ble.sh")
+}
+
 func TestElvish(t *testing.T) {
 	testScript(t, "elvish", "./_test/elvish.elv")
 }

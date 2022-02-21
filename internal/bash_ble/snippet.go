@@ -18,6 +18,8 @@ func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`
 _%v_completion_ble() {
   if [[ ${BLE_ATTACHED-} ]]; then
+    [[ :$comp_type: == *:auto:* ]] && return
+
     bleopt complete_menu_style=desc
 
     local compline="${COMP_LINE:0:${COMP_POINT}}"

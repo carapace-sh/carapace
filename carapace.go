@@ -142,9 +142,9 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.Println(os.Args) // TODO replace last with '' if empty
 			if s, err := complete(cmd, args); err != nil {
-				fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 			} else {
-				fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)
 			}
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
@@ -159,9 +159,9 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 
 	if len(args) == 0 {
 		if s, err := Gen(cmd).Snippet(ps.DetermineShell()); err != nil {
-			fmt.Fprintln(io.MultiWriter(os.Stderr, logger.Writer()), err.Error())
+			fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 		} else {
-			fmt.Fprintln(io.MultiWriter(os.Stdout, logger.Writer()), s)
+			fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)
 		}
 	} else {
 		if len(args) == 1 {

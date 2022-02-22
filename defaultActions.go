@@ -45,8 +45,17 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 	}
 }
 
-// ActionImport is an experimental action for carapace-bin
-// TODO evaluate
+// ActionImport parses the json output from export as Action
+//   carapace.Gen(rootCmd).PositionalAnyCompletion(
+//   	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+//   		args := []string{"_carapace", "export", ""}
+//   		args = append(args, c.Args...)
+//   		args = append(args, c.CallbackValue)
+//   		return carapace.ActionExecCommand("command", args...)(func(output []byte) carapace.Action {
+//   			return carapace.ActionImport(output)
+//   		})
+//   	}),
+//   )
 func ActionImport(output []byte) Action {
 	return ActionCallback(func(c Context) Action {
 		var e export.Export
@@ -61,38 +70,23 @@ func ActionImport(output []byte) Action {
 	})
 }
 
-// ActionInvoke invokes an internal command
-//   var composeCmd = &cobra.Command{
-//   	Use:                "compose",
-//   	Short:              "Define and run multi-container applications with Docker",
-//   	Run:                func(cmd *cobra.Command, args []string) {},
-//   	DisableFlagParsing: true,
-//   }
-//
-//   func init() {
-//   	carapace.Gen(composeCmd).Standalone()
-//
-//   	rootCmd.AddCommand(composeCmd)
-//
-//   	carapace.Gen(composeCmd).PositionalAnyCompletion(
-//   		invoke.ActionInvokeCompleter(compose.Execute),
-//   	)
-//   }
-func ActionInvoke(f func() error) Action {
+// ActionExecute executes completion on an internal command
+// TODO example
+func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
-		// TODO experimental
-		// TODO beware of carapace.Batch goroutines - is this safe? might need locking
-		old := os.Args
-		args := []string{"", "_carapace", "export", ""}
+		args := []string{"_carapace", "export", ""}
 		args = append(args, c.Args...)
 		args = append(args, c.CallbackValue)
-		os.Args = args
-		output, err := common.CaptureStdout(f)
-		os.Args = old
-		if err != nil {
+		cmd.SetArgs(args)
+
+		var stdout, stderr bytes.Buffer
+		cmd.SetOut(&stdout)
+		cmd.SetErr(&stderr)
+
+		if err := cmd.Execute(); err != nil {
 			return ActionMessage(err.Error())
 		}
-		return ActionImport([]byte(output))
+		return ActionImport(stdout.Bytes())
 	})
 }
 

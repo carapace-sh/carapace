@@ -17,10 +17,18 @@ type Context struct {
 	Args []string
 	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
 	Parts []string
-	// Env contains environment variables for current context (implicitly passed to `exec.Cmd` during ActionExecCommand)
+	// Env contains environment variables for current context
 	Env []string
-	// Dir contains the working directory for current context (implicitly passed to `exec.Cmd` during ActionExecCommand)
+	// Dir contains the working directory for current context
 	Dir string
+}
+
+// Setenv sets the value of the environment variable named by the key.
+func (c *Context) Setenv(key, value string) {
+	if c.Env == nil {
+		c.Env = []string{}
+	}
+	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
 }
 
 // Command returns the Cmd struct to execute the named program with the given arguments.
@@ -77,13 +85,4 @@ func (c Context) Abs(s string) (string, error) {
 		result += "/."
 	}
 	return result, nil
-}
-
-// Setenv sets the value of the environment variable named by the key.
-func (c Context) Setenv(key, value string) Context {
-	if c.Env == nil {
-		c.Env = []string{}
-	}
-	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
-	return c
 }

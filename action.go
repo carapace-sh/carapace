@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"path/filepath"
 	"regexp"
 	"runtime"
 	"time"
@@ -24,26 +23,6 @@ type ActionMap map[string]Action
 
 // CompletionCallback is executed during completion of associated flag or positional argument
 type CompletionCallback func(c Context) Action
-
-// Context provides information during completion
-type Context struct {
-	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
-	CallbackValue string
-	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed)
-	Args []string
-	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
-	Parts []string
-	// Env contains environment variables for current context (implicitly passed to `exec.Cmd` during ActionExecCommand)
-	Env []string
-}
-
-// Setenv sets the value of the environment variable named by the key.
-func (c *Context) Setenv(key, value string) {
-	if c.Env == nil {
-		c.Env = []string{}
-	}
-	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
-}
 
 // Cache cashes values of a CompletionCallback for given duration and keys
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
@@ -106,6 +85,18 @@ func (a Action) Style(style string) Action {
 	})
 }
 
+// Style sets the style using a reference
+//   ActionValues("value").StyleR(&style.Carapace.Value)
+//   ActionValues("description").StyleR(&style.Carapace.Value)
+func (a Action) StyleR(style *string) Action {
+	return ActionCallback(func(c Context) Action {
+		if style != nil {
+			return a.Style(*style)
+		}
+		return a
+	})
+}
+
 // Style sets the style using a function
 //   ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
 //   ActionValues("true", "false").StyleF(style.ForKeyword)
@@ -126,7 +117,7 @@ func (a Action) Chdir(dir string) Action {
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
-		c.Dir = filepath.Dir(abs)
+		c.Dir = abs
 		return a.Invoke(c).ToA()
 	})
 }

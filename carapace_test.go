@@ -83,6 +83,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"")
 
@@ -91,6 +92,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{"pos1"},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"pos1", "")
 
@@ -99,6 +101,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{"pos1", "pos2"},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"pos1", "pos2", "po")
 
@@ -107,6 +110,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"--multiparts", "")
 
@@ -115,6 +119,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"--multiparts", "fir")
 
@@ -123,6 +128,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{"pos1"},
 		Parts:         []string{"first"},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"pos1", "--multiparts", "first,seco")
 
@@ -131,6 +137,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"pos")
 
@@ -139,6 +146,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{},
 		Parts:         []string{"first"},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"first:sec")
 
@@ -147,6 +155,7 @@ func TestContext(t *testing.T) {
 		Args:          []string{"first:second"},
 		Parts:         []string{},
 		Env:           []string{},
+		Dir:           wd(""),
 	},
 		"first:second", "thi")
 }

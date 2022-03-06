@@ -6,42 +6,30 @@ import (
 	"testing"
 )
 
+func wd(s string) string {
+	if wd, _ := os.Getwd(); s != "" {
+		return wd + "/" + s
+	} else {
+		return wd
+	}
+}
+
+func home(s string) string {
+	if hd, _ := os.UserHomeDir(); s != "" {
+		return hd + "/" + s
+	} else {
+		return hd
+	}
+}
+
+func parent(s string) string {
+	if s != "" {
+		return filepath.Dir(wd("")) + "/" + s
+	}
+	return filepath.Dir(wd("")) + "/"
+}
+
 func TestContextAbs(t *testing.T) {
-	wd := func(s string) string {
-		if true {
-			return "/home/rsteube/Documents/development/github/carapace/" + s
-		}
-
-		if wd, _ := os.Getwd(); s != "" {
-			return wd + "/" + s
-		} else {
-			return wd
-		}
-	}
-
-	home := func(s string) string {
-		if true {
-			return "/home/rsteube/" + s
-		}
-
-		if hd, _ := os.UserHomeDir(); s != "" {
-			return hd + "/" + s
-		} else {
-			return hd
-		}
-	}
-
-	parent := func(s string) string {
-		if true {
-			return "/home/rsteube/Documents/development/github/" + s
-		}
-
-		if s != "" {
-			return filepath.Dir(wd("")) + "/" + s
-		}
-		return filepath.Dir(wd("")) + "/"
-	}
-
 	tests := append([]string{},
 		"/", "file", "/file",
 		"", "file", wd("file"),
@@ -57,9 +45,9 @@ func TestContextAbs(t *testing.T) {
 		"~", "file", home("file"),
 		"", "/", "/",
 		"", ".hidden", wd(".hidden"),
-		"", "./", wd(""),
-		"", "", wd(""),
-		"", ".", wd("")+".",
+		"", "./", wd("")+"/",
+		"", "", wd("")+"/",
+		"", ".", wd("")+"/"+".",
 	)
 
 	for index := 0; index < len(tests); index += 3 {

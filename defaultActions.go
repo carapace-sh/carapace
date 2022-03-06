@@ -14,6 +14,7 @@ import (
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -37,7 +38,7 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 			cmd.Stderr = &stderr
 			if err := cmd.Run(); err != nil {
 				if firstLine := strings.SplitN(stderr.String(), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
-					return ActionMessage(stripAnsi(firstLine))
+					return ActionMessage(stripansi.Strip(firstLine))
 				}
 				return ActionMessage(err.Error())
 			}
@@ -75,10 +76,19 @@ func ActionImport(output []byte) Action {
 // TODO example
 func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
-		args := []string{"_carapace", "export", ""}
+		args := []string{"_carapace", "export", cmd.Name()}
 		args = append(args, c.Args...)
 		args = append(args, c.CallbackValue)
 		cmd.SetArgs(args)
+
+		Gen(cmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
+			return ActionCallback(func(_c Context) Action {
+				// TODO verify
+				_c.Env = c.Env
+				_c.Dir = c.Dir
+				return action.Invoke(_c).ToA()
+			})
+		})
 
 		var stdout, stderr bytes.Buffer
 		cmd.SetOut(&stdout)
@@ -89,12 +99,6 @@ func ActionExecute(cmd *cobra.Command) Action {
 		}
 		return ActionImport(stdout.Bytes())
 	})
-}
-
-// strip ANSI color escape codes from string (source: https://github.com/acarl005/stripansi)
-func stripAnsi(str string) string {
-	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
-	return re.ReplaceAllString(str, "")
 }
 
 // ActionDirectories completes directories

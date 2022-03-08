@@ -35,6 +35,17 @@ type Context struct {
 	Args []string
 	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
 	Parts []string
+	// Env contains environment variables for current context (implicitly passed to `exec.Cmd` during ActionExecCommand)
+	Env []string
+}
+
+// Setenv sets the value of the environment variable named by the key.
+func (c Context) Setenv(key, value string) Context {
+	if c.Env == nil {
+		c.Env = []string{}
+	}
+	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
+	return c
 }
 
 // Cache cashes values of a CompletionCallback for given duration and keys
@@ -64,6 +75,9 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 func (a Action) Invoke(c Context) InvokedAction {
 	if c.Args == nil {
 		c.Args = []string{}
+	}
+	if c.Env == nil {
+		c.Env = []string{}
 	}
 	if c.Parts == nil {
 		c.Parts = []string{}

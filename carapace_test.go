@@ -77,6 +77,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "",
 		Args:          []string{},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"")
 
@@ -84,6 +85,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "",
 		Args:          []string{"pos1"},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"pos1", "")
 
@@ -91,6 +93,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "po",
 		Args:          []string{"pos1", "pos2"},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"pos1", "pos2", "po")
 
@@ -98,6 +101,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "",
 		Args:          []string{},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"--multiparts", "")
 
@@ -105,6 +109,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "fir",
 		Args:          []string{},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"--multiparts", "fir")
 
@@ -112,6 +117,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "seco",
 		Args:          []string{"pos1"},
 		Parts:         []string{"first"},
+		Env:           []string{},
 	},
 		"pos1", "--multiparts", "first,seco")
 
@@ -119,6 +125,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "pos",
 		Args:          []string{},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"pos")
 
@@ -126,6 +133,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "sec",
 		Args:          []string{},
 		Parts:         []string{"first"},
+		Env:           []string{},
 	},
 		"first:sec")
 
@@ -133,6 +141,7 @@ func TestContext(t *testing.T) {
 		CallbackValue: "thi",
 		Args:          []string{"first:second"},
 		Parts:         []string{},
+		Env:           []string{},
 	},
 		"first:second", "thi")
 }

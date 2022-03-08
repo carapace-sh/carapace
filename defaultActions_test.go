@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -35,4 +36,27 @@ func TestActionFlags(t *testing.T) {
 	cmd.Flag("alpha").Changed = true
 	a := actionFlags(cmd).Invoke(Context{CallbackValue: "-a"})
 	assertEqual(t, ActionValuesDescribed("b", "").NoSpace().Invoke(Context{}).Prefix("-a"), a)
+}
+
+func TestActionExecCommandEnv(t *testing.T) {
+	ActionExecCommand("env")(func(output []byte) Action {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if strings.Contains(line, "carapace_TestActionExecCommand") {
+				t.Error("should not contain env carapace_TestActionExecCommand")
+			}
+		}
+		return ActionValues()
+	}).Invoke(Context{})
+
+	ActionExecCommand("env")(func(output []byte) Action {
+		lines := strings.Split(string(output), "\n")
+		for _, line := range lines {
+			if line == "carapace_TestActionExecCommand=test" {
+				return ActionValues()
+			}
+		}
+		t.Error("should contain env carapace_TestActionExecCommand=test")
+		return ActionValues()
+	}).Invoke(Context{}.Setenv("carapace_TestActionExecCommand", "test"))
 }

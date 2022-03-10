@@ -176,7 +176,11 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			previous := args[len(args)-2]
 
 			targetCmd, targetArgs, err := findTarget(cmd, args)
-			context := Context{CallbackValue: current, Args: targetArgs}
+			context := Context{
+				CallbackValue: current,
+				Args:          targetArgs,
+				Env:           os.Environ(),
+			}
 			if err != nil {
 				if opts.LongShorthand {
 					current = strings.TrimPrefix(current, "-")

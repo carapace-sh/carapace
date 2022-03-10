@@ -63,6 +63,7 @@ func testContext(t *testing.T, expected Context, args ...string) {
 		os.Stdout = null
 		os.Stderr = null
 		actual := execCompletion(args...)
+		actual.Env = []string{} // skip env
 		os.Stdout = sOut
 		os.Stderr = sErr
 

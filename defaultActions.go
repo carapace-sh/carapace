@@ -32,6 +32,7 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 		return ActionCallback(func(c Context) Action {
 			var stdout, stderr bytes.Buffer
 			cmd := exec.Command(name, arg...)
+			cmd.Env = c.Env
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr
 			if err := cmd.Run(); err != nil {

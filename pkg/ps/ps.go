@@ -21,7 +21,7 @@ func DetermineShell() string {
 
 		switch strings.SplitN(strings.TrimSuffix(process.Executable(), ".exe"), "-", 2)[0] {
 		case "bash":
-			if _, ok := os.LookupEnv("BLE_ATTACHED"); ok { // TODO env is not exported
+			if isBLE() {
 				return "bash-ble"
 			}
 			return "bash"
@@ -49,4 +49,20 @@ func DetermineShell() string {
 			return "zsh"
 		}
 	}
+}
+
+func isBLE() bool {
+	bleEnvs := []string{
+		"_ble_util_fd_null",
+		"_ble_util_fd_stderr",
+		"_ble_util_fd_stdin",
+		"_ble_util_fd_stdout",
+		"_ble_util_fd_zero",
+	}
+	for _, e := range bleEnvs {
+		if _, ok := os.LookupEnv(e); ok {
+			return true
+		}
+	}
+	return false
 }

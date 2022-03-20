@@ -9,7 +9,7 @@ RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${
   && chmod +x /usr/local/bin/bat
 
 FROM base as elvish
-ARG version=0.17.0
+ARG version=0.18.0
 RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 

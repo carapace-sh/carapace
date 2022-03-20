@@ -3,7 +3,7 @@ set timeout 10
 set CMDLINE [lindex $argv 0]
 log_user 0
 spawn elvish -norc
-send "eval (example _carapace elvish|slurp);echo EXPECT_START; \$edit:completion:arg-completer\[example\] $CMDLINE'' | each \[c\]{ echo \$c }; echo EXPECT_END"
+send "eval (example _carapace elvish|slurp);echo EXPECT_START; \$edit:completion:arg-completer\[example\] $CMDLINE'' | each {|c| echo \$c }; echo EXPECT_END"
 send "\r"
 expect -re "EXPECT_START\r\n(.*?)EXPECT_END"
 puts "$expect_out(1,string)"

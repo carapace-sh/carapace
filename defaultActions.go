@@ -13,6 +13,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/export"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -137,52 +138,84 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			!strings.HasSuffix(c.CallbackValue, "/") &&
 			strings.HasPrefix(filepath.Base(c.CallbackValue), ".")
 
-		vals := make([]string, 0, len(files))
+		vals := make([]string, 0, len(files)*2)
 		for _, file := range files {
 			if !showHidden && strings.HasPrefix(file.Name(), ".") {
 				continue
 			}
 
-			if file.IsDir() {
-				vals = append(vals, folder+file.Name()+"/")
+			resolvedFile := file
+			if resolved, err := filepath.EvalSymlinks(folder + file.Name()); err == nil {
+				if stat, err := os.Stat(resolved); err == nil {
+					resolvedFile = stat
+				}
+			}
+
+			if resolvedFile.IsDir() {
+				vals = append(vals, folder+file.Name()+"/", style.ForPath(folder+file.Name()+"/"))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, folder+file.Name())
+						vals = append(vals, folder+file.Name(), style.ForPath(folder+file.Name()))
 						break
 					}
 				}
 			}
 		}
 		if strings.HasPrefix(c.CallbackValue, "./") {
-			return ActionValues(vals...).Invoke(Context{}).Prefix("./").ToA()
+			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
-		return ActionValues(vals...)
+		return ActionStyledValues(vals...)
 	})
 }
 
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]string, len(values)*2)
-		for index, val := range values {
-			vals[index*2] = val
-			vals[(index*2)+1] = ""
+		vals := make([]common.RawValue, 0)
+		for _, val := range values {
+			vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: style.Default})
 		}
-		return ActionValuesDescribed(vals...)
+		return actionRawValues(vals...)
+	})
+}
+
+// ActionStyledValues is like ActionValues but also accepts a style
+func ActionStyledValues(values ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		vals := make([]common.RawValue, 0)
+		for index, val := range values {
+			if index%2 == 0 {
+				vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: values[index+1]})
+			}
+		}
+		return actionRawValues(vals...)
 	})
 }
 
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]common.RawValue, len(values)/2)
+		vals := make([]common.RawValue, 0)
 		for index, val := range values {
 			if index%2 == 0 {
-				vals[index/2] = common.RawValue{Value: val, Display: val, Description: values[index+1]}
+				vals = append(vals, common.RawValue{Value: val, Display: val, Description: values[index+1], Style: style.Default})
+			}
+		}
+		return actionRawValues(vals...)
+	})
+}
+
+// ActionStyledValuesDescribed is like ActionValues but also accepts a style
+func ActionStyledValuesDescribed(values ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		vals := make([]common.RawValue, 0)
+		for index, val := range values {
+			if index%3 == 0 {
+				vals = append(vals, common.RawValue{Value: val, Display: val, Description: values[index+1], Style: values[index+2]})
 			}
 		}
 		return actionRawValues(vals...)

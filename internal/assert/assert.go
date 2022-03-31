@@ -21,7 +21,7 @@ func Equal(t *testing.T, expected string, actual string) {
 		_ = ioutil.WriteFile(expectedFile.Name(), []byte(expected), os.ModePerm)
 		_ = ioutil.WriteFile(actualFile.Name(), []byte(actual), os.ModePerm)
 		output, _ := exec.Command("diff", "--color=always", expectedFile.Name(), actualFile.Name()).Output()
-		_, file, line, _ := runtime.Caller(1)
+		_, file, line, _ := runtime.Caller(2)
 		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, string(output))
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/example/cmd/action/net"
 	"github.com/rsteube/carapace/example/cmd/action/os"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +20,7 @@ func init() {
 
 	actionCmd.Flags().CountP("count", "c", "count flag")
 	actionCmd.Flags().StringP("files", "f", "", "files flag")
+	actionCmd.Flags().String("filtered_files", "", "files flag")
 	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("groups", "g", "", "groups flag")
 	actionCmd.Flags().StringP("message", "m", "", "message flag")
@@ -27,6 +29,8 @@ func init() {
 	actionCmd.Flags().StringP("users", "u", "", "users flag")
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
+	actionCmd.Flags().String("styled_values", "", "styled values flag")
+	actionCmd.Flags().String("styled_values_described", "", "styled values with description flag")
 	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
 	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 	actionCmd.Flags().StringP("optarg", "o", "", "optional arg with default value blue")
@@ -34,18 +38,23 @@ func init() {
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionFiles().Chdir(actionCmd.Flag("directories").Value.String())
+		}),
+		"filtered_files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionFiles(".go", "go.mod", ".txt").Chdir(actionCmd.Flag("directories").Value.String())
 		}),
-		"directories":      carapace.ActionDirectories(),
-		"groups":           os.ActionGroups(),
-		"message":          carapace.ActionMessage("message example"),
-		"net_interfaces":   net.ActionNetInterfaces(),
-		"usergroup":        os.ActionUserGroup(),
-		"users":            os.ActionUsers(),
-		"values":           carapace.ActionValues("values", "example"),
-		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
-		"kill":             os.ActionKillSignals(),
-		"optarg":           carapace.ActionValues("blue", "red", "green", "yellow"),
+		"directories":             carapace.ActionDirectories(),
+		"groups":                  os.ActionGroups(),
+		"message":                 carapace.ActionMessage("message example"),
+		"net_interfaces":          net.ActionNetInterfaces(),
+		"usergroup":               os.ActionUserGroup(),
+		"users":                   os.ActionUsers(),
+		"values":                  carapace.ActionValues("values", "example"),
+		"values_described":        carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
+		"styled_values":           carapace.ActionStyledValues("values", style.Green, "example", style.Cyan),
+		"styled_values_described": carapace.ActionStyledValuesDescribed("values", "valueDescription", style.Blue, "example", "exampleDescription", style.Red),
+		"kill":                    os.ActionKillSignals(),
+		"optarg":                  carapace.ActionValues("blue", "red", "green", "yellow"),
 	})
 
 	carapace.Gen(actionCmd).PositionalCompletion(

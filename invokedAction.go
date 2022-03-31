@@ -93,24 +93,36 @@ func (a InvokedAction) ToA() Action {
 //   b := a.ToMultiPartsA("/") // completes segments separately (first one is ["A/", "B/", "C"])
 func (a InvokedAction) ToMultiPartsA(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {
-		uniqueVals := make(map[string]string)
+		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {
 			if strings.HasPrefix(val.Value, strings.Join(c.Parts, divider)) {
 				if splitted := strings.Split(val.Value, divider); len(splitted) > len(c.Parts) {
 					if len(splitted) == len(c.Parts)+1 {
-						uniqueVals[splitted[len(c.Parts)]] = val.Description
+						v := splitted[len(c.Parts)]
+						uniqueVals[v] = common.RawValue{
+							Value:       v,
+							Display:     v,
+							Description: val.Description,
+							Style:       val.Style,
+						}
 					} else {
-						uniqueVals[splitted[len(c.Parts)]+divider] = ""
+						v := splitted[len(c.Parts)] + divider
+						uniqueVals[v] = common.RawValue{
+							Value:       v,
+							Display:     v,
+							Description: "",
+							Style:       val.Style,
+						}
 					}
 				}
 			}
 		}
 
-		vals := make([]string, 0, len(uniqueVals)*2)
-		for val, description := range uniqueVals {
-			vals = append(vals, val, description)
+		vals := make([]common.RawValue, 0)
+		for _, val := range uniqueVals {
+			vals = append(vals, val)
 		}
-		return ActionValuesDescribed(vals...).noSpace(true)
+		return actionRawValues(vals...).noSpace(true)
 	})
 }
 

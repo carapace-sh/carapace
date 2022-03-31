@@ -100,6 +100,17 @@ func (a Action) NoSpace() Action {
 	return a.noSpace(true)
 }
 
+// Style sets the style
+func (a Action) Style(style string) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index := range invoked.rawValues {
+			invoked.rawValues[index].Style = style
+		}
+		return invoked.ToA()
+	})
+}
+
 // Chdir changes the current working directory to the named directory during invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {

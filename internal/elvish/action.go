@@ -26,6 +26,7 @@ type complexCandidate struct {
 	Display     string
 	Description string
 	CodeSuffix  string
+	Style       string
 }
 
 // ActionRawValues formats values for elvish
@@ -37,7 +38,10 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	vals := make([]complexCandidate, len(values))
 	for index, val := range sanitize(values) {
-		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix}
+		if val.Style == "" {
+			val.Style = "default"
+		}
+		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

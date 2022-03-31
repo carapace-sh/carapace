@@ -1,13 +1,18 @@
 // Package common code
 package common
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/rsteube/carapace/pkg/style"
+)
 
 // RawValue represents a completion candidate
 type RawValue struct {
 	Value       string
 	Display     string
 	Description string
+	Style       string
 }
 
 // TrimmedDescription returns the trimmed description
@@ -28,7 +33,7 @@ type RawValues []RawValue
 func RawValuesFrom(values ...string) RawValues {
 	rawValues := make([]RawValue, len(values))
 	for index, val := range values {
-		rawValues[index] = RawValue{Value: val, Display: val}
+		rawValues[index] = RawValue{Value: val, Display: val, Style: style.Default}
 	}
 	return rawValues
 }

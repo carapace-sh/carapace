@@ -103,34 +103,34 @@ func TestNoSpace(t *testing.T) {
 
 func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValues("example/", style.Blue, "docs/", style.Blue, "internal/", style.Blue, "pkg/", style.Blue).noSpace(true).Invoke(Context{}),
+		ActionStyledValues("example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}),
 		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("example/", style.Blue, "docs/", style.Blue, "internal/", style.Blue, "pkg/", style.Blue).noSpace(true).Invoke(Context{}).Prefix("./"),
+		ActionStyledValues("example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Blue, "cmd/", style.Blue).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Blue, "cmd/", style.Blue).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
 	)
 }
 
 func TestActionFiles(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValues("README.md", style.Default, "example/", style.Blue, "docs/", style.Blue, "internal/", style.Blue, "pkg/", style.Blue).noSpace(true).Invoke(Context{}),
+		ActionStyledValues("README.md", style.Default, "example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Blue, "cmd/", style.Blue, "main.go", style.Default, "main_test.go", style.Default).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue), "main.go", style.Default, "main_test.go", style.Default).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
 }

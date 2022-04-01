@@ -29,6 +29,7 @@ var (
 	BrightBlue    string = "bright-blue"
 	BrightMagenta string = "bright-magenta"
 	BrightCyan    string = "bright-cyan"
+	BrightWhite   string = "bright-white"
 
 	BgBlack   string = "bg-black"
 	BgRed     string = "bg-red"

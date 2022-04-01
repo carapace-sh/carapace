@@ -121,8 +121,8 @@ func format(s, _style string) string {
 		//	result = append(result, "\033[7m")
 		default:
 		}
-		result = append(result, s)
-		result = append(result, "\033[0m")
 	}
+	result = append(result, s)
+	result = append(result, "\033[0m")
 	return strings.Join(result, "")
 }

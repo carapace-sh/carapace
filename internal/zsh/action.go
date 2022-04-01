@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/pkg/style"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -38,10 +39,31 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		val.Description = sanitizer.Replace(val.Description)
 
 		if strings.TrimSpace(val.Description) == "" {
-			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
+			vals[index] = fmt.Sprintf("%v\t%v", val.Value, format(val.Display, val.Style))
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
+			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, format(val.Display, val.Style), strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
 		}
 	}
 	return strings.Join(vals, "\n")
+}
+
+func format(s, _style string) string {
+	switch _style {
+	case style.Red:
+		return fmt.Sprintf("\033[31m%v\033[0m", s)
+	case style.Green:
+		return fmt.Sprintf("\033[32m%v\033[0m", s)
+	case style.Yellow:
+		return fmt.Sprintf("\033[33m%v\033[0m", s)
+	case style.Blue:
+		return fmt.Sprintf("\033[34m%v\033[0m", s)
+	case style.Magenta:
+		return fmt.Sprintf("\033[35m%v\033[0m", s)
+	case style.Cyan:
+		return fmt.Sprintf("\033[36m%v\033[0m", s)
+	case style.BrightBlack:
+		return fmt.Sprintf("\033[90m%v\033[0m", s)
+	default:
+		return s
+	}
 }

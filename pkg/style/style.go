@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-// TODO full style support: e.g. "bg-bright-black bright-cyan bold underlined"
-// https://elv.sh/ref/builtin.html#styled
 var (
 	Default string = "default"
 	Red     string = "red"
@@ -18,15 +16,42 @@ var (
 	Magenta string = "magenta"
 	Cyan    string = "cyan"
 
-	BrightBlack string = "bright-black"
-	//BrightRed     Color = "bright-red"
-	//BrightGreen   Color = "bright-green"
-	//BrightYellow  Color = "bright-yellow"
-	//BrightBlue    Color = "bright-blue"
-	//BrightMagenta Color = "bright-magenta"
-	//BrightCyan    Color = "bright-cyan"
-	//BrightWhite   Color = "bright-white"
+	BrightBlack   string = "bright-black"
+	BrightRed     string = "bright-red"
+	BrightGreen   string = "bright-green"
+	BrightYellow  string = "bright-yellow"
+	BrightBlue    string = "bright-blue"
+	BrightMagenta string = "bright-magenta"
+	BrightCyan    string = "bright-cyan"
+
+	BgRed     string = "bg-red"
+	BgGreen   string = "bg-green"
+	BgYellow  string = "bg-yellow"
+	BgBlue    string = "bg-blue"
+	BgMagenta string = "bg-magenta"
+	BgCyan    string = "bg-cyan"
+
+	BgBrightBlack   string = "bg-bright-black"
+	BgBrightRed     string = "bg-bright-red"
+	BgBrightGreen   string = "bg-bright-green"
+	BgBrightYellow  string = "bg-bright-yellow"
+	BgBrightBlue    string = "bg-bright-blue"
+	BgBrightMagenta string = "bg-bright-magenta"
+	BgBrightCyan    string = "bg-bright-cyan"
+	BgBrightWhite   string = "bg-bright-white"
+
+	Bold       string = "bold"
+	Dim        string = "dim"
+	Italic     string = "italic"
+	Underlined string = "underlined"
+	Blink      string = "blink"
+	Inverse    string = "inverse"
 )
+
+// Of combines different styles
+func Of(s ...string) string {
+	return strings.Join(s, " ")
+}
 
 // ForPath returns the style for given path
 func ForPath(path string) string {

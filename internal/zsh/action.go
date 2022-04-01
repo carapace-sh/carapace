@@ -66,18 +66,18 @@ func format(s, _style string) string {
 
 		case style.BrightBlack:
 			result = append(result, "\033[90m")
-		case style.BrightRed:
-			result = append(result, "\033[91m")
-		case style.BrightGreen:
-			result = append(result, "\033[92m")
-		case style.BrightYellow:
-			result = append(result, "\033[93m")
-		case style.BrightBlue:
-			result = append(result, "\033[94m")
-		case style.BrightMagenta:
-			result = append(result, "\033[95m")
-		case style.BrightCyan:
-			result = append(result, "\033[96m")
+		//case style.BrightRed:
+		//	result = append(result, "\033[91m")
+		//case style.BrightGreen:
+		//	result = append(result, "\033[92m")
+		//case style.BrightYellow:
+		//	result = append(result, "\033[93m")
+		//case style.BrightBlue:
+		//	result = append(result, "\033[94m")
+		//case style.BrightMagenta:
+		//	result = append(result, "\033[95m")
+		//case style.BrightCyan:
+		//	result = append(result, "\033[96m")
 
 		case style.BgRed:
 			result = append(result, "\033[41m")
@@ -94,18 +94,18 @@ func format(s, _style string) string {
 
 		case style.BgBrightBlack:
 			result = append(result, "\033[100m")
-		case style.BgBrightRed:
-			result = append(result, "\033[101m")
-		case style.BgBrightGreen:
-			result = append(result, "\033[102m")
-		case style.BgBrightYellow:
-			result = append(result, "\033[103m")
-		case style.BgBrightBlue:
-			result = append(result, "\033[104m")
-		case style.BgBrightMagenta:
-			result = append(result, "\033[105m")
-		case style.BgBrightCyan:
-			result = append(result, "\033[106m")
+		//case style.BgBrightRed:
+		//	result = append(result, "\033[101m")
+		//case style.BgBrightGreen:
+		//	result = append(result, "\033[102m")
+		//case style.BgBrightYellow:
+		//	result = append(result, "\033[103m")
+		//case style.BgBrightBlue:
+		//	result = append(result, "\033[104m")
+		//case style.BgBrightMagenta:
+		//	result = append(result, "\033[105m")
+		//case style.BgBrightCyan:
+		//	result = append(result, "\033[106m")
 
 		case style.Bold:
 			result = append(result, "\033[1m")
@@ -117,8 +117,8 @@ func format(s, _style string) string {
 			result = append(result, "\033[4m")
 		case style.Blink:
 			result = append(result, "\033[5m")
-		case style.Inverse:
-			result = append(result, "\033[7m")
+		//case style.Inverse:
+		//	result = append(result, "\033[7m")
 		default:
 		}
 		result = append(result, s)

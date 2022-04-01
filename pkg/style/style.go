@@ -16,13 +16,13 @@ var (
 	Magenta string = "magenta"
 	Cyan    string = "cyan"
 
-	BrightBlack   string = "bright-black"
-	BrightRed     string = "bright-red"
-	BrightGreen   string = "bright-green"
-	BrightYellow  string = "bright-yellow"
-	BrightBlue    string = "bright-blue"
-	BrightMagenta string = "bright-magenta"
-	BrightCyan    string = "bright-cyan"
+	BrightBlack string = "bright-black"
+	//BrightRed     string = "bright-red"
+	//BrightGreen   string = "bright-green"
+	//BrightYellow  string = "bright-yellow"
+	//BrightBlue    string = "bright-blue"
+	//BrightMagenta string = "bright-magenta"
+	//BrightCyan    string = "bright-cyan"
 
 	BgRed     string = "bg-red"
 	BgGreen   string = "bg-green"
@@ -31,21 +31,21 @@ var (
 	BgMagenta string = "bg-magenta"
 	BgCyan    string = "bg-cyan"
 
-	BgBrightBlack   string = "bg-bright-black"
-	BgBrightRed     string = "bg-bright-red"
-	BgBrightGreen   string = "bg-bright-green"
-	BgBrightYellow  string = "bg-bright-yellow"
-	BgBrightBlue    string = "bg-bright-blue"
-	BgBrightMagenta string = "bg-bright-magenta"
-	BgBrightCyan    string = "bg-bright-cyan"
-	BgBrightWhite   string = "bg-bright-white"
+	BgBrightBlack string = "bg-bright-black"
+	//BgBrightRed     string = "bg-bright-red"
+	//BgBrightGreen   string = "bg-bright-green"
+	//BgBrightYellow  string = "bg-bright-yellow"
+	//BgBrightBlue    string = "bg-bright-blue"
+	//BgBrightMagenta string = "bg-bright-magenta"
+	//BgBrightCyan    string = "bg-bright-cyan"
+	//BgBrightWhite   string = "bg-bright-white"
 
 	Bold       string = "bold"
 	Dim        string = "dim"
 	Italic     string = "italic"
 	Underlined string = "underlined"
 	Blink      string = "blink"
-	Inverse    string = "inverse"
+	// Inverse    string = "inverse" // better leave this out since inverse is how candidates are marked
 )
 
 // Of combines different styles

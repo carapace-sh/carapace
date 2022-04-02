@@ -3,19 +3,19 @@ package carapace
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/internal/bash"
-	"github.com/rsteube/carapace/internal/bash_ble"
 	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/elvish"
-	"github.com/rsteube/carapace/internal/export"
-	"github.com/rsteube/carapace/internal/fish"
-	"github.com/rsteube/carapace/internal/ion"
-	"github.com/rsteube/carapace/internal/nushell"
-	"github.com/rsteube/carapace/internal/oil"
-	"github.com/rsteube/carapace/internal/powershell"
-	"github.com/rsteube/carapace/internal/tcsh"
-	"github.com/rsteube/carapace/internal/xonsh"
-	"github.com/rsteube/carapace/internal/zsh"
+	"github.com/rsteube/carapace/internal/shell/bash"
+	"github.com/rsteube/carapace/internal/shell/bash_ble"
+	"github.com/rsteube/carapace/internal/shell/elvish"
+	"github.com/rsteube/carapace/internal/shell/export"
+	"github.com/rsteube/carapace/internal/shell/fish"
+	"github.com/rsteube/carapace/internal/shell/ion"
+	"github.com/rsteube/carapace/internal/shell/nushell"
+	"github.com/rsteube/carapace/internal/shell/oil"
+	"github.com/rsteube/carapace/internal/shell/powershell"
+	"github.com/rsteube/carapace/internal/shell/tcsh"
+	"github.com/rsteube/carapace/internal/shell/xonsh"
+	"github.com/rsteube/carapace/internal/shell/zsh"
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked

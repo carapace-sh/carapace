@@ -9,3 +9,5 @@ carapace.ActionStyledValues(
   "green-underlined", style.Of(style.Green, style.Underlined),
 )
 ```
+
+![](./actionStyledValues.png)

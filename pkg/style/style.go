@@ -18,6 +18,7 @@ var (
 	Magenta string = "magenta"
 	Cyan    string = "cyan"
 	White   string = "white"
+	Gray    string = Of(Dim, White)
 
 	BrightBlack   string = "bright-black"
 	BrightRed     string = "bright-red"
@@ -107,4 +108,85 @@ func ForPath(path string) string {
 		return Of(styles...)
 	}
 	return Default
+}
+
+// FormatAnsi formats given string with given style as ansi escape sequence
+func FormatAnsi(s, _style string) string {
+	result := make([]string, 0)
+	for _, word := range strings.Split(_style, " ") {
+		switch word {
+		case Red:
+			result = append(result, "\033[31m")
+		case Green:
+			result = append(result, "\033[32m")
+		case Yellow:
+			result = append(result, "\033[33m")
+		case Blue:
+			result = append(result, "\033[34m")
+		case Magenta:
+			result = append(result, "\033[35m")
+		case Cyan:
+			result = append(result, "\033[36m")
+
+		case BrightBlack:
+			result = append(result, "\033[90m")
+		case BrightRed:
+			result = append(result, "\033[91m")
+		case BrightGreen:
+			result = append(result, "\033[92m")
+		case BrightYellow:
+			result = append(result, "\033[93m")
+		case BrightBlue:
+			result = append(result, "\033[94m")
+		case BrightMagenta:
+			result = append(result, "\033[95m")
+		case BrightCyan:
+			result = append(result, "\033[96m")
+
+		case BgRed:
+			result = append(result, "\033[41m")
+		case BgGreen:
+			result = append(result, "\033[42m")
+		case BgYellow:
+			result = append(result, "\033[43m")
+		case BgBlue:
+			result = append(result, "\033[44m")
+		case BgMagenta:
+			result = append(result, "\033[45m")
+		case BgCyan:
+			result = append(result, "\033[46m")
+
+		case BgBrightBlack:
+			result = append(result, "\033[100m")
+		case BgBrightRed:
+			result = append(result, "\033[101m")
+		case BgBrightGreen:
+			result = append(result, "\033[102m")
+		case BgBrightYellow:
+			result = append(result, "\033[103m")
+		case BgBrightBlue:
+			result = append(result, "\033[104m")
+		case BgBrightMagenta:
+			result = append(result, "\033[105m")
+		case BgBrightCyan:
+			result = append(result, "\033[106m")
+
+		case Bold:
+			result = append(result, "\033[1m")
+		case Dim:
+			result = append(result, "\033[2m")
+		case Italic:
+			result = append(result, "\033[3m")
+		case Underlined:
+			result = append(result, "\033[4m")
+		case Blink:
+			result = append(result, "\033[5m")
+		case Inverse:
+			result = append(result, "\033[7m")
+		default:
+		}
+	}
+	result = append(result, s)
+	result = append(result, "\033[0m")
+	return strings.Join(result, "")
 }

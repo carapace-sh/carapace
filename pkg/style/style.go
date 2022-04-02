@@ -2,6 +2,8 @@
 package style
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/lscolors"
@@ -96,6 +98,14 @@ func Of(s ...string) string {
 	return strings.Join(s, " ")
 }
 
+// Color256 returns style for 256 color
+func Color256(i int) string {
+	if i < 0 || i > 255 {
+		return Default
+	}
+	return fmt.Sprintf("color%d", i)
+}
+
 // ForPath returns the style for given path
 func ForPath(path string) string {
 	if ansiStyle := lscolors.GetColorist().GetStyle(path); ansiStyle != "" {
@@ -112,6 +122,8 @@ func ForPath(path string) string {
 
 // FormatAnsi formats given string with given style as ansi escape sequence
 func FormatAnsi(s, _style string) string {
+	reColor256 := regexp.MustCompile(`^color(?P<number>\d+)$`)
+
 	result := make([]string, 0)
 	for _, word := range strings.Split(_style, " ") {
 		switch word {
@@ -184,6 +196,9 @@ func FormatAnsi(s, _style string) string {
 		case Inverse:
 			result = append(result, "\033[7m")
 		default:
+			if reColor256.MatchString(word) {
+				result = append(result, fmt.Sprintf("\033[38;5;%vm", reColor256.FindStringSubmatch(word)[1]))
+			}
 		}
 	}
 	result = append(result, s)

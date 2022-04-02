@@ -27,8 +27,8 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			if length := len(r.Display); length > maxLength {
 				maxLength = length
 			}
+			hasDescriptions = hasDescriptions || r.Description != ""
 		}
-		hasDescriptions = hasDescriptions || r.Description != ""
 	}
 
 	vals := make([]string, len(filtered))

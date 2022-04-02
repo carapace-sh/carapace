@@ -17,14 +17,18 @@ function _example_completion {
   # shellcheck disable=SC2034,2206
   local vals=(${c%%$'\t'*})
   # shellcheck disable=SC2034,2206
-  local descriptions=(${c##*$'\t'})
+  local displays=(${c##*$'\t'})
 
   local suffix=' '
   [[ ${vals[1]} == *$'\001' ]] && suffix=''
   # shellcheck disable=SC2034,2206
   vals=(${vals%%$'\001'*})
 
-  compadd -l -S "${suffix}" -d descriptions -a -- vals
+  if [[ ${displays[*]} == *$'\002'* ]]; then # with descriptions
+    compadd -l -S "${suffix}" -d displays -a -- vals
+  else
+    compadd -S "${suffix}" -d displays -a -- vals
+  fi
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

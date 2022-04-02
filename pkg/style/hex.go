@@ -1,6 +1,7 @@
 package style
 
 import (
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -265,7 +266,7 @@ var hex256 = map[string]string{
 	"#eeeeee": "color255",
 }
 
-// Hex256 returns 256 color style for given hex
+// Hex256 returns nearest 256 color style for given hex
 func Hex256(s string) string {
 	if !strings.HasPrefix(s, "#") {
 		s = "#" + s
@@ -275,12 +276,38 @@ func Hex256(s string) string {
 		return _style
 	} else if r := regexp.MustCompile(`^#(?P<r>..)(?P<g>..)(?P<b>..)$`); r.MatchString(s) {
 		matches := r.FindStringSubmatch(s)
-		r, errR := strconv.ParseUint(matches[1], 16, 64)
-		g, errG := strconv.ParseUint(matches[2], 16, 64)
-		b, errB := strconv.ParseUint(matches[3], 16, 64)
+		r, errR := strconv.ParseUint(matches[1], 16, 32)
+		g, errG := strconv.ParseUint(matches[2], 16, 32)
+		b, errB := strconv.ParseUint(matches[3], 16, 32)
 		if errR == nil && errG == nil && errB == nil {
-			return Color256((int(r)*6/256)*36 + (int(g)*6/256)*6 + (int(b) * 6 / 256))
+			return Color256(rgbToXterm(int(r), int(g), int(b)))
 		}
 	}
 	return Default
+}
+
+var n []int
+
+func init() {
+	n = make([]int, 0)
+	for i, v := range []int{47, 68, 40, 40, 40, 21} {
+		for j := 0; j < v; j++ {
+			n = append(n, i)
+		}
+	}
+}
+
+// rgbToXterm returns nearest 256 color for given rgb
+// source: https://stackoverflow.com/a/62219320
+func rgbToXterm(r, g, b int) int {
+	mx := math.Max(math.Max(float64(r), float64(g)), float64(b))
+	mn := math.Min(math.Min(float64(r), float64(g)), float64(b))
+
+	if (mx-mn)*(mx+mn) <= 6250 {
+		c := 24 - (252-((r+g+b)%3))%10
+		if 0 <= c && c <= 23 {
+			return 232 + c
+		}
+	}
+	return 16 + 36*n[r] + 6*n[g] + n[b]
 }

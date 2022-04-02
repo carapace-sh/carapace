@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/rsteube/carapace/internal/bash"
+	"github.com/rsteube/carapace/internal/shell/bash"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )

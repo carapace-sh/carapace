@@ -150,7 +150,7 @@ func TestActionFilesChdir(t *testing.T) {
 
 	assertEqual(t,
 		ActionValues("action.go", "snippet.go").noSpace(true).Invoke(Context{}).Prefix("elvish/"),
-		ActionFiles().Chdir("internal").Invoke(Context{CallbackValue: "elvish/"}),
+		ActionFiles().Chdir("internal/shell").Invoke(Context{CallbackValue: "elvish/"}),
 	)
 
 	if newWd, _ := os.Getwd(); oldWd != newWd {

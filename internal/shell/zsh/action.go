@@ -13,7 +13,6 @@ var sanitizer = strings.NewReplacer(
 	"\n", ``,
 	"\r", ``,
 	"\t", ``,
-	`'`, `'\''`,
 )
 
 // ActionRawValues formats values for zsh

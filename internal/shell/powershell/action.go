@@ -12,7 +12,6 @@ import (
 var sanitizer = strings.NewReplacer( // TODO
 	"\n", ``,
 	"\t", ``,
-	`'`, "``",
 )
 
 type completionResult struct {

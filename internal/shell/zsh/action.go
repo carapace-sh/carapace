@@ -52,6 +52,10 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			vals[index] = fmt.Sprintf("%v\t%v\002 %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
 		}
 	}
+
+	if len(zstyles) > 1000 { // TODO disable styling for large amount of values (bad performance)
+		zstyles = make([]string, 0)
+	}
 	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n")) // first line is intentionally never empty (single `:`) for snippet
 }
 
@@ -152,7 +156,7 @@ func formatZstyle(s, _style string) string {
 	}
 
 	if len(result) > 0 {
-		return fmt.Sprintf("=(#b)(%v)((\002*|))=0=%v", strings.Replace(regexp.QuoteMeta(s), "#", `\#`, -1), strings.Join(result, ";"))
+		return fmt.Sprintf("=(#b)(%v)((\002*|))=0=%v", strings.Replace(s, "#", `\#`, -1), strings.Join(result, ";"))
 	}
 	return ""
 }

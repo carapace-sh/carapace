@@ -2,15 +2,14 @@
 package style
 
 import (
-	"fmt"
-	"regexp"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/lscolors"
+	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/cli/lscolors"
+	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 var (
-	Default string = "default"
+	Default string = ""
 
 	Black   string = "black"
 	Red     string = "red"
@@ -57,152 +56,58 @@ var (
 	Inverse    string = "inverse"
 )
 
-var ansi = map[string]string{
-	"30": Black,
-	"31": Red,
-	"32": Green,
-	"33": Yellow,
-	"34": Blue,
-	"35": Magenta,
-	"36": Cyan,
-	"37": White,
-
-	"90": BrightBlack,
-	"40": BgBlack,
-	"41": BgRed,
-	"42": BgGreen,
-	"43": BgYellow,
-	"44": BgBlue,
-	"45": BgMagenta,
-	"46": BgCyan,
-	"47": BgWhite,
-
-	"100": BgBrightBlack,
-	"101": BgBrightRed,
-	"102": BgBrightGreen,
-	"103": BgBrightYellow,
-	"104": BgBrightBlue,
-	"105": BgBrightMagenta,
-	"106": BgBrightCyan,
-	"107": BgBrightWhite,
-
-	"01": Bold,
-	"02": Dim,
-	"03": Italic,
-	"04": Underlined,
-	"05": Blink,
-	"07": Inverse,
-}
-
 // Of combines different styles
 func Of(s ...string) string {
 	return strings.Join(s, " ")
 }
 
-// Color256 returns style for 256 color
-func Color256(i int) string {
-	if i < 0 || i > 255 {
-		return Default
-	}
-	return fmt.Sprintf("color%d", i)
-}
+// XTerm256Color returns a color from the xterm 256-color palette.
+func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }
+
+// TrueColor returns a 24-bit true color.
+func TrueColor(r, g, b uint8) string { return ui.TrueColor(r, g, b).String() }
 
 // ForPath returns the style for given path
 func ForPath(path string) string {
-	if ansiStyle := lscolors.GetColorist().GetStyle(path); ansiStyle != "" {
-		styles := make([]string, 0)
-		for _, code := range strings.Split(ansiStyle, ";") {
-			if style, ok := ansi[code]; ok {
-				styles = append(styles, style)
-			}
-		}
-		return Of(styles...)
-	}
-	return Default
-}
-
-// FormatAnsi formats given string with given style as ansi escape sequence
-func FormatAnsi(s, _style string) string {
-	reColor256 := regexp.MustCompile(`^color(?P<number>\d+)$`)
+	s := ui.StyleFromSGR(lscolors.GetColorist().GetStyle(path))
 
 	result := make([]string, 0)
-	for _, word := range strings.Split(_style, " ") {
-		switch word {
-		case Red:
-			result = append(result, "\033[31m")
-		case Green:
-			result = append(result, "\033[32m")
-		case Yellow:
-			result = append(result, "\033[33m")
-		case Blue:
-			result = append(result, "\033[34m")
-		case Magenta:
-			result = append(result, "\033[35m")
-		case Cyan:
-			result = append(result, "\033[36m")
-
-		case BrightBlack:
-			result = append(result, "\033[90m")
-		case BrightRed:
-			result = append(result, "\033[91m")
-		case BrightGreen:
-			result = append(result, "\033[92m")
-		case BrightYellow:
-			result = append(result, "\033[93m")
-		case BrightBlue:
-			result = append(result, "\033[94m")
-		case BrightMagenta:
-			result = append(result, "\033[95m")
-		case BrightCyan:
-			result = append(result, "\033[96m")
-
-		case BgRed:
-			result = append(result, "\033[41m")
-		case BgGreen:
-			result = append(result, "\033[42m")
-		case BgYellow:
-			result = append(result, "\033[43m")
-		case BgBlue:
-			result = append(result, "\033[44m")
-		case BgMagenta:
-			result = append(result, "\033[45m")
-		case BgCyan:
-			result = append(result, "\033[46m")
-
-		case BgBrightBlack:
-			result = append(result, "\033[100m")
-		case BgBrightRed:
-			result = append(result, "\033[101m")
-		case BgBrightGreen:
-			result = append(result, "\033[102m")
-		case BgBrightYellow:
-			result = append(result, "\033[103m")
-		case BgBrightBlue:
-			result = append(result, "\033[104m")
-		case BgBrightMagenta:
-			result = append(result, "\033[105m")
-		case BgBrightCyan:
-			result = append(result, "\033[106m")
-
-		case Bold:
-			result = append(result, "\033[1m")
-		case Dim:
-			result = append(result, "\033[2m")
-		case Italic:
-			result = append(result, "\033[3m")
-		case Underlined:
-			result = append(result, "\033[4m")
-		case Blink:
-			result = append(result, "\033[5m")
-		case Inverse:
-			result = append(result, "\033[7m")
-		default:
-			if reColor256.MatchString(word) {
-				result = append(result, fmt.Sprintf("\033[38;5;%vm", reColor256.FindStringSubmatch(word)[1]))
-			}
-		}
+	if s.Foreground != nil {
+		result = append(result, s.Foreground.String())
 	}
-	result = append(result, s)
-	result = append(result, "\033[0m")
-	return strings.Join(result, "")
+	if s.Background != nil {
+		result = append(result, s.Background.String())
+	}
+	if s.Bold {
+		result = append(result, Bold)
+	}
+	if s.Dim {
+		result = append(result, Dim)
+	}
+	if s.Italic {
+		result = append(result, Italic)
+	}
+	if s.Underlined {
+		result = append(result, Underlined)
+	}
+	if s.Blink {
+		result = append(result, Blink)
+	}
+	if s.Inverse {
+		result = append(result, Inverse)
+	}
+	return Of(result...)
+}
+
+// SGR returns the SGR sequence for given style
+func SGR(s string) string {
+	return parseStyle(s).SGR()
+}
+
+func parseStyle(s string) ui.Style {
+	stylings := make([]ui.Styling, 0)
+	for _, word := range strings.Split(s, " ") {
+		stylings = append(stylings, ui.ParseStyling(word))
+	}
+	return ui.ApplyStyling(ui.Style{}, stylings...)
 }

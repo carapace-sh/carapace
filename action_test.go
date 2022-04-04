@@ -12,6 +12,10 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
+func init() {
+	os.Unsetenv("LS_COLORS")
+}
+
 func assertEqual(t *testing.T, expected, actual InvokedAction) {
 	sort.Sort(common.ByValue(expected.rawValues))
 	sort.Sort(common.ByValue(actual.rawValues))
@@ -103,34 +107,64 @@ func TestNoSpace(t *testing.T) {
 
 func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValues("example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}),
+		ActionStyledValues(
+			"example/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
+		).noSpace(true).Invoke(Context{}),
 		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("./"),
+		ActionStyledValues(
+			"example/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
+		).noSpace(true).Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues(
+			"_test/", style.Of(style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
+		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues(
+			"_test/", style.Of(style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
+		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
 	)
 }
 
 func TestActionFiles(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValues("README.md", style.Default, "example/", style.Of(style.Bold, style.Blue), "docs/", style.Of(style.Bold, style.Blue), "internal/", style.Of(style.Bold, style.Blue), "pkg/", style.Of(style.Bold, style.Blue)).noSpace(true).Invoke(Context{}),
+		ActionStyledValues(
+			"README.md", style.Default,
+			"example/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
+		).noSpace(true).Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
-		ActionStyledValues("_test/", style.Of(style.Bold, style.Blue), "cmd/", style.Of(style.Bold, style.Blue), "main.go", style.Default, "main_test.go", style.Default).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		ActionStyledValues(
+			"_test/", style.Of(style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
+			"main.go", style.Default,
+			"main_test.go", style.Default,
+		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
 }

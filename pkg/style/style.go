@@ -76,7 +76,7 @@ func ForPath(path string) string {
 		result = append(result, s.Foreground.String())
 	}
 	if s.Background != nil {
-		result = append(result, s.Background.String())
+		result = append(result, "bg-"+s.Background.String())
 	}
 	if s.Bold {
 		result = append(result, Bold)

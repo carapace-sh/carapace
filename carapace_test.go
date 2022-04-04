@@ -12,6 +12,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	os.Unsetenv("LS_COLORS")
+}
+
 func execCompletion(args ...string) (context Context) {
 	rootCmd := &cobra.Command{
 		Use: "root",

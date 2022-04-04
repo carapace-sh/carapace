@@ -17,13 +17,13 @@ func TestActionImport(t *testing.T) {
       "Value": "positional1",
       "Display": "positional1",
       "Description": "",
-      "Style": "default"
+      "Style": ""
     },
     {
       "Value": "p1",
       "Display": "p1",
       "Description": "",
-      "Style": "default"
+      "Style": ""
     }
   ]
 }`

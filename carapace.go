@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/bash"
 	"github.com/rsteube/carapace/internal/shell/bash_ble"
 	"github.com/rsteube/carapace/internal/shell/elvish"
@@ -24,6 +25,7 @@ import (
 	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -136,9 +138,14 @@ func addCompletionCommand(cmd *cobra.Command) {
 			return
 		}
 	}
-	cmd.AddCommand(&cobra.Command{
+	carapaceCmd := &cobra.Command{
 		Use:    "_carapace",
 		Hidden: true,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			if len(args) > 2 && strings.HasPrefix(args[2], "_") {
+				cmd.Hidden = false
+			}
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.Println(os.Args) // TODO replace last with '' if empty
 			if s, err := complete(cmd, args); err != nil {
@@ -151,7 +158,65 @@ func addCompletionCommand(cmd *cobra.Command) {
 			UnknownFlags: true,
 		},
 		DisableFlagParsing: true,
-	})
+	}
+	cmd.AddCommand(carapaceCmd)
+	Carapace{carapaceCmd}.PositionalCompletion(
+		ActionStyledValues(
+			"bash", "#d35673",
+			"bash-ble", "#c2039a",
+			"elvish", "#ffd6c9",
+			"export", style.Default,
+			"fish", "#7ea8fc",
+			"ion", "#0e5d6d",
+			"nushell", "#29d866",
+			"oil", "#373a36",
+			"powershell", "#e8a16f",
+			"tcsh", "#412f09",
+			"xonsh", "#a8ffa9",
+			"zsh", "#efda53",
+		),
+		ActionValues(cmd.Root().Name()),
+	)
+	Carapace{carapaceCmd}.PositionalAnyCompletion(
+		ActionCallback(func(c Context) Action {
+			args := []string{"_carapace", "export", ""}
+			args = append(args, c.Args[2:]...)
+			args = append(args, c.CallbackValue)
+			return ActionExecCommand(uid.Executable(), args...)(func(output []byte) Action {
+				if string(output) == "" {
+					return ActionValues()
+				}
+				return ActionImport(output)
+			})
+		}),
+	)
+
+	styleCmd := &cobra.Command{
+		Use:  "style",
+		Args: cobra.ExactArgs(1),
+		Run:  func(cmd *cobra.Command, args []string) {},
+	}
+	carapaceCmd.AddCommand(styleCmd)
+
+	styleSetCmd := &cobra.Command{
+		Use:  "set",
+		Args: cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			for _, arg := range args {
+				if splitted := strings.SplitN(arg, "=", 2); len(splitted) == 2 {
+					if err := style.Set(splitted[0], splitted[1]); err != nil {
+						fmt.Fprint(cmd.ErrOrStderr(), err.Error())
+					}
+				} else {
+					fmt.Fprintf(cmd.ErrOrStderr(), "invalid format: '%v'", arg)
+				}
+			}
+		},
+	}
+	styleCmd.AddCommand(styleSetCmd)
+	Carapace{styleSetCmd}.PositionalAnyCompletion(
+		ActionStyleConfig(),
+	)
 }
 
 func complete(cmd *cobra.Command, args []string) (string, error) {
@@ -174,6 +239,10 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			shell := args[0]
 			current := args[len(args)-1]
 			previous := args[len(args)-2]
+
+			if err := config.Load(); err != nil {
+				return ActionMessage("failed to load config: "+err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+			}
 
 			targetCmd, targetArgs, err := findTarget(cmd, args)
 			context := Context{

@@ -45,7 +45,11 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		}
 
 		if strings.TrimSpace(val.Description) == "" {
-			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
+			if hasDescriptions {
+				vals[index] = fmt.Sprintf("%v\t%v\002", val.Value, val.Display)
+			} else {
+				vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
+			}
 		} else {
 			vals[index] = fmt.Sprintf("%v\t%v\002 %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
 		}
@@ -54,7 +58,8 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	if len(zstyles) > 1000 { // TODO disable styling for large amount of values (bad performance)
 		zstyles = make([]string, 0)
 	}
-	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n")) // first line is intentionally never empty (single `:`) for snippet
+	zstyles = append(zstyles, fmt.Sprintf("=(#b)(*)(\002*)=0=%v=%v", style.SGR(style.Carapace.Value), style.SGR(style.Carapace.Description)))
+	return fmt.Sprintf("%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
 }
 
 // formatZstyle creates a zstyle matcher for given display stings.
@@ -62,7 +67,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
 func formatZstyle(s, _style string) string {
 	if sgr := style.SGR(_style); sgr != "" {
-		return fmt.Sprintf("=(#b)(%v)((\002*|))=0=%v", strings.Replace(s, "#", `\#`, -1), sgr)
+		return fmt.Sprintf("=(#b)(%v)(\002*|)=0=%v=%v", strings.Replace(s, "#", `\#`, -1), sgr, style.SGR(style.Carapace.Description))
 	}
 	return ""
 }

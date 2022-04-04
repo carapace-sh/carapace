@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -22,11 +24,12 @@ func sanitize(values []common.RawValue) []common.RawValue {
 }
 
 type complexCandidate struct {
-	Value       string
-	Display     string
-	Description string
-	CodeSuffix  string
-	Style       string
+	Value            string
+	Display          string
+	Description      string
+	DescriptionStyle string
+	CodeSuffix       string
+	Style            string
 }
 
 // ActionRawValues formats values for elvish
@@ -36,12 +39,22 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		suffix = ""
 	}
 
+	valueStyle := "default"
+	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
+		valueStyle = s
+	}
+
+	descriptionStyle := "default"
+	if s := style.Carapace.Description; s != "" && ui.ParseStyling(s) != nil {
+		descriptionStyle = s
+	}
+
 	vals := make([]complexCandidate, len(values))
 	for index, val := range sanitize(values) {
-		if val.Style == "" {
-			val.Style = "default"
+		if val.Style == "" || ui.ParseStyling(val.Style) == nil {
+			val.Style = valueStyle
 		}
-		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style}
+		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style, DescriptionStyle: descriptionStyle}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

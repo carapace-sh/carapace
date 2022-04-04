@@ -231,7 +231,7 @@ func TestComplete(t *testing.T) {
 	cmd.Flags().BoolP("a", "1", false, "")
 	cmd.Flags().BoolP("b", "2", false, "")
 
-	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `[{"Value":"-12","Display":"2","Description":"","CodeSuffix":"","Style":"default"}]` {
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `[{"Value":"-12","Display":"2","Description":"","DescriptionStyle":"dim white","CodeSuffix":"","Style":"default"}]` {
 		t.Error(s)
 	}
 }
@@ -247,7 +247,7 @@ func TestCompleteOptarg(t *testing.T) {
 		"opt": ActionValuesDescribed("value", "description"),
 	})
 
-	if s, err := complete(cmd, []string{"elvish", "_", "test", "--opt="}); err != nil || s != `[{"Value":"--opt=value","Display":"value","Description":"description","CodeSuffix":" ","Style":"default"}]` {
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "--opt="}); err != nil || s != `[{"Value":"--opt=value","Display":"value","Description":"description","DescriptionStyle":"dim white","CodeSuffix":" ","Style":"default"}]` {
 		t.Error(s)
 	}
 }

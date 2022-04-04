@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/example/cmd/action/net"
 	"github.com/rsteube/carapace/example/cmd/action/os"
@@ -12,7 +14,14 @@ var actionCmd = &cobra.Command{
 	Use:     "action",
 	Short:   "action example",
 	Aliases: []string{"alias"},
-	Run:     func(cmd *cobra.Command, args []string) {},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if f := cmd.Flag("style"); f.Changed {
+			if splitted := strings.Split(f.Value.String(), "="); len(splitted) == 2 {
+				return style.Set(splitted[0], strings.Replace(splitted[1], ",", " ", -1))
+			}
+		}
+		return nil
+	},
 }
 
 func init() {
@@ -34,6 +43,7 @@ func init() {
 	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
 	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 	actionCmd.Flags().StringP("optarg", "o", "", "optional arg with default value blue")
+	actionCmd.Flags().String("style", "", "set style")
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
@@ -83,6 +93,7 @@ func init() {
 		),
 		"kill":   os.ActionKillSignals(),
 		"optarg": carapace.ActionValues("blue", "red", "green", "yellow"),
+		"style":  carapace.ActionStyleConfig(),
 	})
 
 	carapace.Gen(actionCmd).PositionalCompletion(

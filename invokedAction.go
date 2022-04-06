@@ -111,7 +111,7 @@ func (a InvokedAction) ToMultiPartsA(divider string) Action {
 							Value:       v,
 							Display:     v,
 							Description: "",
-							Style:       val.Style,
+							Style:       "",
 						}
 					}
 				}

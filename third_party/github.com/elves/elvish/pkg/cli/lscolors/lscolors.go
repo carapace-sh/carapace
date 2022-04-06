@@ -16,6 +16,8 @@ import (
 type Colorist interface {
 	// GetStyle returns the style for the named file.
 	GetStyle(fname string) string
+	// GetStyle returns the style for the named file only by its extension.
+	GetStyleExt(fname string) string
 }
 
 type colorist struct {
@@ -121,4 +123,15 @@ func (lc *colorist) GetStyle(fname string) string {
 		}
 	}
 	return lc.styleForFeature[feature]
+}
+
+func (lc *colorist) GetStyleExt(fname string) string {
+	if !strings.HasSuffix(fname, "/") {
+		if ext := path.Ext(fname); ext != "" {
+			if style, ok := lc.styleForExt[ext]; ok {
+				return style
+			}
+		}
+	}
+	return lc.styleForFeature[featureDirectory]
 }

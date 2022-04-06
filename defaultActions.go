@@ -3,6 +3,7 @@ package carapace
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	exec "golang.org/x/sys/execabs"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -101,14 +103,14 @@ func stripAnsi(str string) string {
 // ActionDirectories completes directories
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true)
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(style.ForPath)
 	})
 }
 
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true)
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(style.ForPath)
 	})
 }
 
@@ -317,5 +319,154 @@ func actionFlags(cmd *cobra.Command) Action {
 			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true)
 		}
 		return ActionValuesDescribed(vals...)
+	})
+}
+
+// ActionStyleConfig completes style configuration
+//   carapace.Value=blue
+//   carapace.Description=magenta
+func ActionStyleConfig() Action {
+	return ActionMultiParts("=", func(c Context) Action {
+		switch len(c.Parts) {
+		case 0:
+			return ActionMultiParts(".", func(c Context) Action {
+				switch len(c.Parts) {
+				case 0:
+					return ActionValues(config.GetStyleConfigs()...).Invoke(c).Suffix(".").ToA()
+
+				case 1:
+					fields, err := config.GetStyleFields(c.Parts[0])
+					if err != nil {
+						return ActionMessage(err.Error())
+					}
+					return ActionStyledValuesDescribed(fields...).Invoke(c).Suffix("=").ToA()
+
+				default:
+					return ActionValues()
+				}
+			})
+		case 1:
+			return ActionMultiParts(",", func(c Context) Action {
+				return ActionStyles(c.Parts...).Invoke(c).Filter(c.Parts).ToA()
+			})
+		default:
+			return ActionValues()
+		}
+	})
+}
+
+// Actionstyles completes styles
+//   blue
+//   bg-magenta
+func ActionStyles(styles ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		fg := false
+		bg := false
+
+		for _, s := range styles {
+			if strings.HasPrefix(s, "bg-") {
+				bg = true
+			}
+			if s == style.Black ||
+				s == style.Red ||
+				s == style.Green ||
+				s == style.Yellow ||
+				s == style.Blue ||
+				s == style.Magenta ||
+				s == style.Cyan ||
+				s == style.White ||
+				s == style.Gray ||
+				s == style.BrightBlack ||
+				s == style.BrightRed ||
+				s == style.BrightGreen ||
+				s == style.BrightYellow ||
+				s == style.BrightBlue ||
+				s == style.BrightMagenta ||
+				s == style.BrightCyan ||
+				s == style.BrightWhite ||
+				strings.HasPrefix(s, "#") ||
+				strings.HasPrefix(s, "color") ||
+				strings.HasPrefix(s, "fg-") {
+				fg = true
+			}
+		}
+
+		batch := Batch()
+
+		if !fg {
+			batch = append(batch, ActionStyledValues(
+				style.Black, style.Of(append(styles, style.Black)...),
+				style.Red, style.Of(append(styles, style.Red)...),
+				style.Green, style.Of(append(styles, style.Green)...),
+				style.Yellow, style.Of(append(styles, style.Yellow)...),
+				style.Blue, style.Of(append(styles, style.Blue)...),
+				style.Magenta, style.Of(append(styles, style.Magenta)...),
+				style.Cyan, style.Of(append(styles, style.Cyan)...),
+				style.White, style.Of(append(styles, style.White)...),
+				style.Gray, style.Of(append(styles, style.Gray)...),
+
+				style.BrightBlack, style.Of(append(styles, style.BrightBlack)...),
+				style.BrightRed, style.Of(append(styles, style.BrightRed)...),
+				style.BrightGreen, style.Of(append(styles, style.BrightGreen)...),
+				style.BrightYellow, style.Of(append(styles, style.BrightYellow)...),
+				style.BrightBlue, style.Of(append(styles, style.BrightBlue)...),
+				style.BrightMagenta, style.Of(append(styles, style.BrightMagenta)...),
+				style.BrightCyan, style.Of(append(styles, style.BrightCyan)...),
+				style.BrightWhite, style.Of(append(styles, style.BrightWhite)...),
+			))
+
+			if strings.HasPrefix(c.CallbackValue, "color") {
+				for i := 0; i <= 255; i++ {
+					batch = append(batch, ActionStyledValues(
+						fmt.Sprintf("color%v", i), style.Of(append(styles, style.XTerm256Color(uint8(i)))...),
+					))
+				}
+			} else {
+				batch = append(batch, ActionStyledValues("color", style.Of(styles...)))
+			}
+		}
+
+		if !bg {
+			batch = append(batch, ActionStyledValues(
+				style.BgBlack, style.Of(append(styles, style.BgBlack)...),
+				style.BgRed, style.Of(append(styles, style.BgRed)...),
+				style.BgGreen, style.Of(append(styles, style.BgGreen)...),
+				style.BgYellow, style.Of(append(styles, style.BgYellow)...),
+				style.BgBlue, style.Of(append(styles, style.BgBlue)...),
+				style.BgMagenta, style.Of(append(styles, style.BgMagenta)...),
+				style.BgCyan, style.Of(append(styles, style.BgCyan)...),
+				style.BgWhite, style.Of(append(styles, style.BgWhite)...),
+
+				style.BgBrightBlack, style.Of(append(styles, style.BgBrightBlack)...),
+				style.BgBrightRed, style.Of(append(styles, style.BgBrightRed)...),
+				style.BgBrightGreen, style.Of(append(styles, style.BgBrightGreen)...),
+				style.BgBrightYellow, style.Of(append(styles, style.BgBrightYellow)...),
+				style.BgBrightBlue, style.Of(append(styles, style.BgBrightBlue)...),
+				style.BgBrightMagenta, style.Of(append(styles, style.BgBrightMagenta)...),
+				style.BgBrightCyan, style.Of(append(styles, style.BgBrightCyan)...),
+				style.BgBrightWhite, style.Of(append(styles, style.BgBrightWhite)...),
+			))
+
+			if strings.HasPrefix(c.CallbackValue, "bg-color") {
+				for i := 0; i <= 255; i++ {
+					batch = append(batch, ActionStyledValues(
+						fmt.Sprintf("bg-color%v", i), style.Of(append(styles, "bg-"+style.XTerm256Color(uint8(i)))...),
+					))
+				}
+			} else {
+				batch = append(batch, ActionStyledValues("bg-color", style.Of(styles...)))
+			}
+		}
+
+		batch = append(batch, ActionStyledValues(
+			style.Bold, style.Of(append(styles, style.Bold)...),
+			style.Dim, style.Of(append(styles, style.Dim)...),
+			style.Italic, style.Of(append(styles, style.Italic)...),
+			style.Underlined, style.Of(append(styles, style.Underlined)...),
+			style.Blink, style.Of(append(styles, style.Blink)...),
+			style.Inverse, style.Of(append(styles, style.Inverse)...),
+		))
+
+		return batch.ToA()
 	})
 }

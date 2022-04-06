@@ -101,11 +101,22 @@ func (a Action) NoSpace() Action {
 }
 
 // Style sets the style
+//   ActionValues("yes").Style(style.Green)
+//   ActionValues("no").Style(style.Red)
 func (a Action) Style(style string) Action {
+	return a.StyleF(func(s string) string {
+		return style
+	})
+}
+
+// Style sets the style using a function
+//   ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
+//   ActionValues("true", "false").StyleF(style.ForKeyword)
+func (a Action) StyleF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
-		for index := range invoked.rawValues {
-			invoked.rawValues[index].Style = style
+		for index, v := range invoked.rawValues {
+			invoked.rawValues[index].Style = f(v.Value)
 		}
 		return invoked.ToA()
 	})

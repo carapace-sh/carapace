@@ -4,7 +4,6 @@ package style
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/cli/lscolors"
 	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
@@ -57,9 +56,7 @@ var (
 )
 
 // Of combines different styles
-func Of(s ...string) string {
-	return strings.Join(s, " ")
-}
+func Of(s ...string) string { return strings.Join(s, " ") }
 
 // XTerm256Color returns a color from the xterm 256-color palette.
 func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }
@@ -67,47 +64,15 @@ func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }
 // TrueColor returns a 24-bit true color.
 func TrueColor(r, g, b uint8) string { return ui.TrueColor(r, g, b).String() }
 
-// ForPath returns the style for given path
-func ForPath(path string) string {
-	s := ui.StyleFromSGR(lscolors.GetColorist().GetStyle(path))
-
-	result := make([]string, 0)
-	if s.Foreground != nil {
-		result = append(result, s.Foreground.String())
-	}
-	if s.Background != nil {
-		result = append(result, "bg-"+s.Background.String())
-	}
-	if s.Bold {
-		result = append(result, Bold)
-	}
-	if s.Dim {
-		result = append(result, Dim)
-	}
-	if s.Italic {
-		result = append(result, Italic)
-	}
-	if s.Underlined {
-		result = append(result, Underlined)
-	}
-	if s.Blink {
-		result = append(result, Blink)
-	}
-	if s.Inverse {
-		result = append(result, Inverse)
-	}
-	return Of(result...)
-}
-
 // SGR returns the SGR sequence for given style
-func SGR(s string) string {
-	return parseStyle(s).SGR()
-}
+func SGR(s string) string { return parseStyle(s).SGR() }
 
 func parseStyle(s string) ui.Style {
 	stylings := make([]ui.Styling, 0)
 	for _, word := range strings.Split(s, " ") {
-		stylings = append(stylings, ui.ParseStyling(word))
+		if styling := ui.ParseStyling(word); styling != nil {
+			stylings = append(stylings, styling)
+		}
 	}
 	return ui.ApplyStyling(ui.Style{}, stylings...)
 }

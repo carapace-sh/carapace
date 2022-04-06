@@ -108,38 +108,38 @@ func TestNoSpace(t *testing.T) {
 func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
-			"example/", style.Of(style.Blue, style.Bold),
-			"docs/", style.Of(style.Blue, style.Bold),
-			"internal/", style.Of(style.Blue, style.Bold),
-			"pkg/", style.Of(style.Blue, style.Bold),
-			"third_party/", style.Of(style.Blue, style.Bold),
+			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}),
 		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"example/", style.Of(style.Blue, style.Bold),
-			"docs/", style.Of(style.Blue, style.Bold),
-			"internal/", style.Of(style.Blue, style.Bold),
-			"pkg/", style.Of(style.Blue, style.Bold),
-			"third_party/", style.Of(style.Blue, style.Bold),
+			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of(style.Blue, style.Bold),
-			"cmd/", style.Of(style.Blue, style.Bold),
+			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of(style.Blue, style.Bold),
-			"cmd/", style.Of(style.Blue, style.Bold),
+			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
 	)
@@ -148,22 +148,22 @@ func TestActionDirectories(t *testing.T) {
 func TestActionFiles(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
-			"README.md", style.Default,
-			"example/", style.Of(style.Blue, style.Bold),
-			"docs/", style.Of(style.Blue, style.Bold),
-			"internal/", style.Of(style.Blue, style.Bold),
-			"pkg/", style.Of(style.Blue, style.Bold),
-			"third_party/", style.Of(style.Blue, style.Bold),
+			"README.md", style.Of("fg-default", "bg-default"),
+			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of(style.Blue, style.Bold),
-			"cmd/", style.Of(style.Blue, style.Bold),
-			"main.go", style.Default,
-			"main_test.go", style.Default,
+			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"main.go", style.Of("fg-default", "bg-default"),
+			"main_test.go", style.Of("fg-default", "bg-default"),
 		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
@@ -183,7 +183,10 @@ func TestActionFilesChdir(t *testing.T) {
 	)
 
 	assertEqual(t,
-		ActionValues("action.go", "snippet.go").noSpace(true).Invoke(Context{}).Prefix("elvish/"),
+		ActionStyledValues(
+			"action.go", style.Of("fg-default", "bg-default"),
+			"snippet.go", style.Of("fg-default", "bg-default"),
+		).noSpace(true).Invoke(Context{}).Prefix("elvish/"),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{CallbackValue: "elvish/"}),
 	)
 

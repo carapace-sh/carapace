@@ -15,6 +15,7 @@ function _example_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
+  # TODO for ${curcontext}: zstyle ':completion:*' list-colors "${lines[1]}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:1})
@@ -29,13 +30,7 @@ function _example_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%$'\001'*})
 
-  if [[ ${displays[*]} == *$'\002'" "* ]]; then # with descriptions
-      compadd -l -S "${suffix}" -d displays -a -- vals
-  else
-      # shellcheck disable=SC2034,2206
-      displays=(${displays%%$'\002'*})
-      compadd -S "${suffix}" -d displays -a -- vals
-  fi
+  compadd -S "${suffix}" -d displays -a -- vals
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

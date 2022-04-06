@@ -28,39 +28,40 @@ func init() {
 	rootCmd.AddCommand(actionCmd)
 
 	actionCmd.Flags().CountP("count", "c", "count flag")
+	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("files", "f", "", "files flag")
 	actionCmd.Flags().String("filtered_files", "", "files flag")
-	actionCmd.Flags().String("directories", "", "files flag")
 	actionCmd.Flags().StringP("groups", "g", "", "groups flag")
+	actionCmd.Flags().String("keyword", "", "keyword flag")
+	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
 	actionCmd.Flags().StringP("message", "m", "", "message flag")
 	actionCmd.Flags().StringP("net_interfaces", "n", "", "net_interfaces flag")
+	actionCmd.Flags().StringP("optarg", "o", "", "optional arg with default value blue")
+	actionCmd.Flags().String("style", "", "set style")
+	actionCmd.Flags().String("styled_values", "", "styled values flag")
+	actionCmd.Flags().String("styled_values_described", "", "styled values with description flag")
 	actionCmd.Flags().String("usergroup", "", "user:group flag")
 	actionCmd.Flags().StringP("users", "u", "", "users flag")
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
-	actionCmd.Flags().String("styled_values", "", "styled values flag")
-	actionCmd.Flags().String("styled_values_described", "", "styled values with description flag")
-	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
-	actionCmd.Flags().StringP("kill", "k", "", "kill signals")
-	actionCmd.Flags().StringP("optarg", "o", "", "optional arg with default value blue")
-	actionCmd.Flags().String("style", "", "set style")
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
+	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
 
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
+		"directories": carapace.ActionDirectories(),
 		"files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionFiles().Chdir(actionCmd.Flag("directories").Value.String())
 		}),
 		"filtered_files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionFiles(".go", "go.mod", ".txt").Chdir(actionCmd.Flag("directories").Value.String())
 		}),
-		"directories":      carapace.ActionDirectories(),
-		"groups":           os.ActionGroups(),
-		"message":          carapace.ActionMessage("message example"),
-		"net_interfaces":   net.ActionNetInterfaces(),
-		"usergroup":        os.ActionUserGroup(),
-		"users":            os.ActionUsers(),
-		"values":           carapace.ActionValues("values", "example"),
-		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
+		"groups":         os.ActionGroups(),
+		"keyword":        carapace.ActionValues("yes", "no", "auto", "unknown", "default").StyleF(style.ForKeyword),
+		"kill":           os.ActionKillSignals(),
+		"message":        carapace.ActionMessage("message example"),
+		"net_interfaces": net.ActionNetInterfaces(),
+		"optarg":         carapace.ActionValues("blue", "red", "green", "yellow"),
+		"style":          carapace.ActionStyleConfig(),
 		"styled_values": carapace.ActionStyledValues(
 			"default", style.Default,
 			"red", style.Red,
@@ -91,9 +92,10 @@ func init() {
 			"italic", "description of italic", style.Italic,
 			"underlined", "description of underlined", style.Underlined,
 		),
-		"kill":   os.ActionKillSignals(),
-		"optarg": carapace.ActionValues("blue", "red", "green", "yellow"),
-		"style":  carapace.ActionStyleConfig(),
+		"usergroup":        os.ActionUserGroup(),
+		"users":            os.ActionUsers(),
+		"values":           carapace.ActionValues("values", "example"),
+		"values_described": carapace.ActionValuesDescribed("values", "valueDescription", "example", "exampleDescription"),
 	})
 
 	carapace.Gen(actionCmd).PositionalCompletion(

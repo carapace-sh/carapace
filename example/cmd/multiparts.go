@@ -20,8 +20,8 @@ func init() {
 	multipartsCmd.Flags().String("dot", "", "multiparts with . as divider")
 	multipartsCmd.Flags().String("dotdotdot", "", "multiparts with ... as divider")
 	multipartsCmd.Flags().String("equals", "", "multiparts with = as divider")
-	multipartsCmd.Flags().String("slash", "", "multiparts with / as divider")
 	multipartsCmd.Flags().String("none", "", "multiparts without divider")
+	multipartsCmd.Flags().String("slash", "", "multiparts with / as divider")
 
 	rootCmd.AddCommand(multipartsCmd)
 
@@ -32,10 +32,10 @@ func init() {
 		"dot":       actionMultipartsTest("."),
 		"dotdotdot": actionMultipartsTest("..."),
 		"equals":    actionMultipartsTest("="),
-		"slash":     actionMultipartsTest("/"),
 		"none": carapace.ActionMultiParts("", func(c carapace.Context) carapace.Action {
 			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(c.Parts).ToA()
 		}),
+		"slash": actionMultipartsTest("/"),
 	})
 
 	carapace.Gen(multipartsCmd).PositionalCompletion(

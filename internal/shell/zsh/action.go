@@ -6,6 +6,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -30,6 +31,16 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		}
 	}
 
+	valueStyle := "default"
+	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
+		valueStyle = s
+	}
+
+	descriptionStyle := "default"
+	if s := style.Carapace.Description; s != "" && ui.ParseStyling(s) != nil {
+		descriptionStyle = s
+	}
+
 	zstyles := make([]string, 0)
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
@@ -40,34 +51,38 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		val.Display = sanitizer.Replace(val.Display)
 		val.Description = sanitizer.Replace(val.Description)
 
-		if zstyle := formatZstyle(val.Display, val.Style); zstyle != "" {
-			zstyles = append(zstyles, zstyle)
+		if val.Style == "" || ui.ParseStyling(val.Style) == nil {
+			val.Style = valueStyle
 		}
 
 		if strings.TrimSpace(val.Description) == "" {
-			if hasDescriptions {
-				vals[index] = fmt.Sprintf("%v\t%v\002", val.Value, val.Display)
-			} else {
-				vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
-			}
+			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
+			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)()", zstyleQuoter.Replace(val.Display)), val.Style, descriptionStyle))
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v\002 %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
+			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
+			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)[ ]*-- (%v)", zstyleQuoter.Replace(val.Display), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
 		}
 	}
 
 	if len(zstyles) > 1000 { // TODO disable styling for large amount of values (bad performance)
 		zstyles = make([]string, 0)
 	}
-	zstyles = append(zstyles, fmt.Sprintf("=(#b)(*)(\002*)=0=%v=%v", style.SGR(style.Carapace.Value), style.SGR(style.Carapace.Description)))
-	return fmt.Sprintf("%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
+	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
 }
+
+var zstyleQuoter = strings.NewReplacer(
+	"#", `\#`,
+	"*", `\*`,
+	"(", `\(`,
+	")", `\)`,
+	"~", `\~`,
+	"[", `\[`,
+	"]", `\]`,
+)
 
 // formatZstyle creates a zstyle matcher for given display stings.
 // `compadd -l` (one per line) accepts ansi escape sequences in display value but it seems in tabular view these are removed.
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
-func formatZstyle(s, _style string) string {
-	if sgr := style.SGR(_style); sgr != "" {
-		return fmt.Sprintf("=(#b)(%v)(\002*|)=0=%v=%v", strings.Replace(s, "#", `\#`, -1), sgr, style.SGR(style.Carapace.Description))
-	}
-	return ""
+func formatZstyle(s, _styleValue, _styleDescription string) string {
+	return fmt.Sprintf("=(#b)%v=0=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription))
 }

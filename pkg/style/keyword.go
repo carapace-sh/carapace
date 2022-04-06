@@ -2,46 +2,46 @@ package style
 
 import "strings"
 
-var keywords = map[string]string{
-	"yes": Green,
-	"no":  Red,
+var keywords = map[string]*string{
+	"yes": &Carapace.KeywordPositive,
+	"no":  &Carapace.KeywordNegative,
 
-	"true":  Green,
-	"false": Red,
+	"true":  &Carapace.KeywordPositive,
+	"false": &Carapace.KeywordNegative,
 
-	"on":  Green,
-	"off": Red,
+	"on":  &Carapace.KeywordPositive,
+	"off": &Carapace.KeywordNegative,
 
-	"all":  Green,
-	"none": Red,
+	"all":  &Carapace.KeywordPositive,
+	"none": &Carapace.KeywordNegative,
 
-	"always": Green,
-	"auto":   Yellow,
-	"never":  Red,
+	"always": &Carapace.KeywordPositive,
+	"auto":   &Carapace.KeywordAmbiguous,
+	"never":  &Carapace.KeywordNegative,
 
-	"start":      Red,
-	"started":    Red,
-	"running":    Yellow,
-	"inprogress": Yellow,
-	"pause":      Yellow,
-	"paused":     Yellow,
-	"stop":       Red,
-	"stopped":    Red,
+	"start":      &Carapace.KeywordNegative,
+	"started":    &Carapace.KeywordNegative,
+	"running":    &Carapace.KeywordAmbiguous,
+	"inprogress": &Carapace.KeywordAmbiguous,
+	"pause":      &Carapace.KeywordAmbiguous,
+	"paused":     &Carapace.KeywordAmbiguous,
+	"stop":       &Carapace.KeywordNegative,
+	"stopped":    &Carapace.KeywordNegative,
 
-	"onsuccess": Green,
-	"onfailure": Red,
-	"onerror":   Red,
+	"onsuccess": &Carapace.KeywordPositive,
+	"onfailure": &Carapace.KeywordNegative,
+	"onerror":   &Carapace.KeywordNegative,
 
-	"success": Green,
-	"unknown": Gray,
-	"warn":    Yellow,
-	"error":   Red,
-	"failed":  Red,
+	"success": &Carapace.KeywordPositive,
+	"unknown": &Carapace.KeywordUnknown,
+	"warn":    &Carapace.KeywordAmbiguous,
+	"error":   &Carapace.KeywordNegative,
+	"failed":  &Carapace.KeywordNegative,
 
-	"nonblock": Yellow,
-	"block":    Red,
+	"nonblock": &Carapace.KeywordAmbiguous,
+	"block":    &Carapace.KeywordNegative,
 
-	"ondemand": Yellow,
+	"ondemand": &Carapace.KeywordAmbiguous,
 }
 
 var keywordReplacer = strings.NewReplacer(
@@ -52,7 +52,7 @@ var keywordReplacer = strings.NewReplacer(
 // ForKeyword returns the style for given keyword
 func ForKeyword(s string) string {
 	if _style, ok := keywords[keywordReplacer.Replace(strings.ToLower(s))]; ok {
-		return _style
+		return *_style
 	}
 	return Default
 }

@@ -75,9 +75,10 @@ var zstyleQuoter = strings.NewReplacer(
 	"*", `\*`,
 	"(", `\(`,
 	")", `\)`,
-	"~", `\~`,
 	"[", `\[`,
 	"]", `\]`,
+	"|", `\|`,
+	"~", `\~`,
 )
 
 // formatZstyle creates a zstyle matcher for given display stings.

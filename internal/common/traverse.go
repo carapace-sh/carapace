@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // TraverseLenient traverses the command tree but filters errors regarding arguments currently being completed
@@ -33,13 +34,21 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 	for _, name := range append(targetCmd.Aliases, targetCmd.Name()) {
 		if len(args) > 0 &&
 			name == args[len(args)-1] &&
-			len(targetCmd.Flags().Args()) == 0 {
+			len(targetCmd.Flags().Args()) == 0 &&
+			!anyFlagChanged(targetCmd) {
 			if targetCmd.HasParent() {
 				targetCmd = targetCmd.Parent() // when argument currently being completed is fully matching a subcommand it will be returned, so fix this to parent
 			}
 		}
 	}
 	return targetCmd, targetCmd.Flags().Args(), filterError(args, err)
+}
+
+func anyFlagChanged(cmd *cobra.Command) (changed bool) {
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
+		changed = changed || f.Changed
+	})
+	return
 }
 
 func filterError(args []string, err error) error {

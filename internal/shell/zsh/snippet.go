@@ -27,7 +27,7 @@ function _%v_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
-  # TODO for ${curcontext}: zstyle ':completion:*' list-colors "${lines[1]}"
+  #zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:1})

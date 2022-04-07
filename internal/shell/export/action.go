@@ -3,6 +3,7 @@ package export
 import (
 	"encoding/json"
 	"runtime/debug"
+	"sort"
 
 	"github.com/rsteube/carapace/internal/common"
 )
@@ -14,6 +15,7 @@ type Export struct {
 }
 
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
 		Version:   version(),
 		Nospace:   nospace,

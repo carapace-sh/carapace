@@ -101,3 +101,29 @@ func TestDisabledFlagParsing(t *testing.T) {
 	_, args, _ := testTraverseLenient(t, "sub2", "--arg")
 	assert.Equal(t, args[0], "--arg") // TODO test whole slice
 }
+
+func TestFlagValueMatchesCmd(t *testing.T) {
+	cmd, args, _ := testTraverseLenient(t, "--string", testCmd.Name())
+	if cmd != testCmd {
+		t.Errorf("should be testCmd [was: '%v']", cmd)
+	}
+	if len(args) != 0 {
+		t.Errorf("args should be empty [was: '%v']", len(args))
+	}
+	if v := cmd.Flag("string").Value.String(); v != testCmd.Use {
+		t.Errorf("string flag should be set [expected: '%v', was: '%v']", testCmd.Name(), v)
+	}
+}
+
+func TestFlagValueMatchesSubCmd(t *testing.T) {
+	cmd, args, _ := testTraverseLenient(t, "sub", "--substring", testSubCmd.Name())
+	if cmd != testSubCmd {
+		t.Errorf("should be testSubCmd [was: '%v']", cmd.Name())
+	}
+	if len(args) != 0 {
+		t.Errorf("args should be empty [was: '%v']", len(args))
+	}
+	if v := testSubCmd.Flag("substring").Value.String(); v != testSubCmd.Use {
+		t.Errorf("string flag should be set [expected: '%v', was: '%v']", testSubCmd.Name(), v)
+	}
+}

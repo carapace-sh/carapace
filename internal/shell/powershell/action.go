@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 var sanitizer = strings.NewReplacer( // TODO
@@ -33,6 +35,16 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
+	valueStyle := "default"
+	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
+		valueStyle = s
+	}
+
+	descriptionStyle := "default"
+	if s := style.Carapace.Description; s != "" && ui.ParseStyling(s) != nil {
+		descriptionStyle = s
+	}
+
 	vals := make([]completionResult, 0, len(filtered))
 	for _, val := range filtered {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error
@@ -46,13 +58,30 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 				val.Value = val.Value + " "
 			}
 
+			if val.Style == "" || ui.ParseStyling(val.Style) == nil {
+				val.Style = valueStyle
+			}
+
+			listItemText := fmt.Sprintf("`e[21;22;23;24;25;29m`e[%vm%v`e[21;22;23;24;25;29;39;49m", sgr(val.Style), sanitizer.Replace(val.Display))
+			if val.Description != "" {
+				listItemText = listItemText + fmt.Sprintf(" (`e[%vm%v`e[21;22;23;24;25;29;39;49m)", sgr(descriptionStyle), sanitizer.Replace(val.TrimmedDescription()))
+			}
+			listItemText = listItemText + "`e[0m"
+
 			vals = append(vals, completionResult{
 				CompletionText: val.Value,
-				ListItemText:   ensureNotEmpty(sanitizer.Replace(val.Display)),
-				ToolTip:        ensureNotEmpty(sanitizer.Replace(val.TrimmedDescription())),
+				ListItemText:   ensureNotEmpty(listItemText),
+				ToolTip:        ensureNotEmpty(" "),
 			})
 		}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)
+}
+
+func sgr(s string) string {
+	if result := style.SGR(s); result != "" {
+		return result
+	}
+	return "39;49"
 }

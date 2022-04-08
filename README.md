@@ -66,6 +66,7 @@ PATH=$PATH:$(pwd)
 source <(example _carapace oil)
 
 # powershell
+Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 $env:PATH += ":$pwd"
 example _carapace powershell | out-string | Invoke-Expression

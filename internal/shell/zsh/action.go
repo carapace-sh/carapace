@@ -60,7 +60,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)()", zstyleQuoter.Replace(val.Display)), val.Style, descriptionStyle))
 		} else {
 			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
-			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v) %v-- (%v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
+			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v) %v(-- %v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
 		}
 	}
 

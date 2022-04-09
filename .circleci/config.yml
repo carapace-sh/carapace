@@ -26,11 +26,15 @@ commands:
       - run:
           name: "shellcheck zsh"
           command: shellcheck -e SC2148,SC2154 <(./example/example _carapace zsh)
-  codecov:
+  coveralls:
     steps:
       - run:
-          name: "upload coverage"
-          command: codecov
+          name: "Install goveralls"
+          command: go install github.com/mattn/goveralls@latest
+      - run:
+          name: "Send coverage"
+          command: goveralls -coverprofile=coverage.out -service=circleci -repotoken ${COVERALLS_TOKEN}
+
 
 jobs:
   current:
@@ -41,7 +45,7 @@ jobs:
     steps:
       - checkout
       - run_tests
-      - codecov
+      - coveralls
       - run:
           name: "Check formatting"
           command: diff -u <(echo -n) <(gofmt -d -s .)

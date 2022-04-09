@@ -4,7 +4,7 @@
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/rsteube/carapace)](https://pkg.go.dev/github.com/rsteube/carapace)
 [![documentation](https://img.shields.io/badge/&zwnj;-documentation-blue?logo=gitbook)](https://rsteube.github.io/carapace/)
 [![GoReportCard](https://goreportcard.com/badge/github.com/rsteube/carapace)](https://goreportcard.com/report/github.com/rsteube/carapace)
-[![codecov](https://codecov.io/gh/rsteube/carapace/branch/master/graph/badge.svg?token=OQAYYTIJ2J)](https://codecov.io/gh/rsteube/carapace)
+[![Coverage Status](https://coveralls.io/repos/github/rsteube/carapace/badge.svg?branch=master)](https://coveralls.io/github/rsteube/carapace?branch=master)
 
 Command argument completion generator for [cobra]. You can read more about it here: _[A pragmatic approach to shell completion](https://dev.to/rsteube/a-pragmatic-approach-to-shell-completion-4gp0)_.
 

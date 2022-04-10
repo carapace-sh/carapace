@@ -1,11 +1,9 @@
 package carapace
 
 import (
-	"fmt"
-	"os"
+	"path/filepath"
 	"regexp"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/rsteube/carapace/internal/cache"
@@ -124,41 +122,12 @@ func (a Action) StyleF(f func(s string) string) Action {
 // Chdir changes the current working directory to the named directory during invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {
-		if dir == "" || dir == "." {
-			return a // do nothing on current dir
-		}
-
-		if strings.HasPrefix(dir, "~") {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return ActionMessage(err.Error())
-			}
-			dir = strings.Replace(dir, "~", home, 1)
-		}
-
-		file, err := os.Stat(dir)
+		abs, err := c.Abs(dir)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
-		if !file.IsDir() {
-			return ActionMessage(fmt.Sprintf("%v is not a directory", dir))
-		}
-
-		current, err := os.Getwd()
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		if err := os.Chdir(dir); err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		a := a.Invoke(c).ToA()
-
-		if err := os.Chdir(current); err != nil {
-			return ActionMessage(err.Error())
-		}
-		return a
+		c.Dir = filepath.Dir(abs)
+		return a.Invoke(c).ToA()
 	})
 }
 

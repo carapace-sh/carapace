@@ -15,7 +15,7 @@ func Snippet(cmd *cobra.Command) string {
         if (eq $c[Description] "") {
             edit:complex-candidate $c[Value] &display=(styled $c[Display] $c[Style]) &code-suffix=$c[CodeSuffix]
         } else {
-            edit:complex-candidate $c[Value] &display=(styled $c[Display] $c[Style])" "(styled "("$c[Description]")" $c[DescriptionStyle]) &code-suffix=$c[CodeSuffix]
+            edit:complex-candidate $c[Value] &display=(styled $c[Display] $c[Style])(styled " " $c[DescriptionStyle]" bg-default")(styled "("$c[Description]")" $c[DescriptionStyle]) &code-suffix=$c[CodeSuffix]
         }
     }
 }

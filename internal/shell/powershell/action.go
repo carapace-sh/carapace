@@ -64,7 +64,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 			listItemText := fmt.Sprintf("`e[21;22;23;24;25;29m`e[%vm%v`e[21;22;23;24;25;29;39;49m", sgr(val.Style), sanitizer.Replace(val.Display))
 			if val.Description != "" {
-				listItemText = listItemText + fmt.Sprintf(" `e[%vm(%v)`e[21;22;23;24;25;29;39;49m", sgr(descriptionStyle), sanitizer.Replace(val.TrimmedDescription()))
+				listItemText = listItemText + fmt.Sprintf("`e[%vm `e[%vm(%v)`e[21;22;23;24;25;29;39;49m", sgr(descriptionStyle+" bg-default"), sgr(descriptionStyle), sanitizer.Replace(val.TrimmedDescription()))
 			}
 			listItemText = listItemText + "`e[0m"
 

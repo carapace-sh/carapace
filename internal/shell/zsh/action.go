@@ -59,8 +59,8 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
 			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)()", zstyleQuoter.Replace(val.Display)), val.Style, descriptionStyle))
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v %v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)), val.TrimmedDescription())
-			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v) %v(-- %v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
+			vals[index] = fmt.Sprintf("%v\t%v%v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)+1), val.TrimmedDescription())
+			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)(%v)(-- %v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)+1), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
 		}
 	}
 
@@ -85,5 +85,5 @@ var zstyleQuoter = strings.NewReplacer(
 // `compadd -l` (one per line) accepts ansi escape sequences in display value but it seems in tabular view these are removed.
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
 func formatZstyle(s, _styleValue, _styleDescription string) string {
-	return fmt.Sprintf("=(#b)%v=0=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription))
+	return fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription+" bg-default"), style.SGR(_styleDescription))
 }

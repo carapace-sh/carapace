@@ -10,12 +10,11 @@ import (
 	"regexp"
 	"strings"
 
-	exec "golang.org/x/sys/execabs"
-
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
+	exec "github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

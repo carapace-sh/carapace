@@ -245,10 +245,16 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			}
 
 			targetCmd, targetArgs, err := findTarget(cmd, args)
+
+			wd, err := os.Getwd()
+			if err != nil {
+				return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+			}
 			context := Context{
 				CallbackValue: current,
 				Args:          targetArgs,
 				Env:           os.Environ(),
+				Dir:           wd,
 			}
 			if err != nil {
 				if opts.LongShorthand {

@@ -4,11 +4,10 @@ package assert
 import (
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
-
-	exec "golang.org/x/sys/execabs"
 )
 
 // Equal calls t.Error if given strings are not equal

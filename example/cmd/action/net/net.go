@@ -1,7 +1,7 @@
 package net
 
 import (
-	exec "golang.org/x/sys/execabs"
+	"os/exec"
 	"regexp"
 	"strings"
 

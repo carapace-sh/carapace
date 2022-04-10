@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mitchellh/go-ps"
+	"github.com/rsteube/carapace/third_party/github.com/mitchellh/go-ps"
 )
 
 // DetermineShell determines shell by parent process name

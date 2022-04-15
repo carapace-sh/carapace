@@ -26,6 +26,8 @@ var actionCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(actionCmd)
+    actionCmd.Flags().SetOptargDelimiter(':')
+    actionCmd.Flags().SetLongShorthand(true)
 
 	actionCmd.Flags().CountP("count", "c", "count flag")
 	actionCmd.Flags().String("directories", "", "files flag")

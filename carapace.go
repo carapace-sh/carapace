@@ -122,9 +122,9 @@ func (c Carapace) Snippet(shell string) (string, error) {
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
-	nameOrShorthand := strings.TrimLeft(strings.SplitN(arg, "=", 2)[0], "-")
+	nameOrShorthand := strings.TrimLeft(strings.SplitN(arg, string(cmd.Flags().GetOptargDelimiter()), 2)[0], "-")
 
-	if strings.HasPrefix(arg, "--") {
+	if strings.HasPrefix(arg, cmd.Flags().GetLonghandPrefix()) {
 		flag = cmd.Flags().Lookup(nameOrShorthand)
 	} else if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
 		flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
@@ -203,7 +203,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, arg := range args {
-				if splitted := strings.SplitN(arg, "=", 2); len(splitted) == 2 {
+				if splitted := strings.SplitN(arg, string(cmd.Flags().GetOptargDelimiter()), 2); len(splitted) == 2 {
 					if err := style.Set(splitted[0], splitted[1]); err != nil {
 						fmt.Fprint(cmd.ErrOrStderr(), err.Error())
 					}
@@ -251,9 +251,9 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 				Env:           os.Environ(),
 			}
 			if err != nil {
-				if opts.LongShorthand {
-					current = strings.TrimPrefix(current, "-")
-				}
+				//if opts.LongShorthand { // TODO is this needed?
+				//	current = strings.TrimPrefix(current, "-")
+				//}
 				return ActionMessage(err.Error()).Invoke(context).value(shell, current), nil
 			}
 
@@ -262,16 +262,16 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			if flag := lookupFlag(targetCmd, previous); !targetCmd.DisableFlagParsing && flag != nil && flag.NoOptDefVal == "" && !common.IsDash(targetCmd) { // previous arg is a flag and needs a value
 				targetAction = storage.getFlag(targetCmd, flag.Name)
 			} else if !targetCmd.DisableFlagParsing && strings.HasPrefix(current, "-") && !common.IsDash(targetCmd) { // assume flag
-				if strings.Contains(current, "=") { // complete value for optarg flag
+				if strings.Contains(current, string(targetCmd.Flags().GetOptargDelimiter())) { // complete value for optarg flag
 					if flag := lookupFlag(targetCmd, current); flag != nil && flag.NoOptDefVal != "" {
 						a := storage.getFlag(targetCmd, flag.Name)
-						splitted := strings.SplitN(current, "=", 2)
+						splitted := strings.SplitN(current, string(targetCmd.Flags().GetOptargDelimiter()), 2)
 						context.CallbackValue = splitted[1]
-						if opts.LongShorthand {
-							splitted[0] = splitted[0][1:] // revert the added `-` so that the resulting prefix is correct
-						}
-						current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)                  // revert (potentially) overridden optarg divider for `.value()` invocation below
-						targetAction = a.Invoke(context).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
+						//if opts.LongShorthand { // TODO is this needed?
+						//	splitted[0] = splitted[0][1:] // revert the added `-` so that the resulting prefix is correct
+						//}
+						current = strings.Replace(current, string(targetCmd.Flags().GetOptargDelimiter()), string(targetCmd.Flags().GetOptargDelimiter()), 1) // revert (potentially) overridden optarg divider for `.value()` invocation below
+						targetAction = a.Invoke(context).Prefix(splitted[0] + string(targetCmd.Flags().GetOptargDelimiter())).ToA()                           // prefix with (potentially) overridden optarg delimiter
 					}
 				} else { // complete flagnames
 					targetAction = actionFlags(targetCmd)
@@ -291,9 +291,9 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 					}
 				}
 			}
-			if opts.LongShorthand {
-				current = strings.TrimPrefix(current, "-")
-			}
+			//if opts.LongShorthand { // TODO is this needed
+			//	current = strings.TrimPrefix(current, "-")
+			//}
 			return targetAction.Invoke(context).value(shell, current), nil
 		}
 	}

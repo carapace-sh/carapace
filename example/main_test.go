@@ -164,14 +164,14 @@ func TestOil(t *testing.T) {
 	}
 }
 
-func TestPowershell(t *testing.T) {
-	if err := exec.Command("pwsh", "--version").Run(); err != nil {
-		t.Skip("skipping powershell")
-	}
-	for cmdline, text := range tests {
-		doComplete(t, "powershell", cmdline, text)
-	}
-}
+//func TestPowershell(t *testing.T) {
+//	if err := exec.Command("pwsh", "--version").Run(); err != nil {
+//		t.Skip("skipping powershell")
+//	}
+//	for cmdline, text := range tests {
+//		doComplete(t, "powershell", cmdline, text)
+//	}
+//}
 
 func TestZsh(t *testing.T) {
 	if err := exec.Command("zsh", "--version").Run(); err != nil {

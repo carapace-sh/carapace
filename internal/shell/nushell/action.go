@@ -9,6 +9,11 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 )
 
+type record struct {
+	Value       string `json:"value"`
+	Description string `json:"description,omitempty"`
+}
+
 var sanitizer = strings.NewReplacer(
 	"\n", ``,
 	"\r", ``,
@@ -28,7 +33,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
-	vals := make([]string, len(filtered))
+	vals := make([]record, len(filtered))
 	for index, val := range sanitize(filtered) {
 		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {
 			val.Value = fmt.Sprintf("'%v'", val.Value)
@@ -38,7 +43,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			val.Value = val.Value + " "
 		}
 
-		vals[index] = val.Value
+		vals[index] = record{Value: val.Value, Description: val.TrimmedDescription()}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

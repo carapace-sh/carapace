@@ -58,7 +58,7 @@ eval (example _carapace elvish | slurp)
 set PATH $PATH (pwd) 
 example _carapace fish | source
 
-# nushell [needs fork: https://github.com/rsteube/nushell]
+# nushell
 example _carapace nushell | save example.nu
 source example.nu
 

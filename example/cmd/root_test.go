@@ -34,6 +34,10 @@ func TestFish(t *testing.T) {
 	testScript(t, "fish", "./_test/fish.fish")
 }
 
+func TestNushell(t *testing.T) {
+	testScript(t, "nushell", "./_test/nushell.nu")
+}
+
 func TestOil(t *testing.T) {
 	testScript(t, "oil", "./_test/oil.sh")
 }

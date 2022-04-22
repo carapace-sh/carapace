@@ -21,7 +21,7 @@ eval (command _carapace | slurp)
 # fish
 command _carapace | source
 
-# nushell [needs fork: https://github.com/rsteube/nushell]
+# nushell
 command _carapace nushell | save out.nu
 source out.nu
 

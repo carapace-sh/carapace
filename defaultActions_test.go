@@ -51,6 +51,8 @@ func TestActionExecCommandEnv(t *testing.T) {
 		return ActionValues()
 	}).Invoke(Context{})
 
+	c := Context{}
+	c.Setenv("carapace_TestActionExecCommand", "test")
 	ActionExecCommand("env")(func(output []byte) Action {
 		lines := strings.Split(string(output), "\n")
 		for _, line := range lines {
@@ -60,5 +62,5 @@ func TestActionExecCommandEnv(t *testing.T) {
 		}
 		t.Error("should contain env carapace_TestActionExecCommand=test")
 		return ActionValues()
-	}).Invoke(Context{}.Setenv("carapace_TestActionExecCommand", "test"))
+	}).Invoke(c)
 }

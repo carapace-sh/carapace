@@ -40,12 +40,11 @@ type Context struct {
 }
 
 // Setenv sets the value of the environment variable named by the key.
-func (c Context) Setenv(key, value string) Context {
+func (c *Context) Setenv(key, value string) {
 	if c.Env == nil {
 		c.Env = []string{}
 	}
 	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
-	return c
 }
 
 // Cache cashes values of a CompletionCallback for given duration and keys

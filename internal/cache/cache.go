@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +20,7 @@ import (
 func Write(file string, rawValues []common.RawValue) (err error) {
 	var m []byte
 	if m, err = json.Marshal(rawValues); err == nil {
-		err = ioutil.WriteFile(file, m, 0600)
+		err = os.WriteFile(file, m, 0600)
 	}
 	return
 }
@@ -33,7 +32,7 @@ func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err 
 	if stat, err = os.Stat(file); os.IsNotExist(err) || (timeout > 0 && stat.ModTime().Add(timeout).Before(time.Now())) {
 		err = errors.New("not exists or timeout exceeded")
 	} else {
-		if content, err = ioutil.ReadFile(file); err == nil {
+		if content, err = os.ReadFile(file); err == nil {
 			err = json.Unmarshal(content, &rawValues)
 		}
 	}

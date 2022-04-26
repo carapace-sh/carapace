@@ -4,7 +4,6 @@ package cache
 import (
 	"crypto/sha1"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -25,7 +24,7 @@ func String(s ...string) Key {
 func FileChecksum(file string) Key {
 	return func() (checksum string, err error) {
 		var content []byte
-		if content, err = ioutil.ReadFile(file); err == nil {
+		if content, err = os.ReadFile(file); err == nil {
 			checksum = fmt.Sprintf("%x", sha1.Sum(content))
 		}
 		return

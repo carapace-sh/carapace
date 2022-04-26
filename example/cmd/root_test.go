@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/rsteube/carapace"
@@ -9,7 +9,7 @@ import (
 )
 
 func testScript(t *testing.T, shell string, file string) {
-	if content, err := ioutil.ReadFile(file); err != nil {
+	if content, err := os.ReadFile(file); err != nil {
 		t.Fatal("failed to read fixture file")
 	} else {
 		rootCmd.InitDefaultHelpCmd()

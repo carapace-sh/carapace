@@ -18,6 +18,11 @@ ARG version=1.8.3
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
+FROM base as nfpm
+ARG version=2.15.1
+RUN curl -L https://github.com/goreleaser/nfpm/releases/download/v${version}/nfpm_Linux_x86_64.tar.gz | tar -xvz nfpm \
+  && mv nfpm /usr/local/bin/nfpm
+
 FROM rsteube/ion-poc as ion-poc
 #FROM rust as ion
 #ARG version=master
@@ -76,6 +81,7 @@ RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
+COPY --from=nfpm /usr/local/bin/* /usr/local/bin/
 #COPY --from=ion /ion/target/release/ion /usr/local/bin/
 COPY --from=ion-poc /usr/local/bin/ion /usr/local/bin/
 #COPY --from=nushell /usr/local/bin/* /usr/local/bin/

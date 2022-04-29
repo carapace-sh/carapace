@@ -1,4 +1,4 @@
-FROM cimg/go:1.18.1 as base
+FROM cimg/go:1.17 as base
 LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 

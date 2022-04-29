@@ -82,7 +82,6 @@ COPY --from=nushell /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/
-COPY --from=codecov /usr/local/bin/* /usr/local/bin/
 
 RUN ln -s /carapace/example/example /usr/local/bin/example
 

@@ -1,6 +1,8 @@
 package carapace
 
 import (
+	"bytes"
+	"os"
 	"strings"
 	"testing"
 
@@ -63,4 +65,48 @@ func TestActionExecCommandEnv(t *testing.T) {
 		t.Error("should contain env carapace_TestActionExecCommand=test")
 		return ActionValues()
 	}).Invoke(c)
+}
+
+func TestActionExecute(t *testing.T) {
+	root := &cobra.Command{Use: "pass"}
+	rootGitCmd := &cobra.Command{Use: "git"}
+	rootShowCmd := &cobra.Command{Use: "show"}
+
+	root.AddCommand(rootGitCmd)
+	root.AddCommand(rootShowCmd)
+
+	git := &cobra.Command{Use: "git"}
+	gitShowCmd := &cobra.Command{Use: "show"}
+	gitStashCmd := &cobra.Command{Use: "stash"}
+	gitStashShowCmd := &cobra.Command{Use: "show"}
+	git.AddCommand(gitShowCmd)
+	git.AddCommand(gitStashCmd)
+	gitStashCmd.AddCommand(gitStashShowCmd)
+
+	Gen(root)
+
+	Gen(rootShowCmd).PositionalCompletion(
+		ActionValues("rootShowCmd"),
+	)
+
+	Gen(rootGitCmd).PositionalAnyCompletion(
+		ActionExecute(git).Chdir("/tmp"),
+	)
+
+	Gen(gitShowCmd).PositionalCompletion(
+		ActionValues("gitShowCmd"),
+	)
+	
+    Gen(gitStashShowCmd).PositionalCompletion(
+		ActionValues("gitStashShowCmd"),
+	)
+
+	var stdout bytes.Buffer
+	root.SetOut(&stdout)
+	os.Args = []string{"pass", "_carapace", "export", "pass", "git", "show", ""}
+	root.Execute()
+
+	if !strings.Contains(stdout.String(), "gitShowCmd") {
+		t.Error("should be gitShowCmd")
+	}
 }

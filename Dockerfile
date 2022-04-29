@@ -119,16 +119,16 @@ RUN mkdir -p ~/.config/ion \
   > ~/.config/ion/initrc
 
 # nushell
-#RUN touch /carapace.nu \
-#  && mkdir -p ~/.config/nushell \
-#  && echo -e "\
-#ln -s \$env.TARGET /tmp/target \n\
-#/tmp/target _carapace | save /carapace.nu \n\
-#source /carapace.nu \n\
-#" > ~/.config/nushell/config.nu \
-#  && echo -e "\
-#let-env PROMPT_COMMAND = { echo 'carapace-nushell ' } \n\
-#" > ~/.config/nushell/env.nu
+RUN touch /carapace.nu \
+  && mkdir -p ~/.config/nushell \
+  && echo -e "\
+ln -s \$env.TARGET /tmp/target \n\
+/tmp/target _carapace | save /carapace.nu \n\
+source /carapace.nu \n\
+" > ~/.config/nushell/config.nu \
+  && echo -e "\
+let-env PROMPT_COMMAND = { echo 'carapace-nushell ' } \n\
+" > ~/.config/nushell/env.nu
 
 # oil
 RUN mkdir -p ~/.config/oil \

@@ -51,6 +51,18 @@ func Gen(cmd *cobra.Command) *Carapace {
 	}
 }
 
+// PreInvoke TODO experimental
+func (c Carapace) PreInvoke(f func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action) {
+	if entry := storage.get(c.cmd); entry.preinvoke != nil {
+		_f := entry.preinvoke
+		entry.preinvoke = func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
+			return f(cmd, flag, _f(cmd, flag, action)) // TODO verify if this is correct
+		}
+	} else {
+		entry.preinvoke = f
+	}
+}
+
 // PositionalCompletion defines completion for positional arguments using a list of Actions
 func (c Carapace) PositionalCompletion(action ...Action) {
 	storage.get(c.cmd).positional = action
@@ -220,8 +232,6 @@ func addCompletionCommand(cmd *cobra.Command) {
 }
 
 func complete(cmd *cobra.Command, args []string) (string, error) {
-	logger.Println(os.Args) // TODO replace last with '' if empty
-
 	if len(args) == 0 {
 		if s, err := Gen(cmd).Snippet(ps.DetermineShell()); err != nil {
 			fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
@@ -245,10 +255,19 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			}
 
 			targetCmd, targetArgs, err := findTarget(cmd, args)
+			if err != nil {
+				return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+			}
+
+			wd, err := os.Getwd()
+			if err != nil {
+				return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+			}
 			context := Context{
 				CallbackValue: current,
 				Args:          targetArgs,
 				Env:           os.Environ(),
+				Dir:           wd,
 			}
 			if err != nil {
 				if opts.LongShorthand {

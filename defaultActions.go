@@ -14,7 +14,7 @@ import (
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
-	exec "github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
+	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -33,13 +33,12 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 	return func(f func(output []byte) Action) Action {
 		return ActionCallback(func(c Context) Action {
 			var stdout, stderr bytes.Buffer
-			cmd := exec.Command(name, arg...)
-			cmd.Env = c.Env
+			cmd := c.Command(name, arg...)
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr
 			if err := cmd.Run(); err != nil {
 				if firstLine := strings.SplitN(stderr.String(), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
-					return ActionMessage(stripAnsi(firstLine))
+					return ActionMessage(stripansi.Strip(firstLine))
 				}
 				return ActionMessage(err.Error())
 			}
@@ -77,10 +76,19 @@ func ActionImport(output []byte) Action {
 // TODO example
 func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
-		args := []string{"_carapace", "export", ""}
+		args := []string{"_carapace", "export", cmd.Name()}
 		args = append(args, c.Args...)
 		args = append(args, c.CallbackValue)
 		cmd.SetArgs(args)
+
+		Gen(cmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
+			return ActionCallback(func(_c Context) Action {
+				// TODO verify
+				_c.Env = c.Env
+				_c.Dir = c.Dir
+				return action.Invoke(_c).ToA()
+			})
+		})
 
 		var stdout, stderr bytes.Buffer
 		cmd.SetOut(&stdout)
@@ -93,51 +101,51 @@ func ActionExecute(cmd *cobra.Command) Action {
 	})
 }
 
-// strip ANSI color escape codes from string (source: https://github.com/acarl005/stripansi)
-func stripAnsi(str string) string {
-	re := regexp.MustCompile("[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))")
-	return re.ReplaceAllString(str, "")
-}
-
 // ActionDirectories completes directories
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(style.ForPath)
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
+			if abs, err := c.Abs(s); err == nil {
+				return style.ForPath(abs)
+			}
+			return ""
+		})
 	})
 }
 
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(style.ForPath)
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
+			if abs, err := c.Abs(s); err == nil {
+				return style.ForPath(abs)
+			}
+			return ""
+		})
 	})
 }
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		folder := filepath.Dir(c.CallbackValue)
-		expandedFolder := folder
-		if strings.HasPrefix(c.CallbackValue, "~") {
-			homedir, err := os.UserHomeDir()
-			if err != nil {
-				return ActionMessage(err.Error())
-			}
-			expandedFolder = filepath.Dir(homedir + "/" + c.CallbackValue[1:])
-		}
-
-		files, err := ioutil.ReadDir(expandedFolder)
+		abs, err := c.Abs(c.CallbackValue)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
-		if folder == "." {
-			folder = ""
-		} else if !strings.HasSuffix(folder, "/") {
-			folder = folder + "/"
+
+		displayFolder := filepath.Dir(c.CallbackValue)
+		if displayFolder == "." {
+			displayFolder = ""
+		} else if !strings.HasSuffix(displayFolder, "/") {
+			displayFolder = displayFolder + "/"
 		}
 
-		showHidden := c.CallbackValue != "" &&
-			!strings.HasSuffix(c.CallbackValue, "/") &&
-			strings.HasPrefix(filepath.Base(c.CallbackValue), ".")
+		actualFolder := filepath.Dir(abs)
+		files, err := ioutil.ReadDir(actualFolder)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		showHidden := !strings.HasSuffix(abs, "/") && strings.HasPrefix(filepath.Base(abs), ".")
 
 		vals := make([]string, 0, len(files)*2)
 		for _, file := range files {
@@ -146,21 +154,21 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 
 			resolvedFile := file
-			if resolved, err := filepath.EvalSymlinks(folder + file.Name()); err == nil {
+			if resolved, err := filepath.EvalSymlinks(actualFolder + file.Name()); err == nil {
 				if stat, err := os.Stat(resolved); err == nil {
 					resolvedFile = stat
 				}
 			}
 
 			if resolvedFile.IsDir() {
-				vals = append(vals, folder+file.Name()+"/", style.ForPath(folder+file.Name()+"/"))
+				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/")))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, folder+file.Name(), style.ForPath(folder+file.Name()))
+						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name())))
 						break
 					}
 				}

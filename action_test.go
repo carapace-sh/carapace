@@ -55,14 +55,14 @@ func TestCache(t *testing.T) {
 	f := func() Action {
 		return ActionCallback(func(c Context) Action {
 			return ActionValues(time.Now().String())
-		}).Cache(10 * time.Millisecond)
+		}).Cache(15 * time.Millisecond)
 	}
 
 	a1 := f().Invoke(Context{})
 	a2 := f().Invoke(Context{})
 	assertEqual(t, a1, a2)
 
-	time.Sleep(12 * time.Millisecond)
+	time.Sleep(16 * time.Millisecond)
 	a3 := f().Invoke(Context{})
 	assertNotEqual(t, a1, a3)
 }
@@ -173,12 +173,12 @@ func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
 	assertEqual(t,
-		ActionValuesDescribed("ERR", "stat nonexistent: no such file or directory", "_", "").noSpace(true).skipCache(true).Invoke(Context{}),
+		ActionValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), "_", "").noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
 	)
 
 	assertEqual(t,
-		ActionValuesDescribed("ERR", "go.mod is not a directory", "_", "").noSpace(true).skipCache(true).Invoke(Context{}),
+		ActionValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), "_", "").noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
 	)
 

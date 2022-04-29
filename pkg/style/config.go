@@ -30,6 +30,14 @@ var Carapace = struct {
 	KeywordNegative  string `desc:"keyword describing a negative state"`
 	KeywordPositive  string `desc:"keyword describing a positive state"`
 	KeywordUnknown   string `desc:"keyword describing an unknown state"`
+
+	LogLevelTrace    string `desc:"LogLevel TRACE"`
+	LogLevelDebug    string `desc:"LogLevel DEBUG"`
+	LogLevelInfo     string `desc:"LogLevel INFO"`
+	LogLevelWarning  string `desc:"LogLevel WARNING"`
+	LogLevelError    string `desc:"LogLevel ERROR"`
+	LogLevelCritical string `desc:"LogLevel CRITICAL"`
+	LogLevelFatal    string `desc:"LogLevel FATAL"`
 }{
 	Value:       Default,
 	Description: Gray,
@@ -38,6 +46,14 @@ var Carapace = struct {
 	KeywordNegative:  Red,
 	KeywordPositive:  Green,
 	KeywordUnknown:   Gray,
+
+	LogLevelTrace:    Blue,
+	LogLevelDebug:    Gray,
+	LogLevelInfo:     Green,
+	LogLevelWarning:  Yellow,
+	LogLevelError:    Magenta,
+	LogLevelCritical: Red,
+	LogLevelFatal:    Cyan,
 }
 
 func init() {

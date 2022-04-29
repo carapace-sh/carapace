@@ -176,3 +176,4 @@ RUN echo -e "#"'!'"/bin/bash\n\
   > /entrypoint.sh \
   && chmod a+x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
+

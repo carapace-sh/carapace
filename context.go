@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
 
@@ -23,12 +24,34 @@ type Context struct {
 	Dir string
 }
 
+// LookupEnv retrieves the value of the environment variable named by the key.
+func (c *Context) LookupEnv(key string) (string, bool) {
+	prefix := key + "="
+	for i := len(c.Env) - 1; i >= 0; i-- {
+		if env := c.Env[i]; strings.HasPrefix(env, prefix) {
+			return strings.SplitN(env, "=", 2)[1], true
+		}
+	}
+	return "", false
+
+}
+
+// Getenv retrieves the value of the environment variable named by the key.
+func (c *Context) Getenv(key string) string {
+	v, _ := c.LookupEnv(key)
+	return v
+}
+
 // Setenv sets the value of the environment variable named by the key.
 func (c *Context) Setenv(key, value string) {
 	if c.Env == nil {
 		c.Env = []string{}
 	}
 	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
+}
+
+func (c *Context) Envsubst(s string) (string, error) {
+	return envsubst.Eval(s, c.Getenv)
 }
 
 // Command returns the Cmd struct to execute the named program with the given arguments.

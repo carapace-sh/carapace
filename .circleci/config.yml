@@ -7,7 +7,7 @@ commands:
           name: "build"
           command: |
             go get -t -v ./...
-            PATH=$PATH:$PWD/bin go test -coverprofile=coverage.out -v ./...
+            PATH=$PATH:$PWD/bin fish -c "go test -coverprofile=coverage.out -v ./..."
             go build
             go vet
             cd example

@@ -54,7 +54,7 @@ services:
   test:
     <<: *base
     working_dir: /carapace
-    command: go test -v ./...
+    command: fish -c "go test -v ./..."
 
 
 volumes:

@@ -119,14 +119,14 @@ var tests = map[string]string{
 	`example multiparts VALUE=one,DIRECTORY=`:                      "/",
 }
 
-//func TestBash(t *testing.T) {
-//	if err := exec.Command("bash", "--version").Run(); err != nil {
-//		t.Skip("skipping bash")
-//	}
-//	for cmdline, text := range tests {
-//		doComplete(t, "bash", cmdline, text)
-//	}
-//}
+func TestBash(t *testing.T) {
+	if err := exec.Command("bash", "--version").Run(); err != nil {
+		t.Skip("skipping bash")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "bash", cmdline, text)
+	}
+}
 
 func TestElvish(t *testing.T) {
 	if err := exec.Command("elvish", "--version").Run(); err != nil {
@@ -146,23 +146,23 @@ func TestFish(t *testing.T) {
 	}
 }
 
-//func TestXonsh(t *testing.T) {
-//	if err := exec.Command("xonsh", "--version").Run(); err != nil {
-//		t.Skip("skipping xonsh")
-//	}
-//	for cmdline, text := range tests {
-//		doComplete(t, "xonsh", cmdline, text)
-//	}
-//}
-//
-//func TestOil(t *testing.T) {
-//	if err := exec.Command("oil", "--version").Run(); err != nil {
-//		t.Skip("skipping oil")
-//	}
-//	for cmdline, text := range tests {
-//		doComplete(t, "oil", cmdline, text)
-//	}
-//}
+func TestXonsh(t *testing.T) {
+	if err := exec.Command("xonsh", "--version").Run(); err != nil {
+		t.Skip("skipping xonsh")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "xonsh", cmdline, text)
+	}
+}
+
+func TestOil(t *testing.T) {
+	if err := exec.Command("oil", "--version").Run(); err != nil {
+		t.Skip("skipping oil")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "oil", cmdline, text)
+	}
+}
 
 //func TestPowershell(t *testing.T) {
 //	if err := exec.Command("pwsh", "--version").Run(); err != nil {
@@ -173,14 +173,14 @@ func TestFish(t *testing.T) {
 //	}
 //}
 
-//func TestZsh(t *testing.T) {
-//	if err := exec.Command("zsh", "--version").Run(); err != nil {
-//		t.Skip("skipping zsh")
-//	}
-//	for cmdline, text := range tests {
-//		doComplete(t, "zsh", cmdline, text)
-//	}
-//}
+func TestZsh(t *testing.T) {
+	if err := exec.Command("zsh", "--version").Run(); err != nil {
+		t.Skip("skipping zsh")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "zsh", cmdline, text)
+	}
+}
 
 func TestCarapace(t *testing.T) {
 	carapace.Test(t)

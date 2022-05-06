@@ -12,7 +12,7 @@ import (
 
 func doComplete(t *testing.T, shell string, cmdline string, contained ...string) {
 	t.Run(cmdline, func(t *testing.T) {
-		t.Parallel()
+		//t.Parallel()
 		var cmd *exec.Cmd
 
 		switch shell {
@@ -119,15 +119,14 @@ var tests = map[string]string{
 	`example multiparts VALUE=one,DIRECTORY=`:                      "/",
 }
 
-// TODO broken in 1.18 container
-//func TestBash(t *testing.T) {
-//	if err := exec.Command("bash", "--version").Run(); err != nil {
-//		t.Skip("skipping bash")
-//	}
-//	for cmdline, text := range tests {
-//		doComplete(t, "bash", cmdline, text)
-//	}
-//}
+func TestBash(t *testing.T) {
+	if err := exec.Command("bash", "--version").Run(); err != nil {
+		t.Skip("skipping bash")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "bash", cmdline, text)
+	}
+}
 
 func TestElvish(t *testing.T) {
 	if err := exec.Command("elvish", "--version").Run(); err != nil {

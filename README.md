@@ -100,6 +100,7 @@ example <TAB>
 ## Projects
 
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
+- [carapace-spec](https://github.com/rsteube/carapace-spec) define simple carapace completions using a spec file
 - [go-jira-cli](https://github.com/rsteube/go-jira-cli) simple jira command line client
 - [knoxite](https://github.com/knoxite/knoxite) A data storage & backup system
 - [lab](https://github.com/zaquestion/lab) cli client for GitLab

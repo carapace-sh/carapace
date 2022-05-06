@@ -7,11 +7,12 @@ commands:
           name: "build"
           command: |
             go get -t -v ./...
-            PATH=$PATH:$PWD/bin fish -c "go test -coverprofile=coverage.out -v ./..."
             go build
             go vet
             cd example
             go build .
+            cd ..
+            PATH=$PATH:$PWD/example go test -coverprofile=coverage.out -v ./...
       - run:
           name: "shellcheck bash"
           command: shellcheck -e SC2046,SC2206,SC2207 <(./example/example _carapace bash)
@@ -21,7 +22,7 @@ commands:
       - run:
           name: "PSScriptAnayzer powershell"
           command: |
-            example _carapace powershell > /tmp/powershell.ps1
+            ./example/example _carapace powershell > /tmp/powershell.ps1
             pwsh -Command "Invoke-ScriptAnalyzer -Path /tmp/powershell.ps1" -EnableExit
       - run:
           name: "shellcheck zsh"

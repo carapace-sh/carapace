@@ -62,3 +62,50 @@ func TestContextAbs(t *testing.T) {
 	}
 
 }
+
+func TestEnv(t *testing.T) {
+	c := Context{}
+	if c.Getenv("example") != "" {
+		t.Fail()
+	}
+	if v, exist := c.LookupEnv("example"); v != "" || exist {
+		t.Fail()
+	}
+
+	c.Setenv("example", "value")
+	if c.Getenv("example") != "value" {
+		t.Fail()
+	}
+	if v, exist := c.LookupEnv("example"); v != "value" || !exist {
+		t.Fail()
+	}
+
+	c.Setenv("example", "newvalue")
+	if c.Getenv("example") != "newvalue" {
+		t.Fail()
+	}
+	if v, exist := c.LookupEnv("example"); v != "newvalue" || !exist {
+		t.Fail()
+	}
+}
+
+func TestEnvsubst(t *testing.T) {
+	c := Context{}
+
+	if s, err := c.Envsubst("start${example}end"); s != "startend" || err != nil {
+		t.Fail()
+	}
+
+	if s, err := c.Envsubst("start${example:-default}end"); s != "startdefaultend" || err != nil {
+		t.Fail()
+	}
+
+	c.Setenv("example", "value")
+	if s, err := c.Envsubst("start${example}end"); s != "startvalueend" || err != nil {
+		t.Fail()
+	}
+
+	if s, err := c.Envsubst("start${example:-default}end"); s != "startvalueend" || err != nil {
+		t.Fail()
+	}
+}

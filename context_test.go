@@ -3,6 +3,7 @@ package carapace
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -24,9 +25,9 @@ func home(s string) string {
 
 func parent(s string) string {
 	if s != "" {
-		return filepath.Dir(wd("")) + "/" + s
+		return strings.TrimSuffix(filepath.Dir(wd("")), "/") + "/" + s
 	}
-	return filepath.Dir(wd("")) + "/"
+	return strings.TrimSuffix(filepath.Dir(wd("")), "/") + "/"
 }
 
 func TestContextAbs(t *testing.T) {

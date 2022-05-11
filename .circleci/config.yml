@@ -13,7 +13,7 @@ commands:
             go build .
             cd ..
             PATH=$PATH:$PWD/example go test -coverprofile=coverage.out -v ./...
-            sed '/^github.com\/rsteube\/carapace\/third_party/d' coverage.out 
+            sed -i '/^github.com\/rsteube\/carapace\/third_party/d' coverage.out 
       - run:
           name: "shellcheck bash"
           command: shellcheck -e SC2046,SC2206,SC2207 <(./example/example _carapace bash)

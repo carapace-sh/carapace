@@ -47,6 +47,16 @@ RUN wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${versio
   && mv shellcheck-stable/shellcheck /usr/local/bin/ \
   && chmod +x /usr/local/bin/shellcheck
 
+FROM base as starship
+ARG version=1.6.3
+RUN wget -qO- "https://github.com/starship/starship/releases/download/v${version}/starship-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz starship \
+ && mv starship /usr/local/bin/
+
+FROM base as vivid
+ARG version=0.8.0
+RUN wget -qO- "https://github.com/sharkdp/vivid/releases/download/v${version}/vivid-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz vivid-v${version}-x86_64-unknown-linux-gnu/vivid \
+ && mv vivid-v${version}-x86_64-unknown-linux-gnu/vivid /usr/local/bin/
+
 FROM base as mdbook
 ARG version=0.4.18
 RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
@@ -82,23 +92,33 @@ COPY --from=nushell /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=shellcheck /usr/local/bin/* /usr/local/bin/
+COPY --from=starship /usr/local/bin/* /usr/local/bin/
+COPY --from=vivid /usr/local/bin/* /usr/local/bin/
 
 RUN ln -s /carapace/example/example /usr/local/bin/example
 
+RUN echo -e "\n\
+[shell]\n\
+disabled = false\n\
+unknown_indicator = \"oil\"" \
+  > ~/.config/starship.toml
+
 # bash
 RUN echo -e "\n\
-  PS1=$'\e[0;36mcarapace-bash \e[0m'\n\
-  source <(\${TARGET} _carapace)" \
+export SHELL=bash\n\
+export STARSHIP_SHELL=bash\n\
+export LS_COLORS=\"\$(vivid generate dracula)\"\n\
+eval \"\$(starship init bash)\"\n\
+source <(\${TARGET} _carapace)" \
   > ~/.bashrc
 
 # fish
 RUN mkdir -p ~/.config/fish \
   && echo -e "\n\
-  function fish_prompt \n\
-  set_color cyan \n\
-  echo -n 'carapace-fish ' \n\
-  set_color normal\n\
-  end\n\
+  set SHELL 'fish'\n\
+  set STARSHIP_SHELL 'fish'\n\
+  set LS_COLORS (vivid generate dracula)\n\
+  starship init fish | source \n\
   mkdir -p ~/.config/fish/completions\n\
   \$TARGET _carapace fish | source" \
   > ~/.config/fish/config.fish
@@ -106,7 +126,10 @@ RUN mkdir -p ~/.config/fish \
 # elvish
 RUN mkdir -p ~/.elvish/lib \
   && echo -e "\
-  set edit:prompt = { printf  'carapace-elvish ' } \n\
+  set-env SHELL elvish\n\
+  set-env STARSHIP_SHELL elvish\n\
+  set-env LS_COLORS (vivid generate dracula)\n\
+  set edit:prompt = { starship prompt }\n\
   eval (\$E:TARGET _carapace|slurp)" \
   > ~/.elvish/rc.elv
 
@@ -121,33 +144,40 @@ RUN mkdir -p ~/.config/ion \
 # nushell
 RUN touch /carapace.nu \
   && mkdir -p ~/.config/nushell \
+  && starship init nushell > ~/.config/nushell/starship.nu \
   && echo -e "\
 ln -s \$env.TARGET /tmp/target \n\
 /tmp/target _carapace | save /carapace.nu \n\
 source /carapace.nu \n\
 " > ~/.config/nushell/config.nu \
   && echo -e "\
-let-env PROMPT_COMMAND = { echo 'carapace-nushell ' } \n\
+source ~/.config/nushell/starship.nu \n\
 " > ~/.config/nushell/env.nu
 
 # oil
 RUN mkdir -p ~/.config/oil \
   && echo -e "\n\
-  PS1='carapace-oil '\n\
+  export SHELL='oil'\n\
+  export STARSHIP_SHELL='oil'\n\
+  export LS_COLORS=\"\$(vivid generate dracula)\"\n\
+  PS1=\"\$(starship prompt)\"\n\
   source <(\${TARGET} _carapace)" \
   > ~/.config/oil/oshrc
 
 # powershell
 RUN mkdir -p ~/.config/powershell \
   && echo -e "\n\
-  function prompt {Write-Host \"carapace-powershell\" -NoNewLine -ForegroundColor 3; return \" \"}\n\
+  \$env:SHELL = 'powershell'\n\
+  \$env:STARSHIP_SHELL = 'powershell'\n\
+  \$env:LS_COLORS = (&vivid generate dracula)\n\
+  Invoke-Expression (&starship init powershell)\n\
   Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
   & \$Env:TARGET _carapace | out-string | Invoke-Expression" \
   > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 
-# oil
+# tcsh
 RUN  echo -e "\n\
-  set prompt = 'carapace-tcsh '\n\
+  eval `starship init tcsh`\n\
   set autolist\n\
   eval "'`'"\${TARGET} _carapace"'`'"" \
   > ~/.tcshrc
@@ -155,14 +185,20 @@ RUN  echo -e "\n\
 # xonsh
 RUN mkdir -p ~/.config/xonsh \
   && echo -e "\n\
-  \$PROMPT='carapace-xonsh '\n\
-  \$COMPLETIONS_CONFIRM=True\n\
-  exec(\$(\$TARGET _carapace xonsh))"\
+\$SHELL=\"xonsh\"\n\
+\$STARSHIP_SHELL=\"xonsh\"\n\
+\$LS_COLROS=\$(vivid generate dracula)\n\
+\$PROMPT=lambda: \$(starship prompt)\n\
+\$COMPLETIONS_CONFIRM=True\n\
+exec(\$(\$TARGET _carapace xonsh))"\
   > ~/.config/xonsh/rc.xsh
 
 # zsh
 RUN echo -e "\n\
-  PS1=$'%{\e[0;36m%}carapace-zsh %{\e[0m%}'\n\
+  export SHELL=zsh\n\
+  export STARSHIP_SHELL=zsh\n\
+  export LS_COLORS=\"\$(vivid generate dracula)\"\n\
+  eval \"\$(starship init zsh)\"\n\
   \n\
   zstyle ':completion:*' menu select \n\
   zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\
@@ -170,8 +206,9 @@ RUN echo -e "\n\
   autoload -U compinit && compinit \n\
   source <(\$TARGET _carapace zsh)"  > ~/.zshrc
 
+ENV TERM xterm
 RUN echo -e "#"'!'"/bin/bash\n\
-  export PATH=\${PATH}:\$(dirname \${TARGET})\n\
+  export PATH=\${PATH}:\$(dirname \"\${TARGET}\")\n\
   exec \"\$@\"" \
   > /entrypoint.sh \
   && chmod a+x /entrypoint.sh

@@ -91,7 +91,16 @@ func (a InvokedAction) ToA() Action {
 // ToMultiPartsA create an ActionMultiParts from values with given divider
 //   a := carapace.ActionValues("A/B/C", "A/C", "B/C", "C").Invoke(c)
 //   b := a.ToMultiPartsA("/") // completes segments separately (first one is ["A/", "B/", "C"])
-func (a InvokedAction) ToMultiPartsA(divider string) Action {
+func (a InvokedAction) ToMultiPartsA(divider ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		for _, d := range divider {
+			a = a.toMultiPartsA(d).Invoke(c)
+		}
+		return a.ToA()
+	})
+}
+
+func (a InvokedAction) toMultiPartsA(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {
 		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {

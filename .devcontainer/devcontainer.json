@@ -1,0 +1,14 @@
+{
+  "name": "carapace",
+  "image": "ghcr.io/rsteube/carapace:v0.20.3",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/elvish"
+  },
+  "extensions": [
+    "golang.Go"
+  ],
+  "containerEnv": {
+    "TARGET": "/home/circleci/go/bin/example"
+  },
+  "onCreateCommand": [ "sh", "-c", "cd example && go install ."]
+}

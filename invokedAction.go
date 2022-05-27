@@ -1,6 +1,8 @@
 package carapace
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -88,37 +90,53 @@ func (a InvokedAction) ToA() Action {
 	return a.Action
 }
 
-// ToMultiPartsA create an ActionMultiParts from values with given divider
+// ToMultiPartsA create an ActionMultiParts from values with given dividers
 //   a := carapace.ActionValues("A/B/C", "A/C", "B/C", "C").Invoke(c)
 //   b := a.ToMultiPartsA("/") // completes segments separately (first one is ["A/", "B/", "C"])
-func (a InvokedAction) ToMultiPartsA(divider ...string) Action {
+func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		for _, d := range divider {
-			a = a.toMultiPartsA(d).Invoke(c)
-		}
-		return a.ToA()
-	})
-}
+		_split := func() func(s string) []string {
+			quotedDividiers := make([]string, 0)
+			for _, d := range dividers {
+				quotedDividiers = append(quotedDividiers, regexp.QuoteMeta(d))
+			}
+			f := fmt.Sprintf("([^(%v)]*(%v)?)", strings.Join(quotedDividiers, "|"), strings.Join(quotedDividiers, "|"))
+			r := regexp.MustCompile(f)
+			return func(s string) []string {
+				if matches := r.FindAllString(s, -1); matches != nil {
+					return matches
+				}
+				return []string{}
+			}
+		}()
 
-func (a InvokedAction) toMultiPartsA(divider string) Action {
-	return ActionMultiParts(divider, func(c Context) Action {
+		splittedCV := _split(c.CallbackValue)
+		for _, d := range dividers {
+			if strings.HasSuffix(c.CallbackValue, d) {
+				splittedCV = append(splittedCV, "")
+				break
+			}
+
+		}
+
 		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, strings.Join(c.Parts, divider)) {
-				if splitted := strings.Split(val.Value, divider); len(splitted) > len(c.Parts) {
-					if len(splitted) == len(c.Parts)+1 {
-						v := splitted[len(c.Parts)]
+			if strings.HasPrefix(val.Value, c.CallbackValue) {
+				if splitted := _split(val.Value); len(splitted) >= len(splittedCV) {
+					v := strings.Join(splitted[:len(splittedCV)], "")
+					d := splitted[len(splittedCV)-1]
+
+					if len(splitted) == len(splittedCV) {
 						uniqueVals[v] = common.RawValue{
 							Value:       v,
-							Display:     v,
+							Display:     d,
 							Description: val.Description,
 							Style:       val.Style,
 						}
 					} else {
-						v := splitted[len(c.Parts)] + divider
 						uniqueVals[v] = common.RawValue{
 							Value:       v,
-							Display:     v,
+							Display:     d,
 							Description: "",
 							Style:       "",
 						}

@@ -138,7 +138,6 @@ func TestActionDirectories(t *testing.T) {
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).noSpace(true).Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),

@@ -15,6 +15,13 @@ services:
     <<: *base
     command: bash
 
+  ble:
+    <<: *base
+    command: bash
+    environment:
+      BLE: 1
+      TARGET: /carapace/example/example
+
   elvish:
     <<: *base
     command: elvish

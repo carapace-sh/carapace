@@ -8,6 +8,11 @@ RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${
   | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v${version}-x86_64-unknown-linux-gnu/bat \
   && chmod +x /usr/local/bin/bat
 
+FROM base as ble
+RUN git clone --recursive https://github.com/akinomyoga/ble.sh.git \
+ && apt-get update && apt-get install gawk \
+ && make -C ble.sh
+
 FROM base as elvish
 ARG version=0.18.0
 RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
@@ -84,6 +89,7 @@ RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh prompt_toolkit
 RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
+COPY --from=ble /home/circleci/project/ble.sh /opt/ble.sh
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
 #COPY --from=ion /ion/target/release/ion /usr/local/bin/
@@ -108,6 +114,7 @@ RUN echo -e "\n\
 export SHELL=bash\n\
 export STARSHIP_SHELL=bash\n\
 export LS_COLORS=\"\$(vivid generate dracula)\"\n\
+[[ ! -z \$BLE ]] && source /opt/ble.sh/out/ble.sh \n\
 eval \"\$(starship init bash)\"\n\
 source <(\${TARGET} _carapace)" \
   > ~/.bashrc

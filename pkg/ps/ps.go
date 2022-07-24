@@ -19,7 +19,8 @@ func DetermineShell() string {
 			return ""
 		}
 
-		switch strings.SplitN(strings.TrimSuffix(process.Executable(), ".exe"), "-", 2)[0] {
+		executable := process.Executable()
+		switch strings.SplitN(strings.TrimSuffix(executable, ".exe"), "-", 2)[0] {
 		case "bash":
 			if isBLE() {
 				return "bash-ble"
@@ -47,6 +48,10 @@ func DetermineShell() string {
 			return "xonsh"
 		case "zsh":
 			return "zsh"
+		default:
+			if strings.Contains(executable, "xonsh-wrapped") { // nix packaged version
+				return "xonsh"
+			}
 		}
 	}
 }

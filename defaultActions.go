@@ -240,7 +240,7 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 // ActionMessage displays a help messages in places where no completions can be generated
 func ActionMessage(msg string) Action {
 	return ActionCallback(func(c Context) Action {
-		return ActionValuesDescribed("_", "", "ERR", msg).
+		return ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).
 			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
 			noSpace(true).skipCache(true)
 	})

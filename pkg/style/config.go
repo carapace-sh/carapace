@@ -25,6 +25,7 @@ func Set(key, value string) error { return config.SetStyle(key, value) }
 var Carapace = struct {
 	Value       string `desc:"default style for values"`
 	Description string `desc:"default style for descriptions"`
+	Error       string `desc:"default style for errors"`
 
 	KeywordAmbiguous string `desc:"keyword describing a ambiguous state"`
 	KeywordNegative  string `desc:"keyword describing a negative state"`
@@ -41,6 +42,7 @@ var Carapace = struct {
 }{
 	Value:       Default,
 	Description: Gray,
+	Error:       Of(Bold, Red),
 
 	KeywordAmbiguous: Yellow,
 	KeywordNegative:  Red,

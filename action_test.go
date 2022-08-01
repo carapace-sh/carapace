@@ -172,12 +172,12 @@ func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
 	assertEqual(t,
-		ActionValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), "_", "").noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
+		ActionStyledValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), style.Carapace.Error, "_", "", style.Default).noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
 	)
 
 	assertEqual(t,
-		ActionValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), "_", "").noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
+		ActionStyledValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), style.Carapace.Error, "_", "", style.Default).noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
 	)
 
@@ -196,7 +196,7 @@ func TestActionFilesChdir(t *testing.T) {
 
 func TestActionMessage(t *testing.T) {
 	assertEqual(t,
-		ActionValuesDescribed("_", "", "ERR", "example message").noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),
 		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
 	)
 }

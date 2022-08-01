@@ -104,7 +104,9 @@ func (a Action) StyleF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			invoked.rawValues[index].Style = f(v.Value)
+			if v.Value != "ERR" && v.Value != "_" {
+				invoked.rawValues[index].Style = f(v.Value)
+			}
 		}
 		return invoked.ToA()
 	})

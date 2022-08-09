@@ -368,16 +368,12 @@ func initLogger() (err error) {
 	return
 }
 
-type testingT interface {
-	Error(args ...interface{})
-}
-
 // Test verifies the configuration (e.g. flag name exists)
 //   func TestCarapace(t *testing.T) {
 //       carapace.Test(t)
 //   }
-func Test(t testingT) {
+func Test(t interface{ Error(args ...interface{}) }) {
 	for _, e := range storage.check() {
-		testingT(t).Error(e)
+		t.Error(e)
 	}
 }

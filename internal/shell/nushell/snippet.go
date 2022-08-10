@@ -21,7 +21,7 @@ func Snippet(cmd *cobra.Command) string {
   }
   
   export extern "%v" [
-    ...args: string@"nu-complete %v"
+    ..-args: string@"nu-complete %v"
   ]
 }
 use carapace_%v *

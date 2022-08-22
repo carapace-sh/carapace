@@ -10,20 +10,14 @@ import (
 
 // Snippet creates the nushell completion script
 func Snippet(cmd *cobra.Command) string {
-	return fmt.Sprintf(`module carapace_%v {
-  def "nu-complete %v" [line: string, pos: int] {
-    let words = ($line | str substring [0 $pos] | split row " ")
-    if ($line | str substring [0 $pos] | str ends-with " ") {
-      %v _carapace nushell ($words | append "") | from json
-    } else {
-      %v _carapace nushell $words | from json
-    }
-  }
-  
-  export extern "%v" [
-    ...args: string@"nu-complete %v"
-  ]
+	return fmt.Sprintf(`let external_completer = {|spans| 
+    {
+      $spans.0: { } # default
+      %v: { %v _carapace nushell $spans | from json }
+    } | get $spans.0 | each {|it| do $it}
 }
-use carapace_%v *
-`, cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+
+let-env config = {
+  external_completer: $external_completer
+}`, cmd.Name(), uid.Executable())
 }

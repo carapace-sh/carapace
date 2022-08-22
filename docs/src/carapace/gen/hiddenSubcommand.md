@@ -22,8 +22,7 @@ eval (command _carapace | slurp)
 command _carapace | source
 
 # nushell
-command _carapace nushell | save out.nu
-source out.nu
+command _carapace nushell
 
 # oil
 source <(command _carapace)

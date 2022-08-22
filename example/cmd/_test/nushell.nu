@@ -1,16 +1,10 @@
-module carapace_example {
-  def "nu-complete example" [line: string, pos: int] {
-    let words = ($line | str substring [0 $pos] | split row " ")
-    if ($line | str substring [0 $pos] | str ends-with " ") {
-      example _carapace nushell ($words | append "") | from json
-    } else {
-      example _carapace nushell $words | from json
-    }
-  }
-  
-  export extern "example" [
-    ...args: string@"nu-complete example"
-  ]
+let external_completer = {|spans| 
+    {
+      $spans.0: { } # default
+      example: { example _carapace nushell $spans | from json }
+    } | get $spans.0 | each {|it| do $it}
 }
-use carapace_example *
 
+let-env config = {
+  external_completer: $external_completer
+}

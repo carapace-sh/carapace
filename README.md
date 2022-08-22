@@ -59,8 +59,7 @@ set PATH $PATH (pwd)
 example _carapace fish | source
 
 # nushell
-example _carapace nushell | save example.nu
-source example.nu
+example _carapace nushell
 
 # oil
 PATH=$PATH:$(pwd)

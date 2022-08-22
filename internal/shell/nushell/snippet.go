@@ -11,10 +11,10 @@ import (
 // Snippet creates the nushell completion script
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`let external_completer = {|spans| 
-    {
-      $spans.0: { } # default
-      %v: { %v _carapace nushell $spans | from json }
-    } | get $spans.0 | each {|it| do $it}
+  {
+    $spans.0: { } # default
+    %v: { %v _carapace nushell $spans | from json }
+  } | get $spans.0 | each {|it| do $it}
 }
 
 let-env config = {

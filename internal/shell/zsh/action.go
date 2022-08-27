@@ -15,6 +15,38 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
+// TODO verify these are correct/complete (copied from bash)
+var quoter = strings.NewReplacer(
+	`&`, `\&`,
+	`<`, `\<`,
+	`>`, `\>`,
+	"`", "\\`",
+	`'`, `\'`,
+	`"`, `\"`,
+	`{`, `\{`,
+	`}`, `\}`,
+	`$`, `\$`,
+	`#`, `\#`,
+	`|`, `\|`,
+	`?`, `\?`,
+	`(`, `\(`,
+	`)`, `\)`,
+	`;`, `\;`,
+	` `, `\ `,
+	`[`, `\[`,
+	`]`, `\]`,
+	`*`, `\*`,
+	`\`, `\\`,
+	`~`, `\~`,
+)
+
+func quoteValue(s string) string {
+	if strings.HasPrefix(s, "~") {
+		return "~" + quoter.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
+	}
+	return quoter.Replace(s)
+}
+
 // ActionRawValues formats values for zsh
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
@@ -45,6 +77,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
 		val.Value = sanitizer.Replace(val.Value)
+		val.Value = quoteValue(val.Value)
 		if nospace {
 			val.Value = val.Value + "\001"
 		}

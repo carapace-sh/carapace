@@ -30,7 +30,7 @@ function _example_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%$'\001'*})
 
-  compadd -S "${suffix}" -d displays -a -- vals
+  compadd -Q -S "${suffix}" -d displays -a -- vals
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

@@ -66,6 +66,20 @@ func (c Context) Command(name string, arg ...string) *execabs.Cmd {
 
 func expandHome(s string) (string, error) {
 	if strings.HasPrefix(s, "~") {
+		// TODO use env from context
+		if hash, ok := os.LookupEnv("CARAPACE_ZSH_HASH"); ok { // support zsh static named directories
+			for _, line := range strings.Split(hash, "\n") {
+				if splitted := strings.SplitN(line, "=", 2); len(splitted) == 2 {
+					if staticNamedDirectory := fmt.Sprintf("~%v/", splitted[0]); strings.HasPrefix(s, staticNamedDirectory) {
+						if !strings.HasSuffix(splitted[1], "/") {
+							splitted[1] = splitted[1] + "/"
+						}
+						return strings.Replace(s, staticNamedDirectory, splitted[1], 1), nil
+					}
+				}
+			}
+		}
+
 		home, err := os.UserHomeDir() // TODO duplicated code
 		if err != nil {
 			return "", err
@@ -77,7 +91,7 @@ func expandHome(s string) (string, error) {
 
 func (c Context) Abs(s string) (string, error) {
 	var path string
-	if strings.HasPrefix(s, "/") || strings.HasPrefix(s, "~/") {
+	if strings.HasPrefix(s, "/") || strings.HasPrefix(s, "~") {
 		path = s // path is absolute
 	} else {
 		expanded, err := expandHome(c.Dir)

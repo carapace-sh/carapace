@@ -17,6 +17,7 @@ func TestToMultiParts(t *testing.T) {
 			"B/c:5:1", "fiftyone", style.Black,
 			"B/c:5:2/z", "fiftytwo", style.Yellow,
 			"B/c/", "withsuffix", style.Underlined,
+			"C/d/1()2", "withbrackets", style.Yellow,
 		)
 		a = a.Invoke(Context{}).ToMultiPartsA(delimiter...)
 		if actual := a.Invoke(Context{CallbackValue: cv}).value("export", cv); !strings.Contains(actual, expected) {
@@ -36,4 +37,6 @@ func TestToMultiParts(t *testing.T) {
 	_test("B/c:5", `{"Value":"B/c:5:2/","Display":"c:5:2/","Description":"","Style":""}`, "/")
 	_test("B/c:5", `{"Value":"B/c:5:","Display":"5:","Description":"","Style":""}`, "/", ":")
 	_test("B/c:5", `{"Value":"B/c:5:","Display":"5:","Description":"","Style":""}`, ":", "/")
+
+	_test("C/d/1", `{"Value":"C/d/1()2","Display":"1()2","Description":"withbrackets","Style":"yellow"}`, "/")
 }

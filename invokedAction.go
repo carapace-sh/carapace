@@ -105,7 +105,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 			for _, d := range dividers {
 				quotedDividiers = append(quotedDividiers, regexp.QuoteMeta(d))
 			}
-			f := fmt.Sprintf("([^(%v)]*(%v)?)", strings.Join(quotedDividiers, "|"), strings.Join(quotedDividiers, "|"))
+			f := fmt.Sprintf("([^%v]*(%v)?)", strings.Join(quotedDividiers, "|"), strings.Join(quotedDividiers, "|")) // TODO quickfix - this is wrong (fails for dividers longer than one character) an might need a reverse lookahead for character sequence
 			r := regexp.MustCompile(f)
 			return func(s string) []string {
 				if matches := r.FindAllString(s, -1); matches != nil {

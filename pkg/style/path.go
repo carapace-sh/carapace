@@ -6,11 +6,13 @@ import (
 )
 
 // ForPath returns the style for given path
-//   /tmp/locally/reachable/file.txt
+//
+//	/tmp/locally/reachable/file.txt
 func ForPath(path string) string { return fromSGR(lscolors.GetColorist().GetStyle(path)) }
 
 // ForPath returns the style for given path by extension only
-//   /tmp/non/existing/file.txt
+//
+//	/tmp/non/existing/file.txt
 func ForPathExt(path string) string { return fromSGR(lscolors.GetColorist().GetStyleExt(path)) }
 
 func fromSGR(sgr string) string {

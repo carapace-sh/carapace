@@ -25,10 +25,11 @@ func ActionCallback(callback CompletionCallback) Action {
 }
 
 // ActionExecCommand invokes given command and transforms its output using given function on success or returns ActionMessage with the first line of stderr if available.
-//   carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
-//     lines := strings.Split(string(output), "\n")
-//     return carapace.ActionValues(lines[:len(lines)-1]...)
-//   })
+//
+//	carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
+//	  lines := strings.Split(string(output), "\n")
+//	  return carapace.ActionValues(lines[:len(lines)-1]...)
+//	})
 func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Action) Action {
 	return func(f func(output []byte) Action) Action {
 		return ActionCallback(func(c Context) Action {
@@ -48,16 +49,17 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 }
 
 // ActionImport parses the json output from export as Action
-//   carapace.Gen(rootCmd).PositionalAnyCompletion(
-//   	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-//   		args := []string{"_carapace", "export", ""}
-//   		args = append(args, c.Args...)
-//   		args = append(args, c.CallbackValue)
-//   		return carapace.ActionExecCommand("command", args...)(func(output []byte) carapace.Action {
-//   			return carapace.ActionImport(output)
-//   		})
-//   	}),
-//   )
+//
+//	carapace.Gen(rootCmd).PositionalAnyCompletion(
+//		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+//			args := []string{"_carapace", "export", ""}
+//			args = append(args, c.Args...)
+//			args = append(args, c.CallbackValue)
+//			return carapace.ActionExecCommand("command", args...)(func(output []byte) carapace.Action {
+//				return carapace.ActionImport(output)
+//			})
+//		}),
+//	)
 func ActionImport(output []byte) Action {
 	return ActionCallback(func(c Context) Action {
 		var e export.Export
@@ -330,8 +332,9 @@ func actionFlags(cmd *cobra.Command) Action {
 }
 
 // ActionStyleConfig completes style configuration
-//   carapace.Value=blue
-//   carapace.Description=magenta
+//
+//	carapace.Value=blue
+//	carapace.Description=magenta
 func ActionStyleConfig() Action {
 	return ActionMultiParts("=", func(c Context) Action {
 		switch len(c.Parts) {
@@ -363,8 +366,9 @@ func ActionStyleConfig() Action {
 }
 
 // Actionstyles completes styles
-//   blue
-//   bg-magenta
+//
+//	blue
+//	bg-magenta
 func ActionStyles(styles ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		fg := false

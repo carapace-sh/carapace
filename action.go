@@ -77,8 +77,9 @@ func (a Action) NoSpace() Action {
 }
 
 // Style sets the style
-//   ActionValues("yes").Style(style.Green)
-//   ActionValues("no").Style(style.Red)
+//
+//	ActionValues("yes").Style(style.Green)
+//	ActionValues("no").Style(style.Red)
 func (a Action) Style(style string) Action {
 	return a.StyleF(func(s string) string {
 		return style
@@ -86,8 +87,9 @@ func (a Action) Style(style string) Action {
 }
 
 // Style sets the style using a reference
-//   ActionValues("value").StyleR(&style.Carapace.Value)
-//   ActionValues("description").StyleR(&style.Carapace.Value)
+//
+//	ActionValues("value").StyleR(&style.Carapace.Value)
+//	ActionValues("description").StyleR(&style.Carapace.Value)
 func (a Action) StyleR(style *string) Action {
 	return ActionCallback(func(c Context) Action {
 		if style != nil {
@@ -98,8 +100,9 @@ func (a Action) StyleR(style *string) Action {
 }
 
 // Style sets the style using a function
-//   ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
-//   ActionValues("true", "false").StyleF(style.ForKeyword)
+//
+//	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
+//	ActionValues("true", "false").StyleF(style.ForKeyword)
 func (a Action) StyleF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)

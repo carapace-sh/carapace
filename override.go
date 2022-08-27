@@ -30,13 +30,13 @@ func init() {
 // Mostly done by patching `os.Args` before command execution and thus must be called before it.
 // These are considered hacks and might undergo changes in future (or replaced by a custom pflag fork).
 //
-//   func Execute() error {
-//       carapace.Override(carapace.Opts{
-//           LongShorthand: true,
-//           OptArgDelimiter: ":",
-//       })
-//   	return rootCmd.Execute()
-//   }
+//	func Execute() error {
+//	    carapace.Override(carapace.Opts{
+//	        LongShorthand: true,
+//	        OptArgDelimiter: ":",
+//	    })
+//		return rootCmd.Execute()
+//	}
 func Override(o Opts) {
 	if o.LongShorthand {
 		opts.LongShorthand = o.LongShorthand

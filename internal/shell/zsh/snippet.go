@@ -17,13 +17,13 @@ function _%v_completion {
   # shellcheck disable=SC2207,SC2086,SC2154
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
     # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words}"''" | CARAPACE_ZSH_HASH="$(hash -d)" xargs %v _carapace zsh ))
+    local lines=($(echo ${words}"''" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh ))
   elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
     # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words} | sed "s/\$/'/" | CARAPACE_ZSH_HASH="$(hash -d)" xargs %v _carapace zsh))
+    local lines=($(echo ${words} | sed "s/\$/'/" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh))
   else
     # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words} | sed 's/$/"/'  | CARAPACE_ZSH_HASH="$(hash -d)" xargs %v _carapace zsh))
+    local lines=($(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh))
   fi
 
   export ZLS_COLOURS="${lines[1]}"

@@ -43,7 +43,7 @@ func TestContextAbs(t *testing.T) {
 		"/dir", "./.file", "/dir/.file",
 		"", "/dir/", "/dir/",
 		"/dir/", "", "/dir/",
-		"~", "file", home("file"),
+		"~/", "file", home("file"),
 		"", "/", "/",
 		"", ".hidden", wd(".hidden"),
 		"", "./", wd("")+"/",

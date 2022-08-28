@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
@@ -66,25 +67,15 @@ func (c Context) Command(name string, arg ...string) *execabs.Cmd {
 
 func expandHome(s string) (string, error) {
 	if strings.HasPrefix(s, "~") {
-		// TODO use env from context
-		if hash, ok := os.LookupEnv("CARAPACE_ZSH_HASH"); ok { // support zsh static named directories
-			for _, line := range strings.Split(hash, "\n") {
-				if splitted := strings.SplitN(line, "=", 2); len(splitted) == 2 {
-					if staticNamedDirectory := fmt.Sprintf("~%v/", splitted[0]); strings.HasPrefix(s, staticNamedDirectory) {
-						if !strings.HasSuffix(splitted[1], "/") {
-							splitted[1] = splitted[1] + "/"
-						}
-						return strings.Replace(s, staticNamedDirectory, splitted[1], 1), nil
-					}
-				}
-			}
+		if zsh.NamedDirectories.Matches(s) {
+			return zsh.NamedDirectories.Replace(s), nil
 		}
 
 		home, err := os.UserHomeDir() // TODO duplicated code
 		if err != nil {
 			return "", err
 		}
-		s = strings.Replace(s, "~", home+"/", 1)
+		s = strings.Replace(s, "~/", home+"/", 1)
 	}
 	return s, nil
 }

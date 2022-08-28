@@ -41,7 +41,7 @@ var quoter = strings.NewReplacer(
 )
 
 func quoteValue(s string) string {
-	if strings.HasPrefix(s, "~") {
+	if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
 		return "~" + quoter.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
 	}
 	return quoter.Replace(s)

@@ -11,6 +11,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/internal/shell/bash"
 	"github.com/rsteube/carapace/internal/shell/bash_ble"
 	"github.com/rsteube/carapace/internal/shell/elvish"
@@ -150,7 +151,11 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 	if strings.HasPrefix(arg, "--") {
 		flag = cmd.Flags().Lookup(nameOrShorthand)
 	} else if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
-		flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
+		if pflagfork.IsPosix(cmd.Flags()) {
+			flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
+		} else {
+			flag = cmd.Flags().ShorthandLookup(nameOrShorthand)
+		}
 	}
 	return
 }
@@ -281,9 +286,6 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 				Dir:           wd,
 			}
 			if err != nil {
-				if opts.LongShorthand {
-					current = strings.TrimPrefix(current, "-")
-				}
 				return ActionMessage(err.Error()).Invoke(context).value(shell, current), nil
 			}
 
@@ -297,9 +299,6 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 						a := storage.getFlag(targetCmd, flag.Name)
 						splitted := strings.SplitN(current, "=", 2)
 						context.CallbackValue = splitted[1]
-						if opts.LongShorthand {
-							splitted[0] = splitted[0][1:] // revert the added `-` so that the resulting prefix is correct
-						}
 						current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)                  // revert (potentially) overridden optarg divider for `.value()` invocation below
 						targetAction = a.Invoke(context).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
 					}
@@ -320,9 +319,6 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 						targetAction = targetAction.Invoke(context).Merge(subcommandA).ToA()
 					}
 				}
-			}
-			if opts.LongShorthand {
-				current = strings.TrimPrefix(current, "-")
 			}
 			return targetAction.Invoke(context).value(shell, current), nil
 		}

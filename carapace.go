@@ -51,7 +51,18 @@ func Gen(cmd *cobra.Command) *Carapace {
 	}
 }
 
-// PreInvoke TODO experimental
+// PreRun sets a function to be run before completion (use on rootCmd).
+func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
+	if completionCmd, _, err := c.cmd.Find([]string{"_carapace"}); err == nil {
+		completionCmd.PreRun = func(cmd *cobra.Command, args []string) {
+			if len(args) > 2 { // skip script generation
+				f(cmd, args[2:])
+			}
+		}
+	}
+}
+
+// PreInvoke sets a function to alter actions before they are invoked (use on rootCmd).
 func (c Carapace) PreInvoke(f func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action) {
 	if entry := storage.get(c.cmd); entry.preinvoke != nil {
 		_f := entry.preinvoke

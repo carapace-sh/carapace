@@ -74,7 +74,7 @@ jobs:
       - checkout
       - run:
           name: "replace pflag with fork"
-          command: echo 'replace github.com/spf13/pflag => github.com/cornfeedhobo/pflag v1.1.0' >> go.mod
+          command: echo 'replace github.com/spf13/pflag => github.com/rsteube/carapace-pflag v0.0.3' >> go.mod
       - run_tests
   doc:
     docker:

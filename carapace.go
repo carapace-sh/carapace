@@ -56,7 +56,7 @@ func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
 	if completionCmd, _, err := c.cmd.Find([]string{"_carapace"}); err == nil {
 		completionCmd.PreRun = func(cmd *cobra.Command, args []string) {
 			if len(args) > 2 { // skip script generation
-				f(cmd, args[2:])
+				f(c.cmd, args[2:])
 			}
 		}
 	}

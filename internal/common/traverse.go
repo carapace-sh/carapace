@@ -69,13 +69,23 @@ func filterError(args []string, err error) error {
 		return nil
 	}
 
-	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`flag needs an argument: "%v" in -%v`, current[len(current)-1:], current[len(current)-1:]) { // rsteube/carapace-pflag
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`flag needs an argument: "%v" in -%v`, current[len(current)-1:], current[len(current)-1:]) { // rsteube/carapace-pflag: shorthand chain
+		// ignore shorthand flag currently being completed
+		return nil
+	}
+
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`flag needs an argument: "%v" in %v`, current[1:], current) { // rsteube/carapace-pflag: long shorthand
 		// ignore shorthand flag currently being completed
 		return nil
 	}
 
 	if strings.HasPrefix(current, "--") && msg == fmt.Sprintf("unknown flag: %v", current) {
 		// ignore long flag curently being completed
+		return nil
+	}
+
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf("unknown shorthand flag: %v", current) { // rsteube/carapace-pflag: long shorthand
+		// ignore non-posix shorthand flag currently being completed
 		return nil
 	}
 

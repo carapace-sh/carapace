@@ -12,6 +12,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
@@ -286,7 +287,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(c.CallbackValue)
+		isShorthandSeries := re.MatchString(c.CallbackValue) && pflagfork.IsPosix(cmd.Flags())
 
 		vals := make([]string, 0)
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
@@ -311,8 +312,8 @@ func actionFlags(cmd *cobra.Command) Action {
 					vals = append(vals, f.Shorthand, f.Usage)
 				}
 			} else {
-				if !common.IsShorthandOnly(f) {
-					if opts.LongShorthand {
+				if flagstyle := pflagfork.Style(f); flagstyle != pflagfork.ShorthandOnly {
+					if flagstyle == pflagfork.NameAsShorthand {
 						vals = append(vals, "-"+f.Name, f.Usage)
 					} else {
 						vals = append(vals, "--"+f.Name, f.Usage)

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -21,6 +22,7 @@ import (
 	"github.com/rsteube/carapace/internal/shell/nushell"
 	"github.com/rsteube/carapace/internal/shell/oil"
 	"github.com/rsteube/carapace/internal/shell/powershell"
+	"github.com/rsteube/carapace/internal/shell/spec"
 	"github.com/rsteube/carapace/internal/shell/tcsh"
 	"github.com/rsteube/carapace/internal/shell/xonsh"
 	"github.com/rsteube/carapace/internal/shell/zsh"
@@ -135,6 +137,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 		"nushell":    nushell.Snippet,
 		"oil":        oil.Snippet,
 		"powershell": powershell.Snippet,
+		"spec":       spec.Snippet,
 		"tcsh":       tcsh.Snippet,
 		"xonsh":      xonsh.Snippet,
 		"zsh":        zsh.Snippet,
@@ -142,7 +145,13 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	if s, ok := shellSnippets[shell]; ok {
 		return s(c.cmd.Root()), nil
 	}
-	return "", fmt.Errorf("expected 'bash', bash-ble, 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
+
+	expected := make([]string, 0)
+	for key := range shellSnippets {
+		expected = append(expected, key)
+	}
+	sort.Strings(expected)
+	return "", fmt.Errorf("expected one of '%v' [was: %v]", strings.Join(expected, "', '"), shell)
 }
 
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
@@ -199,6 +208,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			"nushell", "#29d866",
 			"oil", "#373a36",
 			"powershell", "#e8a16f",
+			"spec", style.Default,
 			"tcsh", "#412f09",
 			"xonsh", "#a8ffa9",
 			"zsh", "#efda53",

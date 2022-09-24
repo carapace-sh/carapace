@@ -270,3 +270,17 @@ func TestCompleteSnippet(t *testing.T) {
 		t.Error(s)
 	}
 }
+
+func TestCompletePositionalWithSpace(t *testing.T) {
+	cmd := &cobra.Command{
+		Use: "test",
+	}
+
+	Gen(cmd).PositionalCompletion(
+		ActionValues("positional with space"),
+	)
+
+	if s, err := complete(cmd, []string{"elvish", "_", "positional "}); err != nil || s != `[{"Value":"positional with space","Display":"positional with space","Description":"","DescriptionStyle":"dim white","CodeSuffix":" ","Style":"default"}]` {
+		t.Error(s)
+	}
+}

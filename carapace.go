@@ -341,11 +341,6 @@ func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
 	if len(targetArgs) == 0 {
 		return storage.getPositional(targetCmd, 0)
 	}
-
-	lastArg := targetArgs[len(targetArgs)-1]
-	if strings.HasSuffix(lastArg, " ") { // TODO is this still correct/needed?
-		return storage.getPositional(targetCmd, len(targetArgs))
-	}
 	return storage.getPositional(targetCmd, len(targetArgs)-1)
 }
 

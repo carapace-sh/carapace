@@ -59,13 +59,15 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 }
 
 var tests = map[string]string{
-	`example -ap `:              "action",
-	`example action `:           "p",
-	`example action -z`:         "unknown",
-	`example action --fail `:    "unknown",
-	`example --fail acti`:       "unknown",
-	`example -z acti`:           "unknown",
-	`example action positional`: "positional1",
+	`example -ap `:               "action",
+	`example action `:            "p",
+	`example action -z`:          "unknown",
+	`example action --fail `:     "unknown",
+	`example --fail acti`:        "unknown",
+	`example -z acti`:            "unknown",
+	`example action positional`:  "positional1",
+	`example action positional1`: "positional1 with space",
+	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
 	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
 	`example action --optarg `:           "p",
 	`example action --optarg positional`: "positional1",

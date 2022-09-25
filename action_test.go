@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"sort"
@@ -20,15 +21,21 @@ func assertEqual(t *testing.T, expected, actual InvokedAction) {
 	sort.Sort(common.ByValue(expected.rawValues))
 	sort.Sort(common.ByValue(actual.rawValues))
 
-	assert.Equal(t, fmt.Sprintf("%+v\n", expected), fmt.Sprintf("%+v\n", actual))
+	e, _ := json.MarshalIndent(expected.rawValues, "", "  ")
+	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
+
+	assert.Equal(t, string(e), string(a))
 }
 
 func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
 	sort.Sort(common.ByValue(expected.rawValues))
 	sort.Sort(common.ByValue(actual.rawValues))
 
-	if fmt.Sprintf("%+v\n", expected) == fmt.Sprintf("%+v\n", actual) {
-		t.Error("should be different")
+	e, _ := json.MarshalIndent(expected.rawValues, "", "  ")
+	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
+
+	if string(e) == string(a) {
+		t.Errorf("should differ:\n%v", a)
 	}
 }
 

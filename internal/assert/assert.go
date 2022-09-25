@@ -2,23 +2,50 @@
 package assert
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"testing"
 )
 
+type T interface {
+	Cleanup(func())
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
+	Fail()
+	FailNow()
+	Failed() bool
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Helper()
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+	Name() string
+	Setenv(key, value string)
+	Skip(args ...interface{})
+	SkipNow()
+	Skipf(format string, args ...interface{})
+	Skipped() bool
+	TempDir() string
+}
+
 // Equal calls t.Error if given strings are not equal
-func Equal(t *testing.T, expected string, actual string) {
+func Equal(t T, expected string, actual string) {
 	if expected != actual {
 		// TODO handle err
-		expectedFile, _ := os.CreateTemp(os.TempDir(), "carapace_test")
-		actualFile, _ := os.CreateTemp(os.TempDir(), "carapace_test")
+		tempDir := t.TempDir()
+		expctdFile := fmt.Sprintf("%v/expctd", tempDir)
+		actualFile := fmt.Sprintf("%v/actual", tempDir)
 
-		_ = os.WriteFile(expectedFile.Name(), []byte(expected), os.ModePerm)
-		_ = os.WriteFile(actualFile.Name(), []byte(actual), os.ModePerm)
-		output, _ := exec.Command("diff", "--color=always", expectedFile.Name(), actualFile.Name()).Output()
+		if err := os.WriteFile(expctdFile, []byte(expected), os.ModePerm); err != nil {
+			t.Fatal(err.Error())
+		}
+
+		if err := os.WriteFile(actualFile, []byte(actual), os.ModePerm); err != nil {
+			t.Fatal(err.Error())
+		}
+		output, _ := exec.Command("diff", "--color=always", "--context=5", expctdFile, actualFile).Output()
 		_, file, line, _ := runtime.Caller(2)
 		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, string(output))
 	}

@@ -71,8 +71,8 @@ func testContext(t *testing.T, expected Context, args ...string) {
 		os.Stdout = sOut
 		os.Stderr = sErr
 
-		e, _ := json.Marshal(expected)
-		a, _ := json.Marshal(actual)
+		e, _ := json.MarshalIndent(expected, "", "  ")
+		a, _ := json.MarshalIndent(actual, "", "  ")
 		assert.Equal(t, string(e), string(a))
 	})
 }

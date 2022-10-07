@@ -77,7 +77,7 @@ func (s _storage) check() []string {
 	errors := make([]string, 0)
 	for cmd, entry := range s {
 		for name := range entry.flag {
-			if cmd.LocalFlags().Lookup(name) == nil && cmd.PersistentFlags().Lookup(name) == nil {
+			if flag := cmd.LocalFlags().Lookup(name); flag == nil {
 				errors = append(errors, fmt.Sprintf("unknown flag for %s: %s\n", uid.Command(cmd), name))
 			}
 		}

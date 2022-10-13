@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -187,7 +188,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 // ActionValues completes arbitrary keywords (values)
 func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]common.RawValue, 0)
+		vals := make([]common.RawValue, 0, len(values))
 		for _, val := range values {
 			vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: style.Default})
 		}
@@ -198,11 +199,13 @@ func ActionValues(values ...string) Action {
 // ActionStyledValues is like ActionValues but also accepts a style
 func ActionStyledValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]common.RawValue, 0)
-		for index, val := range values {
-			if index%2 == 0 {
-				vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: values[index+1]})
-			}
+		if length := len(values); length%2 != 0 {
+			return ActionMessage("invalid amount of arguments [ActionStyledValues]: " + strconv.Itoa(length))
+		}
+
+		vals := make([]common.RawValue, 0, len(values)/2)
+		for i := 0; i < len(values); i += 2 {
+			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: "", Style: values[i+1]})
 		}
 		return actionRawValues(vals...)
 	})
@@ -211,11 +214,13 @@ func ActionStyledValues(values ...string) Action {
 // ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
 func ActionValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]common.RawValue, 0)
-		for index, val := range values {
-			if index%2 == 0 {
-				vals = append(vals, common.RawValue{Value: val, Display: val, Description: values[index+1], Style: style.Default})
-			}
+		if length := len(values); length%2 != 0 {
+			return ActionMessage("invalid amount of arguments [ActionValuesDescribed]: " + strconv.Itoa(length))
+		}
+
+		vals := make([]common.RawValue, 0, len(values)/2)
+		for i := 0; i < len(values); i += 2 {
+			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1], Style: style.Default})
 		}
 		return actionRawValues(vals...)
 	})
@@ -224,11 +229,13 @@ func ActionValuesDescribed(values ...string) Action {
 // ActionStyledValuesDescribed is like ActionValues but also accepts a style
 func ActionStyledValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]common.RawValue, 0)
-		for index, val := range values {
-			if index%3 == 0 {
-				vals = append(vals, common.RawValue{Value: val, Display: val, Description: values[index+1], Style: values[index+2]})
-			}
+		if length := len(values); length%3 != 0 {
+			return ActionMessage("invalid amount of arguments [ActionStyledValuesDescribed]: " + strconv.Itoa(length))
+		}
+
+		vals := make([]common.RawValue, 0, len(values)/3)
+		for i := 0; i < len(values); i += 3 {
+			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1], Style: values[i+2]})
 		}
 		return actionRawValues(vals...)
 	})

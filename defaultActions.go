@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -200,7 +199,7 @@ func ActionValues(values ...string) Action {
 func ActionStyledValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
-			return ActionMessage("invalid amount of arguments [ActionStyledValues]: " + strconv.Itoa(length))
+			return ActionMessage("invalid amount of arguments [ActionStyledValues]: %v", length)
 		}
 
 		vals := make([]common.RawValue, 0, len(values)/2)
@@ -215,7 +214,7 @@ func ActionStyledValues(values ...string) Action {
 func ActionValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
-			return ActionMessage("invalid amount of arguments [ActionValuesDescribed]: " + strconv.Itoa(length))
+			return ActionMessage("invalid amount of arguments [ActionValuesDescribed]: %v", length)
 		}
 
 		vals := make([]common.RawValue, 0, len(values)/2)
@@ -230,7 +229,7 @@ func ActionValuesDescribed(values ...string) Action {
 func ActionStyledValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%3 != 0 {
-			return ActionMessage("invalid amount of arguments [ActionStyledValuesDescribed]: " + strconv.Itoa(length))
+			return ActionMessage("invalid amount of arguments [ActionStyledValuesDescribed]: %v", length)
 		}
 
 		vals := make([]common.RawValue, 0, len(values)/3)
@@ -248,8 +247,11 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated
-func ActionMessage(msg string) Action {
+func ActionMessage(msg string, a ...interface{}) Action {
 	return ActionCallback(func(c Context) Action {
+		if len(a) > 0 {
+			msg = fmt.Sprintf(msg, a...)
+		}
 		return ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).
 			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
 			noSpace(true).skipCache(true)

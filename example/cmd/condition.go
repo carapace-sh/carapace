@@ -26,7 +26,7 @@ func init() {
 			if conditionCmd.Flag("required").Value.String() == "valid" {
 				result = carapace.ActionValues("condition fulfilled")
 			} else {
-				result = carapace.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
+				result = carapace.ActionMessage("flag --required must be set to valid: %v", conditionCmd.Flag("required").Value.String())
 			}
 			return
 		}),

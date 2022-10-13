@@ -52,7 +52,7 @@ func init() {
 
 	carapace.Gen(callbackCmd).PositionalAnyCompletion(
 		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-			return carapace.ActionMessage(fmt.Sprintf("POS_%v", len(c.Args)))
+			return carapace.ActionMessage("POS_%v", len(c.Args))
 		}),
 	)
 }

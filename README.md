@@ -96,13 +96,10 @@ docker-compose run --rm [bash|elvish|fish|ion|nushell|oil|powershell|tcsh|xonsh|
 example <TAB>
 ```
 
-## Projects
+## Related Projects
 
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
+- [carapace-pflag](https://github.com/rsteube/carapace-pflag) Drop-in replacement for spf13/pflag with support for non-posix variants
 - [carapace-spec](https://github.com/rsteube/carapace-spec) define simple completions using a spec file
-- [freckles](https://github.com/rsteube/freckles) simple dotfiles manager
-- [go-jira-cli](https://github.com/rsteube/go-jira-cli) simple jira command line client
-- [knoxite](https://github.com/knoxite/knoxite) A data storage & backup system
-- [lab](https://github.com/zaquestion/lab) cli client for GitLab
 
 [cobra]:https://github.com/spf13/cobra

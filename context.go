@@ -11,7 +11,7 @@ import (
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
 
-// Context provides information during completion
+// Context provides information during completion.
 type Context struct {
 	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
 	CallbackValue string
@@ -25,6 +25,27 @@ type Context struct {
 	Dir string
 }
 
+// newContext creates a completion context no matter what, so that any error occurring
+// in its setup can still be returned to the shell caller.
+func newContext(shell, currentCallback string, targetArgs []string) (Context, error) {
+	// Always build a completion ctx so that it can handle
+	// errors accordingly, and a default action, without any settings.
+	ctx := Context{
+		CallbackValue: currentCallback,
+		Args:          targetArgs,
+		Env:           os.Environ(),
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return ctx, err
+	} else {
+		ctx.Dir = wd
+	}
+
+	return ctx, nil
+}
+
 // LookupEnv retrieves the value of the environment variable named by the key.
 func (c *Context) LookupEnv(key string) (string, bool) {
 	prefix := key + "="
@@ -34,7 +55,6 @@ func (c *Context) LookupEnv(key string) (string, bool) {
 		}
 	}
 	return "", false
-
 }
 
 // Getenv retrieves the value of the environment variable named by the key.

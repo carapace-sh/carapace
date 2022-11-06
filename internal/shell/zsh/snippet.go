@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the zsh completion script
+// Snippet creates the zsh completion script.
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
 function _%v_completion {
@@ -27,7 +27,8 @@ function _%v_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
-  #zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
+  zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
+  zstyle ":completion:*:default*" list-colors "${lines[1]}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:1})
@@ -42,7 +43,29 @@ function _%v_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%%%$'\001'*})
 
-  compadd -Q -S "${suffix}" -d displays -a -- vals
+  # -------- Quotes ---------- #
+  # ------ OLD ------- #
+  # compadd -S "${suffix}" -l -d displays -a -- vals
+  # compadd -l -Q -S "${suffix}" -d displays -a -- vals
+  # ------ OLD ------- #
+
+  # ------- New ----------
+   ISUFFIX="${suffix}"
+  # compset -S "${suffix}"
+  _describe "testing this" displays vals
+
+  # ------- Alternate ----------
+  # local expl
+
+  # Display message description even if no matches, with -x
+  # Problem is that the builtin message does not disappears
+  # _description -x vals expl "testing that" 
+
+  # _description vals expl "testing that" 
+
+  # Add completions
+  # compadd -l -Q -S "${suffix}" "$expl[@]" -d displays -a vals 
+  # compadd -l -Q -S "${suffix}" -d displays -a vals 
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

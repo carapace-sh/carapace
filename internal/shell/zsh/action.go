@@ -15,7 +15,14 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
-// TODO verify these are correct/complete (copied from bash)
+var displaySanitizer = strings.NewReplacer(
+	"\n", ``,
+	"\r", ``,
+	"\t", ``,
+	`:`, `\:`,
+)
+
+// TODO verify these are correct/complete (copied from bash).
 var quoter = strings.NewReplacer(
 	`&`, `\&`,
 	`<`, `\<`,
@@ -38,27 +45,33 @@ var quoter = strings.NewReplacer(
 	`*`, `\*`,
 	`\`, `\\`,
 	`~`, `\~`,
+	`:`, `\:`,
 )
 
 func quoteValue(s string) string {
 	if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
 		return "~" + quoter.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
 	}
+
 	return quoter.Replace(s)
 }
 
-// ActionRawValues formats values for zsh
+// ActionRawValues formats values for zsh.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 
 	maxLength := 0
 	hasDescriptions := false
+
 	for _, r := range values {
 		if strings.HasPrefix(r.Value, currentWord) {
 			filtered = append(filtered, r)
-			if length := len(r.Display); length > maxLength {
+
+			if length := len(displaySanitizer.Replace(r.Display)); length > maxLength {
+				// if length := len(r.Display); length > maxLength {
 				maxLength = length
 			}
+
 			hasDescriptions = hasDescriptions || r.Description != ""
 		}
 	}
@@ -75,13 +88,16 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	zstyles := make([]string, 0)
 	vals := make([]string, len(filtered))
+
 	for index, val := range filtered {
 		val.Value = sanitizer.Replace(val.Value)
 		val.Value = quoteValue(val.Value)
+
 		if nospace {
-			val.Value = val.Value + "\001"
+			val.Value += "\001"
 		}
-		val.Display = sanitizer.Replace(val.Display)
+
+		val.Display = displaySanitizer.Replace(val.Display)
 		val.Description = sanitizer.Replace(val.Description)
 
 		if val.Style == "" || ui.ParseStyling(val.Style) == nil {
@@ -92,14 +108,20 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
 			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)()", zstyleQuoter.Replace(val.Display)), val.Style, descriptionStyle))
 		} else {
-			vals[index] = fmt.Sprintf("%v\t%v%v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)+1), val.TrimmedDescription())
+			vals[index] = fmt.Sprintf("%v\t%v:%v", val.Value, val.Display, val.TrimmedDescription())
+			// vals[index] = fmt.Sprintf("%v\t%v%v:%v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)+1), val.TrimmedDescription())
+			// vals[index] = fmt.Sprintf("%v\t%v%v-- %v", val.Value, val.Display, strings.Repeat(" ", maxLength-len(val.Display)+1), val.TrimmedDescription())
+
+			// Styling
 			zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)(%v)(-- %v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)+1), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
+			// zstyles = append(zstyles, formatZstyle(fmt.Sprintf("(%v)(%v)(-- %v)", zstyleQuoter.Replace(val.Display), strings.Repeat(" ", maxLength-len(val.Display)+1), zstyleQuoter.Replace(val.TrimmedDescription())), val.Style, descriptionStyle))
 		}
 	}
 
 	if len(zstyles) > 1000 { // TODO disable styling for large amount of values (bad performance)
 		zstyles = make([]string, 0)
 	}
+
 	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
 }
 

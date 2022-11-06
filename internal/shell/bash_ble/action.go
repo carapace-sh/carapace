@@ -7,7 +7,7 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 )
 
-// ActionRawValues formats values for bash_ble
+// ActionRawValues formats values for bash_ble.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	suffix := " "
 	if nospace {

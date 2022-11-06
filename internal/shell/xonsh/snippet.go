@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the xonsh completion script
+// Snippet creates the xonsh completion script.
 func Snippet(cmd *cobra.Command) string {
 	functionName := strings.Replace(cmd.Name(), "-", "__", -1)
 	return fmt.Sprintf(`from xonsh.completers.tools import *

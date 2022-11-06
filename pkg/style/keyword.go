@@ -60,7 +60,7 @@ var keywordReplacer = strings.NewReplacer(
 	"_", "",
 )
 
-// ForKeyword returns the style for given keyword
+// ForKeyword returns the style for given keyword.
 func ForKeyword(s string) string {
 	if _style, ok := keywords[keywordReplacer.Replace(strings.ToLower(s))]; ok {
 		return *_style

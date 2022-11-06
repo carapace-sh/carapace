@@ -22,7 +22,7 @@ type completionResult struct {
 	ToolTip        string
 }
 
-// CompletionResult doesn't like empty parameters, so just replace with space if needed
+// CompletionResult doesn't like empty parameters, so just replace with space if needed.
 func ensureNotEmpty(s string) string {
 	if s == "" {
 		return " "
@@ -30,7 +30,7 @@ func ensureNotEmpty(s string) string {
 	return s
 }
 
-// ActionRawValues formats values for powershell
+// ActionRawValues formats values for powershell.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))

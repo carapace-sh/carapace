@@ -60,7 +60,6 @@ func TestContextAbs(t *testing.T) {
 			t.Errorf("context: '%v' arg: '%v' expected: '%v' was: '%v'", tests[index], tests[index+1], expected, actual)
 		}
 	}
-
 }
 
 func TestEnv(t *testing.T) {

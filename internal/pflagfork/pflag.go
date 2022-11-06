@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// style defines how flags are represented
+// style defines how flags are represented.
 type style int
 
 const (

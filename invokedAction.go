@@ -20,7 +20,7 @@ import (
 	"github.com/rsteube/carapace/internal/shell/zsh"
 )
 
-// InvokedAction is a logical alias for an Action whose (nested) callback was invoked
+// InvokedAction is a logical alias for an Action whose (nested) callback was invoked.
 type InvokedAction struct {
 	Action
 }
@@ -89,7 +89,7 @@ func (a InvokedAction) Suffix(suffix string) InvokedAction {
 	return a
 }
 
-// ToA casts an InvokedAction to Action
+// ToA casts an InvokedAction to Action.
 func (a InvokedAction) ToA() Action {
 	return a.Action
 }
@@ -121,7 +121,6 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 				splittedCV = append(splittedCV, "")
 				break
 			}
-
 		}
 
 		uniqueVals := make(map[string]common.RawValue)

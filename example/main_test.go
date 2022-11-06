@@ -67,13 +67,13 @@ var tests = map[string]string{
 	`example -z acti`:            "unknown",
 	`example action positional`:  "positional1",
 	`example action positional1`: "positional1 with space",
-	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
-	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
+	// `example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
+	// `example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
 	`example action --optarg `:           "p",
 	`example action --optarg positional`: "positional1",
 	`example action --optar`:             "--optarg",
 	`example action --optarg=`:           "blue",
-	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
+	// `example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
 	`example action -o`:                                            "v",
 	`example action -op`:                                           "d",
 	`example action -o `:                                           "p",
@@ -166,7 +166,7 @@ func TestOil(t *testing.T) {
 	}
 }
 
-//func TestPowershell(t *testing.T) {
+// func TestPowershell(t *testing.T) {
 //	if err := exec.Command("pwsh", "--version").Run(); err != nil {
 //		t.Skip("skipping powershell")
 //	}

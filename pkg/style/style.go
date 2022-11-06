@@ -55,7 +55,7 @@ var (
 	Inverse    string = "inverse"
 )
 
-// Of combines different styles
+// Of combines different styles.
 func Of(s ...string) string { return strings.Join(s, " ") }
 
 // XTerm256Color returns a color from the xterm 256-color palette.
@@ -64,7 +64,7 @@ func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }
 // TrueColor returns a 24-bit true color.
 func TrueColor(r, g, b uint8) string { return ui.TrueColor(r, g, b).String() }
 
-// SGR returns the SGR sequence for given style
+// SGR returns the SGR sequence for given style.
 func SGR(s string) string { return parseStyle(s).SGR() }
 
 func parseStyle(s string) ui.Style {

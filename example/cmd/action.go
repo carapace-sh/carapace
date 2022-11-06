@@ -45,8 +45,6 @@ func init() {
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
-	//actionCmd.Flags().StringS("shorthandonly", "s", "", "shorthandonly flag")
-
 	carapace.Gen(actionCmd).FlagCompletion(carapace.ActionMap{
 		"directories": carapace.ActionDirectories(),
 		"files": carapace.ActionCallback(func(c carapace.Context) carapace.Action {

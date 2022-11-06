@@ -60,5 +60,4 @@ func TestSort(t *testing.T) {
 	if r[0].Value != "1" {
 		t.Fail()
 	}
-
 }

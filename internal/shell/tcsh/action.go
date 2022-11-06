@@ -67,7 +67,7 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 	return
 }
 
-// ActionRawValues formats values for bash
+// ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 
@@ -92,7 +92,6 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		if valuePrefix := commonValuePrefix(filtered...); lastSegment != valuePrefix {
 			// replace values with common value prefix (`\001` is removed in snippet and compopt nospace will be set)
 			filtered = common.RawValuesFrom(commonValuePrefix(filtered...)) // TODO nospaceIndicator
-			//filtered = common.RawValuesFrom(commonValuePrefix(filtered...) + nospaceIndicator)
 		} else {
 			// prevent insertion of partial display values by prefixing one with space
 			filtered[0].Display = " " + filtered[0].Display

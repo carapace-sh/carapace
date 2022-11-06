@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the tcsh completion script
+// Snippet creates the tcsh completion script.
 func Snippet(cmd *cobra.Command) string {
 	// TODO initial version - needs to handle open quotes
 	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v _carapace tcsh `@@' ;", cmd.Name(), uid.Executable())

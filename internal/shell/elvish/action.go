@@ -32,7 +32,7 @@ type complexCandidate struct {
 	Style            string
 }
 
-// ActionRawValues formats values for elvish
+// ActionRawValues formats values for elvish.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	suffix := " "
 	if nospace {

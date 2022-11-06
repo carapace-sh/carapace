@@ -76,7 +76,7 @@ func convert(cmd *cobra.Command) command {
 	return c
 }
 
-// Snippet exports the command structure as json
+// Snippet exports the command structure as json.
 func Snippet(cmd *cobra.Command) string {
 	out, err := json.Marshal(convert(cmd))
 	if err == nil {

@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// ActionCallback invokes a go function during completion
+// ActionCallback invokes a go function during completion.
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{callback: callback}
 }
@@ -76,7 +76,7 @@ func ActionImport(output []byte) Action {
 }
 
 // ActionExecute executes completion on an internal command
-// TODO example
+// TODO example.
 func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		args := []string{"_carapace", "export", cmd.Name()}
@@ -104,7 +104,7 @@ func ActionExecute(cmd *cobra.Command) Action {
 	})
 }
 
-// ActionDirectories completes directories
+// ActionDirectories completes directories.
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
 		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
@@ -116,7 +116,7 @@ func ActionDirectories() Action {
 	})
 }
 
-// ActionFiles completes files with optional suffix filtering
+// ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
@@ -184,7 +184,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	})
 }
 
-// ActionValues completes arbitrary keywords (values)
+// ActionValues completes arbitrary keywords (values).
 func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		vals := make([]common.RawValue, 0, len(values))
@@ -195,7 +195,7 @@ func ActionValues(values ...string) Action {
 	})
 }
 
-// ActionStyledValues is like ActionValues but also accepts a style
+// ActionStyledValues is like ActionValues but also accepts a style.
 func ActionStyledValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
@@ -210,7 +210,7 @@ func ActionStyledValues(values ...string) Action {
 	})
 }
 
-// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
+// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs).
 func ActionValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
@@ -225,7 +225,7 @@ func ActionValuesDescribed(values ...string) Action {
 	})
 }
 
-// ActionStyledValuesDescribed is like ActionValues but also accepts a style
+// ActionStyledValuesDescribed is like ActionValues but also accepts a style.
 func ActionStyledValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%3 != 0 {
@@ -246,7 +246,7 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 	}
 }
 
-// ActionMessage displays a help messages in places where no completions can be generated
+// ActionMessage displays a help messages in places where no completions can be generated.
 func ActionMessage(msg string, a ...interface{}) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(a) > 0 {
@@ -258,7 +258,7 @@ func ActionMessage(msg string, a ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation).
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		index := strings.LastIndex(c.CallbackValue, string(divider))
@@ -280,9 +280,30 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	})
 }
 
+func actionSubcommandsAlt(ctx Context, cmd *cobra.Command) Action {
+	vals := make([]string, 0)
+	for _, subcommand := range cmd.Commands() {
+		// We do not propose commands that don't match the prefix,
+		// since it will mess up on some shells (like ZSH) which
+		// rely on a perfect pattern matching for coloring outputs.
+		// if !strings.HasPrefix(subcommand.Use, ctx.CallbackValue) {
+		// 	continue
+		// }
+
+		if !subcommand.Hidden && subcommand.Deprecated == "" {
+			vals = append(vals, subcommand.Name(), subcommand.Short)
+			for _, alias := range subcommand.Aliases {
+				vals = append(vals, alias, subcommand.Short)
+			}
+		}
+	}
+	return ActionValuesDescribed(vals...)
+}
+
 func actionSubcommands(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
 	for _, subcommand := range cmd.Commands() {
+		// We do not propse commands
 		if !subcommand.Hidden && subcommand.Deprecated == "" {
 			vals = append(vals, subcommand.Name(), subcommand.Short)
 			for _, alias := range subcommand.Aliases {

@@ -7,7 +7,7 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
-// RawValue represents a completion candidate
+// RawValue represents a completion candidate.
 type RawValue struct {
 	Value       string
 	Display     string
@@ -15,7 +15,7 @@ type RawValue struct {
 	Style       string
 }
 
-// TrimmedDescription returns the trimmed description
+// TrimmedDescription returns the trimmed description.
 func (r RawValue) TrimmedDescription() string {
 	maxLength := 80
 	description := strings.SplitN(r.Description, "\n", 2)[0]
@@ -26,10 +26,10 @@ func (r RawValue) TrimmedDescription() string {
 	return description
 }
 
-// RawValues is an alias for []RawValue
+// RawValues is an alias for []RawValue.
 type RawValues []RawValue
 
-// RawValuesFrom creates RawValues from given values
+// RawValuesFrom creates RawValues from given values.
 func RawValuesFrom(values ...string) RawValues {
 	rawValues := make([]RawValue, len(values))
 	for index, val := range values {
@@ -38,7 +38,7 @@ func RawValuesFrom(values ...string) RawValues {
 	return rawValues
 }
 
-// FilterPrefix filters values with given prefix
+// FilterPrefix filters values with given prefix.
 func (r RawValues) FilterPrefix(prefix string) RawValues {
 	filtered := make(RawValues, 0)
 	for _, r := range r {
@@ -49,14 +49,14 @@ func (r RawValues) FilterPrefix(prefix string) RawValues {
 	return filtered
 }
 
-// ByValue alias to filter by value
+// ByValue alias to filter by value.
 type ByValue []RawValue
 
 func (a ByValue) Len() int           { return len(a) }
 func (a ByValue) Less(i, j int) bool { return a[i].Value < a[j].Value }
 func (a ByValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-// ByDisplay alias to filter by display
+// ByDisplay alias to filter by display.
 type ByDisplay []RawValue
 
 func (a ByDisplay) Len() int           { return len(a) }

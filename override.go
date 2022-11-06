@@ -7,7 +7,7 @@ import (
 
 var opts Opts
 
-// Opts contains overrides for completion behaviour
+// Opts contains overrides for completion behaviour.
 type Opts struct {
 	// OptArgDelimiter changes the delimiter for optional flag arguments
 	//   "=" // tail --verbose=descriptor (default)

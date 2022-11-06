@@ -16,16 +16,16 @@ import (
 	"github.com/rsteube/carapace/pkg/cache"
 )
 
-// Write persistests given values to file as json
+// Write persistests given values to file as json.
 func Write(file string, rawValues []common.RawValue) (err error) {
 	var m []byte
 	if m, err = json.Marshal(rawValues); err == nil {
-		err = os.WriteFile(file, m, 0600)
+		err = os.WriteFile(file, m, 0o600)
 	}
 	return
 }
 
-// Load loads values from file unless modification date exceeds timeout
+// Load loads values from file unless modification date exceeds timeout.
 func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err error) {
 	var content []byte
 	var stat os.FileInfo
@@ -39,18 +39,18 @@ func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err 
 	return
 }
 
-// CacheDir creates a cache folder for current user and returns the path
+// CacheDir creates a cache folder for current user and returns the path.
 func CacheDir(name string) (dir string, err error) {
 	var userCacheDir string
 	if userCacheDir, err = os.UserCacheDir(); err == nil {
 		dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)
-		err = os.MkdirAll(dir, 0700)
+		err = os.MkdirAll(dir, 0o700)
 	}
 	return
 }
 
 // File returns the cache filename for given values
-// TODO cleanup
+// TODO cleanup.
 func File(callerFile string, callerLine int, keys ...cache.Key) (file string, err error) {
 	uid := uidKeys(callerFile, strconv.Itoa(callerLine))
 	ids := make([]string, 0)

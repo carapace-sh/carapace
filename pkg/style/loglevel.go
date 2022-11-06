@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// ForLogLevel returns the style for given log level
+// ForLogLevel returns the style for given log level.
 func ForLogLevel(s string) string {
 	return map[string]string{
 		"trace":    Carapace.LogLevelTrace,

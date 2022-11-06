@@ -8,7 +8,7 @@ import (
 	"github.com/rsteube/carapace"
 )
 
-// ActionEnvironmentVariables completes environment variables
+// ActionEnvironmentVariables completes environment variables.
 func ActionEnvironmentVariables() carapace.Action {
 	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		env := os.Environ()
@@ -21,7 +21,7 @@ func ActionEnvironmentVariables() carapace.Action {
 	})
 }
 
-// ActionGroups completes groups
+// ActionGroups completes groups.
 func ActionGroups() carapace.Action {
 	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		groups := []string{}
@@ -41,7 +41,7 @@ func ActionGroups() carapace.Action {
 	})
 }
 
-// ActionKillSignals completes kill signals
+// ActionKillSignals completes kill signals.
 func ActionKillSignals() carapace.Action {
 	return carapace.ActionValuesDescribed(
 		"ABRT", "Abnormal termination",
@@ -78,7 +78,7 @@ func ActionKillSignals() carapace.Action {
 	)
 }
 
-// ActionProcessStates completes process states
+// ActionProcessStates completes process states.
 func ActionProcessStates() carapace.Action {
 	return carapace.ActionValuesDescribed(
 		"D", "uninterruptible sleep (usually IO)",
@@ -93,7 +93,7 @@ func ActionProcessStates() carapace.Action {
 	)
 }
 
-// ActionUsers completes users
+// ActionUsers completes users.
 func ActionUsers() carapace.Action {
 	return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 		users := []string{}
@@ -113,7 +113,7 @@ func ActionUsers() carapace.Action {
 	})
 }
 
-// ActionUserGroup completes user:group
+// ActionUserGroup completes user:group.
 func ActionUserGroup() carapace.Action {
 	return carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 		switch len(c.Parts) {
@@ -127,7 +127,7 @@ func ActionUserGroup() carapace.Action {
 	})
 }
 
-// ActionShells completes shells
+// ActionShells completes shells.
 func ActionShells() carapace.Action {
 	return carapace.ActionCallback(func(c carapace.Context) (result carapace.Action) {
 		if output, err := exec.Command("chsh", "--list-shells").Output(); err != nil {

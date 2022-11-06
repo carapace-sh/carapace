@@ -30,7 +30,7 @@ type T interface {
 	TempDir() string
 }
 
-// Equal calls t.Error if given strings are not equal
+// Equal calls t.Error if given strings are not equal.
 func Equal(t T, expected string, actual string) {
 	if expected != actual {
 		// TODO handle err

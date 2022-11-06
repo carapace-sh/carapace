@@ -28,7 +28,7 @@ type suggestion struct {
 	Display string
 }
 
-// ActionRawValues formats values for ion
+// ActionRawValues formats values for ion.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))

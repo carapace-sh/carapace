@@ -36,6 +36,23 @@ func (f Flag) IsRepeatable() bool {
 	return false
 }
 
+func (f Flag) Matches(arg string, posix bool) bool {
+	if !strings.HasPrefix(arg, "-") { // not a flag
+		return false
+	}
+
+	switch f.Style() {
+	case Default:
+		return false
+	case ShorthandOnly:
+		return false
+	case NameAsShorthand:
+		return false
+	default:
+		return false
+	}
+}
+
 func (f Flag) TakesValue() bool {
 	switch f.Value.Type() {
 	case "bool", "boolSlice", "count":

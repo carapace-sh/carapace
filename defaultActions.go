@@ -280,26 +280,6 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	})
 }
 
-func actionSubcommandsAlt(ctx Context, cmd *cobra.Command) Action {
-	vals := make([]string, 0)
-	for _, subcommand := range cmd.Commands() {
-		// We do not propose commands that don't match the prefix,
-		// since it will mess up on some shells (like ZSH) which
-		// rely on a perfect pattern matching for coloring outputs.
-		// if !strings.HasPrefix(subcommand.Use, ctx.CallbackValue) {
-		// 	continue
-		// }
-
-		if !subcommand.Hidden && subcommand.Deprecated == "" {
-			vals = append(vals, subcommand.Name(), subcommand.Short)
-			for _, alias := range subcommand.Aliases {
-				vals = append(vals, alias, subcommand.Short)
-			}
-		}
-	}
-	return ActionValuesDescribed(vals...)
-}
-
 func actionSubcommands(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
 	for _, subcommand := range cmd.Commands() {

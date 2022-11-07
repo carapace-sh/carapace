@@ -100,7 +100,7 @@ func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, 
 	// that we don't have required arguments anymore. Also take account
 	// of if there are still argument completions to provide next.
 	if cmd.HasAvailableSubCommands() && len(args) <= 1 {
-		subcommandA := actionSubcommandsAlt(ctx, cmd).Invoke(ctx)
+		subcommandA := actionSubcommands(cmd).Invoke(ctx)
 		targetAction = targetAction.Invoke(ctx).Merge(subcommandA).ToA()
 	}
 

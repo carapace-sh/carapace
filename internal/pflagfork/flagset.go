@@ -2,6 +2,7 @@ package pflagfork
 
 import (
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -18,6 +19,11 @@ func (f FlagSet) IsPosix() bool {
 		}
 	}
 	return true
+}
+
+func (f FlagSet) IsShorthandSeries(arg string) bool {
+	re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
+	return re.MatchString(arg) && f.IsPosix()
 }
 
 func (f FlagSet) IsMutuallyExclusive(flag *pflag.Flag) bool {
@@ -38,4 +44,18 @@ func (f *FlagSet) VisitAll(fn func(*Flag)) {
 		fn(&Flag{flag})
 	})
 
+}
+
+func (fs FlagSet) LookupArg(arg string) (result *Flag) {
+	isPosix := fs.IsPosix()
+	fs.VisitAll(func(f *Flag) {
+		if result != nil {
+			return
+		}
+
+		if f.Matches(arg, isPosix) {
+			result = f
+		}
+	})
+	return
 }

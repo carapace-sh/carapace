@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -72,8 +71,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
-		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(c.CallbackValue) && flagSet.IsPosix()
+		isShorthandSeries := flagSet.IsShorthandSeries(c.CallbackValue)
 
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {

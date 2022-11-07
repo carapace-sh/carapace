@@ -104,7 +104,32 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		zstyles = make([]string, 0)
 	}
 
-	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
+	// The first line is a header containing any message, and an indication to the shell
+	// telling it if we want to complete something or not (irrespective of the number of comps)
+	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
+}
+
+// Creates a header line with some indications for the shell caller.
+func makeHeader() (header string) {
+	// TODO: Find a way to know if actually want to complete something.
+	header += "0"
+
+	header += "\t"
+
+	// Format the completion message if needed
+	if common.CompletionMessage == "" {
+		return
+	}
+
+	header += fmt.Sprintf("\x1b[%vm%v\x1b[%vm %v\x1b[%vm",
+		style.SGR(style.Carapace.Error),
+		"ERR",
+		style.SGR("fg-default"),
+		sanitizer.Replace(common.CompletionMessage),
+		style.SGR("fg-default"),
+	)
+
+	return
 }
 
 // getCompletionPadding computes the padding needed for candidates, filters the values that we do

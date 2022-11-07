@@ -27,7 +27,7 @@ type Context struct {
 
 // newContext creates a completion context no matter what, so that any error occurring
 // in its setup can still be returned to the shell caller.
-func newContext(shell, currentCallback string, targetArgs []string) (Context, error) {
+func newContext(currentCallback string, targetArgs []string) (Context, error) {
 	// Always build a completion ctx so that it can handle
 	// errors accordingly, and a default action, without any settings.
 	ctx := Context{

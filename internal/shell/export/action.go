@@ -15,6 +15,8 @@ type Export struct {
 }
 
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	values = common.AddMessageToValues(currentWord, values)
+
 	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
 		Version:   version(),

@@ -69,6 +69,8 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 
 // ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	values = common.AddMessageToValues(currentWord, values)
+
 	filtered := make([]common.RawValue, 0)
 
 	lastSegment := currentWord // last segment of currentWord split by COMP_WORDBREAKS

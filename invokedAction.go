@@ -172,6 +172,7 @@ func (a InvokedAction) value(shell string, callbackValue string) string { // TOD
 		"xonsh":      xonsh.ActionRawValues,
 		"zsh":        zsh.ActionRawValues,
 	}
+
 	if f, ok := shellFuncs[shell]; ok {
 		return f(callbackValue, a.nospace, a.rawValues)
 	}

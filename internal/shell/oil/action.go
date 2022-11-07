@@ -16,6 +16,8 @@ const nospaceIndicator = "\001"
 
 // ActionRawValues formats values for oil.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	values = common.AddMessageToValues(currentWord, values)
+
 	filtered := make([]common.RawValue, 0)
 
 	for _, r := range values {

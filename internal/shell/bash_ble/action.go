@@ -9,6 +9,8 @@ import (
 
 // ActionRawValues formats values for bash_ble.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	values = common.AddMessageToValues(currentWord, values)
+
 	suffix := " "
 	if nospace {
 		suffix = ""

@@ -46,7 +46,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 
 	// Create a new context: it is never nil, even if an error occurs
 	// and is returned from this instantation/setup.
-	ctx, err := newContext(shell, current, targetArgs)
+	ctx, err := newContext(current, targetArgs)
 	if err != nil {
 		return ActionMessage(err.Error()).Invoke(ctx).value(shell, current), nil
 	}

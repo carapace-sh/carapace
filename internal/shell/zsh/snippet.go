@@ -26,12 +26,18 @@ function _%v_completion {
     local lines=($(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh))
   fi
 
-  export ZLS_COLOURS="${lines[1]}"
-  zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
-  # zstyle ":completion:*:default*" list-colors "${lines[1]}"
+  # Return code and message (sanitized)
+  header=${lines[1]//$(printf '\t')/:}
+  IFS=$':' read retcode message <<< "${header}"
+  [[ -n ${message} ]] && _message -r "${message}"
+
+  # Styles
+  export ZLS_COLOURS="${lines[2]}"
+  zstyle ":completion:${curcontext}:*" list-colors "${lines[2]}"
+  # zstyle ":completion:*:default*" list-colors "${lines[2]}"
   
   # shellcheck disable=SC2034,2206
-  lines=(${lines[@]:1})
+  lines=(${lines[@]:2})
 
   # Completions (inserted and displayed)
   # shellcheck disable=SC2034,2206
@@ -45,12 +51,13 @@ function _%v_completion {
   # shellcheck disable=SC2034,2206
   vals=(${vals%%%%$'\001'*})
 
-  # Old completion generation call 
-  # compadd -Q -S "${suffix}" -d displays -a -- vals
-
   # New completion generation
-   ISUFFIX="${suffix}"
-  _describe "completions" displays vals
+  #_message -e "test name" 'this is a message description'
+  ISUFFIX="${suffix}"
+  #_describe -t 'test name' "test comps" displays vals
+  #_describe -t 'test name' "test compother" displays vals
+  [[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
+  #[[ ${#vals[@]} -gt 0 ]] && _describe -t 'test name' "test comps" displays vals
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

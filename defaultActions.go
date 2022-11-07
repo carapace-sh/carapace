@@ -248,13 +248,25 @@ func actionRawValues(rawValues ...common.RawValue) Action {
 
 // ActionMessage displays a help messages in places where no completions can be generated.
 func ActionMessage(msg string, a ...interface{}) Action {
+	// We store the message variable, which will be used later
+	// either as a completion (all shells but ZSH), or directly
+	// as a message (ZSH)
+	if len(a) > 0 {
+		msg = fmt.Sprintf(msg, a...)
+	}
+
+	// We don't need to apply any prefix or even take care of
+	// any context: the current callback value will be added
+	// by the complete function when and if it finds a message
+	// to be added to completions.
+	common.CompletionMessage = msg
+
+	// Return a blank action to conform to required return values
+	// and potentially to enable to users to further work on completions.
+	var action Action
+
 	return ActionCallback(func(c Context) Action {
-		if len(a) > 0 {
-			msg = fmt.Sprintf(msg, a...)
-		}
-		return ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).
-			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
-			noSpace(true).skipCache(true)
+		return action.Invoke(c).ToA()
 	})
 }
 

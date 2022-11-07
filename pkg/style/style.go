@@ -8,51 +8,51 @@ import (
 )
 
 var (
-	Default string = ""
+	Default = ""
 
-	Black   string = "black"
-	Red     string = "red"
-	Green   string = "green"
-	Yellow  string = "yellow"
-	Blue    string = "blue"
-	Magenta string = "magenta"
-	Cyan    string = "cyan"
-	White   string = "white"
-	Gray    string = Of(Dim, White)
+	Black   = "black"
+	Red     = "red"
+	Green   = "green"
+	Yellow  = "yellow"
+	Blue    = "blue"
+	Magenta = "magenta"
+	Cyan    = "cyan"
+	White   = "white"
+	Gray    = Of(Dim, White)
 
-	BrightBlack   string = "bright-black"
-	BrightRed     string = "bright-red"
-	BrightGreen   string = "bright-green"
-	BrightYellow  string = "bright-yellow"
-	BrightBlue    string = "bright-blue"
-	BrightMagenta string = "bright-magenta"
-	BrightCyan    string = "bright-cyan"
-	BrightWhite   string = "bright-white"
+	BrightBlack   = "bright-black"
+	BrightRed     = "bright-red"
+	BrightGreen   = "bright-green"
+	BrightYellow  = "bright-yellow"
+	BrightBlue    = "bright-blue"
+	BrightMagenta = "bright-magenta"
+	BrightCyan    = "bright-cyan"
+	BrightWhite   = "bright-white"
 
-	BgBlack   string = "bg-black"
-	BgRed     string = "bg-red"
-	BgGreen   string = "bg-green"
-	BgYellow  string = "bg-yellow"
-	BgBlue    string = "bg-blue"
-	BgMagenta string = "bg-magenta"
-	BgCyan    string = "bg-cyan"
-	BgWhite   string = "bg-white"
+	BgBlack   = "bg-black"
+	BgRed     = "bg-red"
+	BgGreen   = "bg-green"
+	BgYellow  = "bg-yellow"
+	BgBlue    = "bg-blue"
+	BgMagenta = "bg-magenta"
+	BgCyan    = "bg-cyan"
+	BgWhite   = "bg-white"
 
-	BgBrightBlack   string = "bg-bright-black"
-	BgBrightRed     string = "bg-bright-red"
-	BgBrightGreen   string = "bg-bright-green"
-	BgBrightYellow  string = "bg-bright-yellow"
-	BgBrightBlue    string = "bg-bright-blue"
-	BgBrightMagenta string = "bg-bright-magenta"
-	BgBrightCyan    string = "bg-bright-cyan"
-	BgBrightWhite   string = "bg-bright-white"
+	BgBrightBlack   = "bg-bright-black"
+	BgBrightRed     = "bg-bright-red"
+	BgBrightGreen   = "bg-bright-green"
+	BgBrightYellow  = "bg-bright-yellow"
+	BgBrightBlue    = "bg-bright-blue"
+	BgBrightMagenta = "bg-bright-magenta"
+	BgBrightCyan    = "bg-bright-cyan"
+	BgBrightWhite   = "bg-bright-white"
 
-	Bold       string = "bold"
-	Dim        string = "dim"
-	Italic     string = "italic"
-	Underlined string = "underlined"
-	Blink      string = "blink"
-	Inverse    string = "inverse"
+	Bold       = "bold"
+	Dim        = "dim"
+	Italic     = "italic"
+	Underlined = "underlined"
+	Blink      = "blink"
+	Inverse    = "inverse"
 )
 
 // Of combines different styles.
@@ -69,10 +69,12 @@ func SGR(s string) string { return parseStyle(s).SGR() }
 
 func parseStyle(s string) ui.Style {
 	stylings := make([]ui.Styling, 0)
+
 	for _, word := range strings.Split(s, " ") {
 		if styling := ui.ParseStyling(word); styling != nil {
 			stylings = append(stylings, styling)
 		}
 	}
+
 	return ui.ApplyStyling(ui.Style{}, stylings...)
 }

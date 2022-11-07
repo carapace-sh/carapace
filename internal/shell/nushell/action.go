@@ -30,6 +30,8 @@ func sanitize(values []common.RawValue) []common.RawValue {
 
 // ActionRawValues formats values for nushell.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+	values = common.AddMessageToValues(currentWord, values)
+
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 

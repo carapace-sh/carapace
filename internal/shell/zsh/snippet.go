@@ -28,44 +28,29 @@ function _%v_completion {
 
   export ZLS_COLOURS="${lines[1]}"
   zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
-  zstyle ":completion:*:default*" list-colors "${lines[1]}"
+  # zstyle ":completion:*:default*" list-colors "${lines[1]}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:1})
 
+  # Completions (inserted and displayed)
   # shellcheck disable=SC2034,2206
   local vals=(${lines%%%%$'\t'*})
   # shellcheck disable=SC2034,2206
   local displays=(${lines##*$'\t'})
 
+  ## Suffix
   local suffix=' '
   [[ ${vals[1]} == *$'\001' ]] && suffix=''
   # shellcheck disable=SC2034,2206
   vals=(${vals%%%%$'\001'*})
 
-  # -------- Quotes ---------- #
-  # ------ OLD ------- #
-  # compadd -S "${suffix}" -l -d displays -a -- vals
-  # compadd -l -Q -S "${suffix}" -d displays -a -- vals
-  # ------ OLD ------- #
+  # Old completion generation call 
+  # compadd -Q -S "${suffix}" -d displays -a -- vals
 
-  # ------- New ----------
+  # New completion generation
    ISUFFIX="${suffix}"
-  # compset -S "${suffix}"
-  _describe "testing this" displays vals
-
-  # ------- Alternate ----------
-  # local expl
-
-  # Display message description even if no matches, with -x
-  # Problem is that the builtin message does not disappears
-  # _description -x vals expl "testing that" 
-
-  # _description vals expl "testing that" 
-
-  # Add completions
-  # compadd -l -Q -S "${suffix}" "$expl[@]" -d displays -a vals 
-  # compadd -l -Q -S "${suffix}" -d displays -a vals 
+  _describe "completions" displays vals
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

@@ -61,43 +61,8 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	// First compute paddings and filter out any completions we don't need.
 	filtered, maxLength := getCompletionPadding(currentWord, values)
 
-	// Set basic styling things
-	valueStyle, descriptionStyle := setDefaultValueStyle()
-
-	// We know the number of completions passed to shell
-	// but the number of styles might not be equal.
-	vals := make([]string, len(filtered))
-	zstyles := make([]string, 0)
-
-	// For each completion candidate
-	for index, val := range filtered {
-		// Apply sanitizers to each component of the completion (actual/display/description)
-		val = sanitizeCompletion(val, valueStyle, nospace)
-
-		if strings.TrimSpace(val.Description) == "" {
-			// Candidate used by _describe
-			vals[index] = fmt.Sprintf("%v\t%v", val.Value, val.Display)
-
-			// Associated style
-			compStyle := formatZstyle(fmt.Sprintf("(%v)()",
-				zstyleQuoter.Replace(val.Display)),
-				val.Style, descriptionStyle)
-			zstyles = append(zstyles, compStyle)
-		} else {
-			// Candidate used by _describe, note the use of : as separator between completion and description
-			// We quote the entire string with single quotes, so that the ZSH script can split them correctly
-			// into an array, and also to preserve any special characters.
-			vals[index] = fmt.Sprintf("'%v\t%v:%v'", val.Value, val.Display, val.TrimmedDescription())
-
-			// Associated style
-			compStyle := formatZstyle(fmt.Sprintf("(%v)(%v)( -- %v)",
-				zstyleQuoter.Replace(val.Display),                 // First (%v)
-				strings.Repeat(" ", maxLength-len(val.Display)+1), // Second (%v): padding
-				zstyleQuoter.Replace(val.TrimmedDescription())),   // Third (%v): descriptions
-				val.Style, descriptionStyle)
-			zstyles = append(zstyles, compStyle)
-		}
-	}
+	// Generate and assemble all completions structured in groups, and zstyles
+	groups, zstyles := getGroupedComps(filtered, maxLength, nospace)
 
 	// TODO disable styling for large amount of values (bad performance)
 	if len(zstyles) > 1000 {
@@ -106,28 +71,95 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	// The first line is a header containing any message, and an indication to the shell
 	// telling it if we want to complete something or not (irrespective of the number of comps)
-	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(vals, " "))
+	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(groups, "\n"))
 }
 
-// Creates a header line with some indications for the shell caller.
-func makeHeader() (header string) {
-	// TODO: Find a way to know if actually want to complete something.
-	header += "0"
+// getGroupedComps classifies all completions in their respective groups, makes the corresponding header
+// and completion strings, and assembles all of them into a single string to be passed to ZSH.
+// Also takes care of preparing the zstyles format string.
+func getGroupedComps(vals []common.RawValue, maxLength int, nospace bool) (comps, zstyles []string) {
+	valueStyle, descriptionStyle := setDefaultValueStyle()
 
-	header += "\t"
+	groups := make(map[string][]string) // tag:group => []formattedComps
+	var headers []string                // Keeps track of the order
 
-	// Format the completion message if needed
-	if common.CompletionMessage == "" {
-		return
+	// Prepare all completions and put them in their respective groups
+	for _, val := range vals {
+		// Prepare all values
+		val = sanitizeCompletion(val, valueStyle, nospace)         // Sanitize each part of the completion (actual/display/description)
+		comp := formatCompletion(val)                              // Generate the completion candidate string, with description if needed
+		compStyle := formatStyle(val, descriptionStyle, maxLength) // Generate the style for this completion.
+		compGroup := setGroup(val)                                 // Generate the tag:group header
+
+		// Get the group for the completion, creating it if needed.
+		group, exists := groups[compGroup]
+		if !exists {
+			group = make([]string, 0)
+			groups[compGroup] = group
+
+			headers = append(headers, compGroup)
+		}
+
+		// And store the comp and its zstyle
+		group = append(group, comp)
+		groups[compGroup] = group
+
+		zstyles = append(zstyles, compStyle)
 	}
 
-	header += fmt.Sprintf("\x1b[%vm%v\x1b[%vm %v\x1b[%vm",
-		style.SGR(style.Carapace.Error),
-		"ERR",
-		style.SGR("fg-default"),
-		sanitizer.Replace(common.CompletionMessage),
-		style.SGR("fg-default"),
-	)
+	// Assemble all groups' headers and completions together
+	for _, header := range headers {
+		completions := strings.Join(groups[header], " ")
+		comps = append(comps, fmt.Sprintf("%v %v", header, completions))
+	}
+
+	return comps, zstyles
+}
+
+func setGroup(val common.RawValue) string {
+	// Set defaults
+	if val.Tag == "" {
+		val.Tag = "values"
+	}
+	if val.Group == "" {
+		val.Group = "completions"
+	}
+
+	tag := quoter.Replace(val.Tag)
+	group := quoter.Replace(val.Group)
+
+	// We escape both the tag/group strings, and
+	// the entire string itself, like for completions.
+	return fmt.Sprintf("'%v:%v'", tag, group)
+}
+
+// formatCompletion generates the completion string to pass to ZSH.
+func formatCompletion(val common.RawValue) (comp string) {
+	// We quote the entire string with single quotes, so that the ZSH script can split
+	// them correctly into an array, and also to preserve any special characters.
+	if strings.TrimSpace(val.Description) == "" {
+		comp = fmt.Sprintf("'%v\t%v'", val.Value, val.Display)
+	} else {
+		// Note the use of : as separator between completion and description.
+		comp = fmt.Sprintf("'%v\t%v:%v'", val.Value, val.Display, val.TrimmedDescription())
+	}
+
+	return
+}
+
+// formatCompletion generates the style string to pass to ZSH.
+func formatStyle(val common.RawValue, descriptionStyle string, maxLength int) (compStyle string) {
+	if strings.TrimSpace(val.Description) == "" {
+		compStyle = formatZstyle(fmt.Sprintf("(%v)()",
+			zstyleQuoter.Replace(val.Display)),
+			val.Style, descriptionStyle)
+	} else {
+		compStyle = formatZstyle(fmt.Sprintf("(%v)(%v)( -- %v)",
+			zstyleQuoter.Replace(val.Display),                 // First (%v)
+			strings.Repeat(" ", maxLength-len(val.Display)+1), // Second (%v): padding
+			zstyleQuoter.Replace(val.TrimmedDescription())),   // Third (%v): descriptions
+			val.Style, descriptionStyle)
+	}
 
 	return
 }
@@ -216,6 +248,29 @@ var zstyleQuoter = strings.NewReplacer(
 func formatZstyle(s, _styleValue, _styleDescription string) string {
 	// return fmt.Sprintf("=(#b)%v=0=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription))
 	return fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription+" bg-default"), style.SGR(_styleDescription))
+}
+
+// Creates a header line with some indications for the shell caller.
+func makeHeader() (header string) {
+	// TODO: Find a way to know if actually want to complete something.
+	header += "0"
+
+	header += "\t"
+
+	// Format the completion message if needed
+	if common.CompletionMessage == "" {
+		return
+	}
+
+	header += fmt.Sprintf("\x1b[%vm%v\x1b[%vm %v\x1b[%vm",
+		style.SGR(style.Carapace.Error),
+		"ERR",
+		style.SGR("fg-default"),
+		sanitizer.Replace(common.CompletionMessage),
+		style.SGR("fg-default"),
+	)
+
+	return
 }
 
 // Notes:

@@ -34,15 +34,21 @@ function _%v_completion {
   # Styles
   export ZLS_COLOURS="${lines[2]}"
   zstyle ":completion:${curcontext}:*" list-colors "${lines[2]}"
-  # zstyle ":completion:*:default*" list-colors "${lines[2]}"
   
-  # Completions (inserted and displayed)
+  # Grouped completions
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:2})
 
+  # Ensure ordering of groups and tags
+  local tag_order group_order
+
   # Process and generate completions by groups (one per line)
   for group in "${lines[@]}"; do
-    candidates=( $(xargs -n1 <<< ${group}) )
+    candidates=($(xargs -n1 <<< ${group}))
+
+    # Header (tag and group description)
+    IFS=$':' read tag group <<< "${candidates[1]}"
+    candidates=(${candidates[@]:1})
 
     # shellcheck disable=SC2034,2206
     local vals=(${candidates%%%%$'\t'*})
@@ -50,21 +56,21 @@ function _%v_completion {
     local displays=(${candidates##*$'\t'})
 
     # Suffix
-    local suffix=' '
-    [[ ${vals[1]} == *$'\001' ]] && suffix=''
+    local suffix=-S' '
+    [[ ${vals[1]} == *$'\001' ]] && suffix=
     # shellcheck disable=SC2034,2206
     vals=(${vals%%%%$'\001'*})
 
     # Generate completions
-    ISUFFIX="${suffix}"
-    [[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
+    #ISUFFIX="${suffix}"
+    [[ ${#vals[@]} -gt 0 ]] && _describe -t "$tag" "$group" displays vals ${suffix}
 
-    # Other tests
-    #_describe -t 'test name' "test comps" displays vals
-    #_describe -t 'test name' "test compother" displays vals
-    #[[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
-    #[[ ${#vals[@]} -gt 0 ]] && _describe -t 'test name' "test comps" displays vals
+    # Append to tag/group ordering
+    group_order+="$(printf %%q "$group") "
+    zstyle ":completion:${curcontext}:*" tag-order "$tag:$(printf %%q "$group")"
   done
+
+  zstyle ":completion:${curcontext}:*" group-order "$group_order"
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

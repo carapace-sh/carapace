@@ -9,10 +9,15 @@ import (
 
 // RawValue represents a completion candidate.
 type RawValue struct {
+	// All shells
 	Value       string
 	Display     string
 	Description string
 	Style       string
+
+	// Shell-specific (ZSH) structuring
+	Group string
+	Tag   string
 }
 
 // TrimmedDescription returns the trimmed description.

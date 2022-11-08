@@ -49,19 +49,25 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 //	b := carapace.ActionValues("B", "C").Invoke(c)
 //	c := a.Merge(b) // ["A", "B", "C"]
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
+	var orderedValues []string
 	uniqueRawValues := make(map[string]common.RawValue)
 	nospace := a.nospace
 	skipcache := a.skipcache
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
+			_, exists := uniqueRawValues[c.Value]
 			uniqueRawValues[c.Value] = c
+			if !exists {
+				orderedValues = append(orderedValues, c.Value)
+			}
 		}
 		nospace = nospace || other.nospace
 		skipcache = skipcache || other.skipcache
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
-	for _, c := range uniqueRawValues {
+	for _, v := range orderedValues {
+		c := uniqueRawValues[v]
 		rawValues = append(rawValues, c)
 	}
 	return InvokedAction{actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache)}

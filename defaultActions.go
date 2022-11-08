@@ -294,16 +294,46 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 
 func actionSubcommands(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
+	groups := make(map[string]string, len(cmd.Commands()))
+
+	// Generate completions
 	for _, subcommand := range cmd.Commands() {
-		// We do not propse commands
-		if !subcommand.Hidden && subcommand.Deprecated == "" {
-			vals = append(vals, subcommand.Name(), subcommand.Short)
-			for _, alias := range subcommand.Aliases {
-				vals = append(vals, alias, subcommand.Short)
+		// To skip
+		if subcommand.Hidden || subcommand.Deprecated != "" {
+			continue
+		}
+
+		// Name/alias and descriptions
+		vals = append(vals, subcommand.Name(), subcommand.Short)
+		for _, alias := range subcommand.Aliases {
+			vals = append(vals, alias, subcommand.Short)
+		}
+
+		// Grouping
+		groups[subcommand.Use] = subcommand.GroupID
+	}
+
+	// And gather them under their group as description
+	groupCommands := func(command string) string {
+		cmdGroupID := groups[command]
+		for _, group := range cmd.Groups() {
+			if group.ID == cmdGroupID {
+				title := strings.TrimSpace(group.Title)
+				if !strings.HasSuffix(title, "commands") {
+					title += " commands"
+				}
+				return title
 			}
 		}
+
+		if len(cmd.Groups()) > 0 {
+			return "other commands"
+		}
+
+		return "commands"
 	}
-	return ActionValuesDescribed(vals...)
+
+	return ActionValuesDescribed(vals...).GroupF(groupCommands)
 }
 
 func actionFlags(cmd *cobra.Command) Action {

@@ -111,6 +111,63 @@ func (a Action) StyleF(f func(s string) string) Action {
 				invoked.rawValues[index].Style = f(v.Value)
 			}
 		}
+
+		return invoked.ToA()
+	})
+}
+
+// Group gathers sets the group under which to print completions,
+// for shells supporting this feature, like ZSH.
+//
+// ActionValue("192.168.1.1", "127.0.0.1").Group("IPv4 addresses").
+func (a Action) Group(group string) Action {
+	return a.GroupF(func(value string) string {
+		return group
+	})
+}
+
+// Group gathers sets the group under which to print completions,
+// for shells supporting this feature, like ZSH, with a function.
+func (a Action) GroupF(f func(value string) (group string)) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, v := range invoked.rawValues {
+			if v.Value != "ERR" && v.Value != "_" {
+				invoked.rawValues[index].Group = f(v.Value)
+			}
+		}
+
+		return invoked.ToA()
+	})
+}
+
+// Tag marks completions with a tag (which is different from the group).
+// This function only has an effect for ZSH, which makes heavy use of tags.
+// In most cases, this function is not needed, and for simple gathering of
+// some completions under a group description, action.Group() is preferred.
+//
+// ActionValue("192.168.1.1", "127.0.0.1").Tag("interfaces").
+func (a Action) Tag(tag string) Action {
+	return a.TagF(func(value string) string {
+		return tag
+	})
+}
+
+// Tag marks completions with a tag (which is different from the group),
+// using a function.
+//
+// This function only has an effect for ZSH, which makes heavy use of tags.
+// In most cases, this function is not needed, and for simple gathering of
+// some completions under a group description, action.Group() is preferred.
+func (a Action) TagF(f func(value string) (tag string)) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, v := range invoked.rawValues {
+			if v.Value != "ERR" && v.Value != "_" {
+				invoked.rawValues[index].Tag = f(v.Value)
+			}
+		}
+
 		return invoked.ToA()
 	})
 }

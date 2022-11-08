@@ -59,7 +59,6 @@ func quoteValue(s string) string {
 // ActionRawValues formats values for zsh.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
 	// First compute paddings and filter out any completions we don't need.
-	// filtered, _ := getCompletionPadding(currentWord, values)
 	filtered, maxLength := getCompletionPadding(currentWord, values)
 
 	// Set basic styling things
@@ -86,7 +85,9 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 			zstyles = append(zstyles, compStyle)
 		} else {
 			// Candidate used by _describe, note the use of : as separator between completion and description
-			vals[index] = fmt.Sprintf("%v\t%v:%v", val.Value, val.Display, val.TrimmedDescription())
+			// We quote the entire string with single quotes, so that the ZSH script can split them correctly
+			// into an array, and also to preserve any special characters.
+			vals[index] = fmt.Sprintf("'%v\t%v:%v'", val.Value, val.Display, val.TrimmedDescription())
 
 			// Associated style
 			compStyle := formatZstyle(fmt.Sprintf("(%v)(%v)( -- %v)",
@@ -94,7 +95,6 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 				strings.Repeat(" ", maxLength-len(val.Display)+1), // Second (%v): padding
 				zstyleQuoter.Replace(val.TrimmedDescription())),   // Third (%v): descriptions
 				val.Style, descriptionStyle)
-
 			zstyles = append(zstyles, compStyle)
 		}
 	}
@@ -106,7 +106,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	// The first line is a header containing any message, and an indication to the shell
 	// telling it if we want to complete something or not (irrespective of the number of comps)
-	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
+	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(vals, " "))
 }
 
 // Creates a header line with some indications for the shell caller.

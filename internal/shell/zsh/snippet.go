@@ -36,28 +36,35 @@ function _%v_completion {
   zstyle ":completion:${curcontext}:*" list-colors "${lines[2]}"
   # zstyle ":completion:*:default*" list-colors "${lines[2]}"
   
+  # Completions (inserted and displayed)
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:2})
 
-  # Completions (inserted and displayed)
-  # shellcheck disable=SC2034,2206
-  local vals=(${lines%%%%$'\t'*})
-  # shellcheck disable=SC2034,2206
-  local displays=(${lines##*$'\t'})
+  # Process and generate completions by groups (one per line)
+  for group in "${lines[@]}"; do
+    candidates=( $(xargs -n1 <<< ${group}) )
 
-  ## Suffix
-  local suffix=' '
-  [[ ${vals[1]} == *$'\001' ]] && suffix=''
-  # shellcheck disable=SC2034,2206
-  vals=(${vals%%%%$'\001'*})
+    # shellcheck disable=SC2034,2206
+    local vals=(${candidates%%%%$'\t'*})
+    # shellcheck disable=SC2034,2206
+    local displays=(${candidates##*$'\t'})
 
-  # New completion generation
-  #_message -e "test name" 'this is a message description'
-  ISUFFIX="${suffix}"
-  #_describe -t 'test name' "test comps" displays vals
-  #_describe -t 'test name' "test compother" displays vals
-  [[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
-  #[[ ${#vals[@]} -gt 0 ]] && _describe -t 'test name' "test comps" displays vals
+    # Suffix
+    local suffix=' '
+    [[ ${vals[1]} == *$'\001' ]] && suffix=''
+    # shellcheck disable=SC2034,2206
+    vals=(${vals%%%%$'\001'*})
+
+    # Generate completions
+    ISUFFIX="${suffix}"
+    [[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
+
+    # Other tests
+    #_describe -t 'test name' "test comps" displays vals
+    #_describe -t 'test name' "test compother" displays vals
+    #[[ ${#vals[@]} -gt 0 ]] && _describe "completions" displays vals
+    #[[ ${#vals[@]} -gt 0 ]] && _describe -t 'test name' "test comps" displays vals
+  done
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

@@ -296,24 +296,50 @@ func actionSubcommands(cmd *cobra.Command) Action {
 	vals := make([]string, 0)
 	groups := make(map[string]string, len(cmd.Commands()))
 
-	// Generate completions
+	// Order the completions in the order of groups, when they have one
+	for _, group := range cmd.Groups() {
+		for _, subcommand := range cmd.Commands() {
+			if subcommand.Hidden || subcommand.Deprecated != "" {
+				continue
+			}
+			if subcommand.GroupID != group.ID {
+				continue
+			}
+
+			vals = append(vals, subcommand.Name(), subcommand.Short)
+			for _, alias := range subcommand.Aliases {
+				vals = append(vals, alias, subcommand.Short)
+			}
+
+			for _, use := range append(subcommand.Aliases, subcommand.Name()) {
+				groups[use] = subcommand.GroupID
+			}
+		}
+	}
+
+	// Then add commands not belonging to a group.
 	for _, subcommand := range cmd.Commands() {
-		// To skip
 		if subcommand.Hidden || subcommand.Deprecated != "" {
 			continue
 		}
+		if subcommand.GroupID != "" {
+			continue
+		}
 
-		// Name/alias and descriptions
 		vals = append(vals, subcommand.Name(), subcommand.Short)
 		for _, alias := range subcommand.Aliases {
 			vals = append(vals, alias, subcommand.Short)
 		}
-
-		// Grouping
-		groups[subcommand.Use] = subcommand.GroupID
 	}
 
 	// And gather them under their group as description
+	groupCommands := commandGrouper(cmd, groups)
+
+	return ActionValuesDescribed(vals...).GroupF(groupCommands)
+}
+
+// Generates a function to tag command completions with their corresponding group.
+func commandGrouper(cmd *cobra.Command, groups map[string]string) func(string) string {
 	groupCommands := func(command string) string {
 		cmdGroupID := groups[command]
 		for _, group := range cmd.Groups() {
@@ -333,7 +359,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 		return "commands"
 	}
 
-	return ActionValuesDescribed(vals...).GroupF(groupCommands)
+	return groupCommands
 }
 
 func actionFlags(cmd *cobra.Command) Action {

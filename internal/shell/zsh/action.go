@@ -9,60 +9,37 @@ import (
 	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
-var sanitizer = strings.NewReplacer(
-	"\n", ``,
-	"\r", ``,
-	"\t", ``,
-)
-
-var displaySanitizer = strings.NewReplacer(
-	"\n", ``,
-	"\r", ``,
-	"\t", ``,
-	`:`, `\:`,
-)
-
-// TODO verify these are correct/complete (copied from bash).
-var quoter = strings.NewReplacer(
-	`&`, `\&`,
-	`<`, `\<`,
-	`>`, `\>`,
-	"`", "\\`",
-	`'`, `\'`,
-	`"`, `\"`,
-	`{`, `\{`,
-	`}`, `\}`,
-	`$`, `\$`,
-	`#`, `\#`,
-	`|`, `\|`,
-	`?`, `\?`,
-	`(`, `\(`,
-	`)`, `\)`,
-	`;`, `\;`,
-	` `, `\ `,
-	`[`, `\[`,
-	`]`, `\]`,
-	`*`, `\*`,
-	`\`, `\\`,
-	`~`, `\~`,
-	`:`, `\:`,
-)
-
-func quoteValue(s string) string {
-	if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
-		return "~" + quoter.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
-	}
-
-	return quoter.Replace(s)
-}
-
-// ActionRawValues formats values for zsh.
+// ActionRawValues formats values, structured by tag:groups, for zsh.
 func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
-	// First compute paddings and filter out any completions we don't need.
-	filtered, maxLength := getCompletionPadding(currentWord, values)
+	valueStyle, descriptionStyle := setDefaultValueStyle()
 
-	// Generate and assemble all completions structured in groups, and zstyles
-	groups, zstyles := getGroupedComps(filtered, maxLength, nospace)
+	// First group completions according to their tag:group, so that they can compute
+	// their paddings and styles independently. Filters candidates not matching the
+	// prefix, and sanitizes their candidate/display components.
+	headers, groups := groupValues(values, currentWord, valueStyle, nospace)
+
+	var zstyles []string
+	var groupedComps []string
+
+	for _, header := range headers {
+		group := groups[header]
+
+		// Make completion strings for all values, which don't need any padding
+		var comps []string
+
+		for _, val := range group {
+			comps = append(comps, formatCompletion(val))
+		}
+
+		groupedComps = append(groupedComps, fmt.Sprintf("%v %v", header, strings.Join(comps, " ")))
+
+		// Get the correct padding for each value, including those to proposed
+		// as completions on the same line (aliases and short/long flags).
+		paddings := getGroupPaddings(group)
+
+		// Get all formatted zstyles for these completions
+		zstyles = append(zstyles, formatStyles(group, paddings, descriptionStyle)...)
+	}
 
 	// TODO disable styling for large amount of values (bad performance)
 	if len(zstyles) > 1000 {
@@ -71,52 +48,104 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	// The first line is a header containing any message, and an indication to the shell
 	// telling it if we want to complete something or not (irrespective of the number of comps)
-	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(groups, "\n"))
+	return fmt.Sprintf("%v\n%v\n%v", makeHeader(), strings.Join(zstyles, ":"), strings.Join(groupedComps, "\n"))
 }
 
-// getGroupedComps classifies all completions in their respective groups, makes the corresponding header
-// and completion strings, and assembles all of them into a single string to be passed to ZSH.
-// Also takes care of preparing the zstyles format string.
-func getGroupedComps(vals []common.RawValue, maxLength int, nospace bool) (comps, zstyles []string) {
-	valueStyle, descriptionStyle := setDefaultValueStyle()
+// groupValues groups all completions in their groups, and sanitizes the raw completion values.
+func groupValues(vals []common.RawValue, current, style string, nospace bool) ([]string, map[string][]common.RawValue) {
+	var headers []string
 
-	groups := make(map[string][]string) // tag:group => []formattedComps
-	var headers []string                // Keeps track of the order
+	groups := make(map[string][]common.RawValue)
 
-	// Prepare all completions and put them in their respective groups
 	for _, val := range vals {
-		// Prepare all values
-		val = sanitizeCompletion(val, valueStyle, nospace)         // Sanitize each part of the completion (actual/display/description)
-		comp := formatCompletion(val)                              // Generate the completion candidate string, with description if needed
-		compStyle := formatStyle(val, descriptionStyle, maxLength) // Generate the style for this completion.
-		compGroup := setGroup(val)                                 // Generate the tag:group header
-
-		// Get the group for the completion, creating it if needed.
-		group, exists := groups[compGroup]
-		if !exists {
-			group = make([]string, 0)
-			groups[compGroup] = group
-
-			headers = append(headers, compGroup)
+		if !strings.HasPrefix(val.Value, current) {
+			continue
 		}
 
-		// And store the comp and its zstyle
-		group = append(group, comp)
-		groups[compGroup] = group
+		val = sanitizeCompletion(val, style, nospace) // Sanitize each part of the completion (actual/display/description)
+		groupHeader := setGroupHeader(val)            // Generate the tag:group header
+
+		group, exists := groups[groupHeader]
+		if !exists {
+			group = make([]common.RawValue, 0)
+			groups[groupHeader] = group
+
+			headers = append(headers, groupHeader)
+		}
+
+		group = append(group, val)
+		groups[groupHeader] = group
+	}
+
+	return headers, groups
+}
+
+// getGroupPaddings returns a map with each value candidate as key,
+// and its padding as value.  This padding is what is predicted to be
+// used as padding by ZSH, so that we can compute correct format strings.
+func getGroupPaddings(vals []common.RawValue) map[string]int {
+	paddings := make(map[string]int)
+	maxLength := 0
+	hasDescriptions := false
+
+	for _, raw := range vals {
+		// Since the _describe call in the ZSH snippet does not support unquoting values like
+		// with compadd -Q, and since we must use "candidate:description" format, we must use
+		// a special sanitizer for display values (an example of this is IPv6 addresses).
+		length := len(raw.Display)
+		// length := len(sanitizer.Replace(raw.Display))
+		if length > maxLength {
+			maxLength = length
+		}
+
+		hasDescriptions = hasDescriptions || raw.Description != ""
+	}
+
+	for _, raw := range vals {
+		paddings[raw.Value] = maxLength - len(raw.Value) + 1
+	}
+
+	return paddings
+}
+
+// formatStyles makes the styles strings for completions in a group, respecting their padding.
+func formatStyles(vals []common.RawValue, paddings map[string]int, descStyle string) (zstyles []string) {
+	for _, val := range vals {
+		padding := paddings[val.Value]
+		var compStyle string
+
+		if strings.TrimSpace(val.Description) == "" {
+			compStyle = formatZstyle(fmt.Sprintf("(%v)()",
+				zstyleQuoter.Replace(val.Display)),
+				val.Style, descStyle)
+		} else {
+			// compStyle = formatZstyle(fmt.Sprintf("(%v%v*)(-- %v)",
+			// 	zstyleQuoter.Replace(val.Display),               // First (%v)
+			// 	strings.Repeat(" ", maxLength-len(val.Display)), // Second (%v): padding
+			// 	zstyleQuoter.Replace(val.TrimmedDescription())), // Third (%v): descriptions
+			// 	val.Style, descriptionStyle)
+
+			// compStyle = formatZstyle(fmt.Sprintf("(%v%v*)( -- %v)",
+			// 	zstyleQuoter.Replace(val.Display),               // First (%v)
+			// 	strings.Repeat(" ", maxLength-len(val.Display)), // Second (%v): padding
+			// 	zstyleQuoter.Replace(val.TrimmedDescription())), // Third (%v): descriptions
+			// 	val.Style, descriptionStyle)
+
+			compStyle = formatZstyle(fmt.Sprintf("(%v)(%v)( -- %v)",
+				zstyleQuoter.Replace(val.Display),               // First (%v)
+				strings.Repeat(" ", padding),                    // Second (%v): padding
+				zstyleQuoter.Replace(val.TrimmedDescription())), // Third (%v): descriptions
+				val.Style, descStyle)
+		}
 
 		zstyles = append(zstyles, compStyle)
 	}
 
-	// Assemble all groups' headers and completions together
-	for _, header := range headers {
-		completions := strings.Join(groups[header], " ")
-		comps = append(comps, fmt.Sprintf("%v %v", header, completions))
-	}
-
-	return comps, zstyles
+	return zstyles
 }
 
-func setGroup(val common.RawValue) string {
+// setGroupHeader checks that all completions have a group, sets default if needed.
+func setGroupHeader(val common.RawValue) string {
 	// Set defaults
 	if val.Tag == "" {
 		val.Tag = "values"
@@ -145,49 +174,6 @@ func formatCompletion(val common.RawValue) (comp string) {
 	}
 
 	return
-}
-
-// formatCompletion generates the style string to pass to ZSH.
-func formatStyle(val common.RawValue, descriptionStyle string, maxLength int) (compStyle string) {
-	if strings.TrimSpace(val.Description) == "" {
-		compStyle = formatZstyle(fmt.Sprintf("(%v)()",
-			zstyleQuoter.Replace(val.Display)),
-			val.Style, descriptionStyle)
-	} else {
-		compStyle = formatZstyle(fmt.Sprintf("(%v)(%v)( -- %v)",
-			zstyleQuoter.Replace(val.Display),                 // First (%v)
-			strings.Repeat(" ", maxLength-len(val.Display)+1), // Second (%v): padding
-			zstyleQuoter.Replace(val.TrimmedDescription())),   // Third (%v): descriptions
-			val.Style, descriptionStyle)
-	}
-
-	return
-}
-
-// getCompletionPadding computes the padding needed for candidates, filters the values that we do
-// not need as completions, and determines if we must pass descriptions along with values.
-func getCompletionPadding(currentWord string, values common.RawValues) ([]common.RawValue, int) {
-	filtered := make([]common.RawValue, 0)
-
-	maxLength := 0
-	hasDescriptions := false
-
-	for _, raw := range values {
-		if strings.HasPrefix(raw.Value, currentWord) {
-			filtered = append(filtered, raw)
-
-			// Since the _describe call in the ZSH snippet does not support unquoting values like
-			// with compadd -Q, and since we must use "candidate:description" format, we must use
-			// a special sanitizer for display values (an example of this is IPv6 addresses).
-			if length := len(displaySanitizer.Replace(raw.Display)); length > maxLength {
-				maxLength = length
-			}
-
-			hasDescriptions = hasDescriptions || raw.Description != ""
-		}
-	}
-
-	return filtered, maxLength
 }
 
 // sanitizeCompletion applies a series of string sanitizers to the completion
@@ -231,23 +217,17 @@ func setDefaultValueStyle() (valueStyle, descriptionStyle string) {
 	return valueStyle, descriptionStyle
 }
 
-var zstyleQuoter = strings.NewReplacer(
-	"#", `\#`,
-	"*", `\*`,
-	"(", `\(`,
-	")", `\)`,
-	"[", `\[`,
-	"]", `\]`,
-	"|", `\|`,
-	"~", `\~`,
-)
-
 // formatZstyle creates a zstyle matcher for given display stings.
 // `compadd -l` (one per line) accepts ansi escape sequences in display value but it seems in tabular view these are removed.
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
 func formatZstyle(s, _styleValue, _styleDescription string) string {
+	zstyle := fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s,
+		style.SGR(_styleValue),
+		style.SGR(_styleDescription+" bg-default"),
+		style.SGR(_styleDescription))
+
 	// return fmt.Sprintf("=(#b)%v=0=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription))
-	return fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription+" bg-default"), style.SGR(_styleDescription))
+	return zstyle
 }
 
 // Creates a header line with some indications for the shell caller.

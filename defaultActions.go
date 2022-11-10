@@ -335,7 +335,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 	// And gather them under their group as description
 	groupCommands := commandGrouper(cmd, groups)
 
-	return ActionValuesDescribed(vals...).GroupF(groupCommands)
+	return ActionValuesDescribed(vals...).GroupF(groupCommands).Tag("command")
 }
 
 // Generates a function to tag command completions with their corresponding group.

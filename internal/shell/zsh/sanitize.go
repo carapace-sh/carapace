@@ -4,6 +4,9 @@ import (
 	"strings"
 )
 
+// TODO disable styling for large amount of values (bad performance).
+var maxZstyles = 1000
+
 // sanitizer is used only for descriptions and messages.
 var sanitizer = strings.NewReplacer(
 	"\n", ``,
@@ -35,7 +38,7 @@ var quoter = strings.NewReplacer(
 	`$`, `\$`,
 	`#`, `\#`,
 	`|`, `\|`,
-	`?`, `\?`,
+	// `?`, `\?`,
 	`(`, `\(`,
 	`)`, `\)`,
 	`;`, `\;`,

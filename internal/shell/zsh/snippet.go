@@ -39,9 +39,6 @@ function _%v_completion {
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:2})
 
-  # Ensure ordering of groups and tags
-  local tag_order group_order
-
   # Process and generate completions by groups (one per line)
   for group in "${lines[@]}"; do
     candidates=($(xargs -n1 <<< ${group}))
@@ -62,17 +59,25 @@ function _%v_completion {
     vals=(${vals%%%%$'\001'*})
 
     # Generate completions
-    #ISUFFIX="${suffix}"
-    [[ ${#vals[@]} -gt 0 ]] && _describe -t "$tag" "$group" displays vals ${suffix}
-
-    # Append to tag/group ordering
-    group_order+="$(printf %%q "$group") "
-    zstyle ":completion:${curcontext}:*" tag-order "$tag:$(printf %%q "$group")"
+    [[ ${#vals[@]} -gt 0 ]] && _describe -t "$tag-${group// /-}" "$group" displays vals ${suffix} -Q
   done
-
-  zstyle ":completion:${curcontext}:*" group-order "$group_order"
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v
 `, cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
 }
+
+// Notes: Alternative system based _description and compadd
+//
+// A few problems:
+// If the completions share the same tag, they are not grouped under their group description.
+// Completions are not grouped together when they share the same COMPLETION description (short/long flags)
+// Does not seem to go significantly faster than _describe calls.
+//
+// Advantages
+// We can pass our options to compadd more easily, which (-l -Q -S)
+
+// Code:
+//     local expl=(-S "${suffix}")
+//     _description "${tag}" expl ${group}
+//     compadd -Q -S${suffix} -l "${expl[@]}" -d displays -a -- vals

@@ -97,7 +97,7 @@ func formatValue(val common.RawValue, style string, nospace, hasAliases bool, ma
 	// Shorthands
 	comp, display, desc := val.Value, val.Display, val.TrimmedDescription()
 
-	// When the completion is no description, we don't need to take any
+	// When the completion has no description, we don't need to take any
 	// parameters and constraints into account.
 	if strings.TrimSpace(val.Description) == "" {
 		return fmt.Sprintf("'%v\t%v'", comp, display)
@@ -127,7 +127,7 @@ func formatStyle(val common.RawValue, descStyle string, hasAliases bool, maxLenG
 	display := zstyleQuoter.Replace(val.Display)
 	desc := zstyleQuoter.Replace(val.TrimmedDescription())
 
-	// When the completion is no description, we don't need to take any
+	// When the completion has no description, we don't need to take any
 	// parameters and constraints into account.
 	if strings.TrimSpace(val.Description) == "" {
 		return formatZstyle(fmt.Sprintf("(%v)()", display), val.Style, descStyle)
@@ -247,11 +247,11 @@ func formatZstyle(s, styleValue, styleDescription string) string {
 	return zstyle
 }
 
-// formatZstyle creates a zstyle matcher for given display stings.
-// `compadd -l` (one per line) accepts ansi escape sequences in display value but it seems in tabular view these are removed.
-// To ease matching in list mode, the display values have a hidden `\002` suffix.
+// formatZstyleValue creates a zstyle matcher for given display stings.
+// The difference with formatZstyle is that we only match one elemet.
+// This is used when matching values that are displayed 'stacked' like short/long flags.
 func formatZstyleValue(s, styleValue string) string {
-	zstyle := fmt.Sprintf("=%v=%v", s,
+	zstyle := fmt.Sprintf("=(#b)%v=%v", s,
 		style.SGR(styleValue))
 
 	return zstyle

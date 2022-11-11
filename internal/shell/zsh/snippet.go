@@ -59,7 +59,7 @@ function _%v_completion {
     vals=(${vals%%%%$'\001'*})
 
     # Generate completions
-    [[ ${#vals[@]} -gt 0 ]] && _describe -t "$tag-${group// /-}" "$group" displays vals ${suffix} -Q
+    _describe -t "$tag-${group// /-}" "$group" displays vals ${suffix} -Q
   done
 }
 compquote '' 2>/dev/null && _%v_completion

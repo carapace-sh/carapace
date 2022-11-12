@@ -29,12 +29,12 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// Carapace wraps cobra.Command to define completions
+// Carapace wraps cobra.Command to define completions.
 type Carapace struct {
 	cmd *cobra.Command
 }
 
-// Gen initialized Carapace for given command
+// Gen initialized Carapace for given command.
 func Gen(cmd *cobra.Command) *Carapace {
 	addCompletionCommand(cmd)
 
@@ -73,27 +73,27 @@ func (c Carapace) PreInvoke(f func(cmd *cobra.Command, flag *pflag.Flag, action 
 	}
 }
 
-// PositionalCompletion defines completion for positional arguments using a list of Actions
+// PositionalCompletion defines completion for positional arguments using a list of Actions.
 func (c Carapace) PositionalCompletion(action ...Action) {
 	storage.get(c.cmd).positional = action
 }
 
-// PositionalAnyCompletion defines completion for any positional arguments not already defined
+// PositionalAnyCompletion defines completion for any positional arguments not already defined.
 func (c Carapace) PositionalAnyCompletion(action Action) {
 	storage.get(c.cmd).positionalAny = action
 }
 
-// DashCompletion defines completion for positional arguments after dash (`--`) using a list of Actions
+// DashCompletion defines completion for positional arguments after dash (`--`) using a list of Actions.
 func (c Carapace) DashCompletion(action ...Action) {
 	storage.get(c.cmd).dash = action
 }
 
-// DashAnyCompletion defines completion for any positional arguments after dash (`--`) not already defined
+// DashAnyCompletion defines completion for any positional arguments after dash (`--`) not already defined.
 func (c Carapace) DashAnyCompletion(action Action) {
 	storage.get(c.cmd).dashAny = action
 }
 
-// FlagCompletion defines completion for flags using a map consisting of name and Action
+// FlagCompletion defines completion for flags using a map consisting of name and Action.
 func (c Carapace) FlagCompletion(actions ActionMap) {
 	if e := storage.get(c.cmd); e.flag == nil {
 		e.flag = actions
@@ -104,7 +104,7 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 	}
 }
 
-// Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command)
+// Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command).
 func (c Carapace) Standalone() {
 	c.cmd.CompletionOptions = cobra.CompletionOptions{
 		DisableDefaultCmd: true,
@@ -118,7 +118,7 @@ func (c Carapace) Standalone() {
 	c.cmd.SetHelpCommand(&cobra.Command{Hidden: true})
 }
 
-// Snippet creates completion script for given shell
+// Snippet creates completion script for given shell.
 func (c Carapace) Snippet(shell string) (string, error) {
 	if shell == "" {
 		shell = ps.DetermineShell()
@@ -150,7 +150,7 @@ func (c Carapace) Snippet(shell string) (string, error) {
 	return "", fmt.Errorf("expected one of '%v' [was: %v]", strings.Join(expected, "', '"), shell)
 }
 
-// IsCallback returns true if current program invocation is a callback
+// IsCallback returns true if current program invocation is a callback.
 func IsCallback() bool {
 	return len(os.Args) > 1 && os.Args[1] == "_carapace"
 }

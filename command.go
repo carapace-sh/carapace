@@ -17,6 +17,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			return
 		}
 	}
+
 	carapaceCmd := &cobra.Command{
 		Use:    "_carapace",
 		Hidden: true,
@@ -38,7 +39,9 @@ func addCompletionCommand(cmd *cobra.Command) {
 		},
 		DisableFlagParsing: true,
 	}
+
 	cmd.AddCommand(carapaceCmd)
+
 	Carapace{carapaceCmd}.PositionalCompletion(
 		ActionStyledValues(
 			"bash", "#d35673",

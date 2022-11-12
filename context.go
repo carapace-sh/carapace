@@ -25,6 +25,19 @@ type Context struct {
 	Dir string
 }
 
+func newContext(args []string) Context {
+	context := Context{
+		CallbackValue: args[len(args)-1],
+		Args:          args[:len(args)-1],
+		Env:           os.Environ(),
+	}
+
+	if wd, err := os.Getwd(); err == nil {
+		context.Dir = wd
+	}
+	return context
+}
+
 // LookupEnv retrieves the value of the environment variable named by the key.
 func (c *Context) LookupEnv(key string) (string, bool) {
 	prefix := key + "="

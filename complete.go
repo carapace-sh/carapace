@@ -3,7 +3,6 @@ package carapace
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -42,19 +41,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 				return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
 			}
 
-			wd, err := os.Getwd()
-			if err != nil {
-				return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
-			}
-			context := Context{
-				CallbackValue: current,
-				Args:          targetArgs,
-				Env:           os.Environ(),
-				Dir:           wd,
-			}
-			if err != nil {
-				return ActionMessage(err.Error()).Invoke(context).value(shell, current), nil
-			}
+			context := newContext(append(targetArgs, current))
 
 			// TODO needs more cleanup and tests
 			var targetAction Action

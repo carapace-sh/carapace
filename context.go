@@ -11,7 +11,7 @@ import (
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
 
-// Context provides information during completion
+// Context provides information during completion.
 type Context struct {
 	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
 	CallbackValue string
@@ -34,7 +34,6 @@ func (c *Context) LookupEnv(key string) (string, bool) {
 		}
 	}
 	return "", false
-
 }
 
 // Getenv retrieves the value of the environment variable named by the key.

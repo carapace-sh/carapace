@@ -2,15 +2,9 @@
 package carapace
 
 import (
-	"fmt"
-	"io"
-	"io/ioutil"
-	"log"
 	"os"
 
-	_shell "github.com/rsteube/carapace/internal/shell"
-	"github.com/rsteube/carapace/internal/uid"
-	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/rsteube/carapace/internal/shell"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -105,36 +99,13 @@ func (c Carapace) Standalone() {
 }
 
 // Snippet creates completion script for given shell.
-func (c Carapace) Snippet(shell string) (string, error) {
-	return _shell.Snippet(c.cmd, shell)
+func (c Carapace) Snippet(name string) (string, error) {
+	return shell.Snippet(c.cmd, name)
 }
 
 // IsCallback returns true if current program invocation is a callback.
 func IsCallback() bool {
 	return len(os.Args) > 1 && os.Args[1] == "_carapace"
-}
-
-var logger = log.New(ioutil.Discard, "", log.Flags())
-
-func init() {
-	if _, enabled := os.LookupEnv("CARAPACE_LOG"); enabled {
-		if err := initLogger(); err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-}
-
-func initLogger() (err error) {
-	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
-	if err = os.MkdirAll(tmpdir, os.ModePerm); err == nil {
-		var logfileWriter io.Writer
-		if logfileWriter, err = os.OpenFile(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
-			Lmsgprefix := 1 << 6
-			logger = log.New(logfileWriter, ps.DetermineShell()+" ", log.Flags()|Lmsgprefix)
-			//logger = log.New(logfileWriter, determineShell()+" ", log.Flags()|log.Lmsgprefix)
-		}
-	}
-	return
 }
 
 // Test verifies the configuration (e.g. flag name exists)

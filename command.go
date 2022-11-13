@@ -27,7 +27,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.Println(os.Args) // TODO replace last with '' if empty
+			logger.PrintArgs(os.Args)
 			if s, err := complete(cmd, args); err != nil {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 			} else {

@@ -41,7 +41,7 @@ An example implementation can be found in the [example](./example/) folder.
 ## Standalone Mode
 
 Carapace can also be used to provide completion for arbitrary commands.
-See [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
+See [carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
 
 ## Related Projects
 

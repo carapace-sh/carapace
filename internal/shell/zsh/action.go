@@ -29,16 +29,13 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	var zstyles []string
 	var groupValues []string
 
+	// Generate all formatted completion strings and associated zstyles for the group,
+	// generate the complete group string, with tag:group header and its completions,
+	// and append the styles, passed all at once, irrespectively of their groups.
 	for _, header := range groups.headers {
 		group := groups.vals[header]
-
-		// Generate all formatted completion strings and associated zstyles for the group.
 		values, styles := formatGroup(group, valueStyle, descStyle, maxLen)
-
-		// Generate the complete group string, with tag:group header and its completions,
 		groupValues = append(groupValues, fmt.Sprintf("%v\n%v", header, strings.Join(values, "\n")))
-
-		// And append the styles, passed all at once, irrespectively of their groups.
 		zstyles = append(zstyles, styles...)
 	}
 
@@ -46,7 +43,8 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		zstyles = make([]string, 0)
 	}
 
-	// Header line : The header contains any message that has to be printed, and computed suffix matchers/removers.
+	// Header line : The header contains any message that has to be printed,
+	// and computed suffix matchers/removers.
 	ret, message := formatMessage()
 	suffix, removePatterns := formatSuffixMatchers(groups.suffix, groups.suffixRemove)
 	header := strings.Join([]string{ret, message, suffix, removePatterns}, "\t")
@@ -73,13 +71,15 @@ func formatGroup(group []common.RawValue, valueStyle, descStyle string, maxLen i
 	maxLenGrp := getMaxLength(group)
 
 	for idx, val := range group {
+		// Generate the corresponding zstyle with the value while not sanitized, since
+		// we must make some computation in order to match patterns correctly.
+		zstyles[idx] = formatStyle(val, descStyle, hasAliases, maxLenGrp, maxLen)
+
 		// Generate completion string for this value, respecting/considering a few things:
 		// - If some values are to be displayed next to the same description (eg. -f/--file)
 		// - If we must use global padding or per-group padding.
 		completions[idx] = formatValue(val, valueStyle, hasAliases, maxLenGrp, maxLen)
 
-		// Generate the corresponding zstyle string.
-		zstyles[idx] = formatStyle(val, descStyle, hasAliases, maxLenGrp, maxLen)
 	}
 
 	return completions, zstyles
@@ -117,15 +117,54 @@ func formatValue(val common.RawValue, style string, hasAliases bool, maxLenGrp, 
 	return fmt.Sprintf("%v\t%v%v -- %v", comp, display, padding, desc)
 }
 
+// formatDescriptionStylePattern takes care that we compute patterns for the description
+// that correspond to both the sanitizers we run on the displays and "cleartext" length
+// of the trimmed description.
+// This is so because there is a special character (:) that must be accounted for when escaping.
+func formatDescriptionStylePattern(val common.RawValue) (trimmed string) {
+	// First, compute any offset for colons: applied everywhere
+	colonEscaped := strings.NewReplacer(`:`, `\:`).Replace(val.Description)
+	colonOffset := 0
+
+	if len(colonEscaped) > len(val.Description) {
+		colonOffset = len(colonEscaped) - len(val.Description)
+	}
+
+	// Other reference strings, one sanitized and one not,
+	// since the latter is what  the string will actually look like.
+	trimmed = val.TrimmedDescription()
+	escaped := zstyleQuoter.Replace(trimmed)
+
+	// If the description was not trimmed, just sanitize and return .
+	if len(trimmed) >= len(val.Description) {
+		return escaped
+	}
+
+	// Or we have to resanitize the trimmed version,
+	// since it now has the correct length and contents.
+	if strings.HasSuffix(trimmed, "...") {
+		trimmed = strings.TrimSuffix(trimmed, "...")
+		trimmed = zstyleQuoter.Replace(trimmed)
+
+		if colonOffset > 0 {
+			trimmed = trimmed[:len(trimmed)-colonOffset+1]
+		}
+
+		trimmed += "..."
+	}
+
+	return trimmed
+}
+
 // formatStyle makes the style strings for a completion, respecting its padding and considering
 // the various parameters also considered when generating the completion strings.
 func formatStyle(val common.RawValue, descStyle string, hasAliases bool, maxLenGrp, maxLen int) string {
 	// Any padding, if used, must be computed before sanitizing the value
 	valueDisplayLen := len(val.Display)
 
-	// Shorthands
+	// Get the correctly computed display/description patterns.
+	desc := formatDescriptionStylePattern(val)
 	display := zstyleQuoter.Replace(val.Display)
-	desc := zstyleQuoter.Replace(val.TrimmedDescription())
 
 	// When the completion has no description, we don't need to take any
 	// parameters and constraints into account.

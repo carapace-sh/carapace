@@ -70,6 +70,8 @@ var zstyleQuoter = strings.NewReplacer(
 	"~", `\~`,
 )
 
+var zstyleDescriptionQuoter = strings.NewReplacer(`:`, `\:`)
+
 // displaySanitizer is used for candidates and/or their display strings.
 // It also escapes colons, since they are used to delimit the candidate
 // variable from its description (passed to _describe).

@@ -204,3 +204,9 @@ func buildflagValues(cmd *cobra.Command, c *Context, f *pflag.Flag, series bool)
 
 	return yesL, long, yesS, short
 }
+
+func flagRepeatable(flag *pflag.Flag) bool {
+	flagType := flag.Value.Type()
+
+	return strings.HasPrefix(flagType, "[]") || strings.HasPrefix(flagType, "map[")
+}

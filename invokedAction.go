@@ -127,7 +127,6 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 		for _, d := range dividers {
 			if strings.HasSuffix(ctx.CallbackValue, d) {
 				splittedCV = append(splittedCV, "")
-
 				break
 			}
 		}
@@ -162,7 +161,6 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 		for _, val := range uniqueVals {
 			vals = append(vals, val)
 		}
-
 		return actionRawValues(vals...).noSpace(true)
 	})
 }

@@ -67,10 +67,7 @@ func getRepeatableFlag(flag *pflag.Flag, action Action) Action {
 		return action
 	}
 
-	flagType := flag.Value.Type()
-	flagTypeRepeatable := strings.HasPrefix(flagType, "[]") || strings.HasPrefix(flagType, "map[")
-
-	if !flagTypeRepeatable {
+	if flagRepeatable(flag) {
 		return action
 	}
 
@@ -85,7 +82,7 @@ func getRepeatableFlag(flag *pflag.Flag, action Action) Action {
 		// also includes values set at runtime, or with NoOptDefVal.
 		var alreadySet []string
 
-		if flagTypeRepeatable {
+		if flagRepeatable(flag) {
 			// This might have the unintended effect or pulling out
 			// the last comma, not sure if this is dangerous.
 			alreadySet = append(alreadySet, strings.Split(values, " ")...)

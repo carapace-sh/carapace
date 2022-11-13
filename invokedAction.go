@@ -6,18 +6,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/shell/bash"
-	"github.com/rsteube/carapace/internal/shell/bash_ble"
-	"github.com/rsteube/carapace/internal/shell/elvish"
-	"github.com/rsteube/carapace/internal/shell/export"
-	"github.com/rsteube/carapace/internal/shell/fish"
-	"github.com/rsteube/carapace/internal/shell/ion"
-	"github.com/rsteube/carapace/internal/shell/nushell"
-	"github.com/rsteube/carapace/internal/shell/oil"
-	"github.com/rsteube/carapace/internal/shell/powershell"
-	"github.com/rsteube/carapace/internal/shell/tcsh"
-	"github.com/rsteube/carapace/internal/shell/xonsh"
-	"github.com/rsteube/carapace/internal/shell/zsh"
+	_shell "github.com/rsteube/carapace/internal/shell"
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked
@@ -158,23 +147,6 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 	})
 }
 
-func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
-	shellFuncs := map[string]func(currentWord string, nospace bool, values common.RawValues) string{
-		"bash":       bash.ActionRawValues,
-		"bash-ble":   bash_ble.ActionRawValues,
-		"fish":       fish.ActionRawValues,
-		"elvish":     elvish.ActionRawValues,
-		"export":     export.ActionRawValues,
-		"ion":        ion.ActionRawValues,
-		"nushell":    nushell.ActionRawValues,
-		"oil":        oil.ActionRawValues,
-		"powershell": powershell.ActionRawValues,
-		"tcsh":       tcsh.ActionRawValues,
-		"xonsh":      xonsh.ActionRawValues,
-		"zsh":        zsh.ActionRawValues,
-	}
-	if f, ok := shellFuncs[shell]; ok {
-		return f(callbackValue, a.nospace, a.rawValues)
-	}
-	return ""
+func (a InvokedAction) value(shell string, callbackValue string) string {
+	return _shell.Value(shell, callbackValue, a.nospace, a.rawValues)
 }

@@ -42,7 +42,6 @@ An example implementation can be found in the [example](./example/) folder.
 
 Carapace can also be used to provide completion for arbitrary commands.
 See [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
-There is also a binary to parse flags from gnu help pages at [caraparse](https://github.com/rsteube/carapace-bin/tree/master/cmd/caraparse).
 
 ## Related Projects
 

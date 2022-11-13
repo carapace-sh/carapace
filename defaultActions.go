@@ -296,7 +296,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(c.CallbackValue) && pflagfork.IsPosix(cmd.Flags())
+		isShorthandSeries := re.MatchString(c.CallbackValue) && pflagfork.FlagSet(cmd.Flags()).IsPosix()
 
 		vals := make([]string, 0)
 		cmd.Flags().VisitAll(func(f *pflag.Flag) {
@@ -321,7 +321,7 @@ func actionFlags(cmd *cobra.Command) Action {
 					vals = append(vals, f.Shorthand, f.Usage)
 				}
 			} else {
-				if flagstyle := pflagfork.Style(f); flagstyle != pflagfork.ShorthandOnly {
+				if flagstyle := pflagfork.Flag(f).Style(); flagstyle != pflagfork.ShorthandOnly {
 					if flagstyle == pflagfork.NameAsShorthand {
 						vals = append(vals, "-"+f.Name, f.Usage)
 					} else {

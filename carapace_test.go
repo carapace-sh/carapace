@@ -2,7 +2,6 @@ package carapace
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -169,15 +168,6 @@ func TestStandalone(t *testing.T) {
 	Gen(cmd).Standalone()
 
 	if cmd.CompletionOptions.DisableDefaultCmd == false {
-		t.Fail()
-	}
-}
-
-func TestInitLogger(t *testing.T) {
-	initLogger()
-	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
-	if _, err := os.Stat(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable())); os.IsNotExist(err) {
-
 		t.Fail()
 	}
 }

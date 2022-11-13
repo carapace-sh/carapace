@@ -166,6 +166,7 @@ func TestActionFiles(t *testing.T) {
 
 	assertEqual(t,
 		ActionStyledValues(
+			"README.md", style.Of("fg-default", "bg-default"),
 			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"main.go", style.Of("fg-default", "bg-default"),

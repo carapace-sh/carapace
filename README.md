@@ -33,68 +33,16 @@ import (
 carapace.Gen(rootCmd)
 ```
 
-## Standalone Mode
-
-Carapace can also be used to provide completion for arbitrary commands as well (similar to [aws_completer](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html)).
-See [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin) for examples. There is also a binary to parse flags from gnu help pages at [caraparse](https://github.com/rsteube/carapace-bin/tree/master/cmd/caraparse).
-
 ## Example
 
 An example implementation can be found in the [example](./example/) folder.
 
-```sh
-cd example
-go build .
 
-# bash
-PATH=$PATH:$(pwd)
-source <(example _carapace bash)
+## Standalone Mode
 
-# elvish
-paths=[$@paths (pwd)]
-eval (example _carapace elvish | slurp)
-
-# fish
-set PATH $PATH (pwd) 
-example _carapace fish | source
-
-# nushell
-example _carapace nushell
-
-# oil
-PATH=$PATH:$(pwd)
-source <(example _carapace oil)
-
-# powershell
-Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
-$env:PATH += ":$pwd"
-example _carapace powershell | out-string | Invoke-Expression
-
-# tcsh
-set autolist
-eval `example _carapace tcsh`
-
-# xonsh
-$COMPLETION_QUERY_LIMIT = 500 # increase limit
-$PATH.append($(pwd))
-exec($(example _carapace xonsh))
-
-# zsh
-PATH=$PATH:$(pwd)
-source <(example _carapace zsh)
-
-example <TAB>
-```
-
-or use [docker-compose](https://docs.docker.com/compose/):
-```sh
-docker-compose pull
-docker-compose run --rm build
-docker-compose run --rm [bash|elvish|fish|ion|nushell|oil|powershell|tcsh|xonsh|zsh]
-
-example <TAB>
-```
+Carapace can also be used to provide completion for arbitrary commands as well.
+See [rsteube/carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
+There is also a binary to parse flags from gnu help pages at [caraparse](https://github.com/rsteube/carapace-bin/tree/master/cmd/caraparse).
 
 ## Related Projects
 

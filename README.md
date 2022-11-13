@@ -23,7 +23,7 @@ Supported shells:
 
 ## Usage
 
-Calling `carapace.Gen` on the root command is sufficient to enable completion script generation using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).
+Calling `carapace.Gen` on the root command is sufficient to enable completion using the [hidden command](https://rsteube.github.io/carapace/carapace/gen/hiddenSubcommand.html).
 
 ```go
 import (

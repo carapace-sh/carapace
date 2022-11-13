@@ -16,6 +16,8 @@ type Action struct {
 	callback  CompletionCallback
 	nospace   bool
 	skipcache bool
+	hint      string // Non-error message,generally printed by shell caller, not as comp.
+	message   string // A message is an error raised by the caller of this action.
 }
 
 // ActionMap maps Actions to an identifier.
@@ -66,7 +68,7 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 		return ActionMessage("maximum recursion depth exceeded")
 	}
 	if a.rawValues == nil && a.callback != nil {
-		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache)
+		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache).withHint(a.hint)
 	}
 	return a
 }
@@ -172,6 +174,37 @@ func (a Action) TagF(f func(value string) (tag string)) Action {
 	})
 }
 
+// Suffix adds a suffix to all raw values contained in the action.
+// This suffix can automatically be removed upon entering a space
+// character, or some other special characters in some context.
+func (a Action) Suffix(suffix string, removable bool) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index := range invoked.rawValues {
+			invoked.rawValues[index].SuffixRemovable = suffix
+		}
+
+		return invoked.ToA()
+	})
+}
+
+// SuffixValues adds a a suffix to all values currently contained by
+// the Action, and which are found in the values array passed as parameter.
+func (a Action) SuffixValues(values []string, suffix string) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, val := range invoked.rawValues {
+			for _, value := range values {
+				if val.Value == value {
+					invoked.rawValues[index].SuffixRemovable = suffix
+				}
+			}
+		}
+
+		return invoked.ToA()
+	})
+}
+
 // Chdir changes the current working directory to the named directory during invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {
@@ -188,17 +221,33 @@ func (a Action) Chdir(dir string) Action {
 func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
+
+		// First filter the message field we use for storing errors.
 		filter := false
-		for _, rawValue := range invoked.rawValues {
-			if rawValue.Display == "ERR" {
-				for _, e := range expr {
-					r, err := regexp.Compile(e)
-					if err != nil {
-						return ActionMessage(err.Error())
-					}
-					if r.MatchString(rawValue.Description) {
-						filter = true
-						break
+		if a.message != "" {
+			for _, e := range expr {
+				r, err := regexp.Compile(e)
+				if err != nil {
+					return ActionMessage(err.Error())
+				}
+				if r.MatchString(a.message) {
+					a.message = err.Error()
+					filter = true
+					break
+				}
+			}
+		} else {
+			for _, rawValue := range invoked.rawValues {
+				if rawValue.Display == "ERR" {
+					for _, e := range expr {
+						r, err := regexp.Compile(e)
+						if err != nil {
+							return ActionMessage(err.Error())
+						}
+						if r.MatchString(rawValue.Description) {
+							filter = true
+							break
+						}
 					}
 				}
 			}
@@ -215,6 +264,13 @@ func (a Action) Suppress(expr ...string) Action {
 		}
 		return invoked.ToA()
 	})
+}
+
+func (a Action) withHint(s string) Action {
+	if s != "" {
+		a.hint = s
+	}
+	return a
 }
 
 func (a Action) noSpace(state bool) Action {

@@ -9,6 +9,9 @@ import (
 // or used by per-shell completion generation code (like ZSH with _message calls).
 var CompletionMessage string
 
+// CompletionHint TODO: Should be renamed and refactored, because its fundamentally a completion message.
+var CompletionHint string
+
 // AddMessageToValues checks if we should wrap an existing message into a completion action
 // (for all shells) or let the per-shell completion code to use it as they see fit.
 func AddMessageToValues(currentCallback string, values RawValues) RawValues {

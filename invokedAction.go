@@ -70,7 +70,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		c := uniqueRawValues[v]
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction{actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache)}
+	return InvokedAction{actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache).withHint(a.hint)}
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
@@ -105,7 +105,7 @@ func (a InvokedAction) ToA() Action {
 //	a := carapace.ActionValues("A/B/C", "A/C", "B/C", "C").Invoke(c)
 //	b := a.ToMultiPartsA("/") // completes segments separately (first one is ["A/", "B/", "C"])
 func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
-	return ActionCallback(func(c Context) Action {
+	return ActionCallback(func(ctx Context) Action {
 		_split := func() func(s string) []string {
 			quotedDividiers := make([]string, 0)
 			for _, d := range dividers {
@@ -113,25 +113,28 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 			}
 			f := fmt.Sprintf("([^%v]*(%v)?)", strings.Join(quotedDividiers, "|"), strings.Join(quotedDividiers, "|")) // TODO quickfix - this is wrong (fails for dividers longer than one character) an might need a reverse lookahead for character sequence
 			r := regexp.MustCompile(f)
+
 			return func(s string) []string {
 				if matches := r.FindAllString(s, -1); matches != nil {
 					return matches
 				}
+
 				return []string{}
 			}
 		}()
 
-		splittedCV := _split(c.CallbackValue)
+		splittedCV := _split(ctx.CallbackValue)
 		for _, d := range dividers {
-			if strings.HasSuffix(c.CallbackValue, d) {
+			if strings.HasSuffix(ctx.CallbackValue, d) {
 				splittedCV = append(splittedCV, "")
+
 				break
 			}
 		}
 
 		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, c.CallbackValue) {
+			if strings.HasPrefix(val.Value, ctx.CallbackValue) {
 				if splitted := _split(val.Value); len(splitted) >= len(splittedCV) {
 					v := strings.Join(splitted[:len(splittedCV)], "")
 					d := splitted[len(splittedCV)-1]
@@ -159,11 +162,22 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 		for _, val := range uniqueVals {
 			vals = append(vals, val)
 		}
+
 		return actionRawValues(vals...).noSpace(true)
 	})
 }
 
+// onIninalize can take some steps to make everything read for all shells.
+func (a InvokedAction) onInitialize(callbackValue string) InvokedAction {
+	// The final hint present is used by some shells
+	common.CompletionHint = a.hint
+	common.CompletionMessage = a.message
+	return a
+}
+
 func (a InvokedAction) value(shell string, callbackValue string) string { // TODO use context instead?
+	a = a.onInitialize(callbackValue)
+
 	shellFuncs := map[string]func(currentWord string, nospace bool, values common.RawValues) string{
 		"bash":       bash.ActionRawValues,
 		"bash-ble":   bash_ble.ActionRawValues,

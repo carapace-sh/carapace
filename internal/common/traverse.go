@@ -51,25 +51,33 @@ func anyFlagChanged(cmd *cobra.Command) (changed bool) {
 	return
 }
 
+// filterError is written so that it will backward recursively search all arguments and
+// try to parse the parts for which some errors must be analyzed. When the current (last)
+// word has not yielded anything related to the error, we go up the previous word.
 func filterError(args []string, err error) error {
 	if err == nil || len(args) == 0 {
 		return err
 	}
 
 	msg := err.Error()
-
 	current := args[len(args)-1]
+
+	var lastShort string
+	if len(current) > 0 {
+		lastShort = current[len(current)-1:]
+	}
+
 	if strings.HasPrefix(current, "--") && msg == fmt.Sprintf("flag needs an argument: %v", current) {
 		// ignore long flag argument currently being completed
 		return nil
 	}
 
-	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", current[len(current)-1:], current[len(current)-1:]) { // spf13/pflag
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", lastShort, lastShort) { // spf13/pflag
 		// ignore shorthand flag currently being completed
 		return nil
 	}
 
-	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`flag needs an argument: "%v" in -%v`, current[len(current)-1:], current[len(current)-1:]) { // rsteube/carapace-pflag: shorthand chain
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`flag needs an argument: "%v" in -%v`, lastShort, lastShort) { // rsteube/carapace-pflag: shorthand chain
 		// ignore shorthand flag currently being completed
 		return nil
 	}
@@ -89,22 +97,32 @@ func filterError(args []string, err error) error {
 		return nil
 	}
 
-	if len(args) > 1 {
-		previous := args[len(args)-2]
-		if strings.HasPrefix(previous, "--") && msg == fmt.Sprintf("flag needs an argument: %v", previous) {
-			// ignore long flag argument currently being completed
-			return nil
-		}
-
-		if strings.HasPrefix(previous, "-") && msg == fmt.Sprintf("flag needs an argument: '%v' in -%v", previous[len(previous)-1:], previous[len(previous)-1:]) {
-			// ignore shorthand flag argument currently being completed
-			return nil
-		}
-
-		if re := regexp.MustCompile(`invalid argument ".*" for "(?P<shorthand>-., )?(?P<flag>.*)" flag:.*`); re.MatchString(msg) && previous == re.FindStringSubmatch(msg)[2] {
-			// ignore invalid argument for flag currently being completed (e.g. empty IntSlice)
-			return nil
-		}
+	// TODO: Mute errors in flags that have a NoOptDefalue, with option-set OptArgDelimiter
+	if strings.HasPrefix(current, "-") && msg == fmt.Sprintf(`unknown shorthand flag: "%s" in -%s`, "=", "=") { // rsteube/carapace-pflag: long shorthand
+		// ignore non-posix shorthand flag currently being completed
+		return nil
 	}
+
+	re := regexp.MustCompile(`invalid argument ".*" for "(?P<shorthand>-., )?(?P<flag>.*)" flag:.*`)
+	// short := strings.TrimSuffix(re.FindStringSubmatch(msg)[1], ", ") // The space following the comma is important
+	// long := re.FindStringSubmatch(msg)[1]
+	if re.MatchString(msg) {
+		// Ignore invalid argument for flag currently being completed (e.g. empty IntSlice)
+		// Match either the short flag, which we must trim from a potential comma, or the long one
+		return nil
+	}
+
+	// If we did not catch a single error for the current word,
+	// (or any flag relevant in this word for that matter), we
+	// go on to the previous word, which might be the origin of
+	// the error.
+	// WARN: This is recursive so that it should lock the completion
+	// state with an error about this invalid flag. This seems to be
+	// however useful in terms of notifying the user something is going
+	// to go wrong in an almost fully persistent way (message printing).
+	if len(args) > 1 {
+		return filterError(args[len(args)-1:], err)
+	}
+
 	return err
 }

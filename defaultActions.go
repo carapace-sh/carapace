@@ -7,12 +7,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
-	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/internal/shell/export"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
@@ -240,12 +238,6 @@ func ActionStyledValuesDescribed(values ...string) Action {
 	})
 }
 
-func actionRawValues(rawValues ...common.RawValue) Action {
-	return Action{
-		rawValues: rawValues,
-	}
-}
-
 // ActionMessage displays a help messages in places where no completions can be generated.
 func ActionMessage(msg string, a ...interface{}) Action {
 	// We store the message variable, which will be used later
@@ -255,17 +247,37 @@ func ActionMessage(msg string, a ...interface{}) Action {
 		msg = fmt.Sprintf(msg, a...)
 	}
 
-	// We don't need to apply any prefix or even take care of
-	// any context: the current callback value will be added
-	// by the complete function when and if it finds a message
-	// to be added to completions.
-	common.CompletionMessage = msg
+	return ActionCallback(func(c Context) Action {
+		var action Action
+		// We don't need to apply any prefix or even take care of
+		// any context: the current callback value will be added
+		// by the complete function when and if it finds a message
+		// to be added to completions.
+		action.message = msg
 
-	// Return a blank action to conform to required return values
-	// and potentially to enable to users to further work on completions.
-	var action Action
+		return action.Invoke(c).ToA()
+	})
+}
+
+// ActionHint TODO: Should be changed name to enable passing various logs,
+// or at least a way to let different styles of messages being passed easily
+// without cluttering the carapace API.
+func ActionHint(msg string, a ...interface{}) Action {
+	// We store the message variable, which will be used later
+	// either as a completion (all shells but ZSH), or directly
+	// as a message (ZSH)
+	if len(a) > 0 {
+		msg = fmt.Sprintf(msg, a...)
+	}
 
 	return ActionCallback(func(c Context) Action {
+		var action Action
+		// We don't need to apply any prefix or even take care of
+		// any context: the current callback value will be added
+		// by the complete function when and if it finds a message
+		// to be added to completions.
+		action.hint = msg
+
 		return action.Invoke(c).ToA()
 	})
 }
@@ -289,124 +301,6 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 		c.Parts = parts
 
 		return callback(c).Invoke(c).Prefix(prefix).ToA().noSpace(true)
-	})
-}
-
-func actionSubcommands(cmd *cobra.Command) Action {
-	vals := make([]string, 0)
-	groups := make(map[string]string, len(cmd.Commands()))
-
-	// Order the completions in the order of groups, when they have one
-	for _, group := range cmd.Groups() {
-		for _, subcommand := range cmd.Commands() {
-			if subcommand.Hidden || subcommand.Deprecated != "" {
-				continue
-			}
-			if subcommand.GroupID != group.ID {
-				continue
-			}
-
-			vals = append(vals, subcommand.Name(), subcommand.Short)
-			for _, alias := range subcommand.Aliases {
-				vals = append(vals, alias, subcommand.Short)
-			}
-
-			for _, use := range append(subcommand.Aliases, subcommand.Name()) {
-				groups[use] = subcommand.GroupID
-			}
-		}
-	}
-
-	// Then add commands not belonging to a group.
-	for _, subcommand := range cmd.Commands() {
-		if subcommand.Hidden || subcommand.Deprecated != "" {
-			continue
-		}
-		if subcommand.GroupID != "" {
-			continue
-		}
-
-		vals = append(vals, subcommand.Name(), subcommand.Short)
-		for _, alias := range subcommand.Aliases {
-			vals = append(vals, alias, subcommand.Short)
-		}
-	}
-
-	// And gather them under their group as description
-	groupCommands := commandGrouper(cmd, groups)
-
-	return ActionValuesDescribed(vals...).GroupF(groupCommands).Tag("command")
-}
-
-// Generates a function to tag command completions with their corresponding group.
-func commandGrouper(cmd *cobra.Command, groups map[string]string) func(string) string {
-	groupCommands := func(command string) string {
-		cmdGroupID := groups[command]
-		for _, group := range cmd.Groups() {
-			if group.ID == cmdGroupID {
-				title := strings.TrimSpace(group.Title)
-				if !strings.HasSuffix(title, "commands") {
-					title += " commands"
-				}
-				return title
-			}
-		}
-
-		if len(cmd.Groups()) > 0 {
-			return "other commands"
-		}
-
-		return "commands"
-	}
-
-	return groupCommands
-}
-
-func actionFlags(cmd *cobra.Command) Action {
-	return ActionCallback(func(c Context) Action {
-		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(c.CallbackValue) && pflagfork.IsPosix(cmd.Flags())
-
-		vals := make([]string, 0)
-		cmd.Flags().VisitAll(func(f *pflag.Flag) {
-			if f.Deprecated != "" {
-				return // skip deprecated flags
-			}
-
-			if f.Changed &&
-				!strings.Contains(f.Value.Type(), "Slice") &&
-				!strings.Contains(f.Value.Type(), "Array") &&
-				f.Value.Type() != "count" {
-				return // don't repeat flag
-			}
-
-			if isShorthandSeries {
-				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					for _, shorthand := range c.CallbackValue[1:] {
-						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
-							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
-						}
-					}
-					vals = append(vals, f.Shorthand, f.Usage)
-				}
-			} else {
-				if flagstyle := pflagfork.Style(f); flagstyle != pflagfork.ShorthandOnly {
-					if flagstyle == pflagfork.NameAsShorthand {
-						vals = append(vals, "-"+f.Name, f.Usage)
-					} else {
-						vals = append(vals, "--"+f.Name, f.Usage)
-					}
-				}
-				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage)
-				}
-			}
-		})
-
-		if isShorthandSeries {
-			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true)
-		}
-		return ActionValuesDescribed(vals...)
 	})
 }
 

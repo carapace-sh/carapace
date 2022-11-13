@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/uid"
@@ -42,7 +43,11 @@ func (s _storage) getFlag(cmd *cobra.Command, name string) Action {
 func (s _storage) preinvoke(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
 	// TODO yuck - clean this up
 	entry := s.get(cmd)
-	a := action
+
+	// The flag might be a slice or a map, in which case it can accept more
+	// than one value. If it is, this call wraps its completer in an ActionMultiParts.
+	a := getRepeatableFlag(flag, action)
+
 	if entry.preinvoke != nil {
 		a = ActionCallback(func(c Context) Action {
 			return entry.preinvoke(cmd, flag, action)
@@ -53,6 +58,46 @@ func (s _storage) preinvoke(cmd *cobra.Command, flag *pflag.Flag, action Action)
 		return s.preinvoke(cmd.Parent(), flag, a)
 	}
 	return a
+}
+
+// If the given flag is a repeatable one (slice or map), build a special
+// completer that allows completions of comma-separated values for this flag.
+func getRepeatableFlag(flag *pflag.Flag, action Action) Action {
+	if flag == nil {
+		return action
+	}
+
+	flagType := flag.Value.Type()
+	flagTypeRepeatable := strings.HasPrefix(flagType, "[]") || strings.HasPrefix(flagType, "map[")
+
+	if !flagTypeRepeatable {
+		return action
+	}
+
+	// WARN: There must be a better way to check parse the values than this.
+	values := strings.TrimPrefix(flag.Value.String(), "map")
+	values = strings.TrimPrefix(values, "[")
+	values = strings.TrimSuffix(values, "]")
+
+	listAction := ActionMultiParts(",", func(c Context) Action {
+		// First filter out all the values that have been found
+		// with other invocations of this flag. Note that this
+		// also includes values set at runtime, or with NoOptDefVal.
+		var alreadySet []string
+
+		if flagTypeRepeatable {
+			// This might have the unintended effect or pulling out
+			// the last comma, not sure if this is dangerous.
+			alreadySet = append(alreadySet, strings.Split(values, " ")...)
+		} else {
+			alreadySet = append(alreadySet, flag.Value.String())
+		}
+
+		// Finally remove the parts found in the current string.
+		return action.Invoke(c).Filter(alreadySet).Filter(c.Parts).ToA().noSpace(false)
+	})
+
+	return listAction
 }
 
 func (s _storage) getPositional(cmd *cobra.Command, pos int) Action {

@@ -70,15 +70,31 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, args []string) (string, Action, Context) {
 	var targetAction Action
 
+	//
+	// Flags and their arguments, embedded or space separated -----------------------------------
+	//
+
 	// If we want an argument for the previous word (-flag)
-	if yes, flag := needsArgument(cmd, previous); yes {
-		return current, storage.getFlag(cmd, flag.Name), ctx
+	if yes, flag := needsArgument(cmd, previous); yes && flag != nil {
+		// First generate the user provided completions, or default ones.
+		flagArgAction := storage.getFlag(cmd, flag.Name).Invoke(ctx).ToA()
+
+		// Add a hint if requested
+		if len(flagArgAction.rawValues) == 0 {
+			flagArgAction = ActionHint(flag.Usage)
+		}
+
+		return current, flagArgAction, ctx
 	}
 
 	// Else we assume that the argument is a flag, trying to split for embedded args
 	if !cmd.DisableFlagParsing && strings.HasPrefix(current, "-") && !common.IsDash(cmd) {
-		return completeOption(cmd, ctx, current, targetAction)
+		return completeFlag(cmd, ctx, current)
 	}
+
+	//
+	// Positionals and commands, compounded ------------------------------------------------------
+	//
 
 	// Else, we deal with a positional word (either arg or command)
 	if len(ctx.Args) > 0 {
@@ -89,12 +105,12 @@ func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, 
 	// If the argument is a DoubleDash that has an impact on how the
 	// remaining arguments will be parsed (usually all in one list)
 	if common.IsDash(cmd) {
-		return current, findAction(cmd, args[cmd.ArgsLenAtDash():]), ctx
+		return current, initPositionalAction(cmd, args[cmd.ArgsLenAtDash():], ctx), ctx
 	}
 
 	// Else, we must either consume this arg with one of
 	// our positional arg completers, and/or complete subcommands.
-	targetAction = findAction(cmd, args)
+	targetAction = initPositionalAction(cmd, args, ctx)
 
 	// We only propose subcommands to complete if we have determined
 	// that we don't have required arguments anymore. Also take account
@@ -107,41 +123,36 @@ func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, 
 	return current, targetAction, ctx
 }
 
-func completeOption(cmd *cobra.Command, ctx Context, current string, targetAction Action) (string, Action, Context) {
-	// If there is no embedded argument, just parse the next argument word
-	if !strings.Contains(current, "=") {
-		return current, actionFlags(cmd), ctx
-	}
-
-	// If we have found such a split in the string, proceed.
-	// First lookup the flag in the last word.
-	// We must find a flag, or we return an empty Action.
+func completeFlag(cmd *cobra.Command, ctx Context, current string) (string, Action, Context) {
+	// Always try to dected a flag for completion
 	flag := lookupFlag(cmd, current)
-	if flag == nil || flag.NoOptDefVal == "" {
-		return current, targetAction, ctx
+
+	if flag == nil || !strings.Contains(current, "=") {
+		return current, actionFlags(cmd), ctx
 	}
 
 	// Else, process the string and build the completion context.
 	action := storage.getFlag(cmd, flag.Name)
 	splitted := strings.SplitN(current, "=", 2)
 	ctx.CallbackValue = splitted[1]
-	current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)                   // revert (potentially) overridden optarg divider for `.value()` invocation below
-	targetAction = action.Invoke(ctx).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
+	current = strings.Replace(current, "=", opts.OptArgDelimiter, 1)             // revert (potentially) overridden optarg divider for `.value()` invocation below
+	action = action.Invoke(ctx).Prefix(splitted[0] + opts.OptArgDelimiter).ToA() // prefix with (potentially) overridden optarg delimiter
 
-	return current, targetAction, ctx
+	return current, action, ctx
 }
 
-func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
-	// TODO handle Action not found
-	if len(targetArgs) == 0 {
-		return storage.getPositional(targetCmd, 0)
+// initPositionalAction invokes any non-nil action to be found for this positional word.
+func initPositionalAction(cmd *cobra.Command, args []string, ctx Context) (action Action) {
+	if len(args) == 0 {
+		action = storage.getPositional(cmd, 0)
+	} else {
+		action = storage.getPositional(cmd, len(args)-1)
 	}
 
-	// lastArg := targetArgs[len(targetArgs)-1]
-	// if strings.HasSuffix(lastArg, " ") { // TODO is this still correct/needed?
-	// 	return storage.getPositional(targetCmd, len(targetArgs))
-	// }
-	return storage.getPositional(targetCmd, len(targetArgs)-1)
+	// Add a hint if requested
+	action = action.Invoke(ctx).ToA()
+
+	return
 }
 
 func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
@@ -152,14 +163,19 @@ func findTarget(cmd *cobra.Command, args []string) (*cobra.Command, []string, er
 	return common.TraverseLenient(cmd, origArg)
 }
 
+// lookupFlag must actually deal with an arbitrary number of potential short arguments.
 func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 	nameOrShorthand := strings.TrimLeft(strings.SplitN(arg, "=", 2)[0], "-")
 
+	// If we are treating with a long flag request
 	if strings.HasPrefix(arg, "--") {
-		flag = cmd.Flags().Lookup(nameOrShorthand)
-	} else if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
+		return cmd.Flags().Lookup(nameOrShorthand)
+	}
+
+	if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
 		flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
 	}
+
 	return
 }
 
@@ -189,6 +205,14 @@ func needsArgument(targetCmd *cobra.Command, previous string) (yes bool, flag *p
 	flag = lookupFlag(targetCmd, previous)
 	if flag == nil {
 		return
+	}
+
+	// We might have that having an embedded argument
+	// if flag.Changed {
+	// 	return
+	// }
+	if len(strings.Split(previous, "=")) >= 2 {
+		return false, nil
 	}
 
 	if !targetCmd.DisableFlagParsing && flag.NoOptDefVal == "" && !common.IsDash(targetCmd) {

@@ -2,26 +2,9 @@
 package carapace
 
 import (
-	"fmt"
-	"io"
-	"io/ioutil"
-	"log"
 	"os"
 
-	"github.com/rsteube/carapace/internal/shell/bash"
-	"github.com/rsteube/carapace/internal/shell/bash_ble"
-	"github.com/rsteube/carapace/internal/shell/elvish"
-	"github.com/rsteube/carapace/internal/shell/export"
-	"github.com/rsteube/carapace/internal/shell/fish"
-	"github.com/rsteube/carapace/internal/shell/ion"
-	"github.com/rsteube/carapace/internal/shell/nushell"
-	"github.com/rsteube/carapace/internal/shell/oil"
-	"github.com/rsteube/carapace/internal/shell/powershell"
-	"github.com/rsteube/carapace/internal/shell/tcsh"
-	"github.com/rsteube/carapace/internal/shell/xonsh"
-	"github.com/rsteube/carapace/internal/shell/zsh"
-	"github.com/rsteube/carapace/internal/uid"
-	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/rsteube/carapace/internal/shell"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -116,56 +99,13 @@ func (c Carapace) Standalone() {
 }
 
 // Snippet creates completion script for given shell.
-func (c Carapace) Snippet(shell string) (string, error) {
-	if shell == "" {
-		shell = ps.DetermineShell()
-	}
-	shellSnippets := map[string]func(cmd *cobra.Command) string{
-		"bash":       bash.Snippet,
-		"bash-ble":   bash_ble.Snippet,
-		"export":     export.Snippet,
-		"fish":       fish.Snippet,
-		"elvish":     elvish.Snippet,
-		"ion":        ion.Snippet,
-		"nushell":    nushell.Snippet,
-		"oil":        oil.Snippet,
-		"powershell": powershell.Snippet,
-		"tcsh":       tcsh.Snippet,
-		"xonsh":      xonsh.Snippet,
-		"zsh":        zsh.Snippet,
-	}
-	if s, ok := shellSnippets[shell]; ok {
-		return s(c.cmd.Root()), nil
-	}
-	return "", fmt.Errorf("expected 'bash', bash-ble, 'elvish', 'fish', 'ion', 'nushell', 'oil', 'powershell', 'tcsh', 'xonsh' or 'zsh' [was: %v]", shell)
+func (c Carapace) Snippet(name string) (string, error) {
+	return shell.Snippet(c.cmd, name)
 }
 
 // IsCallback returns true if current program invocation is a callback.
 func IsCallback() bool {
 	return len(os.Args) > 1 && os.Args[1] == "_carapace"
-}
-
-var logger = log.New(ioutil.Discard, "", log.Flags())
-
-func init() {
-	if _, enabled := os.LookupEnv("CARAPACE_LOG"); enabled {
-		if err := initLogger(); err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-}
-
-func initLogger() (err error) {
-	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
-	if err = os.MkdirAll(tmpdir, os.ModePerm); err == nil {
-		var logfileWriter io.Writer
-		if logfileWriter, err = os.OpenFile(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable()), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o666); err == nil {
-			Lmsgprefix := 1 << 6
-			logger = log.New(logfileWriter, ps.DetermineShell()+" ", log.Flags()|Lmsgprefix)
-
-		}
-	}
-	return
 }
 
 // Test verifies the configuration (e.g. flag name exists)

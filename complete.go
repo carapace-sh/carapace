@@ -7,6 +7,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/ps"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -42,21 +43,17 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 
 	// Else we are completing the command we've been compiled into.
 	// Any error arising here is returned after creating a context.
-	targetCmd, targetArgs, parseErr := findTarget(cmd, args)
+	targetCmd, targetArgs, err := findTarget(cmd, args)
+	if err != nil {
+		return ActionMessage(err.Error()).
+			Invoke(Context{CallbackValue: current}).value(shell, current), nil
+	}
 
 	// Create a new context: it is never nil, even if an error occurs
 	// and is returned from this instantation/setup.
-	ctx, err := newContext(current, targetArgs)
-	if err != nil {
-		return ActionMessage(err.Error()).Invoke(ctx).value(shell, current), nil
-	}
+	ctx := newContext(append(targetArgs, current))
 
 	var action Action
-
-	// unrecoverable command/arg/flag parsing errors are returned immediately.
-	if parseErr != nil {
-		return ActionMessage(parseErr.Error()).Invoke(ctx).value(shell, current), nil
-	}
 
 	// Or we have at least a positional, a flag or a subcommand word to handle.
 	// We simply want to settle on a "root" completion Action, since it can host
@@ -166,7 +163,11 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 	}
 
 	if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
-		flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
+		if pflagfork.FlagSet(cmd.Flags()).IsPosix() {
+			flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
+		} else {
+			flag = cmd.Flags().ShorthandLookup(nameOrShorthand)
+		}
 	}
 
 	return

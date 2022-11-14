@@ -2,7 +2,6 @@ package carapace
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -27,12 +26,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.Println(os.Args) // TODO replace last with '' if empty
-			if s, err := complete(cmd, args); err != nil {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
-			} else {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)
-			}
+			logger.PrintArgs(os.Args)
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,

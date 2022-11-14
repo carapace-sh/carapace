@@ -89,7 +89,7 @@ func groupCommands(cmd *cobra.Command, groups map[string]string) func(string) st
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(ctx Context) Action {
 		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(ctx.CallbackValue) && pflagfork.IsPosix(cmd.Flags())
+		isShorthandSeries := re.MatchString(ctx.CallbackValue) && pflagfork.FlagSet(cmd.Flags()).IsPosix()
 
 		vals := make([]string, 0)
 
@@ -190,7 +190,7 @@ func buildflagValues(cmd *cobra.Command, c *Context, f *pflag.Flag, series bool)
 		return yesL, long, yesS, short
 	}
 
-	if flagstyle := pflagfork.Style(f); flagstyle != pflagfork.ShorthandOnly {
+	if flagstyle := pflagfork.Flag(f).Style(); flagstyle != pflagfork.ShorthandOnly {
 		if flagstyle == pflagfork.NameAsShorthand {
 			long = "-" + f.Name
 		} else {

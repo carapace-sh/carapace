@@ -25,25 +25,17 @@ type Context struct {
 	Dir string
 }
 
-// newContext creates a completion context no matter what, so that any error occurring
-// in its setup can still be returned to the shell caller.
-func newContext(currentCallback string, targetArgs []string) (Context, error) {
-	// Always build a completion ctx so that it can handle
-	// errors accordingly, and a default action, without any settings.
-	ctx := Context{
-		CallbackValue: currentCallback,
-		Args:          targetArgs,
+func newContext(args []string) Context {
+	context := Context{
+		CallbackValue: args[len(args)-1],
+		Args:          args[:len(args)-1],
 		Env:           os.Environ(),
 	}
 
-	wd, err := os.Getwd()
-	if err != nil {
-		return ctx, err
-	} else {
-		ctx.Dir = wd
+	if wd, err := os.Getwd(); err == nil {
+		context.Dir = wd
 	}
-
-	return ctx, nil
+	return context
 }
 
 // LookupEnv retrieves the value of the environment variable named by the key.

@@ -173,14 +173,6 @@ func TestStandalone(t *testing.T) {
 	}
 }
 
-func TestInitLogger(t *testing.T) {
-	initLogger()
-	tmpdir := fmt.Sprintf("%v/carapace", os.TempDir())
-	if _, err := os.Stat(fmt.Sprintf("%v/%v.log", tmpdir, uid.Executable())); os.IsNotExist(err) {
-		t.Fail()
-	}
-}
-
 func TestIsCallback(t *testing.T) {
 	os.Args = []string{uid.Executable(), "subcommand"}
 	if IsCallback() {

@@ -28,6 +28,7 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 	if shell == "" {
 		shell = ps.DetermineShell()
 	}
+
 	shellSnippets := map[string]func(cmd *cobra.Command) string{
 		"bash":       bash.Snippet,
 		"bash-ble":   bash_ble.Snippet,
@@ -43,6 +44,7 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 		"xonsh":      xonsh.Snippet,
 		"zsh":        zsh.Snippet,
 	}
+
 	if s, ok := shellSnippets[shell]; ok {
 		return s(cmd.Root()), nil
 	}
@@ -52,6 +54,7 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 		expected = append(expected, key)
 	}
 	sort.Strings(expected)
+
 	return "", fmt.Errorf("expected one of '%v' [was: %v]", strings.Join(expected, "', '"), shell)
 }
 
@@ -70,8 +73,10 @@ func Value(shell string, callbackValue string, nospace bool, values common.RawVa
 		"xonsh":      xonsh.ActionRawValues,
 		"zsh":        zsh.ActionRawValues,
 	}
+
 	if f, ok := shellFuncs[shell]; ok {
 		return f(callbackValue, nospace, values)
 	}
+
 	return ""
 }

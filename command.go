@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -27,6 +28,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.PrintArgs(os.Args)
+			if s, err := complete(cmd, args); err != nil {
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
+			} else {
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)
+			}
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,

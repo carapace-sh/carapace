@@ -18,7 +18,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 	// - Filter candidates not matching the current prefix callback
 	// - Group them according to their tag:group specifications,so that they
 	//   can compute their paddings and styles independently.
-	// - Compute a global max padding length, irrespectively of groups
+	// - Define some information needed later.
 	groups, onlyCommands, maxLen := scanValues(values, currentWord, nospace)
 
 	// We actually only pad values globally when all groups are commands.
@@ -206,7 +206,8 @@ func sanitizeCompletion(val common.RawValue, valueStyle string) common.RawValue 
 }
 
 // formatZstyle creates a zstyle matcher for given display stings.
-// `compadd -l` (one per line) accepts ansi escape sequences in display value but it seems in tabular view these are removed.
+// `compadd -l` (one per line) accepts ansi escape sequences in display
+// value but it seems in tabular view these are removed.
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
 func formatZstyle(s, styleValue, styleDescription string) string {
 	zstyle := fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s,

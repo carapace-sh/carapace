@@ -43,11 +43,9 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 		zstyles = make([]string, 0)
 	}
 
-	// Header line : The header contains any message that has to be printed,
-	// and computed suffix matchers/removers.
-	ret, message := formatMessage()
+	// Header line : The header contains any message that has to be printed, and suffix matchers/removers.
 	suffix, removePatterns := formatSuffixMatchers(groups.suffix, groups.suffixRemove)
-	header := strings.Join([]string{ret, message, suffix, removePatterns}, "\t")
+	header := strings.Join([]string{formatMessage(), suffix, removePatterns}, "\t")
 
 	return fmt.Sprintf("%v\n%v\n%v", header, strings.Join(zstyles, ":"), strings.Join(groupValues, "\n\n"))
 }
@@ -79,7 +77,6 @@ func formatGroup(group []common.RawValue, valueStyle, descStyle string, maxLen i
 		// - If some values are to be displayed next to the same description (eg. -f/--file)
 		// - If we must use global padding or per-group padding.
 		completions[idx] = formatValue(val, valueStyle, hasAliases, maxLenGrp, maxLen)
-
 	}
 
 	return completions, zstyles
@@ -245,11 +242,8 @@ func setDefaultValueStyle() (valueStyle, descriptionStyle string) {
 }
 
 // builds the first part of the header line, checking either errors or hints.
-func formatMessage() (retcode, message string) {
+func formatMessage() (message string) {
 	if common.CompletionMessage != "" {
-		// Format the completion message if needed
-		retcode = "1" // TODO VERY VERY UGLY
-
 		msg := messageSanitizer.Replace(common.CompletionMessage)
 		msg = quoter.Replace(msg)
 
@@ -273,5 +267,5 @@ func formatMessage() (retcode, message string) {
 			style.SGR("fg-default"))
 	}
 
-	return retcode, message
+	return message
 }

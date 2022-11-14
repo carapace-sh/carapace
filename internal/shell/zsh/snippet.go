@@ -30,7 +30,7 @@ function _%v_completion {
   # Header ("message":"suffix specs")
   read -r header <<< "${lines}"
   header=${header//$(printf '\t')/:}
-  IFS=$':' read retcode message suffix rm_suffix <<< "${header}"
+  IFS=$':' read message suffix rm_suffix <<< "${header}"
   [[ -n ${message} ]] && _message -r "${message}"
   lines=${lines#*$'\n'}
 
@@ -49,7 +49,7 @@ function _%v_completion {
   local tag group vals=() displays=()
 
   while read -r line ; do
-    # A new line:done with current group, register its completions and reset.
+    # A new line: done with current group, register its completions and reset.
     if [[ $line == "" ]]; then
         _describe -t "$tag-${group// /-}" "$group" displays vals "${compOpts[@]}" 
         ((i++)) && s=1 && vals=() && displays=() && tag= && group= && continue
@@ -70,39 +70,3 @@ compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v
 `, cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
 }
-
-// Notes: Alternative system based _description and compadd
-//
-// A few problems:
-// If the completions share the same tag, they are not grouped under their group description.
-// Completions are not grouped together when they share the same COMPLETION description (short/long flags)
-// Does not seem to go significantly faster than _describe calls.
-//
-// Advantages
-// We can pass our options to compadd more easily, which (-l -Q -S)
-
-// Code:
-//     local expl=(-S "${suffix}")
-//     _description "${tag}" expl ${group}
-//     compadd -Q -S${suffix} -l "${expl[@]}" -d displays -a -- vals
-
-// # Process and generate completions by groups (one per line)
-// for group in "${lines[@]}"; do
-//   #candidates=($(xargs -n1 <<< "${group}"))
-//
-//   # Header (tag and group description)
-//   IFS=$':' read tag group <<< "${candidates[1]}"
-//   candidates=(${candidates[@]:1})
-//
-//   # shellcheck disable=SC2034,2206
-//   local vals=(${candidates%%%%$'\t'*})
-//   # shellcheck disable=SC2034,2206
-//   local displays=(${candidates##*$'\t'})
-//
-//   for comp in "${displays[@]}"; do
-//       echo "$comp" >> ~/displays_groups
-//   done
-//
-//   # Generate completions
-//   _describe -t "$tag-${group// /-}" "$group" displays vals "${compOpts[@]}"
-// done

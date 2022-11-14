@@ -22,6 +22,7 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 	if len(args) > 0 && args[len(args)-1] == "" {
 		targetArgs = append(targetArgs, "")
 	}
+
 	if err != nil {
 		return targetCmd, targetArgs, filterError(args, err)
 	}
@@ -31,6 +32,7 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 	}
 
 	err = targetCmd.ParseFlags(targetArgs)
+
 	for _, name := range append(targetCmd.Aliases, targetCmd.Name()) {
 		if len(args) > 0 &&
 			name == args[len(args)-1] &&
@@ -41,6 +43,7 @@ func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []strin
 			}
 		}
 	}
+
 	return targetCmd, targetCmd.Flags().Args(), filterError(args, err)
 }
 

@@ -70,16 +70,12 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, args []string) (string, Action, Context) {
 	var targetAction Action
 
-	//
-	// Flags and their arguments, embedded or space separated -----------------------------------
-	//
-
 	// If we want an argument for the previous word (-flag)
 	if yes, flag := needsArgument(cmd, previous); yes && flag != nil {
 		// First generate the user provided completions, or default ones.
 		flagArgAction := storage.getFlag(cmd, flag.Name).Invoke(ctx).ToA()
 
-		// Add a hint if requested
+		// Add a hint if needed
 		if len(flagArgAction.rawValues) == 0 {
 			flagArgAction = ActionHint(flag.Usage)
 		}
@@ -92,13 +88,10 @@ func getTargetAction(current, previous string, ctx Context, cmd *cobra.Command, 
 		return completeFlag(cmd, ctx, current)
 	}
 
-	//
-	// Positionals and commands, compounded ------------------------------------------------------
-	//
-
 	// Else, we deal with a positional word (either arg or command)
 	if len(ctx.Args) > 0 {
-		// current word being completed is a positional so remove it from context.Args
+		// current word being completed is a positional
+		// so remove it from context.Args
 		ctx.Args = ctx.Args[:len(ctx.Args)-1]
 	}
 

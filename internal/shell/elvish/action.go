@@ -33,12 +33,7 @@ type complexCandidate struct {
 }
 
 // ActionRawValues formats values for elvish
-func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
-	suffix := " "
-	if nospace {
-		suffix = ""
-	}
-
+func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	valueStyle := "default"
 	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
 		valueStyle = s
@@ -51,6 +46,11 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	vals := make([]complexCandidate, len(values))
 	for index, val := range sanitize(values) {
+		suffix := " "
+		if nospace.Matches(val.Value) {
+			suffix = ""
+		}
+
 		if val.Style == "" || ui.ParseStyling(val.Style) == nil {
 			val.Style = valueStyle
 		}

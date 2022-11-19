@@ -29,7 +29,7 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction{actionRawValues(filtered...).noSpace(a.nospace).skipCache(a.skipcache)}
+	return InvokedAction{actionRawValues(filtered...).noSpace(string(a.nospace)).skipCache(a.skipcache)}
 }
 
 // Merge merges InvokedActions (existing values are overwritten)
@@ -45,7 +45,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
-		nospace = nospace || other.nospace
+		nospace = nospace.Add(string(other.nospace))
 		skipcache = skipcache || other.skipcache
 	}
 
@@ -53,7 +53,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction{actionRawValues(rawValues...).noSpace(nospace).skipCache(skipcache)}
+	return InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).skipCache(skipcache)}
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
@@ -143,7 +143,17 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 		for _, val := range uniqueVals {
 			vals = append(vals, val)
 		}
-		return actionRawValues(vals...).noSpace(true)
+
+		var sm common.SuffixMatcher
+		for _, divider := range dividers {
+			if runes := []rune(divider); len(runes) == 0 {
+				sm = sm.Add("*")
+				break
+			} else {
+				sm = sm.Add(string(runes[len(runes)-1]))
+			}
+		}
+		return actionRawValues(vals...).noSpace(string(sm))
 	})
 }
 

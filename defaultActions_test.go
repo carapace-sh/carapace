@@ -11,7 +11,7 @@ func TestActionImport(t *testing.T) {
 	s := `
 {
   "Version": "unknown",
-  "Nospace": true,
+  "Nospace": "*",
   "RawValues": [
     {
       "Value": "positional1",

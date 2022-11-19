@@ -15,7 +15,7 @@ func TestBatch(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B", "C", "D"),
-			nospace:   false,
+			nospace:   common.SuffixMatcher(""),
 			skipcache: false,
 		},
 	}
@@ -30,7 +30,7 @@ func TestBatchSingle(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B"),
-			nospace:   false,
+			nospace:   common.SuffixMatcher(""),
 			skipcache: false,
 		},
 	}
@@ -43,7 +43,7 @@ func TestBatchNone(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom(),
-			nospace:   false,
+			nospace:   common.SuffixMatcher(""),
 			skipcache: false,
 		},
 	}
@@ -60,7 +60,7 @@ func TestBatchToA(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B", "C", "D"),
-			nospace:   false,
+			nospace:   common.SuffixMatcher(""),
 			skipcache: false,
 		},
 	}

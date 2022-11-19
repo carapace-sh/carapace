@@ -50,7 +50,7 @@ func TestActionCallback(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("a", "b", "c"),
-			nospace:   false,
+			nospace:   "",
 			skipcache: false,
 		},
 	}
@@ -104,11 +104,11 @@ func TestNoSpace(t *testing.T) {
 			Suffix("").
 			ToA()
 	})
-	if a.nospace {
-		t.Fatal("uninvoked nospace should be false")
+	if a.nospace != "" {
+		t.Fatal("uninvoked nospace should be empty")
 	}
-	if !a.Invoke(Context{}).nospace {
-		t.Fatal("invoked nospace should be true")
+	if a.Invoke(Context{}).nospace != "*" {
+		t.Fatal("invoked nospace should be `*`")
 	}
 }
 
@@ -120,7 +120,7 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace(true).Invoke(Context{}),
+		).noSpace("/").Invoke(Context{}),
 		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
@@ -131,7 +131,7 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace(true).Invoke(Context{}).Prefix("./"),
+		).noSpace("/").Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
@@ -139,14 +139,14 @@ func TestActionDirectories(t *testing.T) {
 		ActionStyledValues(
 			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		).noSpace("/").Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		).noSpace("/").Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
 	)
 }
@@ -160,7 +160,7 @@ func TestActionFiles(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace(true).Invoke(Context{}),
+		).noSpace("/").Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
@@ -171,7 +171,7 @@ func TestActionFiles(t *testing.T) {
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"main.go", style.Of("fg-default", "bg-default"),
 			"main_test.go", style.Of("fg-default", "bg-default"),
-		).noSpace(true).Invoke(Context{}).Prefix("example/"),
+		).noSpace("/").Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
 }
@@ -180,12 +180,12 @@ func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
 	assertEqual(t,
-		ActionStyledValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), style.Carapace.Error, "_", "", style.Default).noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
+		ActionStyledValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), style.Carapace.Error, "_", "", style.Default).noSpace("/").Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
 	)
 
 	assertEqual(t,
-		ActionStyledValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), style.Carapace.Error, "_", "", style.Default).noSpace(true).Style("fg-default bg-default").Invoke(Context{}),
+		ActionStyledValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), style.Carapace.Error, "_", "", style.Default).noSpace("/").Style("fg-default bg-default").Invoke(Context{}),
 		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
 	)
 
@@ -193,7 +193,7 @@ func TestActionFilesChdir(t *testing.T) {
 		ActionStyledValues(
 			"action.go", style.Of("fg-default", "bg-default"),
 			"snippet.go", style.Of("fg-default", "bg-default"),
-		).noSpace(true).Invoke(Context{}).Prefix("elvish/"),
+		).noSpace("/").Invoke(Context{}).Prefix("elvish/"),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{CallbackValue: "elvish/"}),
 	)
 
@@ -204,7 +204,7 @@ func TestActionFilesChdir(t *testing.T) {
 
 func TestActionMessage(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("/").skipCache(true).Invoke(Context{}).Prefix("docs/"),
 		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
 	)
 }
@@ -215,13 +215,13 @@ func TestActionMessageSuppress(t *testing.T) {
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
-		ActionValues("test").noSpace(true).skipCache(true).Invoke(Context{}),
+		ActionValues("test").noSpace("/").skipCache(true).Invoke(Context{}),
 	)
 }
 
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
-		ActionMessage("go unknown: unknown command").noSpace(true).skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		ActionMessage("go unknown: unknown command").noSpace("/").skipCache(true).Invoke(Context{}).Prefix("docs/"),
 		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{CallbackValue: "docs/"}),
 	)
 

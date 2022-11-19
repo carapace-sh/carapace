@@ -10,11 +10,11 @@ import (
 
 type Export struct {
 	Version   string
-	Nospace   bool
+	Nospace   common.SuffixMatcher
 	RawValues common.RawValues
 }
 
-func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
 		Version:   version(),

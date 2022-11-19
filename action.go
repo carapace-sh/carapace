@@ -14,7 +14,7 @@ import (
 type Action struct {
 	rawValues []common.RawValue
 	callback  CompletionCallback
-	nospace   bool
+	nospace   common.SuffixMatcher
 	skipcache bool
 }
 
@@ -66,14 +66,17 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 		return ActionMessage("maximum recursion depth exceeded")
 	}
 	if a.rawValues == nil && a.callback != nil {
-		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(a.nospace).skipCache(a.skipcache)
+		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.nospace)).skipCache(a.skipcache)
 	}
 	return a
 }
 
-// NoSpace disables space suffix
-func (a Action) NoSpace() Action {
-	return a.noSpace(true)
+// NoSpace disables space suffix for given characters (or all if none are given).
+func (a Action) NoSpace(suffixes ...rune) Action {
+	if len(suffixes) == 0 {
+		return a.noSpace("*")
+	}
+	return a.noSpace(string(suffixes))
 }
 
 // Style sets the style
@@ -160,8 +163,8 @@ func (a Action) Suppress(expr ...string) Action {
 	})
 }
 
-func (a Action) noSpace(state bool) Action {
-	a.nospace = a.nospace || state
+func (a Action) noSpace(suffixes string) Action {
+	a.nospace = a.nospace.Add(suffixes)
 	return a
 }
 

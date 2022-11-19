@@ -31,7 +31,7 @@ func ensureNotEmpty(s string) string {
 }
 
 // ActionRawValues formats values for powershell
-func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
@@ -54,7 +54,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 				val.Value = fmt.Sprintf("'%v'", val.Value)
 			}
 
-			if !nospace {
+			if !nospace.Matches(val.Value) {
 				val.Value = val.Value + " "
 			}
 

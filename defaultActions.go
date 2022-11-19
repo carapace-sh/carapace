@@ -68,9 +68,7 @@ func ActionImport(output []byte) Action {
 			return ActionMessage(err.Error())
 		}
 		a := actionRawValues(e.RawValues...)
-		if e.Nospace {
-			a = a.NoSpace()
-		}
+		a = a.NoSpace([]rune(e.Nospace)...)
 		return a
 	})
 }
@@ -107,7 +105,7 @@ func ActionExecute(cmd *cobra.Command) Action {
 // ActionDirectories completes directories
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
 			if abs, err := c.Abs(s); err == nil {
 				return style.ForPath(abs)
 			}
@@ -119,7 +117,7 @@ func ActionDirectories() Action {
 // ActionFiles completes files with optional suffix filtering
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").noSpace(true).StyleF(func(s string) string {
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
 			if abs, err := c.Abs(s); err == nil {
 				return style.ForPath(abs)
 			}
@@ -254,7 +252,7 @@ func ActionMessage(msg string, a ...interface{}) Action {
 		}
 		return ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).
 			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
-			noSpace(true).skipCache(true)
+			noSpace("*").skipCache(true)
 	})
 }
 
@@ -276,7 +274,11 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 		}
 		c.Parts = parts
 
-		return callback(c).Invoke(c).Prefix(prefix).ToA().noSpace(true)
+		nospace := "*"
+		if runes := []rune(divider); len(runes) > 0 {
+			nospace = string(runes[len(runes)-1])
+		}
+		return callback(c).Invoke(c).Prefix(prefix).ToA().noSpace(nospace)
 	})
 }
 
@@ -335,7 +337,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		})
 
 		if isShorthandSeries {
-			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace(true)
+			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().noSpace("*")
 		}
 		for i := 0; i < len(vals); i = i + 2 { // TODO experimental - hardcoded multiparts completion if flags are "grouped" with `.`
 			if strings.Contains(vals[i], ".") {

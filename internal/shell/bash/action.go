@@ -71,7 +71,7 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 const nospaceIndicator = "\001"
 
 // ActionRawValues formats values for bash
-func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 
 	lastSegment := currentWord // last segment of currentWord split by COMP_WORDBREAKS
@@ -103,7 +103,7 @@ func ActionRawValues(currentWord string, nospace bool, values common.RawValues) 
 
 	vals := make([]string, len(filtered))
 	for index, val := range filtered {
-		if nospace && !strings.HasSuffix(val.Value, nospaceIndicator) {
+		if nospace.Matches(val.Value) {
 			val.Value = val.Value + nospaceIndicator
 		}
 

@@ -29,13 +29,13 @@ type suggestion struct {
 }
 
 // ActionRawValues formats values for ion
-func ActionRawValues(currentWord string, nospace bool, values common.RawValues) string {
+func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := values.FilterPrefix(currentWord)
 	sort.Sort(common.ByDisplay(filtered))
 
 	vals := make([]suggestion, len(filtered))
 	for index, val := range sanitize(filtered) {
-		if !nospace {
+		if !nospace.Matches(val.Value) {
 			val.Value = val.Value + " "
 		}
 

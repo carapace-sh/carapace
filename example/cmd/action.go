@@ -42,6 +42,7 @@ func init() {
 	actionCmd.Flags().String("styled_values_described", "", "styled values with description flag")
 	actionCmd.Flags().String("usergroup", "", "user:group flag")
 	actionCmd.Flags().StringP("users", "u", "", "users flag")
+	actionCmd.Flags().String("uniquelist", "", "uniquelist flag")
 	actionCmd.Flags().StringP("values", "v", "", "values flag")
 	actionCmd.Flags().StringP("values_described", "d", "", "values with description flag")
 	actionCmd.Flag("optarg").NoOptDefVal = "blue"
@@ -92,6 +93,7 @@ func init() {
 			"italic", "description of italic", style.Italic,
 			"underlined", "description of underlined", style.Underlined,
 		),
+		"uniquelist":       carapace.ActionValues("a", "b", "c").UniqueList(","),
 		"usergroup":        os.ActionUserGroup(),
 		"users":            os.ActionUsers(),
 		"values":           carapace.ActionValues("values", "example"),

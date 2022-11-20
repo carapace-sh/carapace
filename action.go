@@ -163,6 +163,13 @@ func (a Action) Suppress(expr ...string) Action {
 	})
 }
 
+// UniqueList wraps the Action in an ActionMultiParts with given divider.
+func (a Action) UniqueList(divider string) Action {
+	return ActionMultiParts(divider, func(c Context) Action {
+		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
+	})
+}
+
 func (a Action) noSpace(suffixes string) Action {
 	a.nospace = a.nospace.Add(suffixes)
 	return a

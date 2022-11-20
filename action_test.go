@@ -25,6 +25,7 @@ func assertEqual(t *testing.T, expected, actual InvokedAction) {
 	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
 
 	assert.Equal(t, string(e), string(a))
+	assert.Equal(t, string(expected.nospace), string(actual.nospace))
 }
 
 func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
@@ -204,7 +205,7 @@ func TestActionFilesChdir(t *testing.T) {
 
 func TestActionMessage(t *testing.T) {
 	assertEqual(t,
-		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("/").skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("*").skipCache(true).Invoke(Context{}).Prefix("docs/"),
 		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
 	)
 }
@@ -215,7 +216,7 @@ func TestActionMessageSuppress(t *testing.T) {
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
-		ActionValues("test").noSpace("/").skipCache(true).Invoke(Context{}),
+		ActionValues("test").noSpace("*").skipCache(true).Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
 	)
 }
 

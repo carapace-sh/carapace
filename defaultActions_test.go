@@ -11,7 +11,7 @@ func TestActionImport(t *testing.T) {
 	s := `
 {
   "Version": "unknown",
-  "Nospace": "*",
+  "Nospace": "",
   "RawValues": [
     {
       "Value": "positional1",
@@ -27,7 +27,7 @@ func TestActionImport(t *testing.T) {
     }
   ]
 }`
-	assertEqual(t, ActionValues("positional1", "p1").NoSpace().Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
+	assertEqual(t, ActionValues("positional1", "p1").Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
 }
 
 func TestActionFlags(t *testing.T) {

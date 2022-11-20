@@ -68,7 +68,7 @@ func ActionImport(output []byte) Action {
 			return ActionMessage(err.Error())
 		}
 		a := actionRawValues(e.RawValues...)
-		a = a.NoSpace([]rune(e.Nospace)...)
+		a.nospace = e.Nospace
 		return a
 	})
 }

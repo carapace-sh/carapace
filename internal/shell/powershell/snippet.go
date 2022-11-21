@@ -42,7 +42,7 @@ Function _%v_completer {
 
     $completions = @(
       if (!$wordToComplete) {
-        %v _carapace powershell $($elems| ForEach-Object {$_}) '""' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('`+"`"+`e[', "`+"`"+`e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
+        %v _carapace powershell $($elems| ForEach-Object {$_}) '' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('`+"`"+`e[', "`+"`"+`e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
       } else {
         %v _carapace powershell $($elems| ForEach-Object {$_}) | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('`+"`"+`e[', "`+"`"+`e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
       }

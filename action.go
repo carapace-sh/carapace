@@ -110,8 +110,34 @@ func (a Action) StyleF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			if v.Value != "ERR" && v.Value != "_" {
+			if !v.IsMessage() {
 				invoked.rawValues[index].Style = f(v.Value)
+			}
+		}
+		return invoked.ToA()
+	})
+}
+
+// Tag sets the tag.
+//
+//	ActionValues("192.168.1.1", "127.0.0.1").Tag("interfaces").
+func (a Action) Tag(tag string) Action {
+	return a.TagF(func(value string) string {
+		return tag
+	})
+}
+
+// Tag sets the tag using a function.
+//
+//	ActionValues("192.168.1.1", "127.0.0.1").TagF(func(value string) string {
+//		return "interfaces"
+//	})
+func (a Action) TagF(f func(value string) string) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, v := range invoked.rawValues {
+			if !v.IsMessage() {
+				invoked.rawValues[index].Tag = f(v.Value)
 			}
 		}
 		return invoked.ToA()
@@ -136,7 +162,7 @@ func (a Action) Suppress(expr ...string) Action {
 		invoked := a.Invoke(c)
 		filter := false
 		for _, rawValue := range invoked.rawValues {
-			if rawValue.Display == "ERR" {
+			if rawValue.IsMessage() && rawValue.Description != "" {
 				for _, e := range expr {
 					r, err := regexp.Compile(e)
 					if err != nil {
@@ -153,7 +179,7 @@ func (a Action) Suppress(expr ...string) Action {
 		if filter {
 			filtered := make([]common.RawValue, 0)
 			for _, r := range invoked.rawValues {
-				if r.Display != "ERR" && r.Display != "_" {
+				if !r.IsMessage() {
 					filtered = append(filtered, r)
 				}
 			}

@@ -17,9 +17,9 @@ func init() {
 	carapace.Gen(batchCmd).PositionalCompletion(
 		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.Batch(
-				carapace.ActionValues("A", "B"),
-				carapace.ActionValues("C", "D"),
-				carapace.ActionValues("E", "F"),
+				carapace.ActionValues("A", "B").Tag("first"),
+				carapace.ActionValues("C", "D").Tag("second"),
+				carapace.ActionValues("E", "F").TagF(func(value string) string { return "third" }),
 			).Invoke(c).Merge().ToA()
 		}),
 	)

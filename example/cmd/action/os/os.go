@@ -38,7 +38,7 @@ func ActionGroups() carapace.Action {
 			}
 		}
 		return carapace.ActionValuesDescribed(groups...)
-	})
+	}).Tag("groups")
 }
 
 // ActionKillSignals completes kill signals
@@ -110,7 +110,7 @@ func ActionUsers() carapace.Action {
 			}
 		}
 		return carapace.ActionValuesDescribed(users...)
-	})
+	}).Tag("users")
 }
 
 // ActionUserGroup completes user:group

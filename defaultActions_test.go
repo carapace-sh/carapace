@@ -17,17 +17,19 @@ func TestActionImport(t *testing.T) {
       "Value": "positional1",
       "Display": "positional1",
       "Description": "",
-      "Style": ""
+      "Style": "",
+	  "Tag": "first"
     },
     {
       "Value": "p1",
       "Display": "p1",
       "Description": "",
-      "Style": ""
+      "Style": "",
+	  "Tag": "first"
     }
   ]
 }`
-	assertEqual(t, ActionValues("positional1", "p1").Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
+	assertEqual(t, ActionValues("positional1", "p1").Tag("first").Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
 }
 
 func TestActionFlags(t *testing.T) {

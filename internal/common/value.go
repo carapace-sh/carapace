@@ -11,8 +11,14 @@ import (
 type RawValue struct {
 	Value       string
 	Display     string
-	Description string
-	Style       string
+	Description string `json:",omitempty"`
+	Style       string `json:",omitempty"`
+	Tag         string `json:",omitempty"`
+}
+
+// IsMessage checks if the value is a message (ActionMessage)
+func (r RawValue) IsMessage() bool {
+	return r.Value == "ERR" || r.Value == "_"
 }
 
 // TrimmedDescription returns the trimmed description

@@ -26,7 +26,6 @@ type CompletionCallback func(c Context) Action
 
 // Cache cashes values of a CompletionCallback for given duration and keys
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
-	// TODO static actions are using callback now as well (for performance) - probably best to add a `static` bool to Action for this and check that here
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called

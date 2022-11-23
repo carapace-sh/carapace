@@ -204,8 +204,12 @@ func TestActionFilesChdir(t *testing.T) {
 }
 
 func TestActionMessage(t *testing.T) {
+	expected := ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("*").skipCache(true).Invoke(Context{}).Prefix("docs/")
+	for index := range expected.rawValues {
+		expected.rawValues[index].Tag = "messages"
+	}
 	assertEqual(t,
-		ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("*").skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		expected,
 		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
 	)
 }

@@ -67,7 +67,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
-	})
+	}).Tag("files")
 }
 
 func actionFlags(cmd *cobra.Command) Action {
@@ -120,20 +120,22 @@ func actionFlags(cmd *cobra.Command) Action {
 			}
 		}
 		return ActionValuesDescribed(vals...)
-	})
+	}).Tag("flags")
 }
 
 func actionSubcommands(cmd *cobra.Command) Action {
-	vals := make([]string, 0)
-	for _, subcommand := range cmd.Commands() {
-		if !subcommand.Hidden && subcommand.Deprecated == "" {
-			vals = append(vals, subcommand.Name(), subcommand.Short)
-			for _, alias := range subcommand.Aliases {
-				vals = append(vals, alias, subcommand.Short)
+	return ActionCallback(func(c Context) Action {
+		vals := make([]string, 0)
+		for _, subcommand := range cmd.Commands() {
+			if !subcommand.Hidden && subcommand.Deprecated == "" {
+				vals = append(vals, subcommand.Name(), subcommand.Short)
+				for _, alias := range subcommand.Aliases {
+					vals = append(vals, alias, subcommand.Short)
+				}
 			}
 		}
-	}
-	return ActionValuesDescribed(vals...)
+		return ActionValuesDescribed(vals...)
+	}).Tag("commands")
 }
 
 func actionRawValues(rawValues ...common.RawValue) Action {

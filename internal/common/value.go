@@ -18,7 +18,7 @@ type RawValue struct {
 
 // IsMessage checks if the value is a message (ActionMessage)
 func (r RawValue) IsMessage() bool {
-	return r.Value == "ERR" || r.Value == "_"
+	return r.Tag == "messages"
 }
 
 // TrimmedDescription returns the trimmed description

@@ -78,8 +78,8 @@ func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values co
 	for index, val := range filtered {
 		val.Value = sanitizer.Replace(val.Value)
 		val.Value = quoteValue(val.Value)
-		if nospace.Matches(val.Value) {
-			val.Value = val.Value + "\001"
+		if !nospace.Matches(val.Value) {
+			val.Value = val.Value + " "
 		}
 		val.Display = sanitizer.Replace(val.Display)
 		val.Description = sanitizer.Replace(val.Description)

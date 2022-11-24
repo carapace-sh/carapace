@@ -27,22 +27,15 @@ function _%v_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
-  #zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:1})
-
   # shellcheck disable=SC2034,2206
-  local vals=(${lines%%%%$'\t'*})
+  local vals=(${lines%%$'\t'*})
   # shellcheck disable=SC2034,2206
   local displays=(${lines##*$'\t'})
 
-  local suffix=' '
-  [[ ${vals[1]} == *$'\001' ]] && suffix=''
-  # shellcheck disable=SC2034,2206
-  vals=(${vals%%%%$'\001'*})
-
-  compadd -Q -S "${suffix}" -d displays -a -- vals
+  compadd -Q -S '' -a -d displays -- vals
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

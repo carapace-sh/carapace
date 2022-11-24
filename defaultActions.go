@@ -183,9 +183,12 @@ func ActionMessage(msg string, a ...interface{}) Action {
 		if len(a) > 0 {
 			msg = fmt.Sprintf(msg, a...)
 		}
-		return ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).
-			Invoke(c).Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
-			noSpace("*").skipCache(true)
+		m := ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).Invoke(c)
+		for index := range m.rawValues {
+			m.rawValues[index].Tag = "messages"
+		}
+		return m.Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
+							noSpace("*").skipCache(true)
 	})
 }
 
@@ -363,5 +366,5 @@ func ActionStyles(styles ...string) Action {
 		))
 
 		return batch.ToA()
-	})
+	}).Tag("styles")
 }

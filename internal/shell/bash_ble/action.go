@@ -9,9 +9,8 @@ import (
 
 // ActionRawValues formats values for bash_ble.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := values.FilterPrefix(currentWord)
-	vals := make([]string, len(filtered))
-	for index, val := range filtered {
+	vals := make([]string, len(values))
+	for index, val := range values {
 		suffix := " "
 		if nospace.Matches(val.Value) {
 			suffix = ""

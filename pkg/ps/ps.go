@@ -8,7 +8,7 @@ import (
 	"github.com/rsteube/carapace/third_party/github.com/mitchellh/go-ps"
 )
 
-// DetermineShell determines shell by parent process name
+// DetermineShell determines shell by parent process name.
 func DetermineShell() string {
 	process, err := ps.FindProcess(os.Getpid())
 	if err != nil {

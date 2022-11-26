@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the bash completion script
+// Snippet creates the bash completion script.
 func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_completion() {

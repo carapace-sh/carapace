@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the elvish completion script
+// Snippet creates the elvish completion script.
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`set edit:completion:arg-completer[%v] = {|@arg|
     %v _carapace elvish (all $arg) | from-json | all (one) | each {|c| 

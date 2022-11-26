@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet generates the spec file
+// Snippet generates the spec file.
 func Snippet(cmd *cobra.Command) string {
 	replacer := strings.NewReplacer( // TODO might need more replacements
 		`"`, `\"`,

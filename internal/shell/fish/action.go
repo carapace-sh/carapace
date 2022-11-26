@@ -12,7 +12,7 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
-// ActionRawValues formats values for fish
+// ActionRawValues formats values for fish.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	vals := make([]string, len(values))
 	for index, val := range values {

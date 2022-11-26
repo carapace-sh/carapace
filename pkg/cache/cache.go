@@ -10,17 +10,17 @@ import (
 	"strings"
 )
 
-// Key provides a cache key
+// Key provides a cache key.
 type Key func() (string, error)
 
-// String creates a CacheKey for given strings
+// String creates a CacheKey for given strings.
 func String(s ...string) Key {
 	return func() (string, error) {
 		return strings.Join(s, "\n"), nil
 	}
 }
 
-// FileChecksum creates a CacheKey for given file
+// FileChecksum creates a CacheKey for given file.
 func FileChecksum(file string) Key {
 	return func() (checksum string, err error) {
 		var content []byte
@@ -31,7 +31,7 @@ func FileChecksum(file string) Key {
 	}
 }
 
-// FileStats creates a CacheKey for given file
+// FileStats creates a CacheKey for given file.
 func FileStats(file string) Key {
 	return func() (checksum string, err error) {
 		var path string

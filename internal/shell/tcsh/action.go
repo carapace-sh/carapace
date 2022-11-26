@@ -67,7 +67,7 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 	return
 }
 
-// ActionRawValues formats values for bash
+// ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 

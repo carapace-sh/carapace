@@ -7,7 +7,7 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 )
 
-// ActionRawValues formats values for bash_ble
+// ActionRawValues formats values for bash_ble.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := values.FilterPrefix(currentWord)
 	vals := make([]string, len(filtered))

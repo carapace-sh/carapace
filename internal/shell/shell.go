@@ -71,7 +71,9 @@ func Value(shell string, callbackValue string, nospace common.SuffixMatcher, val
 		"zsh":        zsh.ActionRawValues,
 	}
 	if f, ok := shellFuncs[shell]; ok {
-		return f(callbackValue, nospace, values)
+		filtered := values.FilterPrefix(callbackValue)
+		sort.Sort(common.ByDisplay(filtered))
+		return f(callbackValue, nospace, filtered)
 	}
 	return ""
 }

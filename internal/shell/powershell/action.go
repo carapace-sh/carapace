@@ -3,7 +3,6 @@ package powershell
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -32,9 +31,6 @@ func ensureNotEmpty(s string) string {
 
 // ActionRawValues formats values for powershell.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := values.FilterPrefix(currentWord)
-	sort.Sort(common.ByDisplay(filtered))
-
 	valueStyle := "default"
 	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
 		valueStyle = s
@@ -45,8 +41,8 @@ func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values co
 		descriptionStyle = s
 	}
 
-	vals := make([]completionResult, 0, len(filtered))
-	for _, val := range filtered {
+	vals := make([]completionResult, 0, len(values))
+	for _, val := range values {
 		if val.Value != "" { // must not be empty - any empty `''` parameter in CompletionResult causes an error
 			val.Value = sanitizer.Replace(val.Value)
 

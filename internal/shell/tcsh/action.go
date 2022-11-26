@@ -69,39 +69,34 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 
 // ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := make([]common.RawValue, 0)
-
 	lastSegment := currentWord // last segment of currentWord split by COMP_WORDBREAKS
 
 	for _, r := range values {
-		if strings.HasPrefix(r.Value, currentWord) {
-			// TODO optimize
-			if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
-				wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
-				if index := strings.LastIndexAny(currentWord, wordbreaks); index != -1 {
-					r.Value = strings.TrimPrefix(r.Value, currentWord[:index+1])
-					lastSegment = currentWord[index+1:]
-				}
+		// TODO optimize
+		if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
+			wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
+			if index := strings.LastIndexAny(currentWord, wordbreaks); index != -1 {
+				r.Value = strings.TrimPrefix(r.Value, currentWord[:index+1])
+				lastSegment = currentWord[index+1:]
 			}
-			filtered = append(filtered, r)
 		}
 	}
 
-	if len(filtered) > 1 && commonDisplayPrefix(filtered...) != "" {
+	if len(values) > 1 && commonDisplayPrefix(values...) != "" {
 		// When all display values have the same prefix bash will insert is as partial completion (which skips prefixes/formatting).
-		if valuePrefix := commonValuePrefix(filtered...); lastSegment != valuePrefix {
+		if valuePrefix := commonValuePrefix(values...); lastSegment != valuePrefix {
 			// replace values with common value prefix (`\001` is removed in snippet and compopt nospace will be set)
-			filtered = common.RawValuesFrom(commonValuePrefix(filtered...)) // TODO nospaceIndicator
-			//filtered = common.RawValuesFrom(commonValuePrefix(filtered...) + nospaceIndicator)
+			values = common.RawValuesFrom(commonValuePrefix(values...)) // TODO nospaceIndicator
+			//values = common.RawValuesFrom(commonValuePrefix(values...) + nospaceIndicator)
 		} else {
 			// prevent insertion of partial display values by prefixing one with space
-			filtered[0].Display = " " + filtered[0].Display
+			values[0].Display = " " + values[0].Display
 		}
 	}
 
-	vals := make([]string, len(filtered))
-	for index, val := range filtered {
-		if len(filtered) == 1 {
+	vals := make([]string, len(values))
+	for index, val := range values {
+		if len(values) == 1 {
 			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 		} else {
 			if val.Description != "" {

@@ -49,17 +49,10 @@ func quoteValue(s string) string {
 
 // ActionRawValues formats values for zsh
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := make([]common.RawValue, 0)
-
 	maxLength := 0
-	hasDescriptions := false
 	for _, r := range values {
-		if strings.HasPrefix(r.Value, currentWord) {
-			filtered = append(filtered, r)
-			if length := len(r.Display); length > maxLength {
-				maxLength = length
-			}
-			hasDescriptions = hasDescriptions || r.Description != ""
+		if length := len(r.Display); length > maxLength {
+			maxLength = length
 		}
 	}
 
@@ -74,8 +67,8 @@ func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values co
 	}
 
 	zstyles := make([]string, 0)
-	vals := make([]string, len(filtered))
-	for index, val := range filtered {
+	vals := make([]string, len(values))
+	for index, val := range values {
 		val.Value = sanitizer.Replace(val.Value)
 		val.Value = quoteValue(val.Value)
 		if !nospace.Matches(val.Value) {

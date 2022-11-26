@@ -22,16 +22,8 @@ type richCompletion struct {
 
 // ActionRawValues formats values for xonsh.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := make([]common.RawValue, 0)
-
-	for _, r := range values {
-		if strings.HasPrefix(r.Value, currentWord) {
-			filtered = append(filtered, r)
-		}
-	}
-
-	vals := make([]richCompletion, len(filtered))
-	for index, val := range filtered {
+	vals := make([]richCompletion, len(values))
+	for index, val := range values {
 		val.Value = sanitizer.Replace(val.Value)
 
 		if strings.ContainsAny(val.Value, ` ()[]{}*$?\"|<>&;#`+"`") {

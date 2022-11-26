@@ -3,7 +3,6 @@ package nushell
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -30,11 +29,8 @@ func sanitize(values []common.RawValue) []common.RawValue {
 
 // ActionRawValues formats values for nushell.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
-	filtered := values.FilterPrefix(currentWord)
-	sort.Sort(common.ByDisplay(filtered))
-
-	vals := make([]record, len(filtered))
-	for index, val := range sanitize(filtered) {
+	vals := make([]record, len(values))
+	for index, val := range sanitize(values) {
 		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {
 			val.Value = fmt.Sprintf("'%v'", val.Value)
 		}

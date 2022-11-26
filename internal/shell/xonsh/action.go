@@ -21,7 +21,7 @@ type richCompletion struct {
 }
 
 // ActionRawValues formats values for xonsh.
-func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
 	vals := make([]richCompletion, len(values))
 	for index, val := range values {
 		val.Value = sanitizer.Replace(val.Value)

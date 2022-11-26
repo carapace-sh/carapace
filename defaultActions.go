@@ -64,6 +64,7 @@ func ActionImport(output []byte) Action {
 		}
 		a := actionRawValues(e.RawValues...)
 		a.nospace = e.Nospace
+		a.usage = e.Usage
 		return a
 	})
 }

@@ -8,7 +8,7 @@ import (
 )
 
 // ActionRawValues formats values for bash_ble.
-func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		suffix := " "

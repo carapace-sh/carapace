@@ -48,7 +48,7 @@ func quoteValue(s string) string {
 }
 
 // ActionRawValues formats values for zsh
-func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
 	maxLength := 0
 	for _, r := range values {
 		if length := len(r.Display); length > maxLength {

@@ -28,7 +28,7 @@ func sanitize(values []common.RawValue) []common.RawValue {
 }
 
 // ActionRawValues formats values for nushell.
-func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
 	vals := make([]record, len(values))
 	for index, val := range sanitize(values) {
 		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {

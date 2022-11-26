@@ -33,7 +33,7 @@ type complexCandidate struct {
 }
 
 // ActionRawValues formats values for elvish.
-func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
 	valueStyle := "default"
 	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
 		valueStyle = s

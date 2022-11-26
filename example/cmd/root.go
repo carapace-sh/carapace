@@ -28,4 +28,9 @@ func init() {
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
 		"persistentFlag": carapace.ActionValues("p1", "p2", "p3"),
 	})
+
+	rootCmd.AddGroup(
+		&cobra.Group{ID: "main", Title: "Main Commands"},
+		&cobra.Group{ID: "other", Title: "Other Commands"},
+	)
 }

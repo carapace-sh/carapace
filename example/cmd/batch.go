@@ -6,9 +6,10 @@ import (
 )
 
 var batchCmd = &cobra.Command{
-	Use:   "batch",
-	Short: "batch example",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Use:     "batch",
+	Short:   "batch example",
+	GroupID: "main",
+	Run:     func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

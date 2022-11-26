@@ -8,7 +8,7 @@ import (
 	"github.com/rsteube/carapace"
 )
 
-// ActionNetInterfaces completes net interfaces
+// ActionNetInterfaces completes net interfaces.
 func ActionNetInterfaces() carapace.Action {
 	return carapace.ActionCallback(func(c carapace.Context) (result carapace.Action) {
 		if output, err := exec.Command("ifconfig").Output(); err != nil {

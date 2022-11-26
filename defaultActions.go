@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// ActionCallback invokes a go function during completion
+// ActionCallback invokes a go function during completion.
 func ActionCallback(callback CompletionCallback) Action {
 	return Action{callback: callback}
 }
@@ -97,7 +97,7 @@ func ActionExecute(cmd *cobra.Command) Action {
 	})
 }
 
-// ActionDirectories completes directories
+// ActionDirectories completes directories.
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
 		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
@@ -109,7 +109,7 @@ func ActionDirectories() Action {
 	})
 }
 
-// ActionFiles completes files with optional suffix filtering
+// ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
@@ -121,7 +121,7 @@ func ActionFiles(suffix ...string) Action {
 	})
 }
 
-// ActionValues completes arbitrary keywords (values)
+// ActionValues completes arbitrary keywords (values).
 func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		vals := make([]common.RawValue, 0, len(values))
@@ -132,7 +132,7 @@ func ActionValues(values ...string) Action {
 	})
 }
 
-// ActionStyledValues is like ActionValues but also accepts a style
+// ActionStyledValues is like ActionValues but also accepts a style.
 func ActionStyledValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
@@ -147,7 +147,7 @@ func ActionStyledValues(values ...string) Action {
 	})
 }
 
-// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs)
+// ActionValuesDescribed completes arbitrary key (values) with an additional description (value, description pairs).
 func ActionValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%2 != 0 {
@@ -162,7 +162,7 @@ func ActionValuesDescribed(values ...string) Action {
 	})
 }
 
-// ActionStyledValuesDescribed is like ActionValues but also accepts a style
+// ActionStyledValuesDescribed is like ActionValues but also accepts a style.
 func ActionStyledValuesDescribed(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		if length := len(values); length%3 != 0 {
@@ -177,7 +177,7 @@ func ActionStyledValuesDescribed(values ...string) Action {
 	})
 }
 
-// ActionMessage displays a help messages in places where no completions can be generated
+// ActionMessage displays a help messages in places where no completions can be generated.
 func ActionMessage(msg string, a ...interface{}) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(a) > 0 {

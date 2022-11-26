@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the bash-ble completion script
+// Snippet creates the bash-ble completion script.
 func Snippet(cmd *cobra.Command) string {
 	bashSnippet := bash.Snippet(cmd)
 	bashSnippet = regexp.MustCompile("complete -F [^\n]+").ReplaceAllString(bashSnippet, "")

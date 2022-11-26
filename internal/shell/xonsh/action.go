@@ -20,7 +20,7 @@ type richCompletion struct {
 	Description string
 }
 
-// ActionRawValues formats values for xonsh
+// ActionRawValues formats values for xonsh.
 func ActionRawValues(currentWord string, nospace common.SuffixMatcher, values common.RawValues) string {
 	filtered := make([]common.RawValue, 0)
 

@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Command creates a uid for given command
+// Command creates a uid for given command.
 func Command(cmd *cobra.Command) string {
 	names := make([]string, 0)
 	current := cmd
@@ -29,7 +29,7 @@ func Command(cmd *cobra.Command) string {
 	return "_" + strings.Join(reverse, "__")
 }
 
-// Executable returns the name of the executable
+// Executable returns the name of the executable.
 func Executable() string {
 	if executable, err := os.Executable(); err != nil {
 		return "echo" // safe fallback that should never happen

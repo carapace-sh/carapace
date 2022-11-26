@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// TraverseLenient traverses the command tree but filters errors regarding arguments currently being completed
+// TraverseLenient traverses the command tree but filters errors regarding arguments currently being completed.
 func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
 	a := args
 

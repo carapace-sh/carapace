@@ -10,7 +10,7 @@ import (
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
 )
 
-// Action indicates how to complete a flag or positional argument
+// Action indicates how to complete a flag or positional argument.
 type Action struct {
 	rawValues []common.RawValue
 	callback  CompletionCallback
@@ -18,13 +18,13 @@ type Action struct {
 	skipcache bool
 }
 
-// ActionMap maps Actions to an identifier
+// ActionMap maps Actions to an identifier.
 type ActionMap map[string]Action
 
-// CompletionCallback is executed during completion of associated flag or positional argument
+// CompletionCallback is executed during completion of associated flag or positional argument.
 type CompletionCallback func(c Context) Action
 
-// Cache cashes values of a CompletionCallback for given duration and keys
+// Cache cashes values of a CompletionCallback for given duration and keys.
 func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
@@ -46,7 +46,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 	return a
 }
 
-// Invoke executes the callback of an action if it exists (supports nesting)
+// Invoke executes the callback of an action if it exists (supports nesting).
 func (a Action) Invoke(c Context) InvokedAction {
 	if c.Args == nil {
 		c.Args = []string{}
@@ -155,7 +155,7 @@ func (a Action) Chdir(dir string) Action {
 	})
 }
 
-// Suppress suppresses specific error messages using regular expressions
+// Suppress suppresses specific error messages using regular expressions.
 func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)

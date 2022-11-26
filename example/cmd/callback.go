@@ -9,8 +9,9 @@ import (
 )
 
 var callbackCmd = &cobra.Command{
-	Use:   "callback",
-	Short: "callback example",
+	Use:     "callback",
+	Short:   "callback example",
+	GroupID: "other",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("callbackCmd called with args: %v\n", args)
 		fmt.Printf("callback flag is: %v\n", cmd.Flag("callback").Value)

@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -125,17 +126,21 @@ func actionFlags(cmd *cobra.Command) Action {
 
 func actionSubcommands(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
-		vals := make([]string, 0)
+		batch := Batch()
 		for _, subcommand := range cmd.Commands() {
 			if !subcommand.Hidden && subcommand.Deprecated == "" {
-				vals = append(vals, subcommand.Name(), subcommand.Short)
+				tag := "commands"
+				if id := subcommand.GroupID; id != "" {
+					tag = fmt.Sprintf("%v %v", id, tag)
+				}
+				batch = append(batch, ActionValuesDescribed(subcommand.Name(), subcommand.Short).Tag(tag))
 				for _, alias := range subcommand.Aliases {
-					vals = append(vals, alias, subcommand.Short)
+					batch = append(batch, ActionValuesDescribed(alias, subcommand.Short).Tag(tag))
 				}
 			}
 		}
-		return ActionValuesDescribed(vals...)
-	}).Tag("commands")
+		return batch.ToA()
+	})
 }
 
 func actionRawValues(rawValues ...common.RawValue) Action {

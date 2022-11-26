@@ -14,6 +14,7 @@ var actionCmd = &cobra.Command{
 	Use:     "action",
 	Short:   "action example",
 	Aliases: []string{"alias"},
+	GroupID: "main",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if f := cmd.Flag("style"); f.Changed {
 			if splitted := strings.Split(f.Value.String(), "="); len(splitted) == 2 {

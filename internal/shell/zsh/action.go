@@ -94,10 +94,7 @@ func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatc
 		zstyles = make([]string, 0)
 	}
 
-	if usage == "" {
-		usage = "NONE" // TODO fix empty line issue in script
-	}
-	return fmt.Sprintf(":%v\n%v\n%v", strings.Join(zstyles, ":"), usage, strings.Join(vals, "\n"))
+	return fmt.Sprintf(":%v\n%v\n%v", strings.Join(zstyles, ":"), santizeMessage(usage), strings.Join(vals, "\n"))
 }
 
 var zstyleQuoter = strings.NewReplacer(
@@ -116,4 +113,20 @@ var zstyleQuoter = strings.NewReplacer(
 // To ease matching in list mode, the display values have a hidden `\002` suffix.
 func formatZstyle(s, _styleValue, _styleDescription string) string {
 	return fmt.Sprintf("=(#b)%v=0=%v=%v=%v", s, style.SGR(_styleValue), style.SGR(_styleDescription+" bg-default"), style.SGR(_styleDescription))
+}
+
+func santizeMessage(s string) string { // TODO cleanup
+	s = strings.NewReplacer(
+		"\n", ``,
+		"\r", ``,
+		"\t", ``,
+		"\v", ``,
+		"\f", ``,
+		"\b", ``,
+	).Replace(s)
+
+	if s == "" {
+		return "NONE" // TODO fix empty line issue in script
+	}
+	return s
 }

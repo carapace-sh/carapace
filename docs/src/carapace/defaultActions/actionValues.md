@@ -1,7 +1,11 @@
 # ActionValues
 
-[`ActionValues`](https://pkg.go.dev/github.com/rsteube/carapace#ActionValues) completes values.
+[`ActionValues`] completes values.
 
 ```go
-carapace.ActionValues("a", "b", "c")
+carapace.ActionValues("first", "second", "third")
 ```
+
+![](./actionValues.cast)
+
+[`ActionValues`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionValues

@@ -56,7 +56,9 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		}
 
 		if common.IsDash(targetCmd) {
-			targetAction = findAction(targetCmd, targetArgs[targetCmd.ArgsLenAtDash():])
+			dashArgs := targetArgs[targetCmd.ArgsLenAtDash() : len(targetArgs)-1]
+			context.Args = dashArgs
+			targetAction = findAction(targetCmd, dashArgs)
 		} else {
 			targetAction = findAction(targetCmd, targetArgs)
 			if targetCmd.HasAvailableSubCommands() && len(targetArgs) <= 1 {

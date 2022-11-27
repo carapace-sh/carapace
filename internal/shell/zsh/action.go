@@ -93,7 +93,11 @@ func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatc
 	if len(zstyles) > 1000 { // TODO disable styling for large amount of values (bad performance)
 		zstyles = make([]string, 0)
 	}
-	return fmt.Sprintf(":%v\n%v", strings.Join(zstyles, ":"), strings.Join(vals, "\n"))
+
+	if usage == "" {
+		usage = "NONE" // TODO fix empty line issue in script
+	}
+	return fmt.Sprintf(":%v\n%v\n%v", strings.Join(zstyles, ":"), usage, strings.Join(vals, "\n"))
 }
 
 var zstyleQuoter = strings.NewReplacer(

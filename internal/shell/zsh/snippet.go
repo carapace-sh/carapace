@@ -27,9 +27,10 @@ function _%v_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
+  [[ ! "${lines[2]}" == "NONE" ]] && _message -r "${lines[2]}"
   
   # shellcheck disable=SC2034,2206
-  lines=(${lines[@]:1})
+  lines=(${lines[@]:2})
   # shellcheck disable=SC2034,2206
   local vals=(${lines%%$'\t'*})
   # shellcheck disable=SC2034,2206

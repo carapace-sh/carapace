@@ -1,13 +1,16 @@
 # ActionCallback
-[`ActionCallback`](https://pkg.go.dev/github.com/rsteube/carapace#ActionCallback) is a special action where the program itself provides the completion dynamically. For this the [hidden subcommand](../gen/hiddenSubcommand.md) is called with the current command line content which then lets cobra parse existing flags and invokes the callback function after that.
+
+[`ActionCallback`] completes values with given function.
+It is invoked after the arguments are parsed which enables contextual completion.
+
+> All [DefaultActions] are implicitly wrapped in an [`ActionCallback`] for performance.
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-  if conditionCmd.Flag("required").Value.String() == "valid" {
-    return carapace.ActionValues("condition fulfilled")
-  } else {
-    return carapace.ActionMessage("flag --required must be set to valid: " + conditionCmd.Flag("required").Value.String())
-  }
+	if flag := actionCmd.Flag("values"); flag.Changed {
+		return carapace.ActionMessage("values flag is set to: '%v'", flag.Value.String())
+	}
+	return carapace.ActionMessage("values flag is not set")
 })
 ```
 
@@ -15,4 +18,9 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 - return [ActionValues](./actionValues.md) without arguments to silently skip completion
 - return [ActionMessage](./actionMessage.md) to provide an error message (e.g. failure during invocation of an external command)
 - `c.Args` provides access to the positional arguments of the current subcommand (excluding the one currently being completed)
-- [`IsCallback`](https://pkg.go.dev/github.com/rsteube/carapace#IsCallback) indicates if the current invocation of the program is a callback (useful to skip any lengthy init steps)
+
+![](./actionCallback.cast)
+
+
+[`ActionCallback`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionCallback
+[DefaultActions]:../defaultActions.md

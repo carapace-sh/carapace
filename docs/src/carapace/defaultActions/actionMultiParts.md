@@ -1,22 +1,30 @@
 # ActionMultiParts
 
-[`ActionMultiParts`] is a [callback action](./actionCallback.md) where parts of an argument can be completed separately (e.g. `user:group` from chown). Divider can be empty as well, but note that bash and fish will add the space suffix for anything other than `/=@:.,` (it still works, but after each selection backspace is needed to continue the completion).
+[`ActionMultiParts`] completes parts of an argument separately (e.g. `user:group` from chown).
+For this the `Context.CallbackValue` is split with given divider and then updated to only contain the currently completed part.
+`Context.Parts` contains the preceding parts and can be used in a `switch` statement to return the corresponding [Action](../action.md).
+
+> An empty divider splits per character, but be aware that fish will add space suffix for anything other than `/=@:.,`.
 
 ```go
 carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
-	switch len(parts) {
+	switch len(c.Parts) {
 	case 0:
-		return ActionUsers().Invoke(c).Suffix(":").ToA()
+		return carapace.ActionValues("userA", "UserB").Invoke(c).Suffix(":").ToA()
 	case 1:
-		return ActionGroups()
+		return carapace.ActionValues("groupA", "groupB")
 	default:
 		return carapace.ActionValues()
 	}
 })
 ```
 
-- values **must not** contain the separator as a simple `strings.Split()` is used to separate the parts
-- it is however **allowed as suffix** to enable fluent tab completion (like `/` for a directory)
+- Values **must not** contain the separator as a simple `strings.Split()` is used to separate the parts.
+- It is however **allowed as suffix** to enable fluent tab completion (like `/` for a directory).
+- The divider is implicitly added to [`NoSpace`]
+- If no suffix is added [`NoSpace`] can be used in the preceding parts to prevent a space suffix.
+
+![](./actionMultiParts.cast)
 
 ## Nesting
 
@@ -35,11 +43,11 @@ carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
 		case 1:
 			switch c.Parts[0] {
 			case "FILE":
-				return carapace.ActionFiles("")
+				return carapace.ActionFiles("").NoSpace()
 			case "DIRECTORY":
-				return carapace.ActionDirectories()
+				return carapace.ActionDirectories().NoSpace()
 			case "VALUE":
-				return carapace.ActionValues("one", "two", "three")
+				return carapace.ActionValues("one", "two", "three").NoSpace()
 			default:
 				return carapace.ActionValues()
 
@@ -51,5 +59,8 @@ carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
 })
 ```
 
+![](./actionMultiParts-nested.cast)
+
 [`carapace.CallbackValue`]:https://pkg.go.dev/github.com/rsteube/carapace#pkg-variables
 [`ActionMultiParts`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionMultiParts
+[`NoSpace`]:../action/noSpace.md

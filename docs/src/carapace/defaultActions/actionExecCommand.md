@@ -9,5 +9,6 @@ carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action 
 })
 ```
 
+![](./actionExecCommand.cast)
 
 [`ActionExecCommand`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionExecCommand

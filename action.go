@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"fmt"
 	"regexp"
 	"runtime"
 	"time"
@@ -16,6 +17,7 @@ type Action struct {
 	callback  CompletionCallback
 	nospace   common.SuffixMatcher
 	skipcache bool
+	usage     string
 }
 
 // ActionMap maps Actions to an identifier.
@@ -65,17 +67,33 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 		return ActionMessage("maximum recursion depth exceeded")
 	}
 	if a.rawValues == nil && a.callback != nil {
-		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.nospace)).skipCache(a.skipcache)
+		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.nospace)).skipCache(a.skipcache).withUsage(a.usage)
 	}
 	return a
 }
 
 // NoSpace disables space suffix for given characters (or all if none are given).
 func (a Action) NoSpace(suffixes ...rune) Action {
-	if len(suffixes) == 0 {
-		return a.noSpace("*")
-	}
-	return a.noSpace(string(suffixes))
+	return ActionCallback(func(c Context) Action {
+		if len(suffixes) == 0 {
+			return a.noSpace("*")
+		}
+		return a.noSpace(string(suffixes))
+	})
+}
+
+// Usage sets the usage.
+func (a Action) Usage(usage string, args ...interface{}) Action {
+	return a.UsageF(func() string {
+		return fmt.Sprintf(usage, args...)
+	})
+}
+
+// Usage sets the usage using a function.
+func (a Action) UsageF(f func() string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.withUsage(f())
+	})
 }
 
 // Style sets the style
@@ -209,5 +227,12 @@ func (a Action) noSpace(suffixes string) Action {
 
 func (a Action) skipCache(state bool) Action {
 	a.skipcache = a.skipcache || state
+	return a
+}
+
+func (a Action) withUsage(usage string) Action {
+	if usage != "" {
+		a.usage = usage
+	}
 	return a
 }

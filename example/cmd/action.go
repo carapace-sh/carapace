@@ -9,7 +9,7 @@ import (
 )
 
 var actionCmd = &cobra.Command{
-	Use:     "action",
+	Use:     "action [pos1] [pos2] [--] [dashAny]...",
 	Short:   "action example",
 	Aliases: []string{"alias"},
 	GroupID: "main",

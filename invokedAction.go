@@ -29,7 +29,7 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 			filtered = append(filtered, rawValue)
 		}
 	}
-	return InvokedAction{actionRawValues(filtered...).noSpace(string(a.nospace)).skipCache(a.skipcache)}
+	return InvokedAction{actionRawValues(filtered...).noSpace(string(a.nospace)).skipCache(a.skipcache).withUsage(a.usage)}
 }
 
 // Merge merges InvokedActions (existing values are overwritten)
@@ -41,19 +41,23 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	uniqueRawValues := make(map[string]common.RawValue)
 	nospace := a.nospace
 	skipcache := a.skipcache
+	usage := a.usage
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
 		nospace = nospace.Add(string(other.nospace))
 		skipcache = skipcache || other.skipcache
+		if other.usage != "" {
+			usage = other.usage
+		}
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).skipCache(skipcache)}
+	return InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).skipCache(skipcache).withUsage(usage)}
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
@@ -158,5 +162,5 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 }
 
 func (a InvokedAction) value(shell string, callbackValue string) string {
-	return _shell.Value(shell, callbackValue, a.nospace, a.rawValues)
+	return _shell.Value(shell, callbackValue, a.usage, a.nospace, a.rawValues)
 }

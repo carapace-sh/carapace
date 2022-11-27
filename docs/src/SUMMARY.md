@@ -22,6 +22,7 @@
   - [Action](./carapace/action.md)
     - [Custom](./carapace/action/custom.md)
     - [Chdir](./carapace/action/chDir.md)
+    - [NoSpace](./carapace/action/noSpace.md)
     - [Suppress](./carapace/action/suppress.md)
     - [Style](./carapace/action/style.md)
     - [Tag](./carapace/action/tag.md)

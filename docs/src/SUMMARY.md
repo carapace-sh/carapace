@@ -23,6 +23,7 @@
     - [Chdir](./carapace/action/chDir.md)
     - [Suppress](./carapace/action/suppress.md)
     - [Style](./carapace/action/style.md)
+    - [Tag](./carapace/action/tag.md)
   - [InvokedAction](./carapace/invokedAction.md)
     - [Filter](./carapace/invokedAction/filter.md)
     - [Merge](./carapace/invokedAction/merge.md)

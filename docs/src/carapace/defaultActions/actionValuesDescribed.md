@@ -1,10 +1,15 @@
 # ActionValuesDescribed
 
-[`ActionValuesDescribed`](https://pkg.go.dev/github.com/rsteube/carapace#ActionValuesDescribed) completes values with a description.
+[`ActionValuesDescribed`] completes values with a description.
 
 ```go
 carapace.ActionValuesDescribed(
-  "a", "description of a",
-  "b", "description of b"
+	"first", "description of first",
+	"second", "description of second",
+	"third", "description of third",
 )
 ```
+
+![](./actionValuesDescribed.cast)
+
+[`ActionValuesDescribed`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionValuesDescribed

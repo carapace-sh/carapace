@@ -1,13 +1,15 @@
 # ActionStyledValuesDescribed
 
-Same as [ActionValuesDescribed](./actionValuesDescribed.md) but accepts an additional [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style).
+[`ActionStyledValuesDescribed`] is like [ActionValuesDescribed](./actionValuesDescribed.md) but accepts an additional [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style).
 
 ```go
 carapace.ActionStyledValuesDescribed(
-  "default", "description of default", style.Default,
-  "red", "description of red", style.Red,
-  "green-underlined", "description of green-underlined", style.Of(style.Green, style.Underlined),
+	"first", "description of first", style.Blink,
+	"second", "description of second", style.Of("color210", style.Underlined),
+	"third", "description of third", style.Of("#112233", style.Italic),
 )
 ```
 
-![](./actionStyledValuesDescribed.png)
+![](./actionStyledValuesDescribed.cast)
+
+[`ActionStyledValuesDescribed`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionStyledValuesDescribed

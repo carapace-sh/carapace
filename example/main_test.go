@@ -69,18 +69,7 @@ var tests = map[string]string{
 	`example action positional1`: "positional1 with space",
 	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
 	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
-	`example action --optarg `:           "p",
-	`example action --optarg positional`: "positional1",
-	`example action --optar`:             "--optarg",
-	`example action --optarg=`:           "blue",
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
-	`example action -o`:                                            "v",
-	`example action -op`:                                           "d",
-	`example action -o `:                                           "p",
-	`example action -o positional`:                                 "positional1",
-	`example action -o=`:                                           "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag
-	`example action -fgo=`:                                         "blue",
-	`example action -fgo= `:                                        "p",
 	`example condition `:                                           "ERR",
 	`example condition --required `:                                "valid",
 	`example condition --required invalid `:                        "ERR",
@@ -89,6 +78,15 @@ var tests = map[string]string{
 	`example callback callback`:                                    "callback1",
 	`example callback --callback `:                                 "cb",
 	`example callback --callback cb`:                               "cb1",
+	`example flag --optarg `:                                       "p",
+	`example flag --optarg positional`:                             "positional1",
+	`example flag --optar`:                                         "--optarg",
+	`example flag --optarg=`:                                       "--optarg=optarg",
+	`example flag -o`:                                              "count flag",
+	`example flag -oc`:                                             "count flag",
+	`example flag -o `:                                             "p",
+	`example flag -o pos`:                                          "positional",
+	`example flag -o=`:                                             "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag
 	`example multiparts `:                                          "VALUE",
 	`example multiparts -`:                                         "-c",
 	`example multiparts --`:                                        "--comma",

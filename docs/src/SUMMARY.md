@@ -26,6 +26,7 @@
     - [Suppress](./carapace/action/suppress.md)
     - [Style](./carapace/action/style.md)
     - [Tag](./carapace/action/tag.md)
+    - [Usage](./carapace/action/usage.md)
   - [InvokedAction](./carapace/invokedAction.md)
     - [Filter](./carapace/invokedAction/filter.md)
     - [Merge](./carapace/invokedAction/merge.md)

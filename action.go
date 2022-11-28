@@ -2,7 +2,7 @@ package carapace
 
 import (
 	"fmt"
-	"regexp"
+	"os"
 	"runtime"
 	"time"
 
@@ -15,9 +15,7 @@ import (
 type Action struct {
 	rawValues []common.RawValue
 	callback  CompletionCallback
-	nospace   common.SuffixMatcher
-	skipcache bool
-	usage     string
+	meta      common.Meta
 }
 
 // ActionMap maps Actions to an identifier.
@@ -37,7 +35,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 					return actionRawValues(rawValues...)
 				}
 				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
-				if !invokedAction.skipcache {
+				if invokedAction.meta.Messages.IsEmpty() {
 					_ = cache.Write(cacheFile, invokedAction.rawValues)
 				}
 				return invokedAction.ToA()
@@ -67,7 +65,9 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 		return ActionMessage("maximum recursion depth exceeded")
 	}
 	if a.rawValues == nil && a.callback != nil {
-		return a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.nospace)).skipCache(a.skipcache).withUsage(a.usage)
+		result := a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.meta.Nospace)).withUsage(a.meta.Usage)
+		result.meta.Messages.Merge(a.meta.Messages)
+		return result
 	}
 	return a
 }
@@ -127,9 +127,7 @@ func (a Action) StyleF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			if !v.IsMessage() {
-				invoked.rawValues[index].Style = f(v.Value)
-			}
+			invoked.rawValues[index].Style = f(v.Value)
 		}
 		return invoked.ToA()
 	})
@@ -153,9 +151,7 @@ func (a Action) TagF(f func(value string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			if !v.IsMessage() {
-				invoked.rawValues[index].Tag = f(v.Value)
-			}
+			invoked.rawValues[index].Tag = f(v.Value)
 		}
 		return invoked.ToA()
 	})
@@ -168,6 +164,11 @@ func (a Action) Chdir(dir string) Action {
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
+		if info, err := os.Stat(abs); err != nil {
+			return ActionMessage(err.Error())
+		} else if !info.IsDir() {
+			return ActionMessage("not a directory: %v", abs)
+		}
 		c.Dir = abs
 		return a.Invoke(c).ToA()
 	})
@@ -177,30 +178,8 @@ func (a Action) Chdir(dir string) Action {
 func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
-		filter := false
-		for _, rawValue := range invoked.rawValues {
-			if rawValue.IsMessage() && rawValue.Description != "" {
-				for _, e := range expr {
-					r, err := regexp.Compile(e)
-					if err != nil {
-						return ActionMessage(err.Error())
-					}
-					if r.MatchString(rawValue.Description) {
-						filter = true
-						break
-					}
-				}
-			}
-		}
-
-		if filter {
-			filtered := make([]common.RawValue, 0)
-			for _, r := range invoked.rawValues {
-				if !r.IsMessage() {
-					filtered = append(filtered, r)
-				}
-			}
-			invoked.rawValues = filtered
+		if err := invoked.meta.Messages.Suppress(expr...); err != nil {
+			return ActionMessage(err.Error())
 		}
 		return invoked.ToA()
 	})
@@ -221,18 +200,13 @@ func (a Action) UniqueList(divider string) Action {
 }
 
 func (a Action) noSpace(suffixes string) Action {
-	a.nospace = a.nospace.Add(suffixes)
-	return a
-}
-
-func (a Action) skipCache(state bool) Action {
-	a.skipcache = a.skipcache || state
+	a.meta.Nospace = a.meta.Nospace.Add(suffixes)
 	return a
 }
 
 func (a Action) withUsage(usage string) Action {
 	if usage != "" {
-		a.usage = usage
+		a.meta.Usage = usage
 	}
 	return a
 }

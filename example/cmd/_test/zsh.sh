@@ -15,7 +15,8 @@ function _example_completion {
   fi
 
   export ZLS_COLOURS="${lines[1]}"
-  [[ ! "${lines[2]}" == "NONE" ]] && _message -r "${lines[2]}"
+  local line_break=$'\n'
+  [[ ! "${lines[2]}" == "NONE" ]] && _message -r "${lines[2]//$'\t'/${line_break}}"
   
   # shellcheck disable=SC2034,2206
   lines=(${lines[@]:2})

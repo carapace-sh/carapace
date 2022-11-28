@@ -63,8 +63,9 @@ func ActionImport(output []byte) Action {
 			return ActionMessage(err.Error())
 		}
 		a := actionRawValues(e.RawValues...)
-		a.nospace = e.Nospace
-		a.usage = e.Usage
+		a.meta.Nospace = e.Nospace
+		a.meta.Usage = e.Usage
+		a.meta.Messages = e.Messages
 		return a
 	})
 }
@@ -179,17 +180,14 @@ func ActionStyledValuesDescribed(values ...string) Action {
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated.
-func ActionMessage(msg string, a ...interface{}) Action {
+func ActionMessage(msg string, args ...interface{}) Action {
 	return ActionCallback(func(c Context) Action {
-		if len(a) > 0 {
-			msg = fmt.Sprintf(msg, a...)
+		if len(args) > 0 {
+			msg = fmt.Sprintf(msg, args...)
 		}
-		m := ActionStyledValuesDescribed("_", "", style.Default, "ERR", msg, style.Carapace.Error).Invoke(c)
-		for index := range m.rawValues {
-			m.rawValues[index].Tag = "messages"
-		}
-		return m.Prefix(c.CallbackValue).ToA(). // needs to be prefixed with current callback value to not be filtered out
-							noSpace("*").skipCache(true)
+		a := ActionValues().NoSpace()
+		a.meta.Messages.Add(msg)
+		return a
 	})
 }
 

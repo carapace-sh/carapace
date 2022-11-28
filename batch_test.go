@@ -15,8 +15,6 @@ func TestBatch(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B", "C", "D"),
-			nospace:   common.SuffixMatcher(""),
-			skipcache: false,
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
@@ -30,8 +28,6 @@ func TestBatchSingle(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B"),
-			nospace:   common.SuffixMatcher(""),
-			skipcache: false,
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
@@ -43,8 +39,6 @@ func TestBatchNone(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom(),
-			nospace:   common.SuffixMatcher(""),
-			skipcache: false,
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
@@ -60,8 +54,6 @@ func TestBatchToA(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("A", "B", "C", "D"),
-			nospace:   common.SuffixMatcher(""),
-			skipcache: false,
 		},
 	}
 	actual := b.ToA().Invoke(Context{})

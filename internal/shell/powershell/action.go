@@ -30,7 +30,7 @@ func ensureNotEmpty(s string) string {
 }
 
 // ActionRawValues formats values for powershell.
-func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	valueStyle := "default"
 	if s := style.Carapace.Value; s != "" && ui.ParseStyling(s) != nil {
 		valueStyle = s
@@ -50,7 +50,7 @@ func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatc
 				val.Value = fmt.Sprintf("'%v'", val.Value)
 			}
 
-			if !nospace.Matches(val.Value) {
+			if !meta.Nospace.Matches(val.Value) {
 				val.Value = val.Value + " "
 			}
 

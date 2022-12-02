@@ -23,9 +23,11 @@ func assertEqual(t *testing.T, expected, actual InvokedAction) {
 
 	e, _ := json.MarshalIndent(expected.rawValues, "", "  ")
 	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
-
 	assert.Equal(t, string(e), string(a))
-	assert.Equal(t, string(expected.nospace), string(actual.nospace))
+
+	eMeta, _ := json.MarshalIndent(expected.meta, "", "  ")
+	aMeta, _ := json.MarshalIndent(actual.meta, "", "  ")
+	assert.Equal(t, string(eMeta), string(aMeta))
 }
 
 func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
@@ -51,8 +53,9 @@ func TestActionCallback(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("a", "b", "c"),
-			nospace:   "",
-			skipcache: false,
+			meta: common.Meta{
+				Nospace: "",
+			},
 		},
 	}
 	actual := a.Invoke(Context{})
@@ -86,11 +89,11 @@ func TestSkipCache(t *testing.T) {
 			Suffix("").
 			ToA()
 	})
-	if a.skipcache {
-		t.Fatal("uninvoked skipcache should be false")
+	if !a.meta.Messages.IsEmpty() {
+		t.Fatal("uninvoked action should not contain messages")
 	}
-	if !a.Invoke(Context{}).skipcache {
-		t.Fatal("invoked skipcache should be true")
+	if a.Invoke(Context{}).meta.Messages.IsEmpty() {
+		t.Fatal("invoked action should contain messages")
 	}
 }
 
@@ -105,10 +108,10 @@ func TestNoSpace(t *testing.T) {
 			Suffix("").
 			ToA()
 	})
-	if a.nospace != "" {
+	if a.meta.Nospace != "" {
 		t.Fatal("uninvoked nospace should be empty")
 	}
-	if a.Invoke(Context{}).nospace != "*" {
+	if a.Invoke(Context{}).meta.Nospace != "*" {
 		t.Fatal("invoked nospace should be `*`")
 	}
 }
@@ -181,12 +184,12 @@ func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
 	assertEqual(t,
-		ActionStyledValuesDescribed("ERR", fmt.Sprintf("open %v: no such file or directory", wd("nonexistent")), style.Carapace.Error, "_", "", style.Default).noSpace("/").Style("fg-default bg-default").Invoke(Context{}),
-		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{CallbackValue: ""}),
+		ActionMessage(fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))).NoSpace('/').Invoke(Context{}),
+		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{}),
 	)
 
 	assertEqual(t,
-		ActionStyledValuesDescribed("ERR", fmt.Sprintf("readdirent %v/go.mod: not a directory", wd("")), style.Carapace.Error, "_", "", style.Default).noSpace("/").Style("fg-default bg-default").Invoke(Context{}),
+		ActionMessage(fmt.Sprintf("not a directory: %v/go.mod", wd(""))).Invoke(Context{}),
 		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
 	)
 
@@ -204,12 +207,11 @@ func TestActionFilesChdir(t *testing.T) {
 }
 
 func TestActionMessage(t *testing.T) {
-	expected := ActionStyledValuesDescribed("_", "", style.Default, "ERR", "example message", style.Carapace.Error).noSpace("*").skipCache(true).Invoke(Context{}).Prefix("docs/")
-	for index := range expected.rawValues {
-		expected.rawValues[index].Tag = "messages"
-	}
+	expected := ActionValues().NoSpace()
+	expected.meta.Messages.Add("example message")
+
 	assertEqual(t,
-		expected,
+		expected.Invoke(Context{}),
 		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
 	)
 }
@@ -220,13 +222,13 @@ func TestActionMessageSuppress(t *testing.T) {
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
-		ActionValues("test").noSpace("*").skipCache(true).Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
+		ActionValues("test").noSpace("*").Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
 	)
 }
 
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
-		ActionMessage("go unknown: unknown command").noSpace("/").skipCache(true).Invoke(Context{}).Prefix("docs/"),
+		ActionMessage("go unknown: unknown command").noSpace("/").Invoke(Context{}).Prefix("docs/"),
 		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{CallbackValue: "docs/"}),
 	)
 

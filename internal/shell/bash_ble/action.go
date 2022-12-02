@@ -8,11 +8,11 @@ import (
 )
 
 // ActionRawValues formats values for bash_ble.
-func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	vals := make([]string, len(values))
 	for index, val := range values {
 		suffix := " "
-		if nospace.Matches(val.Value) {
+		if meta.Nospace.Matches(val.Value) {
 			suffix = ""
 		}
 		vals[index] = fmt.Sprintf("%v\t%v\x1c%v\x1c%v\x1c%v", val.Value, val.Display, "", suffix, val.TrimmedDescription())

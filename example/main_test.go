@@ -61,25 +61,19 @@ func doComplete(t *testing.T, shell string, cmdline string, contained ...string)
 var tests = map[string]string{
 	`example -ap `:               "action",
 	`example action `:            "p",
-	`example action -z`:          "unknown",
-	`example action --fail `:     "unknown",
-	`example --fail acti`:        "unknown",
-	`example -z acti`:            "unknown",
 	`example action positional`:  "positional1",
 	`example action positional1`: "positional1 with space",
 	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
 	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
-	`example action --callback `:                                   "values flag is not set",
 	`example flag --optarg `:                                       "p",
 	`example flag --optarg positional`:                             "positional1",
 	`example flag --optar`:                                         "--optarg",
-	`example flag --optarg=`:                                       "--optarg=optarg",
+	`example flag --optarg=`:                                       "optarg",
 	`example flag -o`:                                              "count flag",
 	`example flag -oc`:                                             "count flag",
 	`example flag -o `:                                             "p",
 	`example flag -o pos`:                                          "positional",
-	`example flag -o=`:                                             "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag
 	`example multiparts `:                                          "VALUE",
 	`example multiparts -`:                                         "-c",
 	`example multiparts --`:                                        "--comma",
@@ -112,11 +106,23 @@ var tests = map[string]string{
 	`example multiparts VALUE=one,DIRECTORY=`:                      "/",
 }
 
+var testsIntegratedMessage = map[string]string{
+	`example action -z`:          "unknown",
+	`example action --fail `:     "unknown",
+	`example --fail acti`:        "unknown",
+	`example -z acti`:            "unknown",
+	`example flag -o=`:           "unknown", // seems shorthand flag should not accept optional arguments and `=` is seen as another flag
+	`example action --callback `: "values flag is not set",
+}
+
 func TestBash(t *testing.T) {
 	if err := exec.Command("bash", "--version").Run(); err != nil {
 		t.Skip("skipping bash")
 	}
 	for cmdline, text := range tests {
+		doComplete(t, "bash", cmdline, text)
+	}
+	for cmdline, text := range testsIntegratedMessage {
 		doComplete(t, "bash", cmdline, text)
 	}
 }
@@ -137,6 +143,9 @@ func TestFish(t *testing.T) {
 	for cmdline, text := range tests {
 		doComplete(t, "fish", cmdline, text)
 	}
+	for cmdline, text := range testsIntegratedMessage {
+		doComplete(t, "fish", cmdline, text)
+	}
 }
 
 func TestXonsh(t *testing.T) {
@@ -144,6 +153,9 @@ func TestXonsh(t *testing.T) {
 		t.Skip("skipping xonsh")
 	}
 	for cmdline, text := range tests {
+		doComplete(t, "xonsh", cmdline, text)
+	}
+	for cmdline, text := range testsIntegratedMessage {
 		doComplete(t, "xonsh", cmdline, text)
 	}
 }
@@ -155,6 +167,9 @@ func TestOil(t *testing.T) {
 	for cmdline, text := range tests {
 		doComplete(t, "oil", cmdline, text)
 	}
+	for cmdline, text := range testsIntegratedMessage {
+		doComplete(t, "oil", cmdline, text)
+	}
 }
 
 //func TestPowershell(t *testing.T) {
@@ -162,6 +177,9 @@ func TestOil(t *testing.T) {
 //		t.Skip("skipping powershell")
 //	}
 //	for cmdline, text := range tests {
+//		doComplete(t, "powershell", cmdline, text)
+//	}
+//	for cmdline, text := range testsIntegratedMessage {
 //		doComplete(t, "powershell", cmdline, text)
 //	}
 //}

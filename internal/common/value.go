@@ -16,11 +16,6 @@ type RawValue struct {
 	Tag         string `json:",omitempty"`
 }
 
-// IsMessage checks if the value is a message (ActionMessage)
-func (r RawValue) IsMessage() bool {
-	return r.Tag == "messages"
-}
-
 // TrimmedDescription returns the trimmed description.
 func (r RawValue) TrimmedDescription() string {
 	maxLength := 80
@@ -42,6 +37,30 @@ func RawValuesFrom(values ...string) RawValues {
 		rawValues[index] = RawValue{Value: val, Display: val, Style: style.Default}
 	}
 	return rawValues
+}
+
+func (r RawValues) contains(s string) bool {
+	for _, value := range r {
+		if value.Value == s {
+			return true
+		}
+	}
+	return false
+}
+
+// Filter filters values.
+func (r RawValues) Filter(values ...string) RawValues {
+	toremove := make(map[string]bool)
+	for _, v := range values {
+		toremove[v] = true
+	}
+	filtered := make([]RawValue, 0)
+	for _, rawValue := range r {
+		if _, ok := toremove[rawValue.Value]; !ok {
+			filtered = append(filtered, rawValue)
+		}
+	}
+	return filtered
 }
 
 // FilterPrefix filters values with given prefix.

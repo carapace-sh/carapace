@@ -26,6 +26,7 @@ func init() {
 	actionCmd.Flags().String("files-filtered", "", "ActionFiles(\".md\", \"go.mod\", \"go.sum\")")
 	actionCmd.Flags().String("import", "", "ActionImport()")
 	actionCmd.Flags().String("message", "", "ActionMessage()")
+	actionCmd.Flags().String("message-multiple", "", "ActionMessage()")
 	actionCmd.Flags().String("multiparts", "", "ActionMultiParts()")
 	actionCmd.Flags().String("multiparts-nested", "", "ActionMultiParts(...ActionMultiParts...)")
 	actionCmd.Flags().String("styled-values", "", "ActionStyledValues()")
@@ -68,6 +69,12 @@ func init() {
 }
 		`)),
 		"message": carapace.ActionMessage("example message"),
+		"message-multiple": carapace.Batch(
+			carapace.ActionMessage("first message"),
+			carapace.ActionMessage("second message"),
+			carapace.ActionMessage("third message"),
+			carapace.ActionValues("one", "two", "three"),
+		).ToA(),
 		"multiparts": carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {
 			case 0:

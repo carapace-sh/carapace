@@ -19,17 +19,8 @@ type InvokedAction struct {
 //	a := carapace.ActionValues("A", "B", "C").Invoke(c)
 //	b := a.Filter([]string{"B"}) // ["A", "C"]
 func (a InvokedAction) Filter(values []string) InvokedAction {
-	toremove := make(map[string]bool)
-	for _, v := range values {
-		toremove[v] = true
-	}
-	filtered := make([]common.RawValue, 0)
-	for _, rawValue := range a.rawValues {
-		if _, ok := toremove[rawValue.Value]; !ok {
-			filtered = append(filtered, rawValue)
-		}
-	}
-	return InvokedAction{actionRawValues(filtered...).noSpace(string(a.nospace)).skipCache(a.skipcache).withUsage(a.usage)}
+	a.rawValues = common.RawValues(a.rawValues).Filter(values...)
+	return a
 }
 
 // Merge merges InvokedActions (existing values are overwritten)
@@ -39,25 +30,28 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 //	c := a.Merge(b) // ["A", "B", "C"]
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	uniqueRawValues := make(map[string]common.RawValue)
-	nospace := a.nospace
-	skipcache := a.skipcache
-	usage := a.usage
+	nospace := a.meta.Nospace
+	usage := a.meta.Usage
+	messages := a.meta.Messages
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
-		nospace = nospace.Add(string(other.nospace))
-		skipcache = skipcache || other.skipcache
-		if other.usage != "" {
-			usage = other.usage
+		nospace = nospace.Add(string(other.meta.Nospace))
+		if other.meta.Usage != "" {
+			usage = other.meta.Usage
 		}
+		messages.Merge(other.meta.Messages)
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
 	for _, c := range uniqueRawValues {
 		rawValues = append(rawValues, c)
 	}
-	return InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).skipCache(skipcache).withUsage(usage)}
+
+	invoked := InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).withUsage(usage)}
+	invoked.meta.Messages = messages // TODO verify & optimize
+	return invoked
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
@@ -162,5 +156,5 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 }
 
 func (a InvokedAction) value(shell string, callbackValue string) string {
-	return _shell.Value(shell, callbackValue, a.usage, a.nospace, a.rawValues)
+	return _shell.Value(shell, callbackValue, a.meta, a.rawValues)
 }

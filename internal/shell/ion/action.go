@@ -28,10 +28,10 @@ type suggestion struct {
 }
 
 // ActionRawValues formats values for ion.
-func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	vals := make([]suggestion, len(values))
 	for index, val := range sanitize(values) {
-		if !nospace.Matches(val.Value) {
+		if !meta.Nospace.Matches(val.Value) {
 			val.Value = val.Value + " "
 		}
 

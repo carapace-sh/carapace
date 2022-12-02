@@ -11,16 +11,18 @@ import (
 type Export struct {
 	Version   string
 	Usage     string
+	Messages  common.Messages
 	Nospace   common.SuffixMatcher
 	RawValues common.RawValues
 }
 
-func ActionRawValues(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string {
+func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
 		Version:   version(),
-		Usage:     usage,
-		Nospace:   nospace,
+		Usage:     meta.Usage,
+		Messages:  meta.Messages,
+		Nospace:   meta.Nospace,
 		RawValues: values,
 	})
 	return string(m)

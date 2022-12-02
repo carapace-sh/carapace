@@ -55,8 +55,8 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 	return "", fmt.Errorf("expected one of '%v' [was: %v]", strings.Join(expected, "', '"), shell)
 }
 
-func Value(shell string, callbackValue string, usage string, nospace common.SuffixMatcher, values common.RawValues) string { // TODO use context instead?
-	shellFuncs := map[string]func(currentWord string, usage string, nospace common.SuffixMatcher, values common.RawValues) string{
+func Value(shell string, callbackValue string, meta common.Meta, values common.RawValues) string { // TODO use context instead?
+	shellFuncs := map[string]func(currentWord string, meta common.Meta, values common.RawValues) string{
 		"bash":       bash.ActionRawValues,
 		"bash-ble":   bash_ble.ActionRawValues,
 		"fish":       fish.ActionRawValues,
@@ -72,8 +72,13 @@ func Value(shell string, callbackValue string, usage string, nospace common.Suff
 	}
 	if f, ok := shellFuncs[shell]; ok {
 		filtered := values.FilterPrefix(callbackValue)
+		switch shell {
+		case "elvish", "export", "zsh": // shells with support for showing messages
+		default:
+			filtered = meta.Messages.Integrate(filtered, callbackValue)
+		}
 		sort.Sort(common.ByDisplay(filtered))
-		return f(callbackValue, usage, nospace, filtered)
+		return f(callbackValue, meta, filtered)
 	}
 	return ""
 }

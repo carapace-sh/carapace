@@ -25,7 +25,8 @@ function _example_completion {
   # shellcheck disable=SC2034,2206
   local displays=(${lines##*$'\t'})
 
-  compadd -Q -S '' -a -d displays -- vals
+  local compOpts=( -qS "" -Q )
+  _describe -t "sometag" "sometag" displays vals "${compOpts[@]}"
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

@@ -12,7 +12,7 @@ type message struct {
 	common.Meta
 }
 
-func (m message) format() string {
+func (m message) Format() string {
 	formatted := make([]string, 0)
 	for _, message := range m.Messages.Get() {
 		formatted = append(formatted, m.formatMessage(message, style.Carapace.Error))

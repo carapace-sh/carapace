@@ -37,7 +37,8 @@ function _%v_completion {
   # shellcheck disable=SC2034,2206
   local displays=(${lines##*$'\t'})
 
-  compadd -Q -S '' -a -d displays -- vals
+  local compOpts=( -qS "" -Q )
+  _describe -t "sometag" "sometag" displays vals "${compOpts[@]}"
 }
 compquote '' 2>/dev/null && _%v_completion
 compdef _%v_completion %v

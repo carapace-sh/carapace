@@ -63,6 +63,10 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style}
 	}
 
+	if len(values) > 0 {
+		meta.Usage = "" // TODO edit:notify is persistent, so avoid spamming the user for now
+	}
+
 	m, _ := json.Marshal(completion{
 		Usage:            meta.Usage,
 		Messages:         meta.Messages,

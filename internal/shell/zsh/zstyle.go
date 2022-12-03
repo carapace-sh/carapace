@@ -35,7 +35,7 @@ func (z zstyles) valueSGR(val common.RawValue) string {
 func (z zstyles) hasAliases() bool {
 	descriptions := make(map[string]bool)
 	for _, val := range z.rawValues {
-		if _, exists := descriptions[val.Description]; exists {
+		if _, exists := descriptions[val.Description]; exists && val.Description != "" {
 			return true
 		}
 		descriptions[val.Description] = true
@@ -55,15 +55,16 @@ func (z zstyles) Format() string {
 		"~", `\~`,
 	)
 
-	// TODO this might need to be handled differently regarding tags/groups (e.g. done for each tag)
-	pattern := "=(#b)(%v)( * -- *)=0=%v=%v" // match value with description
-	if z.hasAliases() {                     // different behaviour in `_describe` when values are on the same line
-		pattern = "=(#b)(%v)()=0=%v=%v" // only match value
-	}
-
+	hasAliases := z.hasAliases()
 	formatted := make([]string, 0)
 	if len(z.rawValues) < 1000 { // disable styling for large amount of values (bad performance)
 		for _, val := range z.rawValues {
+			// TODO this might need to be handled differently regarding tags/groups (e.g. done for each tag)
+			pattern := "=(#b)(%v)( * -- *)=0=%v=%v"  // match value with description
+			if val.Description == "" || hasAliases { // different behaviour in `_describe` when values are on the same line
+				pattern = "=(#b)(%v)()=0=%v=%v" // only match value
+			}
+
 			formatted = append(formatted, fmt.Sprintf(pattern, replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
 		}
 	}

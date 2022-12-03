@@ -185,6 +185,13 @@ func (a Action) Suppress(expr ...string) Action {
 	})
 }
 
+// MultiParts splits values of an Action by given dividers and completes each segment separately.
+func (a Action) MultiParts(dividers ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).ToMultiPartsA(dividers...)
+	})
+}
+
 // List wraps the Action in an ActionMultiParts with given divider.
 func (a Action) List(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {

@@ -78,7 +78,7 @@ func init() {
 		"multiparts": carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {
 			case 0:
-				return carapace.ActionValues("userA", "UserB").Invoke(c).Suffix(":").ToA()
+				return carapace.ActionValues("userA", "userB").Invoke(c).Suffix(":").ToA()
 			case 1:
 				return carapace.ActionValues("groupA", "groupB")
 			default:
@@ -120,6 +120,7 @@ func init() {
 			"first", "description of first", style.Blink,
 			"second", "description of second", style.Of("color210", style.Underlined),
 			"third", "description of third", style.Of("#112233", style.Italic),
+			"thirdalias", "description of third", style.BgBrightMagenta,
 		),
 		"values": carapace.ActionValues("first", "second", "third"),
 		"values-described": carapace.ActionValuesDescribed(

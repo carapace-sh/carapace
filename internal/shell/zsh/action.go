@@ -15,6 +15,7 @@ var sanitizer = strings.NewReplacer(
 
 // TODO verify these are correct/complete (copied from bash)
 var quoter = strings.NewReplacer(
+	`\`, `\\`,
 	`&`, `\&`,
 	`<`, `\<`,
 	`>`, `\>`,
@@ -34,9 +35,7 @@ var quoter = strings.NewReplacer(
 	`[`, `\[`,
 	`]`, `\]`,
 	`*`, `\*`,
-	`\`, `\\`,
 	`~`, `\~`,
-	`:`, `\:`,
 )
 
 func quoteValue(s string) string {
@@ -59,10 +58,14 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	for index, val := range values {
 		val.Value = sanitizer.Replace(val.Value)
 		val.Value = quoteValue(val.Value)
+		val.Value = strings.ReplaceAll(val.Value, `\`, `\\`) // TODO find out why `_describe` needs another backslash
+		val.Value = strings.ReplaceAll(val.Value, `:`, `\:`) // TODO find out why `_describe` needs another backslash
 		if !meta.Nospace.Matches(val.Value) {
 			val.Value = val.Value + " "
 		}
 		val.Display = sanitizer.Replace(val.Display)
+		val.Display = strings.ReplaceAll(val.Display, `\`, `\\`) // TODO find out why `_describe` needs another backslash
+		val.Display = strings.ReplaceAll(val.Display, `:`, `\:`) // TODO find out why `_describe` needs another backslash
 		val.Description = sanitizer.Replace(val.Description)
 
 		if strings.TrimSpace(val.Description) == "" {

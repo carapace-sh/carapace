@@ -14,7 +14,7 @@ function _example_completion {
     local lines=($(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh))
   fi
 
-  zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}":
+  zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
 
   local line_break=$'\n'
   [[ ! "${lines[2]}" == "NONE" ]] && _message -r "${lines[2]//$'\t'/${line_break}}"

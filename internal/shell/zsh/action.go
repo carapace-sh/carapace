@@ -74,5 +74,5 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			vals[index] = fmt.Sprintf("%v\t%v:%v", val.Value, val.Display, val.TrimmedDescription())
 		}
 	}
-	return fmt.Sprintf(":%v\n%v\n%v", zstyles{values}.Format(), message{meta}.Format(), strings.Join(vals, "\n"))
+	return fmt.Sprintf("%v\n%v\n%v", zstyles{values}.Format(), message{meta}.Format(), strings.Join(vals, "\n"))
 }

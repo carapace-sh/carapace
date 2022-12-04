@@ -92,9 +92,11 @@ func (m Messages) Integrate(values RawValues, prefix string) RawValues {
 	i := 0
 	for _, message := range sorted {
 		value := prefix + "ERR"
+		display := "ERR"
 		for {
 			if i > 0 {
 				value = fmt.Sprintf("%vERR%v", prefix, i)
+				value = fmt.Sprintf("ERR%v", i)
 			}
 			i += 1
 
@@ -105,7 +107,7 @@ func (m Messages) Integrate(values RawValues, prefix string) RawValues {
 
 		values = append(values, RawValue{
 			Value:       value,
-			Display:     value,
+			Display:     display,
 			Description: message,
 			Style:       style.Carapace.Error,
 		})

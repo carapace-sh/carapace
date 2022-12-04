@@ -37,7 +37,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
-		nospace = nospace.Add(string(other.meta.Nospace))
+		nospace.Merge(other.meta.Nospace)
 		if other.meta.Usage != "" {
 			usage = other.meta.Usage
 		}
@@ -49,7 +49,9 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		rawValues = append(rawValues, c)
 	}
 
-	invoked := InvokedAction{actionRawValues(rawValues...).noSpace(string(nospace)).withUsage(usage)}
+	invoked := InvokedAction{actionRawValues(rawValues...)}
+	invoked.meta.Usage = usage
+	invoked.meta.Nospace.Merge(nospace)
 	invoked.meta.Messages = messages // TODO verify & optimize
 	return invoked
 }
@@ -142,16 +144,16 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 			vals = append(vals, val)
 		}
 
-		var sm common.SuffixMatcher
+		a := actionRawValues(vals...)
 		for _, divider := range dividers {
 			if runes := []rune(divider); len(runes) == 0 {
-				sm = sm.Add("*")
+				a.meta.Nospace.Add('*')
 				break
 			} else {
-				sm = sm.Add(string(runes[len(runes)-1]))
+				a.meta.Nospace.Add(runes[len(runes)-1])
 			}
 		}
-		return actionRawValues(vals...).noSpace(string(sm))
+		return a
 	})
 }
 

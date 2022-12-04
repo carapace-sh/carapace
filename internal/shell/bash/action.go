@@ -92,7 +92,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			// prevent insertion of partial display values by prefixing one with space
 			values[0].Display = " " + values[0].Display
 		}
-		meta.Nospace = meta.Nospace.Add("*")
+		meta.Nospace.Add('*')
 	}
 
 	vals := make([]string, len(values))

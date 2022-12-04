@@ -65,7 +65,11 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 		return ActionMessage("maximum recursion depth exceeded")
 	}
 	if a.rawValues == nil && a.callback != nil {
-		result := a.callback(c).nestedAction(c, maxDepth-1).noSpace(string(a.meta.Nospace)).withUsage(a.meta.Usage)
+		result := a.callback(c).nestedAction(c, maxDepth-1)
+		if usage := a.meta.Usage; usage != "" {
+			result.meta.Usage = usage
+		}
+		result.meta.Nospace.Merge(a.meta.Nospace)
 		result.meta.Messages.Merge(a.meta.Messages)
 		return result
 	}
@@ -76,9 +80,10 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 func (a Action) NoSpace(suffixes ...rune) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(suffixes) == 0 {
-			return a.noSpace("*")
+			a.meta.Nospace.Add('*')
 		}
-		return a.noSpace(string(suffixes))
+		a.meta.Nospace.Add(suffixes...)
+		return a
 	})
 }
 
@@ -92,7 +97,10 @@ func (a Action) Usage(usage string, args ...interface{}) Action {
 // Usage sets the usage using a function.
 func (a Action) UsageF(f func() string) Action {
 	return ActionCallback(func(c Context) Action {
-		return a.withUsage(f())
+		if usage := f(); usage != "" {
+			a.meta.Usage = usage
+		}
+		return a
 	})
 }
 
@@ -204,16 +212,4 @@ func (a Action) UniqueList(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {
 		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
 	})
-}
-
-func (a Action) noSpace(suffixes string) Action {
-	a.meta.Nospace = a.meta.Nospace.Add(suffixes)
-	return a
-}
-
-func (a Action) withUsage(usage string) Action {
-	if usage != "" {
-		a.meta.Usage = usage
-	}
-	return a
 }

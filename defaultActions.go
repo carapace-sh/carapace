@@ -209,11 +209,11 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 		}
 		c.Parts = parts
 
-		nospace := "*"
+		nospace := '*'
 		if runes := []rune(divider); len(runes) > 0 {
-			nospace = string(runes[len(runes)-1])
+			nospace = runes[len(runes)-1]
 		}
-		return callback(c).Invoke(c).Prefix(prefix).ToA().noSpace(nospace)
+		return callback(c).Invoke(c).Prefix(prefix).ToA().NoSpace(nospace)
 	})
 }
 
@@ -243,7 +243,7 @@ func ActionStyleConfig() Action {
 			})
 		case 1:
 			return ActionMultiParts(",", func(c Context) Action {
-				return ActionStyles(c.Parts...).Invoke(c).Filter(c.Parts).ToA()
+				return ActionStyles(c.Parts...).Invoke(c).Filter(c.Parts).ToA().NoSpace()
 			})
 		default:
 			return ActionValues()

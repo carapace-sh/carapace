@@ -53,9 +53,6 @@ func TestActionCallback(t *testing.T) {
 	expected := InvokedAction{
 		Action{
 			rawValues: common.RawValuesFrom("a", "b", "c"),
-			meta: common.Meta{
-				Nospace: "",
-			},
 		},
 	}
 	actual := a.Invoke(Context{})
@@ -108,11 +105,11 @@ func TestNoSpace(t *testing.T) {
 			Suffix("").
 			ToA()
 	})
-	if a.meta.Nospace != "" {
-		t.Fatal("uninvoked nospace should be empty")
+	if a.meta.Nospace.Matches("x") {
+		t.Fatal("uninvoked nospace should not match")
 	}
-	if a.Invoke(Context{}).meta.Nospace != "*" {
-		t.Fatal("invoked nospace should be `*`")
+	if !a.Invoke(Context{}).meta.Nospace.Matches("x") {
+		t.Fatal("invoked nospace should match")
 	}
 }
 
@@ -124,7 +121,7 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace("/").Invoke(Context{}),
+		).NoSpace('/').Invoke(Context{}),
 		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
@@ -135,7 +132,7 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace("/").Invoke(Context{}).Prefix("./"),
+		).NoSpace('/').Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
 	)
 
@@ -143,14 +140,14 @@ func TestActionDirectories(t *testing.T) {
 		ActionStyledValues(
 			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace("/").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace("/").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
 	)
 }
@@ -164,7 +161,7 @@ func TestActionFiles(t *testing.T) {
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-		).noSpace("/").Invoke(Context{}),
+		).NoSpace('/').Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
 	)
 
@@ -175,7 +172,7 @@ func TestActionFiles(t *testing.T) {
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"main.go", style.Of("fg-default", "bg-default"),
 			"main_test.go", style.Of("fg-default", "bg-default"),
-		).noSpace("/").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
 	)
 }
@@ -197,7 +194,7 @@ func TestActionFilesChdir(t *testing.T) {
 		ActionStyledValues(
 			"action.go", style.Of("fg-default", "bg-default"),
 			"snippet.go", style.Of("fg-default", "bg-default"),
-		).noSpace("/").Invoke(Context{}).Prefix("elvish/"),
+		).NoSpace('/').Invoke(Context{}).Prefix("elvish/"),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{CallbackValue: "elvish/"}),
 	)
 
@@ -222,13 +219,13 @@ func TestActionMessageSuppress(t *testing.T) {
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
-		ActionValues("test").noSpace("*").Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
+		ActionValues("test").NoSpace('*').Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
 	)
 }
 
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
-		ActionMessage("go unknown: unknown command").noSpace("/").Invoke(Context{}).Prefix("docs/"),
+		ActionMessage("go unknown: unknown command").NoSpace('/').Invoke(Context{}).Prefix("docs/"),
 		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{CallbackValue: "docs/"}),
 	)
 

@@ -133,7 +133,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 				if id := subcommand.GroupID; id != "" {
 					tag = fmt.Sprintf("%v %v", id, tag)
 				} else if len(cmd.Groups()) != 0 {
-					tag = fmt.Sprintf("%v %v", "additional", tag) // implicit group name in cobra
+					tag = "other commands"
 				}
 				batch = append(batch, ActionValuesDescribed(subcommand.Name(), subcommand.Short).Tag(tag))
 				for _, alias := range subcommand.Aliases {

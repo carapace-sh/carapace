@@ -55,19 +55,15 @@ func (z zstyles) Format() string {
 		"~", `\~`,
 	)
 
-	hasAliases := z.hasAliases()
 	formatted := make([]string, 0)
 	if len(z.rawValues) < 1000 { // disable styling for large amount of values (bad performance)
 		for _, val := range z.rawValues {
-			// TODO this might need to be handled differently regarding tags/groups (e.g. done for each tag)
-			pattern := "=(#b)(%v)( * -- *)=0=%v=%v"  // match value with description
-			if val.Description == "" || hasAliases { // different behaviour in `_describe` when values are on the same line
-				pattern = "=(#b)(%v)()=0=%v=%v" // only match value
-			}
-
-			formatted = append(formatted, fmt.Sprintf(pattern, replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
+			// match value with description
+			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)( * -- *)=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
+			// only match value (also matches aliased completions that are placed on the same line if the space allows it)
+			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)()=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
 		}
 	}
-	formatted = append(formatted, fmt.Sprintf("=(#b)(%v)=0=%v", "-- *", z.descriptionSGR()))
+	formatted = append(formatted, fmt.Sprintf("=(#b)(%v)=0=%v", "-- *", z.descriptionSGR())) // match description for aliased completions
 	return strings.Join(formatted, ":")
 }

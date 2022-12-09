@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -143,10 +142,4 @@ func actionSubcommands(cmd *cobra.Command) Action {
 		}
 		return batch.ToA()
 	})
-}
-
-func actionRawValues(rawValues ...common.RawValue) Action {
-	return Action{
-		rawValues: rawValues,
-	}
 }

@@ -62,11 +62,10 @@ func ActionImport(output []byte) Action {
 		if err := json.Unmarshal(output, &e); err != nil {
 			return ActionMessage(err.Error())
 		}
-		a := actionRawValues(e.RawValues...)
-		a.meta.Nospace = e.Nospace
-		a.meta.Usage = e.Usage
-		a.meta.Messages = e.Messages
-		return a
+		return Action{
+			rawValues: e.RawValues,
+			meta:      e.Meta,
+		}
 	})
 }
 
@@ -130,7 +129,7 @@ func ActionValues(values ...string) Action {
 		for _, val := range values {
 			vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: style.Default})
 		}
-		return actionRawValues(vals...)
+		return Action{rawValues: vals}
 	})
 }
 
@@ -145,7 +144,7 @@ func ActionStyledValues(values ...string) Action {
 		for i := 0; i < len(values); i += 2 {
 			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: "", Style: values[i+1]})
 		}
-		return actionRawValues(vals...)
+		return Action{rawValues: vals}
 	})
 }
 
@@ -160,7 +159,7 @@ func ActionValuesDescribed(values ...string) Action {
 		for i := 0; i < len(values); i += 2 {
 			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1], Style: style.Default})
 		}
-		return actionRawValues(vals...)
+		return Action{rawValues: vals}
 	})
 }
 
@@ -175,7 +174,7 @@ func ActionStyledValuesDescribed(values ...string) Action {
 		for i := 0; i < len(values); i += 3 {
 			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1], Style: values[i+2]})
 		}
-		return actionRawValues(vals...)
+		return Action{rawValues: vals}
 	})
 }
 

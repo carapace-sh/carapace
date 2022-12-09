@@ -9,10 +9,8 @@ import (
 )
 
 type Export struct {
-	Version   string
-	Usage     string
-	Messages  common.Messages
-	Nospace   common.SuffixMatcher
+	Version string
+	common.Meta
 	RawValues common.RawValues
 }
 
@@ -20,9 +18,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
 		Version:   version(),
-		Usage:     meta.Usage,
-		Messages:  meta.Messages,
-		Nospace:   meta.Nospace,
+		Meta:      meta,
 		RawValues: values,
 	})
 	return string(m)

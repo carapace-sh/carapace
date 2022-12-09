@@ -30,18 +30,12 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 //	c := a.Merge(b) // ["A", "B", "C"]
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 	uniqueRawValues := make(map[string]common.RawValue)
-	nospace := a.meta.Nospace
-	usage := a.meta.Usage
-	messages := a.meta.Messages
+	var meta common.Meta
 	for _, other := range append([]InvokedAction{a}, others...) {
 		for _, c := range other.rawValues {
 			uniqueRawValues[c.Value] = c
 		}
-		nospace.Merge(other.meta.Nospace)
-		if other.meta.Usage != "" {
-			usage = other.meta.Usage
-		}
-		messages.Merge(other.meta.Messages)
+		meta.Merge(other.meta)
 	}
 
 	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
@@ -49,10 +43,8 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 		rawValues = append(rawValues, c)
 	}
 
-	invoked := InvokedAction{actionRawValues(rawValues...)}
-	invoked.meta.Usage = usage
-	invoked.meta.Nospace.Merge(nospace)
-	invoked.meta.Messages = messages // TODO verify & optimize
+	invoked := InvokedAction{Action{rawValues: rawValues}}
+	invoked.meta.Merge(meta)
 	return invoked
 }
 
@@ -144,7 +136,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 			vals = append(vals, val)
 		}
 
-		a := actionRawValues(vals...)
+		a := Action{rawValues: vals}
 		for _, divider := range dividers {
 			if runes := []rune(divider); len(runes) == 0 {
 				a.meta.Nospace.Add('*')

@@ -32,7 +32,7 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 		a.callback = func(c Context) Action {
 			if cacheFile, err := cache.File(file, line, keys...); err == nil {
 				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
-					return actionRawValues(rawValues...)
+					return Action{rawValues: rawValues}
 				}
 				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
 				if invokedAction.meta.Messages.IsEmpty() {
@@ -66,11 +66,7 @@ func (a Action) nestedAction(c Context, maxDepth int) Action {
 	}
 	if a.rawValues == nil && a.callback != nil {
 		result := a.callback(c).nestedAction(c, maxDepth-1)
-		if usage := a.meta.Usage; usage != "" {
-			result.meta.Usage = usage
-		}
-		result.meta.Nospace.Merge(a.meta.Nospace)
-		result.meta.Messages.Merge(a.meta.Messages)
+		result.meta.Merge(a.meta)
 		return result
 	}
 	return a

@@ -21,7 +21,7 @@ eval (command _carapace | slurp)
 # fish
 command _carapace | source
 
-# nushell
+# nushell (update config.nu according to output)
 command _carapace nushell
 
 # oil

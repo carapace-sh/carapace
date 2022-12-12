@@ -6,7 +6,7 @@
 - [Elvish](https://elv.sh/)
 - [Fish](https://fishshell.com/)
 - [Ion](https://doc.redox-os.org/ion-manual/html/) ([experimental](https://github.com/rsteube/carapace/issues/88))
-- [Nushell](https://www.nushell.sh/) ([experimental](https://github.com/rsteube/carapace/issues/89))
+- [Nushell](https://www.nushell.sh/)
 - [Oil](http://www.oilshell.org/)
 - [Powershell](https://microsoft.com/powershell)
 - [Xonsh](https://xon.sh/)

@@ -22,9 +22,9 @@ func (m message) Format() string {
 	}
 
 	if len(formatted) > 0 {
-		return strings.Join(formatted, "\t")
+		return strings.Join(formatted, "\n")
 	}
-	return "NONE" // TODO fix empty line issue in script
+	return ""
 }
 
 func (m message) formatMessage(message, _style string) string {
@@ -35,18 +35,6 @@ func (m message) formatMessage(message, _style string) string {
 		"\v", ``,
 		"\f", ``,
 		"\b", ``,
-
-		// TODO verify which are needed
-		`&`, `\&`,
-		`'`, `\'`,
-		`$`, `\$`,
-		`#`, `\#`,
-		`;`, `\;`,
-		`*`, `\*`,
-		`\`, `\\`,
-		`~`, `\~`,
-
-		`\`, `\\`,
 	).Replace(message)
 
 	return fmt.Sprintf("\x1b[%vm%v\x1b[%vm", style.SGR(_style), msg, style.SGR("fg-default"))

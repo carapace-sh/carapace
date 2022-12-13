@@ -2,6 +2,7 @@
 package common
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/rsteube/carapace/pkg/style"
@@ -72,6 +73,26 @@ func (r RawValues) FilterPrefix(prefix string) RawValues {
 		}
 	}
 	return filtered
+}
+
+func (r RawValues) EachTag(f func(tag string, values RawValues)) {
+	tagGroups := make(map[string]RawValues)
+	for _, val := range r {
+		if _, exists := tagGroups[val.Tag]; !exists {
+			tagGroups[val.Tag] = make(RawValues, 0)
+		}
+		tagGroups[val.Tag] = append(tagGroups[val.Tag], val)
+	}
+
+	tags := make([]string, 0)
+	for tag := range tagGroups {
+		tags = append(tags, tag)
+	}
+	sort.Strings(tags)
+
+	for _, tag := range tags {
+		f(tag, tagGroups[tag])
+	}
 }
 
 // ByValue alias to filter by value.

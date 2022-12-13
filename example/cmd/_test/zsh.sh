@@ -2,31 +2,30 @@
 function _example_completion {
   local IFS=$'\n'
   
-  # shellcheck disable=SC2207,SC2086,SC2154
+  # shellcheck disable=SC2086,SC2154,SC2155
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
-    # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words}"''" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh ))
+    local lines="$(echo ${words}"''" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
   elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-    # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words} | sed "s/\$/'/" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh))
+    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   else
-    # shellcheck disable=SC2207,SC2086
-    local lines=($(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh))
+    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   fi
 
-  zstyle ":completion:${curcontext}:*" list-colors "${lines[1]}"
-
-  local line_break=$'\n'
-  [[ ! "${lines[2]}" == "NONE" ]] && _message -r "${lines[2]//$'\t'/${line_break}}"
+  local zstyle message data
+  IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
+  # shellcheck disable=SC2154
+  zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
+  [ -z "$message" ] || _message -r "${message}"
   
-  # shellcheck disable=SC2034,2206
-  lines=(${lines[@]:2})
-  # shellcheck disable=SC2034,2206
-  local vals=(${lines%$'\t'*})
-  # shellcheck disable=SC2034,2206
-  local displays=(${lines##*$'\t'})
-
-  _describe -t "sometag" "sometag" displays vals -Q -S ''
+  local block tag displays values displaysArr valuesArr
+  while IFS=$'\002' read -r -d $'\002' block; do
+    IFS=$'\003' read -r -d '' tag displays values <<<"${block}"
+    # shellcheck disable=SC2034
+    IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
+    IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
+  
+    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+  done <<<"${data}"
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example

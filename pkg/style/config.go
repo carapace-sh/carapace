@@ -53,6 +53,7 @@ var Carapace = struct {
 	H8  string `desc:"Highlight 8"`
 	H9  string `desc:"Highlight 9"`
 	H10 string `desc:"Highlight 10"`
+
 	H11 string `desc:"Highlight 11"`
 	H12 string `desc:"Highlight 12"`
 }{
@@ -78,13 +79,14 @@ var Carapace = struct {
 	H3: Magenta,
 	H4: Cyan,
 	H5: Green,
-	H6: Bold,
 
-	H7:  Of(Blue, Dim),
-	H8:  Of(Yellow, Dim),
-	H9:  Of(Magenta, Dim),
-	H10: Of(Cyan, Dim),
-	H11: Of(Green, Dim),
+	H6:  Of(Blue, Dim),
+	H7:  Of(Yellow, Dim),
+	H8:  Of(Magenta, Dim),
+	H9:  Of(Cyan, Dim),
+	H10: Of(Green, Dim),
+
+	H11: Bold,
 	H12: Of(Bold, Dim),
 }
 

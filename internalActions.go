@@ -1,13 +1,13 @@
 package carapace
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -128,15 +128,10 @@ func actionSubcommands(cmd *cobra.Command) Action {
 		batch := Batch()
 		for _, subcommand := range cmd.Commands() {
 			if !subcommand.Hidden && subcommand.Deprecated == "" {
-				tag := "commands"
-				if id := subcommand.GroupID; id != "" {
-					tag = fmt.Sprintf("%v %v", id, tag)
-				} else if len(cmd.Groups()) != 0 {
-					tag = "other commands"
-				}
-				batch = append(batch, ActionValuesDescribed(subcommand.Name(), subcommand.Short).Tag(tag))
+				group := common.Group{Cmd: subcommand}
+				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
 				for _, alias := range subcommand.Aliases {
-					batch = append(batch, ActionValuesDescribed(alias, subcommand.Short).Tag(tag))
+					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
 				}
 			}
 		}

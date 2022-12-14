@@ -41,6 +41,20 @@ var Carapace = struct {
 	LogLevelError    string `desc:"LogLevel ERROR"`
 	LogLevelCritical string `desc:"LogLevel CRITICAL"`
 	LogLevelFatal    string `desc:"LogLevel FATAL"`
+
+	H1 string `desc:"Highlight 1"`
+	H2 string `desc:"Highlight 2"`
+	H3 string `desc:"Highlight 3"`
+	H4 string `desc:"Highlight 4"`
+	H5 string `desc:"Highlight 5"`
+	H6 string `desc:"Highlight 6"`
+
+	H7  string `desc:"Highlight 7"`
+	H8  string `desc:"Highlight 8"`
+	H9  string `desc:"Highlight 9"`
+	H10 string `desc:"Highlight 10"`
+	H11 string `desc:"Highlight 11"`
+	H12 string `desc:"Highlight 12"`
 }{
 	Value:       Default,
 	Description: Gray,
@@ -58,6 +72,20 @@ var Carapace = struct {
 	LogLevelError:    Magenta,
 	LogLevelCritical: Red,
 	LogLevelFatal:    Cyan,
+
+	H1: Blue,
+	H2: Yellow,
+	H3: Magenta,
+	H4: Cyan,
+	H5: Green,
+	H6: Bold,
+
+	H7:  Of(Blue, Dim),
+	H8:  Of(Yellow, Dim),
+	H9:  Of(Magenta, Dim),
+	H10: Of(Cyan, Dim),
+	H11: Of(Green, Dim),
+	H12: Of(Bold, Dim),
 }
 
 func init() {

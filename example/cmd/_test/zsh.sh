@@ -15,6 +15,7 @@ function _example_completion {
   IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
   # shellcheck disable=SC2154
   zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
+  zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
   
   local block tag displays values displaysArr valuesArr

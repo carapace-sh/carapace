@@ -6,9 +6,10 @@ import (
 )
 
 var injectionCmd = &cobra.Command{
-	Use:   "injection",
-	Short: "just trying to break things",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Use:     "injection",
+	Short:   "just trying to break things",
+	GroupID: "test",
+	Run:     func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {

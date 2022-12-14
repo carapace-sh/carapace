@@ -8,7 +8,7 @@ import (
 var modifierCmd = &cobra.Command{
 	Use:     "modifier [pos1]",
 	Short:   "modifier example",
-	GroupID: "main",
+	GroupID: "modifier",
 	Run:     func(cmd *cobra.Command, args []string) {},
 }
 

@@ -26,24 +26,9 @@ func (g Group) Style() string {
 		return style.Default
 	}
 
-	groupStyles := []string{
-		style.Carapace.H1,
-		style.Carapace.H2,
-		style.Carapace.H3,
-		style.Carapace.H4,
-		style.Carapace.H5,
-		style.Carapace.H6,
-		style.Carapace.H7,
-		style.Carapace.H8,
-		style.Carapace.H9,
-		style.Carapace.H10,
-		style.Carapace.H11,
-		style.Carapace.H12,
-	}
-
 	for index, group := range g.Cmd.Parent().Groups() {
-		if group.ID == g.Cmd.GroupID && index < len(groupStyles) {
-			return groupStyles[index]
+		if group.ID == g.Cmd.GroupID {
+			return style.Carapace.Highlight(index)
 		}
 	}
 	return style.Default

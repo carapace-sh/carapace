@@ -24,7 +24,7 @@ func Register(name string, i interface{}) { config.RegisterStyle(name, i) }
 //	Set("carapace.Value", "bold magenta")
 func Set(key, value string) error { return config.SetStyle(key, value) }
 
-var Carapace = struct {
+type carapace struct {
 	Value       string `desc:"default style for values"`
 	Description string `desc:"default style for descriptions"`
 	Error       string `desc:"default style for errors"`
@@ -42,21 +42,23 @@ var Carapace = struct {
 	LogLevelCritical string `desc:"LogLevel CRITICAL"`
 	LogLevelFatal    string `desc:"LogLevel FATAL"`
 
-	H1 string `desc:"Highlight 1"`
-	H2 string `desc:"Highlight 2"`
-	H3 string `desc:"Highlight 3"`
-	H4 string `desc:"Highlight 4"`
-	H5 string `desc:"Highlight 5"`
-	H6 string `desc:"Highlight 6"`
+	Highlight1 string `desc:"Highlight 1"`
+	Highlight2 string `desc:"Highlight 2"`
+	Highlight3 string `desc:"Highlight 3"`
+	Highlight4 string `desc:"Highlight 4"`
+	Highlight5 string `desc:"Highlight 5"`
+	Highlight6 string `desc:"Highlight 6"`
 
-	H7  string `desc:"Highlight 7"`
-	H8  string `desc:"Highlight 8"`
-	H9  string `desc:"Highlight 9"`
-	H10 string `desc:"Highlight 10"`
+	Highlight7  string `desc:"Highlight 7"`
+	Highlight8  string `desc:"Highlight 8"`
+	Highlight9  string `desc:"Highlight 9"`
+	Highlight10 string `desc:"Highlight 10"`
 
-	H11 string `desc:"Highlight 11"`
-	H12 string `desc:"Highlight 12"`
-}{
+	Highlight11 string `desc:"Highlight 11"`
+	Highlight12 string `desc:"Highlight 12"`
+}
+
+var Carapace = carapace{
 	Value:       Default,
 	Description: Gray,
 	Error:       Of(Bold, Red),
@@ -74,20 +76,53 @@ var Carapace = struct {
 	LogLevelCritical: Red,
 	LogLevelFatal:    Cyan,
 
-	H1: Blue,
-	H2: Yellow,
-	H3: Magenta,
-	H4: Cyan,
-	H5: Green,
+	Highlight1: Blue,
+	Highlight2: Yellow,
+	Highlight3: Magenta,
+	Highlight4: Cyan,
+	Highlight5: Green,
 
-	H6:  Of(Blue, Dim),
-	H7:  Of(Yellow, Dim),
-	H8:  Of(Magenta, Dim),
-	H9:  Of(Cyan, Dim),
-	H10: Of(Green, Dim),
+	Highlight6:  Of(Blue, Dim),
+	Highlight7:  Of(Yellow, Dim),
+	Highlight8:  Of(Magenta, Dim),
+	Highlight9:  Of(Cyan, Dim),
+	Highlight10: Of(Green, Dim),
 
-	H11: Bold,
-	H12: Of(Bold, Dim),
+	Highlight11: Bold,
+	Highlight12: Of(Bold, Dim),
+}
+
+// Highlight returns the style for given level (0..n)
+func (c carapace) Highlight(level int) string {
+	switch level {
+	case 0:
+		return c.Highlight1
+	case 1:
+		return c.Highlight2
+	case 2:
+		return c.Highlight3
+	case 3:
+		return c.Highlight4
+	case 4:
+		return c.Highlight5
+	case 5:
+		return c.Highlight6
+	case 6:
+		return c.Highlight7
+	case 7:
+		return c.Highlight8
+	case 8:
+		return c.Highlight9
+	case 9:
+		return c.Highlight10
+	case 10:
+		return c.Highlight11
+	case 11:
+		return c.Highlight12
+	default:
+		return Default
+	}
+
 }
 
 func init() {

@@ -25,37 +25,37 @@ func Register(name string, i interface{}) { config.RegisterStyle(name, i) }
 func Set(key, value string) error { return config.SetStyle(key, value) }
 
 type carapace struct {
-	Value       string `desc:"default style for values"`
-	Description string `desc:"default style for descriptions"`
-	Error       string `desc:"default style for errors"`
+	Value       string `desc:"default style for values" tag:"core styles"`
+	Description string `desc:"default style for descriptions" tag:"core styles"`
+	Error       string `desc:"default style for errors" tag:"core styles"`
 
-	KeywordAmbiguous string `desc:"keyword describing a ambiguous state"`
-	KeywordNegative  string `desc:"keyword describing a negative state"`
-	KeywordPositive  string `desc:"keyword describing a positive state"`
-	KeywordUnknown   string `desc:"keyword describing an unknown state"`
+	KeywordAmbiguous string `desc:"keyword describing a ambiguous state" tag:"keyword styles"`
+	KeywordNegative  string `desc:"keyword describing a negative state" tag:"keyword styles"`
+	KeywordPositive  string `desc:"keyword describing a positive state" tag:"keyword styles"`
+	KeywordUnknown   string `desc:"keyword describing an unknown state" tag:"keyword styles"`
 
-	LogLevelTrace    string `desc:"LogLevel TRACE"`
-	LogLevelDebug    string `desc:"LogLevel DEBUG"`
-	LogLevelInfo     string `desc:"LogLevel INFO"`
-	LogLevelWarning  string `desc:"LogLevel WARNING"`
-	LogLevelError    string `desc:"LogLevel ERROR"`
-	LogLevelCritical string `desc:"LogLevel CRITICAL"`
-	LogLevelFatal    string `desc:"LogLevel FATAL"`
+	LogLevelTrace    string `desc:"LogLevel TRACE" tag:"loglevel styles"`
+	LogLevelDebug    string `desc:"LogLevel DEBUG" tag:"loglevel styles"`
+	LogLevelInfo     string `desc:"LogLevel INFO" tag:"loglevel styles"`
+	LogLevelWarning  string `desc:"LogLevel WARNING" tag:"loglevel styles"`
+	LogLevelError    string `desc:"LogLevel ERROR" tag:"loglevel styles"`
+	LogLevelCritical string `desc:"LogLevel CRITICAL" tag:"loglevel styles"`
+	LogLevelFatal    string `desc:"LogLevel FATAL" tag:"loglevel styles"`
 
-	Highlight1 string `desc:"Highlight 1"`
-	Highlight2 string `desc:"Highlight 2"`
-	Highlight3 string `desc:"Highlight 3"`
-	Highlight4 string `desc:"Highlight 4"`
-	Highlight5 string `desc:"Highlight 5"`
-	Highlight6 string `desc:"Highlight 6"`
+	Highlight1 string `desc:"Highlight 1" tag:"highlight styles"`
+	Highlight2 string `desc:"Highlight 2" tag:"highlight styles"`
+	Highlight3 string `desc:"Highlight 3" tag:"highlight styles"`
+	Highlight4 string `desc:"Highlight 4" tag:"highlight styles"`
+	Highlight5 string `desc:"Highlight 5" tag:"highlight styles"`
+	Highlight6 string `desc:"Highlight 6" tag:"highlight styles"`
 
-	Highlight7  string `desc:"Highlight 7"`
-	Highlight8  string `desc:"Highlight 8"`
-	Highlight9  string `desc:"Highlight 9"`
-	Highlight10 string `desc:"Highlight 10"`
+	Highlight7  string `desc:"Highlight 7" tag:"highlight styles"`
+	Highlight8  string `desc:"Highlight 8" tag:"highlight styles"`
+	Highlight9  string `desc:"Highlight 9" tag:"highlight styles"`
+	Highlight10 string `desc:"Highlight 10" tag:"highlight styles"`
 
-	Highlight11 string `desc:"Highlight 11"`
-	Highlight12 string `desc:"Highlight 12"`
+	Highlight11 string `desc:"Highlight 11" tag:"highlight styles"`
+	Highlight12 string `desc:"Highlight 12" tag:"highlight styles"`
 }
 
 var Carapace = carapace{

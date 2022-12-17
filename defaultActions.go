@@ -234,7 +234,11 @@ func ActionStyleConfig() Action {
 					if err != nil {
 						return ActionMessage(err.Error())
 					}
-					return ActionStyledValuesDescribed(fields...).Invoke(c).Suffix("=").ToA()
+					batch := Batch()
+					for _, field := range fields {
+						batch = append(batch, ActionStyledValuesDescribed(field.Name, field.Description, field.Style).Tag(field.Tag))
+					}
+					return batch.Invoke(c).Merge().Suffix("=").ToA()
 
 				default:
 					return ActionValues()

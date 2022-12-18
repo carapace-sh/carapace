@@ -2,6 +2,7 @@ package pflagfork
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/spf13/pflag"
 )
@@ -15,17 +16,22 @@ const (
 	NameAsShorthand              // non-posix style where the name is also added as shorthand (single `-` prefix)
 )
 
-type flag struct {
+type Flag struct {
 	*pflag.Flag
 }
 
-func (f flag) Style() style {
+func (f Flag) Style() style {
 	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Style"); field.IsValid() && field.Kind() == reflect.Int {
 		return style(field.Int())
 	}
 	return Default
 }
 
-func Flag(f *pflag.Flag) *flag {
-	return &flag{Flag: f}
+func (f Flag) IsRepeatable() bool {
+	if strings.Contains(f.Value.Type(), "Slice") ||
+		strings.Contains(f.Value.Type(), "Array") ||
+		f.Value.Type() == "count" {
+		return true
+	}
+	return false
 }

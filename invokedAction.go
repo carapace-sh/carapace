@@ -102,7 +102,6 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 				splittedCV = append(splittedCV, "")
 				break
 			}
-
 		}
 
 		uniqueVals := make(map[string]common.RawValue)

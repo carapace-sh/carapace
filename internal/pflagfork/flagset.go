@@ -37,5 +37,4 @@ func (f *FlagSet) VisitAll(fn func(*Flag)) {
 	f.FlagSet.VisitAll(func(flag *pflag.Flag) {
 		fn(&Flag{flag})
 	})
-
 }

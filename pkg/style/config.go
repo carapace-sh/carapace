@@ -92,7 +92,7 @@ var Carapace = carapace{
 	Highlight12: Of(Bold, Dim),
 }
 
-// Highlight returns the style for given level (0..n)
+// Highlight returns the style for given level (0..n).
 func (c carapace) Highlight(level int) string {
 	switch level {
 	case 0:
@@ -122,7 +122,6 @@ func (c carapace) Highlight(level int) string {
 	default:
 		return Default
 	}
-
 }
 
 func init() {

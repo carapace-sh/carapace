@@ -70,7 +70,7 @@ func ActionImport(output []byte) Action {
 }
 
 // ActionExecute executes completion on an internal command
-// TODO example
+// TODO example.
 func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		args := []string{"_carapace", "export", cmd.Name()}
@@ -190,7 +190,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation).
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		index := strings.LastIndex(c.CallbackValue, string(divider))

@@ -7,9 +7,25 @@ import (
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
+
+// Complete can be used by Go programs wishing to produce completions for
+// themselves, without passing through shell snippets/output or export formats.
+//
+// The `onFinalize` function parameter, if non nil, will be called after having
+// generated the completions from the given command/tree. This function is generally
+// used to reset the command tree, which is needed when the Go program is a shell itself.
+// Also, and before calling `onFinalize` if not nil, the completion storage is cleared.
+func Complete(cmd *cobra.Command, args []string, onFinalize func()) (common.RawValues, common.Meta) {
+	// Generate the completion as normally done for an external system shell
+	action, current := generate(cmd, args)
+
+	// And adapt/fetch the results from invoked action
+	return internalValues(action, current, onFinalize)
+}
 
 func complete(cmd *cobra.Command, args []string) (string, error) {
 	switch len(args) {
@@ -20,16 +36,28 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 	}
 
 	shell := args[0]
+
+	// Generate the completions and get the resulting invoked action.
+	action, current := generate(cmd, args)
+
+	// And generate the completions string for the target shell caller.
+	return action.value(shell, current), nil
+}
+
+func generate(cmd *cobra.Command, args []string) (InvokedAction, string) {
 	current := args[len(args)-1]
-	previous := args[len(args)-2]
+	previous := ""
+	if len(args) > 1 {
+		previous = args[len(args)-2]
+	}
 
 	if err := config.Load(); err != nil {
-		return ActionMessage("failed to load config: "+err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+		return ActionMessage("failed to load config: " + err.Error()).Invoke(Context{CallbackValue: current}), current
 	}
 
 	targetCmd, targetArgs, err := findTarget(cmd, args)
 	if err != nil {
-		return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
+		return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}), current
 	}
 
 	context := newContext(append(targetArgs, current))
@@ -67,7 +95,8 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			}
 		}
 	}
-	return targetAction.Invoke(context).value(shell, current), nil
+
+	return targetAction.Invoke(context), current
 }
 
 func findAction(targetCmd *cobra.Command, targetArgs []string) Action {
@@ -99,4 +128,38 @@ func lookupFlag(cmd *cobra.Command, arg string) (flag *pflag.Flag) {
 		}
 	}
 	return
+}
+
+func internalValues(a InvokedAction, current string, onFinalize func()) (common.RawValues, common.Meta) {
+	unsorted := common.RawValues(a.rawValues)
+	sorted := make(common.RawValues, 0)
+
+	// Ensure values are sorted.
+	unsorted.EachTag(func(tag string, values common.RawValues) {
+		vals := make(common.RawValues, len(values))
+		for index, val := range values {
+			if !a.meta.Nospace.Matches(val.Value) {
+				val.Value += " "
+			}
+			if val.Style != "" {
+				val.Style = style.SGR(val.Style)
+			}
+
+			vals[index] = val
+		}
+		sorted = append(sorted, vals...)
+	})
+
+	// Merge/filter completions and meta stuff.
+	filtered := sorted.FilterPrefix(current)
+	filtered = a.meta.Messages.Integrate(filtered, current)
+
+	// Reset the storage (empty all commands) and run the finalize function, which is
+	// generally in charge of binding new command instances, with blank flags.
+	if onFinalize != nil {
+		storage = make(_storage)
+		onFinalize()
+	}
+
+	return filtered, a.meta
 }

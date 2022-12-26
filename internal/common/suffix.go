@@ -41,6 +41,10 @@ func (sm SuffixMatcher) Matches(s string) bool {
 	return false
 }
 
+func (sm SuffixMatcher) String() string {
+	return sm.string
+}
+
 func (sm SuffixMatcher) MarshalJSON() ([]byte, error) {
 	return json.Marshal(sm.string)
 }

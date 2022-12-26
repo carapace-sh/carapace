@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"net"
-	"os"
 	"time"
 
 	"github.com/rsteube/carapace"
@@ -55,8 +54,9 @@ func init() {
 	flagCmd.Flags().Uint("Uint", 0, "Uint")
 	flagCmd.Flags().UintSlice("UintSlice", []uint{}, "UintSlice")
 
+	flagCmd.Flags().Bool("optarg", false, "test optarg variant (must be second arg on command line to work)") // TODO quick&dirty toggle for now
 	carapace.Gen(rootCmd).PreRun(func(cmd *cobra.Command, args []string) {
-		if _, exists := os.LookupEnv("OPTARG"); !exists {
+		if len(args) < 2 || args[1] != "--optarg" {
 			return
 		}
 
@@ -105,7 +105,7 @@ func init() {
 		"BytesHex":       carapace.ActionValues("01", "02", "03"),
 		"Count":          carapace.ActionValues(),
 		"Duration":       carapace.ActionValues("1h", "2m", "3s"),
-		"DurationSlice":  carapace.ActionValues("1", "2", "3"),
+		"DurationSlice":  carapace.ActionValues("1h", "2m", "3s"),
 		"Float32P":       carapace.ActionValues("1", "2", "3"),
 		"Float32Slice":   carapace.ActionValues("1", "2", "3"),
 		"Float64P":       carapace.ActionValues("1", "2", "3"),

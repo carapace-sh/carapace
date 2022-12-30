@@ -76,18 +76,20 @@ func (r RawValues) FilterPrefix(prefix string) RawValues {
 }
 
 func (r RawValues) EachTag(f func(tag string, values RawValues)) {
+	tags := make([]string, 0)
 	tagGroups := make(map[string]RawValues)
 	for _, val := range r {
 		if _, exists := tagGroups[val.Tag]; !exists {
 			tagGroups[val.Tag] = make(RawValues, 0)
+			tags = append(tags, val.Tag)
 		}
 		tagGroups[val.Tag] = append(tagGroups[val.Tag], val)
 	}
 
-	tags := make([]string, 0)
-	for tag := range tagGroups {
-		tags = append(tags, tag)
-	}
+	// tags := make([]string, 0)
+	// for tag := range tagGroups {
+	// 	tags = append(tags, tag)
+	// }
 	sort.Strings(tags)
 
 	for _, tag := range tags {

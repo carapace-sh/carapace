@@ -93,12 +93,14 @@ func Fg(c Color) Styling { return setForeground{c} }
 // Bg returns a Styling that sets the background color.
 func Bg(c Color) Styling { return setBackground{c} }
 
-type reset struct{}
-type setForeground struct{ c Color }
-type setBackground struct{ c Color }
-type boolOn struct{ f boolField }
-type boolOff struct{ f boolField }
-type boolToggle struct{ f boolField }
+type (
+	reset         struct{}
+	setForeground struct{ c Color }
+	setBackground struct{ c Color }
+	boolOn        struct{ f boolField }
+	boolOff       struct{ f boolField }
+	boolToggle    struct{ f boolField }
+)
 
 func (reset) transform(s *Style)           { *s = Style{} }
 func (t setForeground) transform(s *Style) { s.Foreground = t.c }
@@ -109,12 +111,14 @@ func (t boolToggle) transform(s *Style)    { p := t.f.get(s); *p = !*p }
 
 type boolField interface{ get(*Style) *bool }
 
-type boldField struct{}
-type dimField struct{}
-type italicField struct{}
-type underlinedField struct{}
-type blinkField struct{}
-type inverseField struct{}
+type (
+	boldField       struct{}
+	dimField        struct{}
+	italicField     struct{}
+	underlinedField struct{}
+	blinkField      struct{}
+	inverseField    struct{}
+)
 
 func (boldField) get(s *Style) *bool       { return &s.Bold }
 func (dimField) get(s *Style) *bool        { return &s.Dim }

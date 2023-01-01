@@ -100,9 +100,9 @@ func ActionExecute(cmd *cobra.Command) Action {
 // ActionDirectories completes directories.
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(func(s string, sc style.Context) string {
 			if abs, err := c.Abs(s); err == nil {
-				return style.ForPath(abs)
+				return style.ForPath(abs, c)
 			}
 			return ""
 		})
@@ -112,9 +112,9 @@ func ActionDirectories() Action {
 // ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(func(s string) string {
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(func(s string, sc style.Context) string {
 			if abs, err := c.Abs(s); err == nil {
-				return style.ForPath(abs)
+				return style.ForPath(abs, c)
 			}
 			return ""
 		})

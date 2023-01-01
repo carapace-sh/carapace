@@ -214,3 +214,21 @@ func (a Action) UniqueList(divider string) Action {
 		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
 	})
 }
+
+// Prefix adds a prefix to values (only the ones inserted, not the display values)
+//
+//	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
+func (a Action) Prefix(prefix string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Prefix(prefix).ToA()
+	})
+}
+
+// Suffix adds a suffx to values (only the ones inserted, not the display values)
+//
+//	carapace.ActionValues("apple", "melon", "orange").Suffix("juice")
+func (a Action) Suffix(suffix string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Suffix(suffix).ToA()
+	})
+}

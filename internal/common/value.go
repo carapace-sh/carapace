@@ -8,6 +8,10 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
+// FromInvokedAction provides access to RawValues within an InvokedAction.
+// It is intended for testing purposes in Sandbox (circumventing dependency issues).
+var FromInvokedAction func(action interface{}) RawValues
+
 // RawValue represents a completion candidate.
 type RawValue struct {
 	Value       string

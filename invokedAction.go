@@ -150,3 +150,12 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 func (a InvokedAction) value(shell string, callbackValue string) string {
 	return _shell.Value(shell, callbackValue, a.meta, a.rawValues)
 }
+
+func init() {
+	common.FromInvokedAction = func(i interface{}) common.RawValues {
+		if a, ok := i.(InvokedAction); ok {
+			return a.rawValues
+		}
+		return nil
+	}
+}

@@ -50,8 +50,7 @@ func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
 //
-//	a := carapace.ActionValues("melon", "drop", "fall").Invoke(c)
-//	b := a.Prefix("water") // ["watermelon", "waterdrop", "waterfall"] but display still ["melon", "drop", "fall"]
+//	carapace.ActionValues("melon", "drop", "fall").Invoke(c).Prefix("water")
 func (a InvokedAction) Prefix(prefix string) InvokedAction {
 	for index, val := range a.rawValues {
 		a.rawValues[index].Value = prefix + val.Value
@@ -61,8 +60,7 @@ func (a InvokedAction) Prefix(prefix string) InvokedAction {
 
 // Suffix adds a suffx to values (only the ones inserted, not the display values)
 //
-//	a := carapace.ActionValues("apple", "melon", "orange").Invoke(c)
-//	b := a.Suffix("juice") // ["applejuice", "melonjuice", "orangejuice"] but display still ["apple", "melon", "orange"]
+//	carapace.ActionValues("apple", "melon", "orange").Invoke(c).Suffix("juice")
 func (a InvokedAction) Suffix(suffix string) InvokedAction {
 	for index, val := range a.rawValues {
 		a.rawValues[index].Value = val.Value + suffix

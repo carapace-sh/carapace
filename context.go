@@ -39,7 +39,7 @@ func newContext(args []string) Context {
 }
 
 // LookupEnv retrieves the value of the environment variable named by the key.
-func (c *Context) LookupEnv(key string) (string, bool) {
+func (c Context) LookupEnv(key string) (string, bool) {
 	prefix := key + "="
 	for i := len(c.Env) - 1; i >= 0; i-- {
 		if env := c.Env[i]; strings.HasPrefix(env, prefix) {
@@ -50,7 +50,7 @@ func (c *Context) LookupEnv(key string) (string, bool) {
 }
 
 // Getenv retrieves the value of the environment variable named by the key.
-func (c *Context) Getenv(key string) string {
+func (c Context) Getenv(key string) string {
 	v, _ := c.LookupEnv(key)
 	return v
 }
@@ -63,7 +63,7 @@ func (c *Context) Setenv(key, value string) {
 	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
 }
 
-func (c *Context) Envsubst(s string) (string, error) {
+func (c Context) Envsubst(s string) (string, error) {
 	return envsubst.Eval(s, c.Getenv)
 }
 

@@ -49,14 +49,14 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 
 			if resolvedFile.IsDir() {
-				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/")))
+				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name())))
+						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
 						break
 					}
 				}

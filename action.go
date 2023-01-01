@@ -9,6 +9,7 @@ import (
 	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/style"
 )
 
 // Action indicates how to complete a flag or positional argument.
@@ -104,9 +105,9 @@ func (a Action) UsageF(f func() string) Action {
 //
 //	ActionValues("yes").Style(style.Green)
 //	ActionValues("no").Style(style.Red)
-func (a Action) Style(style string) Action {
-	return a.StyleF(func(s string) string {
-		return style
+func (a Action) Style(s string) Action {
+	return a.StyleF(func(_ string, _ style.Context) string {
+		return s
 	})
 }
 
@@ -114,10 +115,10 @@ func (a Action) Style(style string) Action {
 //
 //	ActionValues("value").StyleR(&style.Carapace.Value)
 //	ActionValues("description").StyleR(&style.Carapace.Value)
-func (a Action) StyleR(style *string) Action {
+func (a Action) StyleR(s *string) Action {
 	return ActionCallback(func(c Context) Action {
-		if style != nil {
-			return a.Style(*style)
+		if s != nil {
+			return a.Style(*s)
 		}
 		return a
 	})
@@ -127,11 +128,15 @@ func (a Action) StyleR(style *string) Action {
 //
 //	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
 //	ActionValues("true", "false").StyleF(style.ForKeyword)
-func (a Action) StyleF(f func(s string) string) Action {
+func (a Action) StyleF(f func(s string, sc style.Context) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			invoked.rawValues[index].Style = f(v.Value)
+			path, err := c.Abs(v.Value)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
+			invoked.rawValues[index].Style = f(path, c)
 		}
 		return invoked.ToA()
 	})

@@ -106,7 +106,7 @@ func ActionDirectories() Action {
 			}
 			return ""
 		})
-	})
+	}).Tag("directories")
 }
 
 // ActionFiles completes files with optional suffix filtering.
@@ -118,7 +118,7 @@ func ActionFiles(suffix ...string) Action {
 			}
 			return ""
 		})
-	})
+	}).Tag("files")
 }
 
 // ActionValues completes arbitrary keywords (values).

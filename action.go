@@ -132,11 +132,7 @@ func (a Action) StyleF(f func(s string, sc style.Context) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {
-			path, err := c.Abs(v.Value)
-			if err != nil {
-				return ActionMessage(err.Error())
-			}
-			invoked.rawValues[index].Style = f(path, c)
+			invoked.rawValues[index].Style = f(v.Value, c)
 		}
 		return invoked.ToA()
 	})

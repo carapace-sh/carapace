@@ -15,6 +15,9 @@ type Context interface {
 //
 //	/tmp/locally/reachable/file.txt
 func ForPath(path string, sc Context) string {
+	if abs, err := sc.Abs(path); err == nil {
+		path = abs
+	}
 	return fromSGR(lscolors.GetColorist(sc.Getenv("LS_COLORS")).GetStyle(path))
 }
 

@@ -40,8 +40,8 @@ func NewContext(args []string) Context {
 		context.Dir = wd
 	}
 
-	// TODO needed for sandbox tests. is this a security hazard?
-	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists {
+	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
+	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists && isGoRun() {
 		var m common.Mock
 		if err := json.Unmarshal([]byte(value), &m); err != nil {
 			panic(err.Error()) // TODO

@@ -40,14 +40,14 @@ func (f *FlagSet) VisitAll(fn func(*Flag)) {
 
 }
 
-func (fs FlagSet) LookupArg(arg string) (result *flag) {
+func (fs FlagSet) LookupArg(arg string) (result *Flag) {
 	fs.FlagSet.VisitAll(func(f *pflag.Flag) {
 		if result != nil {
 			return
 		}
 
-		if Flag(f).Matches(arg, fs.IsPosix()) { // TODO handle posix
-			result = Flag(f)
+		if flag := (&Flag{f}); flag.Matches(arg, fs.IsPosix()) { // TODO handle posix
+			result = flag
 		}
 	})
 	return

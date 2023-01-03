@@ -14,7 +14,7 @@ type InFlag struct {
 }
 
 func (f InFlag) Consumes(arg string) bool {
-	pflagfork.Flag(f.Flag)
+	//pflagfork.Flag{f.Flag}
 
 	return false // TODO
 }
@@ -24,9 +24,9 @@ func actionTraverse(c *cobra.Command, args []string) (Action, Context) {
 
 	inArgs := []string{} // args consumed by current command
 	var inFlag *InFlag
-	fs := pflagfork.FlagSet(c.Flags())
+	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
-	context := newContext(args)
+	context := NewContext(args)
 	for i, arg := range context.Args {
 		switch {
 		// flag argument

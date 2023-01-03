@@ -100,24 +100,14 @@ func ActionExecute(cmd *cobra.Command) Action {
 // ActionDirectories completes directories.
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(func(s string, sc style.Context) string {
-			if abs, err := c.Abs(s); err == nil {
-				return style.ForPath(abs, c)
-			}
-			return ""
-		})
+		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(style.ForPath)
 	}).Tag("directories")
 }
 
 // ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(func(s string, sc style.Context) string {
-			if abs, err := c.Abs(s); err == nil {
-				return style.ForPath(abs, c)
-			}
-			return ""
-		})
+		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(style.ForPath)
 	}).Tag("files")
 }
 
@@ -126,7 +116,7 @@ func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		vals := make([]common.RawValue, 0, len(values))
 		for _, val := range values {
-			vals = append(vals, common.RawValue{Value: val, Display: val, Description: "", Style: style.Default})
+			vals = append(vals, common.RawValue{Value: val, Display: val})
 		}
 		return Action{rawValues: vals}
 	})
@@ -141,7 +131,7 @@ func ActionStyledValues(values ...string) Action {
 
 		vals := make([]common.RawValue, 0, len(values)/2)
 		for i := 0; i < len(values); i += 2 {
-			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: "", Style: values[i+1]})
+			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Style: values[i+1]})
 		}
 		return Action{rawValues: vals}
 	})
@@ -156,7 +146,7 @@ func ActionValuesDescribed(values ...string) Action {
 
 		vals := make([]common.RawValue, 0, len(values)/2)
 		for i := 0; i < len(values); i += 2 {
-			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1], Style: style.Default})
+			vals = append(vals, common.RawValue{Value: values[i], Display: values[i], Description: values[i+1]})
 		}
 		return Action{rawValues: vals}
 	})

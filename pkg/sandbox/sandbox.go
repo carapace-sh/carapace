@@ -154,10 +154,17 @@ type run struct {
 
 func (r run) invoke(a carapace.Action) string {
 	invoked := a.Invoke(r.context)
-	rawValues := common.FromInvokedAction(invoked) // TODO nil check
+	meta, rawValues := common.FromInvokedAction(invoked) // TODO nil check
 	rawValues = rawValues.FilterPrefix(r.context.CallbackValue)
 	sort.Sort(common.ByValue(rawValues))
-	m, err := json.MarshalIndent(rawValues, "", "  ")
+	// TODO improve this
+	m, err := json.MarshalIndent(struct {
+		Meta      common.Meta
+		RawValues common.RawValues
+	}{
+		Meta:      meta,
+		RawValues: rawValues,
+	}, "", "  ")
 	if err != nil {
 		r.t.Fatal(err.Error())
 	}

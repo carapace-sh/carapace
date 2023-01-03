@@ -152,10 +152,10 @@ func (a InvokedAction) value(shell string, callbackValue string) string {
 }
 
 func init() {
-	common.FromInvokedAction = func(i interface{}) common.RawValues {
+	common.FromInvokedAction = func(i interface{}) (common.Meta, common.RawValues) {
 		if a, ok := i.(InvokedAction); ok {
-			return a.rawValues
+			return a.meta, a.rawValues
 		}
-		return nil
+		return common.Meta{}, nil
 	}
 }

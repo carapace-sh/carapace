@@ -44,6 +44,20 @@ func RawValuesFrom(values ...string) RawValues {
 	return rawValues
 }
 
+func (r RawValues) Unique() RawValues {
+	uniqueRawValues := make(map[string]RawValue)
+	for _, value := range r {
+		uniqueRawValues[value.Value] = value
+	}
+
+	rawValues := make([]RawValue, 0, len(uniqueRawValues))
+	for _, value := range uniqueRawValues {
+		rawValues = append(rawValues, value)
+	}
+	sort.Sort(ByDisplay(rawValues))
+	return rawValues
+}
+
 func (r RawValues) contains(s string) bool {
 	for _, value := range r {
 		if value.Value == s {

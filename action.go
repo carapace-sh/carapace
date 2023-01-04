@@ -14,9 +14,9 @@ import (
 
 // Action indicates how to complete a flag or positional argument.
 type Action struct {
-	rawValues []common.RawValue
-	callback  CompletionCallback
 	meta      common.Meta
+	rawValues common.RawValues
+	callback  CompletionCallback
 }
 
 // ActionMap maps Actions to an identifier.

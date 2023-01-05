@@ -66,15 +66,14 @@ var tests = map[string]string{
 	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
 	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
-	`example flag --optarg `:                                       "p",
-	`example flag --optarg positional`:                             "positional1",
-	`example flag --optar`:                                         "--optarg",
-	`example flag --optarg=`:                                       "optarg",
-	`example flag -o`:                                              "count flag",
-	`example flag -oc`:                                             "count flag",
-	`example flag -o `:                                             "p",
-	`example flag -o pos`:                                          "positional",
-=======
+	`example flag --optarg `:           "p",
+	`example flag --optarg positional`: "positional1",
+	`example flag --optar`:             "--optarg",
+	`example flag --optarg=`:           "optarg",
+	`example flag -o`:                  "count flag",
+	`example flag -oc`:                 "count flag",
+	`example flag -o `:                 "p",
+	`example flag -o pos`:              "positional",
 	//`example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
 	//`example action --`:                                            "--values_described", // weird: causes regex match in expect/xonsh not to work
 	//`example action -`:                                             "-o", // weird: causes regex match in expect/xonsh not to work
@@ -86,7 +85,6 @@ var tests = map[string]string{
 	`example special -oc`:                                          "count flag",
 	`example special -o `:                                          "p",
 	`example special -o pos`:                                       "positional",
->>>>>>> 987ec888591636ef36af413c67e26dbffb6b3623
 	`example multiparts `:                                          "VALUE",
 	`example multiparts -`:                                         "-c",
 	`example multiparts --`:                                        "--comma",

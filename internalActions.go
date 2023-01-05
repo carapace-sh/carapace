@@ -49,14 +49,14 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 
 			if resolvedFile.IsDir() {
-				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/")))
+				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name())))
+						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
 						break
 					}
 				}
@@ -66,11 +66,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
-<<<<<<< HEAD
 	}).Tag("files").NoSpace([]rune{'/'}...)
-=======
-	})
->>>>>>> 987ec888591636ef36af413c67e26dbffb6b3623
 }
 
 func actionFlags(cmd *cobra.Command) Action {

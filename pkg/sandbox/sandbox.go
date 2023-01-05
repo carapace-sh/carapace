@@ -66,15 +66,14 @@ func (s *Sandbox) Files(args ...string) {
 
 		path := fmt.Sprintf("%v/%v", s.mock.Dir, file)
 
-		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil && !os.IsExist(err) {
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil && !os.IsExist(err) {
 			s.t.Fatal(err.Error())
 		}
 
-		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 			s.t.Fatal(err.Error())
 		}
 	}
-
 }
 
 // Reply mocks a command for given arguments (Only works for `(Context).Command`).

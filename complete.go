@@ -32,7 +32,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}).value(shell, current), nil
 	}
 
-	context := newContext(append(targetArgs, current))
+	context := NewContext(append(targetArgs, current))
 
 	// TODO needs more cleanup and tests
 	var targetAction Action

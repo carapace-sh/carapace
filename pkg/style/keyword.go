@@ -61,7 +61,7 @@ var keywordReplacer = strings.NewReplacer(
 )
 
 // ForKeyword returns the style for given keyword.
-func ForKeyword(s string) string {
+func ForKeyword(s string, _ Context) string {
 	if _style, ok := keywords[keywordReplacer.Replace(strings.ToLower(s))]; ok {
 		return *_style
 	}

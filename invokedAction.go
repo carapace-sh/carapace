@@ -19,7 +19,7 @@ type InvokedAction struct {
 //	a := carapace.ActionValues("A", "B", "C").Invoke(c)
 //	b := a.Filter([]string{"B"}) // ["A", "C"]
 func (a InvokedAction) Filter(values []string) InvokedAction {
-	a.rawValues = common.RawValues(a.rawValues).Filter(values...)
+	a.rawValues = a.rawValues.Filter(values...)
 	return a
 }
 
@@ -29,29 +29,17 @@ func (a InvokedAction) Filter(values []string) InvokedAction {
 //	b := carapace.ActionValues("B", "C").Invoke(c)
 //	c := a.Merge(b) // ["A", "B", "C"]
 func (a InvokedAction) Merge(others ...InvokedAction) InvokedAction {
-	uniqueRawValues := make(map[string]common.RawValue)
-	var meta common.Meta
 	for _, other := range append([]InvokedAction{a}, others...) {
-		for _, c := range other.rawValues {
-			uniqueRawValues[c.Value] = c
-		}
-		meta.Merge(other.meta)
+		a.rawValues = append(a.rawValues, other.rawValues...)
+		a.meta.Merge(other.meta)
 	}
-
-	rawValues := make([]common.RawValue, 0, len(uniqueRawValues))
-	for _, c := range uniqueRawValues {
-		rawValues = append(rawValues, c)
-	}
-
-	invoked := InvokedAction{Action{rawValues: rawValues}}
-	invoked.meta.Merge(meta)
-	return invoked
+	a.rawValues = a.rawValues.Unique()
+	return a
 }
 
 // Prefix adds a prefix to values (only the ones inserted, not the display values)
 //
-//	a := carapace.ActionValues("melon", "drop", "fall").Invoke(c)
-//	b := a.Prefix("water") // ["watermelon", "waterdrop", "waterfall"] but display still ["melon", "drop", "fall"]
+//	carapace.ActionValues("melon", "drop", "fall").Invoke(c).Prefix("water")
 func (a InvokedAction) Prefix(prefix string) InvokedAction {
 	for index, val := range a.rawValues {
 		a.rawValues[index].Value = prefix + val.Value
@@ -61,8 +49,7 @@ func (a InvokedAction) Prefix(prefix string) InvokedAction {
 
 // Suffix adds a suffx to values (only the ones inserted, not the display values)
 //
-//	a := carapace.ActionValues("apple", "melon", "orange").Invoke(c)
-//	b := a.Suffix("juice") // ["applejuice", "melonjuice", "orangejuice"] but display still ["apple", "melon", "orange"]
+//	carapace.ActionValues("apple", "melon", "orange").Invoke(c).Suffix("juice")
 func (a InvokedAction) Suffix(suffix string) InvokedAction {
 	for index, val := range a.rawValues {
 		a.rawValues[index].Value = val.Value + suffix
@@ -150,4 +137,13 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 
 func (a InvokedAction) value(shell string, callbackValue string) string {
 	return _shell.Value(shell, callbackValue, a.meta, a.rawValues)
+}
+
+func init() {
+	common.FromInvokedAction = func(i interface{}) (common.Meta, common.RawValues) {
+		if a, ok := i.(InvokedAction); ok {
+			return a.meta, a.rawValues
+		}
+		return common.Meta{}, nil
+	}
 }

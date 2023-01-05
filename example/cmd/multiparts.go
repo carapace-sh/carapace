@@ -15,7 +15,7 @@ var multipartsCmd = &cobra.Command{
 
 func init() {
 	multipartsCmd.Flags().String("at", "", "multiparts with @ as divider")
-	multipartsCmd.Flags().String("colon", "", "multiparts with : as divider ")
+	multipartsCmd.Flags().String("colon", "", "multiparts with : as divider")
 	multipartsCmd.Flags().String("comma", "", "multiparts with , as divider")
 	multipartsCmd.Flags().String("dot", "", "multiparts with . as divider")
 	multipartsCmd.Flags().String("dotdotdot", "", "multiparts with ... as divider")

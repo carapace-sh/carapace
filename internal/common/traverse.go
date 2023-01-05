@@ -89,6 +89,11 @@ func filterError(args []string, err error) error {
 		return nil
 	}
 
+	if re := regexp.MustCompile(`invalid argument ".*" for "(?P<flag>.*)" flag:.*`); re.MatchString(msg) && strings.SplitN(current, "=", 2)[0] == re.FindStringSubmatch(msg)[1] {
+		// ignore invalid argument for flag currently being completed (e.g. empty IntSlice)
+		return nil
+	}
+
 	if len(args) > 1 {
 		previous := args[len(args)-2]
 		if strings.HasPrefix(previous, "--") && msg == fmt.Sprintf("flag needs an argument: %v", previous) {

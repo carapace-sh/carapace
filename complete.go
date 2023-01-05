@@ -60,7 +60,7 @@ func generate(cmd *cobra.Command, args []string) (InvokedAction, string) {
 		return ActionMessage(err.Error()).Invoke(Context{CallbackValue: current}), current
 	}
 
-	context := newContext(append(targetArgs, current))
+	context := NewContext(append(targetArgs, current))
 
 	// TODO needs more cleanup and tests
 	var targetAction Action

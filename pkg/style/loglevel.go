@@ -5,7 +5,7 @@ import (
 )
 
 // ForLogLevel returns the style for given log level.
-func ForLogLevel(s string) string {
+func ForLogLevel(s string, _ Context) string {
 	return map[string]string{
 		"trace":    Carapace.LogLevelTrace,
 		"debug":    Carapace.LogLevelDebug,

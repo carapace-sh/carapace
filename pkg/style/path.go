@@ -5,15 +5,28 @@ import (
 	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
+type Context interface {
+	Abs(s string) (string, error)
+	Getenv(key string) string
+	LookupEnv(key string) (string, bool)
+}
+
 // ForPath returns the style for given path
 //
 //	/tmp/locally/reachable/file.txt
-func ForPath(path string) string { return fromSGR(lscolors.GetColorist().GetStyle(path)) }
+func ForPath(path string, sc Context) string {
+	if abs, err := sc.Abs(path); err == nil {
+		path = abs
+	}
+	return fromSGR(lscolors.GetColorist(sc.Getenv("LS_COLORS")).GetStyle(path))
+}
 
 // ForPath returns the style for given path by extension only
 //
 //	/tmp/non/existing/file.txt
-func ForPathExt(path string) string { return fromSGR(lscolors.GetColorist().GetStyleExt(path)) }
+func ForPathExt(path string, sc Context) string {
+	return fromSGR(lscolors.GetColorist(sc.Getenv("LS_COLORS")).GetStyleExt(path))
+}
 
 func fromSGR(sgr string) string {
 	s := ui.StyleFromSGR(sgr)

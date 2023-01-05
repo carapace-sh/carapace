@@ -1,11 +1,13 @@
 package carapace
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
@@ -23,9 +25,11 @@ type Context struct {
 	Env []string
 	// Dir contains the working directory for current context
 	Dir string
+
+	mockedReplies map[string]string
 }
 
-func newContext(args []string) Context {
+func NewContext(args []string) Context {
 	context := Context{
 		CallbackValue: args[len(args)-1],
 		Args:          args[:len(args)-1],
@@ -35,11 +39,21 @@ func newContext(args []string) Context {
 	if wd, err := os.Getwd(); err == nil {
 		context.Dir = wd
 	}
+
+	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
+	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists && isGoRun() {
+		var m common.Mock
+		if err := json.Unmarshal([]byte(value), &m); err != nil {
+			panic(err.Error()) // TODO
+		}
+		context.Dir = m.Dir
+		context.mockedReplies = m.Replies
+	}
 	return context
 }
 
 // LookupEnv retrieves the value of the environment variable named by the key.
-func (c *Context) LookupEnv(key string) (string, bool) {
+func (c Context) LookupEnv(key string) (string, bool) {
 	prefix := key + "="
 	for i := len(c.Env) - 1; i >= 0; i-- {
 		if env := c.Env[i]; strings.HasPrefix(env, prefix) {
@@ -50,7 +64,7 @@ func (c *Context) LookupEnv(key string) (string, bool) {
 }
 
 // Getenv retrieves the value of the environment variable named by the key.
-func (c *Context) Getenv(key string) string {
+func (c Context) Getenv(key string) string {
 	v, _ := c.LookupEnv(key)
 	return v
 }
@@ -63,7 +77,7 @@ func (c *Context) Setenv(key, value string) {
 	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
 }
 
-func (c *Context) Envsubst(s string) (string, error) {
+func (c Context) Envsubst(s string) (string, error) {
 	return envsubst.Eval(s, c.Getenv)
 }
 
@@ -71,6 +85,14 @@ func (c *Context) Envsubst(s string) (string, error) {
 // Env and Dir are set using the Context.
 // See exec.Command for most details.
 func (c Context) Command(name string, arg ...string) *execabs.Cmd {
+	if c.mockedReplies != nil {
+		if m, err := json.Marshal(append([]string{name}, arg...)); err == nil {
+			if reply, exists := c.mockedReplies[string(m)]; exists {
+				return execabs.Command("echo", reply)
+			}
+		}
+	}
+
 	cmd := execabs.Command(name, arg...)
 	cmd.Env = c.Env
 	cmd.Dir = c.Dir

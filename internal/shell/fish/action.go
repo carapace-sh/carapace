@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"strings"
-
 	"github.com/rsteube/carapace/internal/common"
 )
 

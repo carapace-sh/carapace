@@ -208,17 +208,17 @@ var testsIntegratedMessage = map[string]string{
 // 	}
 // }
 
-// func TestFish(t *testing.T) {
-// 	if err := exec.Command("fish", "--version").Run(); err != nil {
-// 		t.Skip("skipping fish")
-// 	}
-// 	for cmdline, text := range tests {
-// 		doComplete(t, "fish", cmdline, text)
-// 	}
-// 	for cmdline, text := range testsIntegratedMessage {
-// 		doComplete(t, "fish", cmdline, text)
-// 	}
-// }
+func TestFish(t *testing.T) {
+	if err := exec.Command("fish", "--version").Run(); err != nil {
+		t.Skip("skipping fish")
+	}
+	for cmdline, text := range tests {
+		doComplete(t, "fish", cmdline, text)
+	}
+	for cmdline, text := range testsIntegratedMessage {
+		doComplete(t, "fish", cmdline, text)
+	}
+}
 
 // func TestXonsh(t *testing.T) {
 // 	if err := exec.Command("xonsh", "--version").Run(); err != nil {

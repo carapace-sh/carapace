@@ -66,7 +66,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
-	}).Tag("files").NoSpace([]rune{'/'}...)
+	}).Tag("files").NoSpace('/')
 }
 
 func actionFlags(cmd *cobra.Command) Action {

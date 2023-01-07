@@ -63,7 +63,7 @@ func ActionImport(output []byte) Action {
 			return ActionMessage(err.Error())
 		}
 		return Action{
-			rawValues: e.RawValues,
+			rawValues: e.Values,
 			meta:      e.Meta,
 		}
 	})

@@ -11,15 +11,15 @@ import (
 type Export struct {
 	Version string
 	common.Meta
-	RawValues common.RawValues
+	Values common.RawValues
 }
 
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	sort.Sort(common.ByValue(values))
 	m, _ := json.Marshal(Export{
-		Version:   version(),
-		Meta:      meta,
-		RawValues: values,
+		Version: version(),
+		Meta:    meta,
+		Values:  values,
 	})
 	return string(m)
 }

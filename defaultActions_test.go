@@ -12,7 +12,7 @@ func TestActionImport(t *testing.T) {
 {
   "Version": "unknown",
   "Nospace": "",
-  "RawValues": [
+  "Values": [
     {
       "Value": "positional1",
       "Display": "positional1",

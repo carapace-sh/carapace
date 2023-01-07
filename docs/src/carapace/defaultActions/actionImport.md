@@ -7,7 +7,7 @@ carapace.ActionImport([]byte(`
 {
   "Version": "unknown",
   "Nospace": "",
-  "RawValues": [
+  "Values": [
     {
       "Value": "first",
       "Display": "first"

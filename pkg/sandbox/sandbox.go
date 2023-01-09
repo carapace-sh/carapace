@@ -18,6 +18,7 @@ import (
 type Sandbox struct {
 	t    *testing.T
 	f    func() *cobra.Command
+	env  map[string]string
 	keep bool
 	mock *common.Mock
 }
@@ -28,8 +29,9 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 		t.Fatal("failed to create sandbox dir: " + err.Error())
 	}
 	return Sandbox{
-		t: t,
-		f: f,
+		t:   t,
+		f:   f,
+		env: make(map[string]string),
 		mock: &common.Mock{
 			Dir:     tempDir,
 			Replies: make(map[string]string),
@@ -39,6 +41,10 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 
 func (s *Sandbox) Keep() {
 	s.keep = true
+}
+
+func (s *Sandbox) Env(key, value string) {
+	s.env[key] = value
 }
 
 func (s *Sandbox) remove() {
@@ -128,6 +134,9 @@ func Run(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 // Run executes the sandbox with given arguments.
 func (s *Sandbox) Run(args ...string) run {
 	c := carapace.NewContext(args)
+	for key, value := range s.env {
+		c.Setenv(key, value)
+	}
 	// TODO actually invoke it here instead of Expect
 	m, _ := json.Marshal(args)
 

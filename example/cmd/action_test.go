@@ -163,3 +163,15 @@ func TestAction(t *testing.T) {
 			Expect(carapace.ActionMessage("unknown flag: --unknown"))
 	})
 }
+
+func TestUnknownFlag(t *testing.T) {
+	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--unknown", "").
+			Expect(carapace.ActionMessage("unknown flag: --unknown").NoSpace())
+
+		s.Env("CARAPACE_LENIENT", "1")
+		s.Run("action", "--unknown", "").
+			Expect(carapace.ActionValues("p1", "positional1", "positional1 with space").
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
+	})
+}

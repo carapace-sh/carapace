@@ -50,20 +50,20 @@ func init() {
 		"files-filtered": carapace.ActionFiles(".md", "go.mod", "go.sum"),
 		"import": carapace.ActionImport([]byte(`
 {
-  "Version": "unknown",
-  "Nospace": "",
-  "Values": [
+  "version": "unknown",
+  "nospace": "",
+  "values": [
     {
-      "Value": "first",
-      "Display": "first"
+      "value": "first",
+      "display": "first"
     },
     {
-      "Value": "second",
-      "Display": "second"
+      "value": "second",
+      "display": "second"
     },
     {
-      "Value": "third",
-      "Display": "third"
+      "value": "third",
+      "display": "third"
     }
   ]
 }

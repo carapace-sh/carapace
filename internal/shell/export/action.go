@@ -9,9 +9,9 @@ import (
 )
 
 type Export struct {
-	Version string
+	Version string `json:"version"`
 	common.Meta
-	Values common.RawValues
+	Values common.RawValues `json:"values"`
 }
 
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {

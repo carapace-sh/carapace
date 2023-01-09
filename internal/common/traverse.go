@@ -5,12 +5,26 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/rsteube/carapace/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
+func allowUnknownFlags(cmd *cobra.Command) {
+	cmd.FParseErrWhitelist = cobra.FParseErrWhitelist{
+		UnknownFlags: true,
+	}
+	for _, subCmd := range cmd.Commands() {
+		allowUnknownFlags(subCmd)
+	}
+}
+
 // TraverseLenient traverses the command tree but filters errors regarding arguments currently being completed.
 func TraverseLenient(cmd *cobra.Command, args []string) (*cobra.Command, []string, error) {
+	if config.IsLenient() {
+		allowUnknownFlags(cmd.Root())
+	}
+
 	a := args
 
 	// needed so that completion for positional argument that has no value yet to work

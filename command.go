@@ -21,13 +21,13 @@ func addCompletionCommand(cmd *cobra.Command) {
 	carapaceCmd := &cobra.Command{
 		Use:    "_carapace",
 		Hidden: true,
-		PreRun: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, args []string) {
+			logger.PrintArgs(os.Args)
+
 			if len(args) > 2 && strings.HasPrefix(args[2], "_") {
 				cmd.Hidden = false
 			}
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			logger.PrintArgs(os.Args)
+
 			if s, err := complete(cmd, args); err != nil {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 			} else {

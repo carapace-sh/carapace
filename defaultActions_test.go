@@ -10,22 +10,22 @@ import (
 func TestActionImport(t *testing.T) {
 	s := `
 {
-  "Version": "unknown",
-  "Nospace": "",
-  "Values": [
+  "version": "unknown",
+  "nospace": "",
+  "values": [
     {
-      "Value": "positional1",
-      "Display": "positional1",
-      "Description": "",
-      "Style": "",
-	  "Tag": "first"
+      "value": "positional1",
+      "display": "positional1",
+      "description": "",
+      "style": "",
+	  "tag": "first"
     },
     {
-      "Value": "p1",
-      "Display": "p1",
-      "Description": "",
-      "Style": "",
-	  "Tag": "first"
+      "value": "p1",
+      "display": "p1",
+      "description": "",
+      "style": "",
+	  "tag": "first"
     }
   ]
 }`

@@ -25,18 +25,18 @@ func TestToMultiParts(t *testing.T) {
 		}
 	}
 
-	_test("A/a:1", `{"Value":"A/a:1","Display":"1","Description":"one","Style":"green"}`, "/", ":")
-	_test("A/a:1", `{"Value":"A/a:1","Display":"1","Description":"one","Style":"green"}`, ":", "/")
-	_test("A/a:1", `{"Value":"A/a:1","Display":"a:1","Description":"one","Style":"green"}`, "/")
-	_test("A", `{"Value":"A/","Display":"A/"}`, "/", ":")
-	_test("A", `{"Value":"A/","Display":"A/"}`, "/")
-	_test("", `{"Value":"A/","Display":"A/"}`, "/")
-	_test("A/", `{"Value":"A/a:","Display":"a:"}`, "/", ":")
-	_test("A/", `{"Value":"A/a:1","Display":"a:1","Description":"one","Style":"green"}`, "/")
-	_test("B/", `{"Value":"B/c/","Display":"c/","Description":"withsuffix","Style":"underlined"}`, "/")
-	_test("B/c:5", `{"Value":"B/c:5:2/","Display":"c:5:2/"}`, "/")
-	_test("B/c:5", `{"Value":"B/c:5:","Display":"5:"}`, "/", ":")
-	_test("B/c:5", `{"Value":"B/c:5:","Display":"5:"}`, ":", "/")
+	_test("A/a:1", `{"value":"A/a:1","display":"1","description":"one","style":"green"}`, "/", ":")
+	_test("A/a:1", `{"value":"A/a:1","display":"1","description":"one","style":"green"}`, ":", "/")
+	_test("A/a:1", `{"value":"A/a:1","display":"a:1","description":"one","style":"green"}`, "/")
+	_test("A", `{"value":"A/","display":"A/"}`, "/", ":")
+	_test("A", `{"value":"A/","display":"A/"}`, "/")
+	_test("", `{"value":"A/","display":"A/"}`, "/")
+	_test("A/", `{"value":"A/a:","display":"a:"}`, "/", ":")
+	_test("A/", `{"value":"A/a:1","display":"a:1","description":"one","style":"green"}`, "/")
+	_test("B/", `{"value":"B/c/","display":"c/","description":"withsuffix","style":"underlined"}`, "/")
+	_test("B/c:5", `{"value":"B/c:5:2/","display":"c:5:2/"}`, "/")
+	_test("B/c:5", `{"value":"B/c:5:","display":"5:"}`, "/", ":")
+	_test("B/c:5", `{"value":"B/c:5:","display":"5:"}`, ":", "/")
 
-	_test("C/d/1", `{"Value":"C/d/1()2","Display":"1()2","Description":"withbrackets","Style":"yellow"}`, "/")
+	_test("C/d/1", `{"value":"C/d/1()2","display":"1()2","description":"withbrackets","style":"yellow"}`, "/")
 }

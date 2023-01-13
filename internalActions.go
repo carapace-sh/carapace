@@ -115,12 +115,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		if isShorthandSeries {
 			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().NoSpace('*')
 		}
-		for i := 0; i < len(vals); i = i + 2 { // TODO experimental - hardcoded multiparts completion if flags are "grouped" with `.`
-			if strings.Contains(vals[i], ".") {
-				return ActionValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".")
-			}
-		}
-		return ActionValuesDescribed(vals...)
+		return ActionValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".") // multiparts completion for flags grouped with `.`
 	}).Tag("flags")
 }
 

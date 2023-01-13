@@ -98,33 +98,33 @@ func TestRoot(t *testing.T) {
 				"-p", "Help message for persistentFlag",
 				"--toggle", "Help message for toggle",
 				"-t", "Help message for toggle",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--").
 			Expect(carapace.ActionValuesDescribed(
 				"--array", "multiflag",
 				"--persistentFlag", "Help message for persistentFlag",
 				"--toggle", "Help message for toggle",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--a").
 			Expect(carapace.ActionValuesDescribed(
 				"--array", "multiflag",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array").
 			Expect(carapace.ActionValuesDescribed(
 				"--array", "multiflag",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array", "", "--a").
 			Expect(carapace.ActionValuesDescribed(
 				"--array", "multiflag",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("-a", "", "--a").
 			Expect(carapace.ActionValuesDescribed(
 				"--array", "multiflag",
-			).Tag("flags"))
+			).NoSpace('.').Tag("flags"))
 	})
 }

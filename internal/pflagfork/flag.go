@@ -35,3 +35,16 @@ func (f Flag) IsRepeatable() bool {
 	}
 	return false
 }
+
+func (f Flag) TakesValue() bool {
+	switch f.Value.Type() {
+	case "bool", "boolSlice", "count":
+		return false
+	default:
+		return true
+	}
+}
+
+func (f Flag) IsOptarg() bool {
+	return f.NoOptDefVal != ""
+}

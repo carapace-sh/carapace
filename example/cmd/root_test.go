@@ -91,40 +91,40 @@ func TestRoot(t *testing.T) {
 			).Tag("main commands"))
 
 		s.Run("-").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-				"-a", "multiflag",
-				"--persistentFlag", "Help message for persistentFlag",
-				"-p", "Help message for persistentFlag",
-				"--toggle", "Help message for toggle",
-				"-t", "Help message for toggle",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+				"-a", "multiflag", style.Blue,
+				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"-p", "Help message for persistentFlag", style.Yellow,
+				"--toggle", "Help message for toggle", style.Default,
+				"-t", "Help message for toggle", style.Default,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-				"--persistentFlag", "Help message for persistentFlag",
-				"--toggle", "Help message for toggle",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"--toggle", "Help message for toggle", style.Default,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array", "", "--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("-a", "", "--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
 	})
 }

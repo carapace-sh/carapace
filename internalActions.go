@@ -89,6 +89,15 @@ func actionFlags(cmd *cobra.Command) Action {
 				return // skip flag of group already set
 			}
 
+			s := style.Carapace.FlagNoArg
+			if f.TakesValue() {
+				if f.IsOptarg() {
+					s = style.Carapace.FlagOptArg
+				} else {
+					s = style.Carapace.FlagArg
+				}
+			}
+
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					for _, shorthand := range c.CallbackValue[1:] {
@@ -96,26 +105,26 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					vals = append(vals, f.Shorthand, f.Usage)
+					vals = append(vals, f.Shorthand, f.Usage, s)
 				}
 			} else {
 				if flagstyle := f.Style(); flagstyle != pflagfork.ShorthandOnly {
 					if flagstyle == pflagfork.NameAsShorthand {
-						vals = append(vals, "-"+f.Name, f.Usage)
+						vals = append(vals, "-"+f.Name, f.Usage, s)
 					} else {
-						vals = append(vals, "--"+f.Name, f.Usage)
+						vals = append(vals, "--"+f.Name, f.Usage, s)
 					}
 				}
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage)
+					vals = append(vals, "-"+f.Shorthand, f.Usage, s)
 				}
 			}
 		})
 
 		if isShorthandSeries {
-			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().NoSpace('*')
+			return ActionStyledValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().NoSpace('*')
 		}
-		return ActionValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".") // multiparts completion for flags grouped with `.`
+		return ActionStyledValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".") // multiparts completion for flags grouped with `.`
 	}).Tag("flags")
 }
 

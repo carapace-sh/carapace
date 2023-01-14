@@ -5,20 +5,22 @@
 ```go
 carapace.ActionImport([]byte(`
 {
-  "Version": "unknown",
-  "Nospace": "",
-  "Values": [
+  "version": "unknown",
+  "messages": [],
+  "nospace": "",
+  "usage": "",
+  "values": [
     {
-      "Value": "first",
-      "Display": "first"
+      "value": "first",
+      "display": "first"
     },
     {
-      "Value": "second",
-      "Display": "second"
+      "value": "second",
+      "display": "second"
     },
     {
-      "Value": "third",
-      "Display": "third"
+      "value": "third",
+      "display": "third"
     }
   ]
 }

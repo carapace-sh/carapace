@@ -229,7 +229,7 @@ func (a Action) Suffix(suffix string) Action {
 	})
 }
 
-// Timeout sets a maximum duration an Action may take to invoke.
+// Timeout sets the maximum duration an Action may take to invoke.
 //
 //	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 //		time.Sleep(2*time.Second)

@@ -228,3 +228,28 @@ func (a Action) Suffix(suffix string) Action {
 		return a.Invoke(c).Suffix(suffix).ToA()
 	})
 }
+
+// Timeout sets a maximum duration an Action may take to invoke.
+//
+//	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+//		time.Sleep(2*time.Second)
+//		return carapace.ActionValues("done")
+//	}).Timeout(1*time.Second, carapace.ActionMessage("timeout exceeded"))
+func (a Action) Timeout(d time.Duration, alternative Action) Action {
+	return ActionCallback(func(c Context) Action {
+		currentChannel := make(chan string, 1)
+
+		var result InvokedAction
+		go func() {
+			result = a.Invoke(c)
+			currentChannel <- ""
+		}()
+
+		select {
+		case <-currentChannel:
+		case <-time.After(d):
+			return alternative
+		}
+		return result.ToA()
+	})
+}

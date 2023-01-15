@@ -66,4 +66,4 @@ func init() {
 ```
 
 [Command Groups]:https://github.com/spf13/cobra/blob/main/user_guide.md#grouping-commands-in-help
-[`Tag`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Tag
+[`Tag`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Tag

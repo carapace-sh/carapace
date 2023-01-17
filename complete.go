@@ -17,6 +17,18 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		return Gen(cmd).Snippet(ps.DetermineShell())
 	case 1:
 		return Gen(cmd).Snippet(args[0])
+	default:
+		action, context := traverse(cmd, args[2:])
+		return action.Invoke(context).value(args[0], args[len(args)-1]), nil
+	}
+}
+
+func completeOld(cmd *cobra.Command, args []string) (string, error) {
+	switch len(args) {
+	case 0:
+		return Gen(cmd).Snippet(ps.DetermineShell())
+	case 1:
+		return Gen(cmd).Snippet(args[0])
 	}
 
 	shell := args[0]

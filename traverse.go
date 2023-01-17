@@ -27,7 +27,7 @@ func (f InFlag) Consumes(arg string) bool {
 	}
 }
 
-func actionTraverse(c *cobra.Command, args []string) (Action, Context) {
+func traverse(c *cobra.Command, args []string) (Action, Context) {
 	preInvoke(c, args)
 
 	inArgs := []string{} // args consumed by current command
@@ -61,7 +61,7 @@ func actionTraverse(c *cobra.Command, args []string) (Action, Context) {
 			if err := c.ParseFlags(inArgs); err != nil {
 				return ActionMessage(err.Error()), context
 			}
-			return actionTraverse(subcommand(c, arg), args[i+1:])
+			return traverse(subcommand(c, arg), args[i+1:])
 
 		// positional
 		default:

@@ -66,7 +66,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		// positional
 		default:
 			inArgs = append(inArgs, arg)
-			inFlag = nil
 		}
 	}
 

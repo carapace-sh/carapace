@@ -5,25 +5,32 @@ import (
 
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type InFlag struct {
-	*pflag.Flag
+	*pflagfork.Flag
+	// currently consumed args
 	Args []string
 }
 
 func (f InFlag) Consumes(arg string) bool {
-	//pflagfork.Flag{f.Flag}
-
-	return false // TODO
+	switch {
+	case !f.TakesValue():
+		return false
+	case f.IsOptarg():
+		return false
+	case len(f.Args) == 0: // TODO or takes multiple: `|| f.Nargs`
+		return true
+	default:
+		return false
+	}
 }
 
 func actionTraverse(c *cobra.Command, args []string) (Action, Context) {
 	preInvoke(c, args)
 
 	inArgs := []string{} // args consumed by current command
-	var inFlag *InFlag
+	var inFlag *InFlag   // last encountered flag that still expects arguments
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
 	context := NewContext(args)
@@ -42,7 +49,7 @@ func actionTraverse(c *cobra.Command, args []string) (Action, Context) {
 		// flag
 		case strings.HasPrefix(arg, "-"):
 			inFlag = &InFlag{
-				Flag: fs.LookupArg(arg).Flag,
+				Flag: fs.LookupArg(arg),
 				Args: []string{},
 			}
 			inArgs = append(inArgs, arg)

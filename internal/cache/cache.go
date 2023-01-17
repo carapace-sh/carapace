@@ -11,29 +11,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/cache"
 )
 
 // Write persistests given values to file as json.
-func Write(file string, rawValues []common.RawValue) (err error) {
+func Write(file string, e export.Export) (err error) {
 	var m []byte
-	if m, err = json.Marshal(rawValues); err == nil {
+	if m, err = json.Marshal(e); err == nil {
 		err = os.WriteFile(file, m, 0600)
 	}
 	return
 }
 
 // Load loads values from file unless modification date exceeds timeout.
-func Load(file string, timeout time.Duration) (rawValues []common.RawValue, err error) {
-	var content []byte
+func Load(file string, timeout time.Duration) (e export.Export, err error) {
 	var stat os.FileInfo
 	if stat, err = os.Stat(file); os.IsNotExist(err) || (timeout > 0 && stat.ModTime().Add(timeout).Before(time.Now())) {
 		err = errors.New("not exists or timeout exceeded")
 	} else {
+		var content []byte
 		if content, err = os.ReadFile(file); err == nil {
-			err = json.Unmarshal(content, &rawValues)
+			err = json.Unmarshal(content, &e)
 		}
 	}
 	return

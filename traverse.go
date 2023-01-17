@@ -9,7 +9,7 @@ import (
 
 type InFlag struct {
 	*pflagfork.Flag
-	// currently consumed args
+	// currently consumed args since encountered flag
 	Args []string
 }
 
@@ -19,8 +19,9 @@ func (f InFlag) Consumes(arg string) bool {
 		return false
 	case f.IsOptarg():
 		return false
-	case len(f.Args) == 0: // TODO or takes multiple: `|| f.Nargs`
+	case len(f.Args) == 0:
 		return true
+		// TODO another case that takes multiple (nargs) and arg is not a flag (breaking consumption chain)
 	default:
 		return false
 	}

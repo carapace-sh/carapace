@@ -6,12 +6,17 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/export"
 	_shell "github.com/rsteube/carapace/internal/shell"
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked.
 type InvokedAction struct {
 	Action
+}
+
+func (a InvokedAction) export() export.Export {
+	return export.Export{Meta: a.meta, Values: a.rawValues}
 }
 
 // Filter filters given values (this should be done before any call to Prefix/Suffix as those alter the values being filtered)

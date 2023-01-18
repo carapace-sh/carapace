@@ -32,12 +32,12 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
 		a.callback = func(c Context) Action {
 			if cacheFile, err := cache.File(file, line, keys...); err == nil {
-				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
-					return Action{rawValues: rawValues}
+				if cached, err := cache.Load(cacheFile, timeout); err == nil {
+					return Action{meta: cached.Meta, rawValues: cached.Values}
 				}
 				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
 				if invokedAction.meta.Messages.IsEmpty() {
-					_ = cache.Write(cacheFile, invokedAction.rawValues)
+					_ = cache.Write(cacheFile, invokedAction.export())
 				}
 				return invokedAction.ToA()
 			}

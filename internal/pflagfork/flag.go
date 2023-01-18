@@ -41,16 +41,30 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		return false
 	}
 
-	switch f.Style() {
-	case Default:
-		return false
-	case ShorthandOnly:
-		return false
-	case NameAsShorthand:
-		return false
-	default:
-		return false
+	if strings.HasPrefix(arg, "--") {
+		name := strings.TrimPrefix(arg, "--")
+		name = strings.SplitN(name, "=", 2)[0]
+
+		switch f.Style() {
+		case ShorthandOnly, NameAsShorthand:
+			return false
+		default:
+			return name == f.Name
+		}
 	}
+
+	return false
+	// name := strings.TrimPrefix(arg, "-")
+	// switch f.Style() {
+	// case Default:
+	// return false
+	// case ShorthandOnly:
+	// return false
+	// case NameAsShorthand:
+	// return false
+	// default:
+	// return false
+	// }
 }
 
 func (f Flag) TakesValue() bool {

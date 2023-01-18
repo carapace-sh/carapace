@@ -90,7 +90,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		//if inFlag != nil && inFlag.Consumes("") {
 		toParse = toParse[:len(toParse)-1+len(inFlag.Args)] // TODO nargs support
 		logger.Printf("removed flag missing argument from args to parse %#v\n", toParse)
-	} else {
+	} else if strings.HasPrefix(context.CallbackValue, "-") && (pflagfork.FlagSet{FlagSet: c.Flags()}).IsPosix() {
 		logger.Printf("not removing args from %#v\n", toParse)
 	}
 	logger.Printf("inFlag %#v\n", inFlag)

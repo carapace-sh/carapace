@@ -71,6 +71,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		case subcommand(c, arg) != nil:
 			logger.Printf("arg %#v is a subcommand\n", arg)
 			// TODO update args to parse (skip flag missing argument)
+			logger.Printf("parsing flags for %#v with args %#v\n", c.Name(), inArgs)
 			if err := c.ParseFlags(inArgs); err != nil {
 				return ActionMessage(err.Error()), context
 			}
@@ -94,7 +95,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	}
 	logger.Printf("inFlag %#v\n", inFlag)
 
-	logger.Printf("parsing flags for: %#v\n", toParse)
+	logger.Printf("parsing flags for %#v with args %#v\n", c.Name(), inArgs)
 	if err := c.ParseFlags(toParse); err != nil { // TODO filter error
 		return ActionMessage(err.Error()), context
 	}

@@ -31,7 +31,7 @@ func (f InFlag) Consumes(arg string) bool {
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
 	preInvoke(c, args)
-	logger.Printf("traverse called with args: %#v\n", args)
+	logger.Printf("traverse called for %#v with args: %#v\n", c.Name(), args)
 
 	inArgs := []string{} // args consumed by current command
 	var inFlag *InFlag   // last encountered flag that still expects arguments
@@ -75,7 +75,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 				return ActionMessage(err.Error()), context
 			}
 			// TODO what if there is no next argument
-			logger.Printf("calling subcommand %#v with args: %#v\n", arg, args[i+1:])
 			return traverse(subcommand(c, arg), args[i+1:])
 
 		// positional
@@ -89,7 +88,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	if inFlag != nil {
 		//if inFlag != nil && inFlag.Consumes("") {
 		toParse = toParse[:len(toParse)-1+len(inFlag.Args)] // TODO nargs support
-		logger.Printf("removed flag missing argument from args to parse: %#v\n", toParse)
+		logger.Printf("removed flag missing argument from args to parse %#v\n", toParse)
 	} else {
 		logger.Printf("not removing args from %#v\n", toParse)
 	}
@@ -125,7 +124,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 func subcommand(cmd *cobra.Command, arg string) *cobra.Command {
 	if subcommand, _, _ := cmd.Find([]string{arg}); subcommand != cmd {
-		logger.Printf("subcommand for %#v: %#v", arg, subcommand.Name())
 		return subcommand
 	}
 	return nil

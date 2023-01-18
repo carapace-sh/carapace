@@ -31,6 +31,7 @@ func (f InFlag) Consumes(arg string) bool {
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
 	preInvoke(c, args)
+	logger.Printf("traverse called with args: %#v\n", args)
 
 	inArgs := []string{} // args consumed by current command
 	var inFlag *InFlag   // last encountered flag that still expects arguments
@@ -41,6 +42,8 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		switch {
 		// flag argument
 		case inFlag != nil && inFlag.Consumes(arg):
+			logger.Printf("arg '%v' is a flag argument\n", arg)
+
 			inArgs = append(inArgs, arg)
 			inFlag.Args = append(inFlag.Args, arg)
 
@@ -51,11 +54,15 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 		// dash
 		case arg == "--":
+			logger.Printf("arg '%v' is dash\n", arg)
+
 			inArgs = append(inArgs, args[i:]...)
 			break
 
 		// flag
 		case strings.HasPrefix(arg, "-"):
+			logger.Printf("arg '%v' is a flag\n", arg)
+
 			inFlag = &InFlag{
 				Flag: fs.LookupArg(arg), // TODO can be nil
 				Args: []string{},
@@ -65,13 +72,18 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 		// subcommand
 		case subcommand(c, arg) != nil:
+			logger.Printf("arg '%v' is a subcommand\n", arg)
+
 			if err := c.ParseFlags(inArgs); err != nil {
 				return ActionMessage(err.Error()), context
 			}
+			// TODO what if there is no next argument
+			logger.Printf("calling subcommand '%v' with args: %#v\n", arg, args[i+1:])
 			return traverse(subcommand(c, arg), args[i+1:])
 
 		// positional
 		default:
+			logger.Printf("arg '%v' is a positional\n", arg)
 			inArgs = append(inArgs, arg)
 		}
 	}
@@ -93,16 +105,19 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	// positional or subcommand
 	default:
 		return Batch(
-				storage.getPositional(c, len(context.Args)),
+				storage.getPositional(c, len(c.Flags().Args())),
 				actionSubcommands(c),
 			).ToA(),
 			context
 	}
 }
 
-func subcommand(cmd *cobra.Command, arg string) (subcommand *cobra.Command) {
-	subcommand, _, _ = cmd.Find([]string{arg})
-	return
+func subcommand(cmd *cobra.Command, arg string) *cobra.Command {
+	if subcommand, _, _ := cmd.Find([]string{arg}); subcommand != cmd {
+		logger.Printf("subcommand for '%v': %v", arg, subcommand.Name())
+		return subcommand
+	}
+	return nil
 }
 
 func preInvoke(cmd *cobra.Command, args []string) {

@@ -43,7 +43,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		// flag argument
 		case inFlag != nil && inFlag.Consumes(arg):
 			logger.Printf("arg '%v' is a flag argument\n", arg)
-
 			inArgs = append(inArgs, arg)
 			inFlag.Args = append(inFlag.Args, arg)
 
@@ -55,14 +54,12 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		// dash
 		case arg == "--":
 			logger.Printf("arg '%v' is dash\n", arg)
-
 			inArgs = append(inArgs, args[i:]...)
 			break
 
 		// flag
 		case strings.HasPrefix(arg, "-"):
 			logger.Printf("arg '%v' is a flag\n", arg)
-
 			inFlag = &InFlag{
 				Flag: fs.LookupArg(arg), // TODO can be nil
 				Args: []string{},
@@ -73,7 +70,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		// subcommand
 		case subcommand(c, arg) != nil:
 			logger.Printf("arg '%v' is a subcommand\n", arg)
-
 			if err := c.ParseFlags(inArgs); err != nil {
 				return ActionMessage(err.Error()), context
 			}
@@ -95,15 +91,18 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	switch {
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
+		logger.Printf("completing flag argument for arg '%v'\n", context.CallbackValue)
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag
 	case strings.HasPrefix(context.CallbackValue, "-"):
+		logger.Printf("completing optional flag argument for arg '%v'\n", context.CallbackValue)
 		// TODO handle optargflags with their value
 		return actionFlags(c), context
 
 	// positional or subcommand
 	default:
+		logger.Printf("completing positional and subcommands for arg '%v'\n", context.CallbackValue)
 		return Batch(
 				storage.getPositional(c, len(c.Flags().Args())),
 				actionSubcommands(c),

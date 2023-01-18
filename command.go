@@ -22,7 +22,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Use:    "_carapace",
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.PrintArgs(os.Args)
+			logger.Printf("%#v", os.Args)
 
 			if len(args) > 2 && strings.HasPrefix(args[2], "_") {
 				cmd.Hidden = false

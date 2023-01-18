@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,12 +12,6 @@ import (
 
 type _logger struct {
 	*log.Logger
-}
-
-func (l _logger) PrintArgs(args []string) {
-	if m, err := json.Marshal(args); err == nil {
-		l.Println(string(m))
-	}
 }
 
 var logger = _logger{log.New(ioutil.Discard, "", log.Flags())}

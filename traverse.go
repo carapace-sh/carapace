@@ -42,7 +42,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		switch {
 		// flag argument
 		case inFlag != nil && inFlag.Consumes(arg):
-			logger.Printf("arg '%v' is a flag argument\n", arg)
+			logger.Printf("arg %#v is a flag argument\n", arg)
 			inArgs = append(inArgs, arg)
 			inFlag.Args = append(inFlag.Args, arg)
 
@@ -53,13 +53,13 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 		// dash
 		case arg == "--":
-			logger.Printf("arg '%v' is dash\n", arg)
+			logger.Printf("arg %#v is dash\n", arg)
 			inArgs = append(inArgs, args[i:]...)
 			break
 
 		// flag
 		case strings.HasPrefix(arg, "-"):
-			logger.Printf("arg '%v' is a flag\n", arg)
+			logger.Printf("arg %#v is a flag\n", arg)
 			inFlag = &InFlag{
 				Flag: fs.LookupArg(arg), // TODO can be nil
 				Args: []string{},
@@ -69,40 +69,52 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 		// subcommand
 		case subcommand(c, arg) != nil:
-			logger.Printf("arg '%v' is a subcommand\n", arg)
+			logger.Printf("arg %#v is a subcommand\n", arg)
+			// TODO update args to parse (skip flag missing argument)
 			if err := c.ParseFlags(inArgs); err != nil {
 				return ActionMessage(err.Error()), context
 			}
 			// TODO what if there is no next argument
-			logger.Printf("calling subcommand '%v' with args: %#v\n", arg, args[i+1:])
+			logger.Printf("calling subcommand %#v with args: %#v\n", arg, args[i+1:])
 			return traverse(subcommand(c, arg), args[i+1:])
 
 		// positional
 		default:
-			logger.Printf("arg '%v' is a positional\n", arg)
+			logger.Printf("arg %#v is a positional\n", arg)
 			inArgs = append(inArgs, arg)
 		}
 	}
 
-	if err := c.ParseFlags(inArgs); err != nil { // TODO filter error
+	toParse := context.Args
+	if inFlag != nil {
+		//if inFlag != nil && inFlag.Consumes("") {
+		toParse = toParse[:len(toParse)-1+len(inFlag.Args)] // TODO nargs support
+		logger.Printf("removed flag missing argument from args to parse: %#v\n", toParse)
+	} else {
+		logger.Printf("not removing args from %#v\n", toParse)
+	}
+	logger.Printf("inFlag %#v\n", inFlag)
+
+	logger.Printf("parsing flags for: %#v\n", toParse)
+	if err := c.ParseFlags(toParse); err != nil { // TODO filter error
 		return ActionMessage(err.Error()), context
 	}
 
 	switch {
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
-		logger.Printf("completing flag argument for arg '%v'\n", context.CallbackValue)
+		logger.Printf("completing flag argument for arg %#v\n", context.CallbackValue)
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag
 	case strings.HasPrefix(context.CallbackValue, "-"):
-		logger.Printf("completing optional flag argument for arg '%v'\n", context.CallbackValue)
+		logger.Printf("completing optional flag argument for arg %#v\n", context.CallbackValue)
 		// TODO handle optargflags with their value
 		return actionFlags(c), context
 
 	// positional or subcommand
 	default:
-		logger.Printf("completing positional and subcommands for arg '%v'\n", context.CallbackValue)
+		logger.Printf("completing positional and subcommands for arg %#v\n", context.CallbackValue)
 		return Batch(
 				storage.getPositional(c, len(c.Flags().Args())),
 				actionSubcommands(c),
@@ -113,7 +125,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 func subcommand(cmd *cobra.Command, arg string) *cobra.Command {
 	if subcommand, _, _ := cmd.Find([]string{arg}); subcommand != cmd {
-		logger.Printf("subcommand for '%v': %v", arg, subcommand.Name())
+		logger.Printf("subcommand for %#v: %#v", arg, subcommand.Name())
 		return subcommand
 	}
 	return nil

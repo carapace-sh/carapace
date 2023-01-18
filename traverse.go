@@ -110,8 +110,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	case strings.HasPrefix(context.CallbackValue, "-"):
 		if f := fs.LookupArg(context.CallbackValue); f != nil && f.IsOptarg() && strings.Contains(context.CallbackValue, "=") {
 			logger.Printf("completing optional flag argument for arg %#v\n", context.CallbackValue)
-			prefix := strings.SplitN(context.CallbackValue, "=", 2)[0] + "="
-			return storage.getFlag(c, f.Name).Prefix(prefix), context
+			return storage.getFlag(c, f.Name).Prefix(strings.SplitN(context.CallbackValue, "=", 2)[0] + "="), context
 		}
 		logger.Printf("completing flags for arg %#v\n", context.CallbackValue)
 		return actionFlags(c), context

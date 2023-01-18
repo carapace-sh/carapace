@@ -15,6 +15,8 @@ type InFlag struct {
 
 func (f InFlag) Consumes(arg string) bool {
 	switch {
+	case f.Flag == nil:
+		return false
 	case !f.TakesValue():
 		return false
 	case f.IsOptarg():
@@ -50,7 +52,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		// flag
 		case strings.HasPrefix(arg, "-"):
 			inFlag = &InFlag{
-				Flag: fs.LookupArg(arg),
+				Flag: fs.LookupArg(arg), // TODO can be nil
 				Args: []string{},
 			}
 			inArgs = append(inArgs, arg)

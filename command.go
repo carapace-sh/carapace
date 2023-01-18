@@ -28,7 +28,11 @@ func addCompletionCommand(cmd *cobra.Command) {
 				cmd.Hidden = false
 			}
 
-			if s, err := complete(cmd, args); err != nil {
+			if !cmd.HasParent() {
+				panic("missing parent command") // TODO this should never happen
+			}
+
+			if s, err := complete(cmd.Parent(), args); err != nil {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 			} else {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)

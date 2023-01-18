@@ -31,7 +31,7 @@ func (f InFlag) Consumes(arg string) bool {
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
 	preInvoke(c, args)
-	logger.Printf("traverse called for %#v with args: %#v\n", c.Name(), args)
+	logger.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
 
 	inArgs := []string{} // args consumed by current command
 	var inFlag *InFlag   // last encountered flag that still expects arguments

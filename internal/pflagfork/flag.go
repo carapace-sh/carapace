@@ -41,7 +41,9 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		return false
 	}
 
-	if strings.HasPrefix(arg, "--") {
+	switch {
+
+	case strings.HasPrefix(arg, "--"):
 		name := strings.TrimPrefix(arg, "--")
 		name = strings.SplitN(name, "=", 2)[0]
 
@@ -51,21 +53,43 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		default:
 			return name == f.Name
 		}
-	}
 
-	return false
-	// name := strings.TrimPrefix(arg, "-")
-	// switch f.Style() {
-	// case Default:
-	// return false
-	// case ShorthandOnly:
-	// return false
-	// case NameAsShorthand:
-	// return false
-	// default:
-	// return false
-	// }
+	case !posix:
+		name := strings.TrimPrefix(arg, "-")
+		name = strings.SplitN(name, "=", 2)[0]
+
+		if name == "" {
+			return false
+		}
+
+		switch f.Style() {
+		case ShorthandOnly:
+			return name == f.Shorthand
+		default:
+			return name == f.Name || name == f.Shorthand
+		}
+
+	default:
+		if f.Shorthand != "" {
+			return strings.HasSuffix(arg, f.Shorthand)
+		}
+		return false
+	}
 }
+
+// func lookupFlag(arg string) (flag *pflag.Flag) {
+
+// 	if strings.HasPrefix(arg, "--") {
+// 		flag = cmd.Flags().Lookup(nameOrShorthand)
+// 	} else if strings.HasPrefix(arg, "-") && len(nameOrShorthand) > 0 {
+// 		if (pflagfork.FlagSet{FlagSet: cmd.Flags()}).IsPosix() {
+// 			flag = cmd.Flags().ShorthandLookup(string(nameOrShorthand[len(nameOrShorthand)-1]))
+// 		} else {
+// 			flag = cmd.Flags().ShorthandLookup(nameOrShorthand)
+// 		}
+// 	}
+// 	return
+// }
 
 func (f Flag) TakesValue() bool {
 	switch f.Value.Type() {

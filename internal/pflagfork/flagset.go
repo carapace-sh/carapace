@@ -41,13 +41,14 @@ func (f *FlagSet) VisitAll(fn func(*Flag)) {
 }
 
 func (fs FlagSet) LookupArg(arg string) (result *Flag) {
-	fs.FlagSet.VisitAll(func(f *pflag.Flag) {
+	isPosix := fs.IsPosix()
+	fs.VisitAll(func(f *Flag) {
 		if result != nil {
 			return
 		}
 
-		if flag := (&Flag{f}); flag.Matches(arg, fs.IsPosix()) { // TODO handle posix
-			result = flag
+		if f.Matches(arg, isPosix) { // TODO handle posix
+			result = f
 		}
 	})
 	return

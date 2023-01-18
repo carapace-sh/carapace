@@ -86,6 +86,8 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	}
 
 	toParse := context.Args
+	// TODO remove args that would case a parse error (flag witout value)
+	// TODO add CallBackvalue to parsed ags if posix shorthand chain (skip last rune if it expects a value)
 	if inFlag != nil {
 		//if inFlag != nil && inFlag.Consumes("") {
 		toParse = toParse[:len(toParse)-1+len(inFlag.Args)] // TODO nargs support
@@ -96,7 +98,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	logger.Printf("inFlag %#v\n", inFlag)
 
 	logger.Printf("parsing flags for %#v with args %#v\n", c.Name(), inArgs)
-	if err := c.ParseFlags(toParse); err != nil { // TODO filter error
+	if err := c.ParseFlags(toParse); err != nil {
 		return ActionMessage(err.Error()), context
 	}
 

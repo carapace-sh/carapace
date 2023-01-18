@@ -49,6 +49,11 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 			}
 			continue
 
+		// dash
+		case arg == "--":
+			inArgs = append(inArgs, args[i:]...)
+			break
+
 		// flag
 		case strings.HasPrefix(arg, "-"):
 			inFlag = &InFlag{

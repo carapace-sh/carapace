@@ -3,6 +3,7 @@ package carapace
 import (
 	"strings"
 
+	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
 )
@@ -103,6 +104,12 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 	// TODO handle dash args
 	switch {
+	// dash argument
+	case common.IsDash(c):
+		logger.Printf("completing dash for arg %#v\n", context.CallbackValue)
+		context.Args = c.Flags().Args()[c.ArgsLenAtDash():]
+		return storage.getPositional(c, len(context.Args)), context
+
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
 		logger.Printf("completing flag argument for arg %#v\n", context.CallbackValue)

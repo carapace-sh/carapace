@@ -30,6 +30,6 @@ func init() {
 	if logfileWriter, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err != nil {
 		log.Fatal(err.Error())
 	} else {
-		logger = _logger{log.New(logfileWriter, ps.DetermineShell()+" ", log.Flags()|log.Lmsgprefix)}
+		logger = _logger{log.New(logfileWriter, ps.DetermineShell()+" ", log.Flags()|log.Lmsgprefix|log.Lmicroseconds)}
 	}
 }

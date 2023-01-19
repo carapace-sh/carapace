@@ -96,7 +96,6 @@ loop:
 	} else if strings.HasPrefix(context.CallbackValue, "-") && (pflagfork.FlagSet{FlagSet: c.Flags()}).IsPosix() {
 		logger.Printf("not removing args from %#v\n", toParse)
 	}
-	logger.Printf("inFlag %#v\n", inFlag)
 
 	logger.Printf("parsing flags for %#v with args %#v\n", c.Name(), inArgs)
 	if err := c.ParseFlags(toParse); err != nil {
@@ -112,7 +111,7 @@ loop:
 
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
-		logger.Printf("completing flag argument for arg %#v\n", context.CallbackValue)
+		logger.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.CallbackValue)
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag

@@ -102,7 +102,6 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		return ActionMessage(err.Error()), context
 	}
 
-	// TODO handle dash args
 	switch {
 	// dash argument
 	case common.IsDash(c):

@@ -101,6 +101,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		return ActionMessage(err.Error()), context
 	}
 
+	// TODO handle dash args
 	switch {
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):

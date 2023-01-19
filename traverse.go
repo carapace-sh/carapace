@@ -39,6 +39,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
 	context := NewContext(args)
+loop:
 	for i, arg := range context.Args {
 		switch {
 		// flag argument
@@ -56,7 +57,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		case arg == "--":
 			logger.Printf("arg %#v is dash\n", arg)
 			inArgs = append(inArgs, args[i:]...)
-			break
+			break loop
 
 		// flag
 		case strings.HasPrefix(arg, "-"):
@@ -90,8 +91,8 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	// TODO remove args that would case a parse error (flag witout value)
 	// TODO add CallBackvalue to parsed ags if posix shorthand chain (skip last rune if it expects a value)
 	if inFlag != nil && inFlag.Consumes("") {
-		toParse = toParse[:len(toParse)-1+len(inFlag.Args)] // TODO nargs support
-		logger.Printf("removed flag missing argument from args to parse %#v\n", toParse)
+		logger.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
+		toParse = toParse[:len(toParse)-1] // TODO nargs support
 	} else if strings.HasPrefix(context.CallbackValue, "-") && (pflagfork.FlagSet{FlagSet: c.Flags()}).IsPosix() {
 		logger.Printf("not removing args from %#v\n", toParse)
 	}

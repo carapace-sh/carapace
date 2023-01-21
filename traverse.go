@@ -149,7 +149,6 @@ loop:
 	case !c.DisableFlagParsing && strings.HasPrefix(context.CallbackValue, "-"):
 		if f := fs.LookupArg(context.CallbackValue); f != nil && f.IsOptarg() && strings.Contains(context.CallbackValue, string(f.OptargDelimiter())) {
 			logger.Printf("completing optional flag argument for arg %#v\n", context.CallbackValue)
-			logger.Printf("delimiter %#v", f.OptargDelimiter())
 			prefix, optarg := f.Split(context.CallbackValue)
 			context.CallbackValue = optarg
 			return storage.getFlag(c, f.Name).Prefix(prefix), context

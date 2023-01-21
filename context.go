@@ -29,7 +29,11 @@ type Context struct {
 	mockedReplies map[string]string
 }
 
-func NewContext(args []string) Context {
+func NewContext(args ...string) Context {
+	if len(args) == 0 {
+		args = append(args, "")
+	}
+
 	context := Context{
 		CallbackValue: args[len(args)-1],
 		Args:          args[:len(args)-1],

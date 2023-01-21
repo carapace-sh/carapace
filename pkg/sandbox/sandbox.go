@@ -133,7 +133,7 @@ func Run(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 
 // Run executes the sandbox with given arguments.
 func (s *Sandbox) Run(args ...string) run {
-	c := carapace.NewContext(args)
+	c := carapace.NewContext(args...)
 	for key, value := range s.env {
 		c.Setenv(key, value)
 	}

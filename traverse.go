@@ -107,13 +107,13 @@ loop:
 		toParse = toParse[:len(toParse)-1] // TODO nargs support
 	} else if fs.IsShorthandSeries(context.CallbackValue) {
 		logger.Printf("arg %#v is a shorthand flag series", context.CallbackValue)
-		inFlag = &InFlag{
+		localInFlag := &InFlag{
 			Flag: fs.LookupArg(context.CallbackValue),
 			Args: []string{},
 		}
-		if inFlag.Consumes("") && len(context.CallbackValue) > 2 {
-			logger.Printf("removing shorthand %#v from flag series since it is missing its argument\n", inFlag.Shorthand)
-			toParse = append(toParse, strings.TrimSuffix(context.CallbackValue, inFlag.Shorthand))
+		if localInFlag.Consumes("") && len(context.CallbackValue) > 2 {
+			logger.Printf("removing shorthand %#v from flag series since it is missing its argument\n", localInFlag.Shorthand)
+			toParse = append(toParse, strings.TrimSuffix(context.CallbackValue, localInFlag.Shorthand))
 		} else {
 			toParse = append(toParse, context.CallbackValue)
 		}
@@ -130,7 +130,7 @@ loop:
 		if err := c.ParseFlags(toParse); err != nil {
 			return ActionMessage(err.Error()), context
 		}
-		context.Args = c.Flags().Args() // TODO duh!
+		context.Args = c.Flags().Args()
 	}
 
 	switch {

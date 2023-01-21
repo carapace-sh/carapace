@@ -117,6 +117,7 @@ func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
 			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
@@ -128,6 +129,7 @@ func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
 			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
@@ -157,6 +159,7 @@ func TestActionFiles(t *testing.T) {
 		ActionStyledValues(
 			"README.md", style.Of("fg-default", "bg-default"),
 			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),

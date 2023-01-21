@@ -22,13 +22,17 @@ func addCompletionCommand(cmd *cobra.Command) {
 		Use:    "_carapace",
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
-			logger.PrintArgs(os.Args)
+			logger.Printf("%#v", os.Args)
 
 			if len(args) > 2 && strings.HasPrefix(args[2], "_") {
 				cmd.Hidden = false
 			}
 
-			if s, err := complete(cmd, args); err != nil {
+			if !cmd.HasParent() {
+				panic("missing parent command") // TODO this should never happen
+			}
+
+			if s, err := complete(cmd.Parent(), args); err != nil {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
 			} else {
 				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)

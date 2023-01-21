@@ -32,8 +32,8 @@ func (f InFlag) Consumes(arg string) bool {
 }
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
-	preInvoke(c, args)
 	logger.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
+	preRun(c, args)
 
 	if config.IsLenient() {
 		logger.Printf("allowing unknown flags")
@@ -175,8 +175,9 @@ func subcommand(cmd *cobra.Command, arg string) *cobra.Command {
 	return nil
 }
 
-func preInvoke(cmd *cobra.Command, args []string) {
+func preRun(cmd *cobra.Command, args []string) {
 	if subCmd := subcommand(cmd, "_carapace"); subCmd != nil && subCmd.PreRun != nil {
+		logger.Printf("executing PreRun for %#v with args %#v", cmd.Name(), args)
 		subCmd.PreRun(cmd, args)
 	}
 }

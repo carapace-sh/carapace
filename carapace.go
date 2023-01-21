@@ -32,12 +32,16 @@ func Gen(cmd *cobra.Command) *Carapace {
 
 // PreRun sets a function to be run before completion (use on rootCmd).
 func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
-	if completionCmd, _, err := c.cmd.Find([]string{"_carapace"}); err == nil {
-		completionCmd.PreRun = func(cmd *cobra.Command, args []string) {
-			if len(args) > 2 { // skip script generation
-				f(c.cmd, args[2:])
-			}
+	if entry := storage.get(c.cmd); entry.prerun != nil {
+		_f := entry.prerun
+		entry.prerun = func(cmd *cobra.Command, args []string) {
+			// TODO yuck - probably best to append to a slice in storage
+			_f(cmd, args)
+			f(cmd, args)
+
 		}
+	} else {
+		entry.prerun = f
 	}
 }
 

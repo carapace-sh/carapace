@@ -19,6 +19,7 @@ type entry struct {
 	dash          []Action
 	dashAny       Action
 	preinvoke     func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action
+	prerun        func(cmd *cobra.Command, args []string)
 }
 
 type _storage map[*cobra.Command]*entry
@@ -45,6 +46,12 @@ func (s _storage) getFlag(cmd *cobra.Command, name string) Action {
 			}
 			return invoked.ToA()
 		})
+	}
+}
+
+func (s _storage) preRun(cmd *cobra.Command, args []string) {
+	if entry := s.get(cmd); entry.prerun != nil {
+		entry.prerun(cmd, args)
 	}
 }
 

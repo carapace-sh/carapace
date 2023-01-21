@@ -57,7 +57,7 @@ func TestZsh(t *testing.T) {
 }
 
 func TestRoot(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("").
 			Expect(carapace.Batch(
 				carapace.ActionValuesDescribed(

@@ -160,7 +160,7 @@ loop:
 	// positional or subcommand
 	default:
 		logger.Printf("completing positional and subcommands for arg %#v\n", context.CallbackValue)
-		batch := Batch(storage.getPositional(c, len(c.Flags().Args())))
+		batch := Batch(storage.getPositional(c, len(context.Args)))
 		if c.HasAvailableSubCommands() && len(context.Args) <= 1 {
 			batch = append(batch, actionSubcommands(c))
 		}

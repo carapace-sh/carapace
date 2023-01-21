@@ -44,7 +44,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	var inFlag *InFlag   // last encountered flag that still expects arguments
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
-	context := NewContext(args)
+	context := NewContext(args...)
 loop:
 	for i, arg := range context.Args {
 		switch {

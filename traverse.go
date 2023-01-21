@@ -78,7 +78,6 @@ loop:
 		// subcommand
 		case subcommand(c, arg) != nil:
 			logger.Printf("arg %#v is a subcommand\n", arg)
-			// TODO update args to parse (skip flag missing argument)
 
 			switch {
 			case c.DisableFlagParsing:
@@ -89,7 +88,7 @@ loop:
 				if err := c.ParseFlags(inArgs); err != nil {
 					return ActionMessage(err.Error()), context
 				}
-				context.Args = c.Flags().Args() // TODO duh!
+				context.Args = c.Flags().Args()
 			}
 
 			// TODO what if there is no next argument
@@ -107,16 +106,15 @@ loop:
 		logger.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1] // TODO nargs support
 	} else if fs.IsShorthandSeries(context.CallbackValue) {
-		logger.Printf("not removing args from %#v\n", context.Args)
+		logger.Printf("arg %#v is a shorthand flag series", context.CallbackValue)
 		inFlag = &InFlag{
 			Flag: fs.LookupArg(context.CallbackValue),
 			Args: []string{},
 		}
 		if inFlag.Consumes("") && len(context.CallbackValue) > 2 {
-			logger.Printf("TODO adding flag chain without last shorthand")
-			toParse = append(toParse, context.CallbackValue[:len(context.CallbackValue)-1])
+			logger.Printf("removing shorthand %#v from flag series since it is missing its argument\n", inFlag.Shorthand)
+			toParse = append(toParse, strings.TrimSuffix(context.CallbackValue, inFlag.Shorthand))
 		} else {
-			logger.Printf("TODO adding flag chain")
 			toParse = append(toParse, context.CallbackValue)
 		}
 
@@ -125,7 +123,7 @@ loop:
 	// TODO duplicated code
 	switch {
 	case c.DisableFlagParsing:
-		logger.Printf("flag parsing disabled for %#v\n", c.Name())
+		logger.Printf("flag parsing is disabled for %#v\n", c.Name())
 
 	default:
 		logger.Printf("parsing flags for %#v with args %#v\n", c.Name(), toParse)

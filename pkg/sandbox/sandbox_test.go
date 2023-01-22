@@ -1,12 +1,62 @@
 package sandbox
 
 import (
+	"os"
 	"testing"
 
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
+
+func TestPreInvoke(t *testing.T) {
+	Command(t, func() *cobra.Command {
+		rootCmd := &cobra.Command{}
+		rootCmd.CompletionOptions.DisableDefaultCmd = true
+		rootCmd.SetHelpCommand(nil)
+		carapace.Gen(rootCmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action carapace.Action) carapace.Action {
+			return action.Chdir("subdir1")
+		})
+		carapace.Gen(rootCmd).PositionalCompletion(
+			carapace.ActionFiles(),
+		)
+
+		subCmd := &cobra.Command{
+			Use: "sub",
+		}
+		carapace.Gen(subCmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action carapace.Action) carapace.Action {
+			return action.Chdir("subdir2")
+		})
+		carapace.Gen(subCmd).PositionalCompletion(
+			carapace.ActionFiles(),
+		)
+		rootCmd.AddCommand(subCmd)
+
+		return rootCmd
+	})(func(s *Sandbox) {
+		s.Files(
+			"subdir1/file1.txt", "",
+			"subdir1/subdir2/file2.txt", "",
+		)
+
+		s.Run("").
+			Expect(carapace.ActionValues(
+				"file1.txt",
+				"subdir2/").
+				StyleF(style.ForPath).
+				NoSpace('/').
+				Tag("files").
+				Chdir("subdir1"))
+
+		s.Run("sub", "").
+			Expect(carapace.ActionValues("file2.txt").
+				StyleF(style.ForPath).
+				NoSpace('/').
+				Tag("files").
+				Chdir("subdir1/subdir2/"))
+	})
+}
 
 func TestPreRun(t *testing.T) {
 	Command(t, func() *cobra.Command {
@@ -48,5 +98,22 @@ func TestPreRun(t *testing.T) {
 		s.Run("sub", "--sub", "").
 			Expect(carapace.ActionValues("false").
 				Usage("sub flag"))
+	})
+}
+
+func TestEnv(t *testing.T) {
+	Command(t, func() *cobra.Command {
+		rootCmd := &cobra.Command{}
+		rootCmd.CompletionOptions.DisableDefaultCmd = true
+		rootCmd.SetHelpCommand(nil)
+		carapace.Gen(rootCmd).PositionalCompletion(
+			carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+				return carapace.ActionValues(c.Getenv("LS_COLORS"))
+			}),
+		)
+		return rootCmd
+	})(func(s *Sandbox) {
+		s.Run("").
+			Expect(carapace.ActionValues(os.Getenv("LS_COLORS")))
 	})
 }

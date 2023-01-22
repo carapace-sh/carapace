@@ -23,9 +23,18 @@ func init() {
 
 	carapace.Gen(modifierCmd).FlagCompletion(carapace.ActionMap{
 		"batch": carapace.Batch(
-			carapace.ActionValues("A", "B"),
-			carapace.ActionValues("C", "D"),
-			carapace.ActionValues("E", "F"),
+			carapace.ActionValuesDescribed(
+				"A", "description of A",
+				"B", "description of first B",
+			),
+			carapace.ActionValuesDescribed(
+				"B", "description of second B",
+				"C", "description of first C",
+			),
+			carapace.ActionValuesDescribed(
+				"C", "description of second C",
+				"D", "description of D",
+			),
 		).ToA(),
 		"timeout": carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {

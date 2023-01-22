@@ -91,7 +91,6 @@ loop:
 				context.Args = c.Flags().Args()
 			}
 
-			// TODO what if there is no next argument
 			return traverse(subcommand(c, arg), args[i+1:])
 
 		// positional

@@ -40,6 +40,7 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 	}
 }
 
+// Keep prevents removal of the sandbox directory.
 func (s *Sandbox) Keep() {
 	s.keep = true
 }
@@ -54,6 +55,12 @@ func (s *Sandbox) remove() {
 	}
 }
 
+// Files creates files within the sandbox directory.
+//
+//	s.Files(
+//		"file1.txt", "content of files1.txt",
+//		"dir1/file2.md", "content of file2.md",
+//	)
 func (s *Sandbox) Files(args ...string) {
 	if len(args)%2 != 0 {
 		s.t.Errorf("invalid amount of arguments: %v", len(args))
@@ -100,11 +107,14 @@ func (r reply) With(s string) {
 	r.mock.Replies[r.call] = s
 }
 
+// NewContext creates a new context enriched with sandbox specifics.
 func (s *Sandbox) NewContext(args ...string) carapace.Context {
 	context := carapace.NewContext(args...)
 	for key, value := range s.env {
 		context.Setenv(key, value)
 	}
+	context.Dir = s.mock.Dir
+	// TODO set mockedreplies in context
 	return context
 }
 
@@ -155,7 +165,7 @@ func (r run) invoke(a carapace.Action) string {
 func (r run) Expect(expected carapace.Action) {
 	r.t.Run(r.id, func(t *testing.T) {
 		// t.Parallel() TODO prevent concurrent map write for this (storage.go)
-		assert.Equal(r.t, r.invoke(expected.Chdir(r.dir)), r.invoke(r.actual))
+		assert.Equal(r.t, r.invoke(expected), r.invoke(r.actual))
 	})
 }
 
@@ -179,9 +189,14 @@ func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 				args := []string{"run", pkg, "_carapace", "export", ""}
 				args = append(args, c.Args...)
 				args = append(args, c.CallbackValue)
+
+				var err error
+				if c.Dir, err = os.Getwd(); err != nil { // `go run` needs to run in actual workdir and not the sandbox dir
+					return carapace.ActionMessage(err.Error())
+				}
 				return carapace.ActionExecCommand("go", args...)(func(output []byte) carapace.Action {
 					return carapace.ActionImport(output)
-				})
+				}).Invoke(c).ToA()
 			}),
 		)
 		return cmd

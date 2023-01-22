@@ -101,7 +101,7 @@ func (a Action) UsageF(f func() string) Action {
 	})
 }
 
-// Style sets the style
+// Style sets the style.
 //
 //	ActionValues("yes").Style(style.Green)
 //	ActionValues("no").Style(style.Red)
@@ -111,7 +111,7 @@ func (a Action) Style(s string) Action {
 	})
 }
 
-// Style sets the style using a reference
+// Style sets the style using a reference.
 //
 //	ActionValues("value").StyleR(&style.Carapace.Value)
 //	ActionValues("description").StyleR(&style.Carapace.Value)
@@ -124,7 +124,7 @@ func (a Action) StyleR(s *string) Action {
 	})
 }
 
-// Style sets the style using a function
+// Style sets the style using a function.
 //
 //	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
 //	ActionValues("true", "false").StyleF(style.ForKeyword)
@@ -162,7 +162,7 @@ func (a Action) TagF(f func(value string) string) Action {
 	})
 }
 
-// Chdir changes the current working directory to the named directory during invocation.
+// Chdir changes the current working directory to the named directory for the duration of invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {
 		abs, err := c.Abs(dir)
@@ -211,7 +211,7 @@ func (a Action) UniqueList(divider string) Action {
 	})
 }
 
-// Prefix adds a prefix to values (only the ones inserted, not the display values)
+// Prefix adds a prefix to values (only the ones inserted, not the display values).
 //
 //	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
 func (a Action) Prefix(prefix string) Action {
@@ -220,7 +220,7 @@ func (a Action) Prefix(prefix string) Action {
 	})
 }
 
-// Suffix adds a suffx to values (only the ones inserted, not the display values)
+// Suffix adds a suffx to values (only the ones inserted, not the display values).
 //
 //	carapace.ActionValues("apple", "melon", "orange").Suffix("juice")
 func (a Action) Suffix(suffix string) Action {

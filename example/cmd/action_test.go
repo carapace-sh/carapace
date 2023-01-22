@@ -9,7 +9,7 @@ import (
 )
 
 func TestAction(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"dirA/file1.txt", "",
 			"dirA/file2.png", "",
@@ -165,7 +165,7 @@ func TestAction(t *testing.T) {
 }
 
 func TestUnknownFlag(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--unknown", "").
 			Expect(carapace.ActionMessage("unknown flag: --unknown").NoSpace())
 

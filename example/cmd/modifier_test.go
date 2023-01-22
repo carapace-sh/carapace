@@ -8,7 +8,7 @@ import (
 )
 
 func TestModifier(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--timeout", "1s:").
 			Expect(carapace.ActionValues("within timeout").
 				Prefix("1s:").

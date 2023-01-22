@@ -9,7 +9,7 @@ import (
 )
 
 func TestMultiparts(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"dirA/file1.txt", "",
 			"dirA/file2.png", "",

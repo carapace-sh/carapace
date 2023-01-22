@@ -17,7 +17,7 @@ import (
 
 type Sandbox struct {
 	t    *testing.T
-	f    func() *cobra.Command
+	cmdF func() *cobra.Command
 	env  map[string]string
 	keep bool
 	mock *common.Mock
@@ -29,9 +29,9 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 		t.Fatal("failed to create sandbox dir: " + err.Error())
 	}
 	return Sandbox{
-		t:   t,
-		f:   f,
-		env: make(map[string]string),
+		t:    t,
+		cmdF: f,
+		env:  make(map[string]string),
 		mock: &common.Mock{
 			Dir:     tempDir,
 			Replies: make(map[string]string),
@@ -100,8 +100,8 @@ func (r reply) With(s string) {
 }
 
 // Run invokes `go run` on given package for sandbox tests.
-func Run(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
-	cmdF := func() *cobra.Command {
+func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
+	return Command(t, func() *cobra.Command {
 		cmd := &cobra.Command{
 			Use:                "integration",
 			Run:                func(cmd *cobra.Command, args []string) {},
@@ -122,8 +122,11 @@ func Run(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 			}),
 		)
 		return cmd
-	}
+	})
+}
 
+// Command executes the command returned by given function for sandbox tests.
+func Command(t *testing.T, cmdF func() *cobra.Command) (f func(func(s *Sandbox))) {
 	return func(f func(s *Sandbox)) {
 		s := newSandbox(t, cmdF)
 		defer s.remove()
@@ -137,7 +140,6 @@ func (s *Sandbox) Run(args ...string) run {
 	for key, value := range s.env {
 		c.Setenv(key, value)
 	}
-	// TODO actually invoke it here instead of Expect
 	m, _ := json.Marshal(args)
 
 	return run{
@@ -146,9 +148,12 @@ func (s *Sandbox) Run(args ...string) run {
 		s.mock.Dir,
 		c,
 		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-			b, _ := json.Marshal(s.mock)
+			b, err := json.Marshal(s.mock)
+			if err != nil {
+				return carapace.ActionMessage(err.Error())
+			}
 			c.Setenv("CARAPACE_SANDBOX", string(b))
-			return carapace.ActionExecute(s.f()).Invoke(c).ToA()
+			return carapace.ActionExecute(s.cmdF()).Invoke(c).ToA()
 		}),
 	}
 }

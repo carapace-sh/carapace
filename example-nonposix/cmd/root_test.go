@@ -8,7 +8,7 @@ import (
 )
 
 func TestRoot(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-delim-colon:").
 			Expect(carapace.ActionValues("d1", "d2", "d3").
 				Prefix("-delim-colon:").

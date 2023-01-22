@@ -5,9 +5,23 @@ import (
 
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/pkg/sandbox"
+	"github.com/rsteube/carapace/pkg/style"
 )
 
-func TestModifier(t *testing.T) {
+func TestBatch(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--batch", "").
+			Expect(carapace.ActionValuesDescribed(
+				"A", "description of A",
+				"B", "description of second B",
+				"C", "description of second C",
+				"D", "description of D",
+			).
+				Usage("Batch()"))
+	})
+}
+
+func TestTimeout(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--timeout", "1s:").
 			Expect(carapace.ActionValues("within timeout").
@@ -18,5 +32,29 @@ func TestModifier(t *testing.T) {
 		s.Run("modifier", "--timeout", "3s:").
 			Expect(carapace.ActionMessage("timeout exceeded").
 				Usage("Timeout()"))
+	})
+}
+
+func TestUsage(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--usage", "").
+			Expect(carapace.ActionValues().
+				Usage("explicit flag usage"))
+	})
+}
+
+func TestChdir(t *testing.T) {
+	sandbox.Action(t, func() carapace.Action {
+		return carapace.ActionFiles().Chdir("subdir")
+	})(func(s *sandbox.Sandbox) {
+		s.Files("subdir/file1.txt", "")
+
+		s.Run("").Expect(
+			carapace.ActionValues("file1.txt").
+				StyleF(func(s string, sc style.Context) string {
+					return style.ForPath("subdir/file1.txt", sc)
+				}).
+				NoSpace('/').
+				Tag("files"))
 	})
 }

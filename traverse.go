@@ -33,7 +33,7 @@ func (f InFlag) Consumes(arg string) bool {
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
 	logger.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
-	preRun(c, args)
+	storage.preRun(c, args)
 
 	if config.IsLenient() {
 		logger.Printf("allowing unknown flags")
@@ -157,7 +157,7 @@ loop:
 
 	// positional or subcommand
 	default:
-		logger.Printf("completing positional and subcommands for arg %#v\n", context.CallbackValue)
+		logger.Printf("completing positionals and subcommands for arg %#v\n", context.CallbackValue)
 		batch := Batch(storage.getPositional(c, len(context.Args)))
 		if c.HasAvailableSubCommands() && len(context.Args) <= 1 {
 			batch = append(batch, actionSubcommands(c))
@@ -171,9 +171,4 @@ func subcommand(cmd *cobra.Command, arg string) *cobra.Command {
 		return subcommand
 	}
 	return nil
-}
-
-func preRun(cmd *cobra.Command, args []string) {
-	logger.Printf("executing PreRun for %#v with args %#v", cmd.Name(), args)
-	storage.preRun(cmd, args)
 }

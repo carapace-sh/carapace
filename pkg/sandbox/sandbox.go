@@ -203,13 +203,13 @@ func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 	})
 }
 
-// Action executes a a command with the action return by given function as first positional argument.
+// Action executes a a command with the action return by given function as PositionalAny.
 func Action(t *testing.T, actionF func() carapace.Action) (f func(func(s *Sandbox))) {
 	return Command(t, func() *cobra.Command {
 		cmd := &cobra.Command{DisableFlagParsing: true}
 		cmd.CompletionOptions.DisableDefaultCmd = true
 
-		carapace.Gen(cmd).PositionalCompletion(actionF())
+		carapace.Gen(cmd).PositionalAnyCompletion(actionF())
 		return cmd
 	})
 }

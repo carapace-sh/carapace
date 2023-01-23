@@ -9,4 +9,4 @@ require (
 
 replace github.com/rsteube/carapace => ../
 
-replace github.com/spf13/pflag => github.com/rsteube/carapace-pflag v0.0.6
+replace github.com/spf13/pflag => ../../carapace-pflag/

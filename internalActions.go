@@ -91,6 +91,8 @@ func actionFlags(cmd *cobra.Command) Action {
 			if f.TakesValue() {
 				if f.IsOptarg() {
 					s = style.Carapace.FlagOptArg
+				} else if f.Nargs() != 0 {
+					s = style.Carapace.FlagNargs
 				} else {
 					s = style.Carapace.FlagArg
 				}

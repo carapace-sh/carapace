@@ -20,6 +20,13 @@ type Flag struct {
 	*pflag.Flag
 }
 
+func (f Flag) Nargs() int {
+	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Nargs"); field.IsValid() && field.Kind() == reflect.Int {
+		return int(field.Int())
+	}
+	return 0
+}
+
 func (f Flag) Style() style {
 	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Style"); field.IsValid() && field.Kind() == reflect.Int {
 		return style(field.Int())

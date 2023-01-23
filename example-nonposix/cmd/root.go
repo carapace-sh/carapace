@@ -21,11 +21,13 @@ func init() {
 	rootCmd.Flags().StringS("delim-colon", "delim-colon", "", "OptargDelimiter ':'")
 	rootCmd.Flags().StringS("delim-slash", "delim-slash", "", "OptargDelimiter '/'")
 	rootCmd.Flags().CountN("count", "c", "CountN")
+	rootCmd.Flags().StringS("nargs", "nargs", "", "Nargs")
 
 	rootCmd.Flag("delim-colon").NoOptDefVal = " "
 	rootCmd.Flag("delim-colon").OptargDelimiter = ':'
 	rootCmd.Flag("delim-slash").NoOptDefVal = " "
 	rootCmd.Flag("delim-slash").OptargDelimiter = '/'
+	rootCmd.Flag("nargs").Nargs = 2
 
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
 		"delim-colon": carapace.ActionValues("d1", "d2", "d3"),

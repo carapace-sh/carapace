@@ -175,3 +175,16 @@ func TestUnknownFlag(t *testing.T) {
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 	})
 }
+
+func TestPersistentFlag(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--persistentFlag=").
+			Expect(carapace.ActionValues("p1", "p2", "p3").
+				Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
+
+		s.Run("action", "--persistentFlag2", "").
+			Expect(carapace.ActionValues("p4", "p5", "p6").
+				Usage("Help message for persistentFlag2"))
+	})
+}

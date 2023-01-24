@@ -95,6 +95,7 @@ func TestRoot(t *testing.T) {
 				"--array", "multiflag", style.Blue,
 				"-a", "multiflag", style.Blue,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
 				"-p", "Help message for persistentFlag", style.Yellow,
 				"--toggle", "Help message for toggle", style.Default,
 				"-t", "Help message for toggle", style.Default,
@@ -104,6 +105,7 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
 				"--toggle", "Help message for toggle", style.Default,
 			).NoSpace('.').Tag("flags"))
 

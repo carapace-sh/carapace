@@ -42,6 +42,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 
 	inArgs := []string{} // args consumed by current command
 	var inFlag *InFlag   // last encountered flag that still expects arguments
+	c.LocalFlags()       // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
 	context := NewContext(args...)

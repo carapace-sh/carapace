@@ -21,12 +21,14 @@ func Execute() error {
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().StringP("persistentFlag", "p", "", "Help message for persistentFlag")
+	rootCmd.PersistentFlags().String("persistentFlag2", "", "Help message for persistentFlag2")
 	rootCmd.Flag("persistentFlag").NoOptDefVal = "defaultValue" // no argument required
 
 	rootCmd.Flags().StringArrayP("array", "a", []string{}, "multiflag")
 
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
-		"persistentFlag": carapace.ActionValues("p1", "p2", "p3"),
+		"persistentFlag":  carapace.ActionValues("p1", "p2", "p3"),
+		"persistentFlag2": carapace.ActionValues("p4", "p5", "p6"),
 	})
 
 	rootCmd.AddGroup(

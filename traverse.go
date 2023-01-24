@@ -69,11 +69,11 @@ loop:
 		// flag
 		case !c.DisableFlagParsing && strings.HasPrefix(arg, "-"):
 			logger.Printf("arg %#v is a flag\n", arg)
+			inArgs = append(inArgs, arg)
 			inFlag = &InFlag{
 				Flag: fs.LookupArg(arg),
 				Args: []string{},
 			}
-			inArgs = append(inArgs, arg)
 			continue
 
 		// subcommand
@@ -160,7 +160,7 @@ loop:
 	default:
 		logger.Printf("completing positionals and subcommands for arg %#v\n", context.CallbackValue)
 		batch := Batch(storage.getPositional(c, len(context.Args)))
-		if c.HasAvailableSubCommands() && len(context.Args) <= 1 {
+		if c.HasAvailableSubCommands() && len(context.Args) == 0 {
 			batch = append(batch, actionSubcommands(c))
 		}
 		return batch.ToA(), context

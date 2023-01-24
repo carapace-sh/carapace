@@ -101,7 +101,7 @@ loop:
 		}
 	}
 
-	toParse := context.Args
+	toParse := inArgs
 	if inFlag != nil && inFlag.Consumes("") {
 		logger.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1] // TODO nargs support

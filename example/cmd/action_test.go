@@ -164,6 +164,28 @@ func TestAction(t *testing.T) {
 	})
 }
 
+func TestDash(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--", "").
+			Expect(carapace.ActionValues("embeddedP1", "embeddedPositional1").
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
+
+		s.Run("action", "--", "-").
+			Expect(carapace.ActionValuesDescribed(
+				"--embedded-flag", "embedded flag").
+				NoSpace('.').
+				Usage("action [pos1] [pos2] [--] [dashAny]...").
+				Tag("flags"))
+
+		s.Run("action", "--", "--").
+			Expect(carapace.ActionValuesDescribed(
+				"--embedded-flag", "embedded flag").
+				NoSpace('.').
+				Usage("action [pos1] [pos2] [--] [dashAny]...").
+				Tag("flags"))
+	})
+}
+
 func TestUnknownFlag(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--unknown", "").

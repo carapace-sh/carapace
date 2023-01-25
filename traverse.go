@@ -137,7 +137,7 @@ loop:
 	// dash argument
 	case common.IsDash(c):
 		logger.Printf("completing dash for arg %#v\n", context.CallbackValue)
-		context.Args = c.Flags().Args()[c.ArgsLenAtDash():]
+		context.Args = c.Flags().Args()[c.ArgsLenAtDash()+1:]
 		return storage.getPositional(c, len(context.Args)), context
 
 	// flag argument

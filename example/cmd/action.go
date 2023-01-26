@@ -145,7 +145,16 @@ func init() {
 				Run: func(cmd *cobra.Command, args []string) {},
 			}
 
-			cmd.Flags().Bool("embedded-flag", false, "embedded flag")
+			cmd.Flags().Bool("embedded-bool", false, "embedded bool flag")
+			cmd.Flags().String("embedded-string", "", "embedded string flag")
+			cmd.Flags().String("embedded-optarg", "", "embedded optarg flag")
+
+			cmd.Flag("embedded-optarg").NoOptDefVal = " "
+
+			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
+				"embedded-string": carapace.ActionValues("es1", "es2", "es3"),
+				"embedded-optarg": carapace.ActionValues("eo1", "eo2", "eo3"),
+			})
 
 			carapace.Gen(cmd).PositionalCompletion(
 				carapace.ActionValues("embeddedPositional1", "embeddedP1"),

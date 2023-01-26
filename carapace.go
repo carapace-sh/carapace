@@ -17,13 +17,7 @@ type Carapace struct {
 // Gen initialized Carapace for given command.
 func Gen(cmd *cobra.Command) *Carapace {
 	addCompletionCommand(cmd)
-
-	cobra.OnInitialize(func() {
-		if opts.BridgeCompletion {
-			registerValidArgsFunction(cmd)
-			registerFlagCompletion(cmd)
-		}
-	})
+	storage.bridge(cmd)
 
 	return &Carapace{
 		cmd: cmd,

@@ -58,19 +58,13 @@ func (a Action) Invoke(c Context) InvokedAction {
 	if c.Parts == nil {
 		c.Parts = []string{}
 	}
-	return InvokedAction{a.nestedAction(c, 10)}
-}
 
-func (a Action) nestedAction(c Context, maxDepth int) Action {
-	if maxDepth < 0 {
-		return ActionMessage("maximum recursion depth exceeded")
-	}
 	if a.rawValues == nil && a.callback != nil {
-		result := a.callback(c).nestedAction(c, maxDepth-1)
+		result := a.callback(c).Invoke(c)
 		result.meta.Merge(a.meta)
 		return result
 	}
-	return a
+	return InvokedAction{a}
 }
 
 // NoSpace disables space suffix for given characters (or all if none are given).

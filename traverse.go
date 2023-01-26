@@ -63,7 +63,7 @@ loop:
 		// dash
 		case arg == "--":
 			logger.Printf("arg %#v is dash\n", arg)
-			inArgs = append(inArgs, args[i:]...)
+			inArgs = append(inArgs, context.Args[i:]...)
 			break loop
 
 		// flag
@@ -73,6 +73,10 @@ loop:
 			inFlag = &InFlag{
 				Flag: fs.LookupArg(arg),
 				Args: []string{},
+			}
+
+			if inFlag.Flag == nil {
+				logger.Printf("flag %#v is unknown", arg)
 			}
 			continue
 
@@ -137,7 +141,9 @@ loop:
 	// dash argument
 	case common.IsDash(c):
 		logger.Printf("completing dash for arg %#v\n", context.CallbackValue)
-		context.Args = c.Flags().Args()[c.ArgsLenAtDash()+1:]
+		context.Args = c.Flags().Args()[c.ArgsLenAtDash():]
+		logger.Printf("context: %#v\n", context.Args)
+
 		return storage.getPositional(c, len(context.Args)), context
 
 	// flag argument

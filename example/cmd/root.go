@@ -12,9 +12,6 @@ var rootCmd = &cobra.Command{
 
 // Execute executes cmd.
 func Execute() error {
-	carapace.Override(carapace.Opts{
-		BridgeCompletion: true,
-	})
 	return rootCmd.Execute()
 }
 

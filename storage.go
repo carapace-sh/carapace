@@ -20,6 +20,7 @@ type entry struct {
 	dashAny       Action
 	preinvoke     func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action
 	prerun        func(cmd *cobra.Command, args []string)
+	bridged       bool
 }
 
 type _storage map[*cobra.Command]*entry
@@ -31,6 +32,16 @@ func (s _storage) get(cmd *cobra.Command) (e *entry) {
 		s[cmd] = e
 	}
 	return
+}
+
+func (s _storage) bridge(cmd *cobra.Command) {
+	if entry := storage.get(cmd); !entry.bridged {
+		cobra.OnInitialize(func() {
+			registerValidArgsFunction(cmd)
+			registerFlagCompletion(cmd)
+		})
+		entry.bridged = true
+	}
 }
 
 func (s _storage) getFlag(cmd *cobra.Command, name string) Action {

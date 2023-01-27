@@ -17,6 +17,7 @@ var modifierCmd = &cobra.Command{
 func init() {
 	modifierCmd.Flags().String("batch", "", "Batch()")
 	modifierCmd.Flags().String("timeout", "", "Timeout()")
+	modifierCmd.Flags().String("tomultiparts", "", "ToMultiPartsA()")
 	modifierCmd.Flags().String("usage", "", "Usage()")
 
 	rootCmd.AddCommand(modifierCmd)
@@ -57,7 +58,16 @@ func init() {
 				return carapace.ActionValues()
 			}
 		}),
-
+		"tomultiparts": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionValuesDescribed(
+				"1=1==1/1", "one",
+				"1=1==1/2", "two",
+				"1=1==2/1", "three",
+				"1=1==2/2", "four",
+				"1=2==1/1", "five",
+				"2=1==1/1", "six",
+			).Invoke(c).ToMultiPartsA("==", "=", "/")
+		}),
 		"usage": carapace.ActionValues().Usage("explicit flag usage"),
 	})
 

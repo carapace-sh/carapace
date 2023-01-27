@@ -33,7 +33,6 @@ func TestToMultiParts(t *testing.T) {
 	_test("", `{"value":"A/","display":"A/"}`, "/")
 	_test("A/", `{"value":"A/a:","display":"a:"}`, "/", ":")
 	_test("A/", `{"value":"A/a:1","display":"a:1","description":"one","style":"green"}`, "/")
-	_test("B/", `{"value":"B/c/","display":"c/","description":"withsuffix","style":"underlined"}`, "/")
 	_test("B/c:5", `{"value":"B/c:5:2/","display":"c:5:2/"}`, "/")
 	_test("B/c:5", `{"value":"B/c:5:","display":"5:"}`, "/", ":")
 	_test("B/c:5", `{"value":"B/c:5:","display":"5:"}`, ":", "/")

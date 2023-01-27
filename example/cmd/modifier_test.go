@@ -58,3 +58,32 @@ func TestChdir(t *testing.T) {
 				Tag("files"))
 	})
 }
+
+func TestToMultiPartsA(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--tomultiparts", "").
+			Expect(carapace.ActionValues("1=", "2=").
+				NoSpace('/', '=').
+				Usage("ToMultiPartsA()"))
+
+		s.Run("modifier", "--tomultiparts", "1=").
+			Expect(carapace.ActionValues("1==", "2==").
+				Prefix("1=").
+				NoSpace('/', '=').
+				Usage("ToMultiPartsA()"))
+
+		s.Run("modifier", "--tomultiparts", "1=1==").
+			Expect(carapace.ActionValues("1/", "2/").
+				Prefix("1=1==").
+				NoSpace('/', '=').
+				Usage("ToMultiPartsA()"))
+
+		s.Run("modifier", "--tomultiparts", "1=1==1/").
+			Expect(carapace.ActionValuesDescribed(
+				"1", "one",
+				"2", "two").
+				Prefix("1=1==1/").
+				NoSpace('/', '=').
+				Usage("ToMultiPartsA()"))
+	})
+}

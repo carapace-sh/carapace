@@ -24,7 +24,7 @@ func Gen(cmd *cobra.Command) *Carapace {
 	}
 }
 
-// PreRun sets a function to be run before completion (use on rootCmd).
+// PreRun sets a function to be run before completion.
 func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
 	if entry := storage.get(c.cmd); entry.prerun != nil {
 		_f := entry.prerun
@@ -39,12 +39,12 @@ func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
 	}
 }
 
-// PreInvoke sets a function to alter actions before they are invoked (use on rootCmd).
+// PreInvoke sets a function to alter actions before they are invoked.
 func (c Carapace) PreInvoke(f func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action) {
 	if entry := storage.get(c.cmd); entry.preinvoke != nil {
 		_f := entry.preinvoke
 		entry.preinvoke = func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
-			return f(cmd, flag, _f(cmd, flag, action)) // TODO verify if this is correct
+			return f(cmd, flag, _f(cmd, flag, action))
 		}
 	} else {
 		entry.preinvoke = f

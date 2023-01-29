@@ -152,7 +152,7 @@ loop:
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
 		logger.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.CallbackValue)
-		context.Parts = inFlag.Parts() // TODO check for various flag types (bool,int,...)
+		context.Parts = inFlag.Args
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag

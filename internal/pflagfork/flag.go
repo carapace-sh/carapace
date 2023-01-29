@@ -28,21 +28,6 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
-func (f Flag) Parts() []string {
-	if t := f.Value.Type(); !strings.HasSuffix(t, "Array") && !strings.HasSuffix(t, "Slice") {
-		return []string{}
-	}
-
-	toParse := f.Value.String()
-	toParse = strings.TrimPrefix(toParse, "[")
-	toParse = strings.TrimSuffix(toParse, "]")
-	if parts, err := readAsCSV(toParse); err == nil {
-		// TODO fails with StringArray (works with StringSlice)
-		return parts
-	}
-	return []string{}
-}
-
 func readAsCSV(val string) ([]string, error) {
 	if val == "" {
 		return []string{}, nil

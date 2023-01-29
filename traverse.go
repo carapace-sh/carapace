@@ -25,7 +25,10 @@ func (f InFlag) Consumes(arg string) bool {
 		return false
 	case len(f.Args) == 0:
 		return true
-		// TODO another case that takes multiple (nargs) and arg is not a flag (breaking consumption chain)
+	case f.Nargs() > 1 && len(f.Args) < f.Nargs():
+		return true
+	case f.Nargs() < 0 && !strings.HasPrefix(arg, "-"):
+		return true
 	default:
 		return false
 	}
@@ -106,7 +109,7 @@ loop:
 	}
 
 	toParse := inArgs
-	if inFlag != nil && inFlag.Consumes("") {
+	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
 		logger.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1] // TODO nargs support
 	} else if fs.IsShorthandSeries(context.CallbackValue) {
@@ -149,6 +152,7 @@ loop:
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
 		logger.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.CallbackValue)
+		context.Parts = inFlag.Parts() // TODO check for various flag types (bool,int,...)
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag

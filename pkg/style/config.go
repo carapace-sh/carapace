@@ -60,6 +60,7 @@ type carapace struct {
 	FlagArg    string `desc:"flag with argument" tag:"flag styles"`
 	FlagNoArg  string `desc:"flag without argument" tag:"flag styles"`
 	FlagOptArg string `desc:"flag with optional argument" tag:"flag styles"`
+	FlagNargs  string `desc:"flag with multiple arguments" tag:"flag styles"`
 }
 
 var Carapace = carapace{
@@ -98,6 +99,7 @@ var Carapace = carapace{
 	FlagArg:    Blue,
 	FlagNoArg:  Default,
 	FlagOptArg: Yellow,
+	FlagNargs:  Magenta,
 }
 
 // Highlight returns the style for given level (0..n)

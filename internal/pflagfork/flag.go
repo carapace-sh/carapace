@@ -1,6 +1,7 @@
 package pflagfork
 
 import (
+	"encoding/csv"
 	"reflect"
 	"strings"
 
@@ -18,6 +19,37 @@ const (
 
 type Flag struct {
 	*pflag.Flag
+}
+
+func (f Flag) Nargs() int {
+	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Nargs"); field.IsValid() && field.Kind() == reflect.Int {
+		return int(field.Int())
+	}
+	return 0
+}
+
+func (f Flag) Parts() []string {
+	if t := f.Value.Type(); !strings.HasSuffix(t, "Array") && !strings.HasSuffix(t, "Slice") {
+		return []string{}
+	}
+
+	toParse := f.Value.String()
+	toParse = strings.TrimPrefix(toParse, "[")
+	toParse = strings.TrimSuffix(toParse, "]")
+	if parts, err := readAsCSV(toParse); err == nil {
+		// TODO fails with StringArray (works with StringSlice)
+		return parts
+	}
+	return []string{}
+}
+
+func readAsCSV(val string) ([]string, error) {
+	if val == "" {
+		return []string{}, nil
+	}
+	stringReader := strings.NewReader(val)
+	csvReader := csv.NewReader(stringReader)
+	return csvReader.Read()
 }
 
 func (f Flag) Style() style {

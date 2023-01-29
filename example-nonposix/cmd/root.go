@@ -43,7 +43,7 @@ func init() {
 		"delim-colon": carapace.ActionValues("d1", "d2", "d3"),
 		"delim-slash": carapace.ActionValues("d1", "d2", "d3"),
 		"nargs-any": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-			return carapace.ActionValues("na1", "na2", "na3").Invoke(c).Filter(c.Parts).ToA()
+			return carapace.ActionValues("na1", "na2", "na3").Invoke(c).Filter(c.Parts).ToA() // only filters current occurrence
 		}),
 		"nargs-two": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {

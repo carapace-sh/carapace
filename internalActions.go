@@ -87,11 +87,6 @@ func actionFlags(cmd *cobra.Command) Action {
 				return // skip flag of group already set
 			}
 
-			if f.Changed && f.Nargs() > 0 && len(f.Parts()) >= f.Nargs() { // TODO optimize
-				// TODO only works with StringSlice at the moment
-				return // don't repeat nargs flag that has consumed all its required arguments
-			}
-
 			s := style.Carapace.FlagNoArg
 			if f.TakesValue() {
 				if f.IsOptarg() {

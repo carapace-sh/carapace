@@ -57,10 +57,10 @@ type carapace struct {
 	Highlight11 string `desc:"Highlight 11" tag:"highlight styles"`
 	Highlight12 string `desc:"Highlight 12" tag:"highlight styles"`
 
-	FlagArg    string `desc:"flag with argument" tag:"flag styles"`
-	FlagNoArg  string `desc:"flag without argument" tag:"flag styles"`
-	FlagOptArg string `desc:"flag with optional argument" tag:"flag styles"`
-	FlagNargs  string `desc:"flag with multiple arguments" tag:"flag styles"`
+	FlagArg      string `desc:"flag with argument" tag:"flag styles"`
+	FlagMultiArg string `desc:"flag with multiple arguments" tag:"flag styles"`
+	FlagNoArg    string `desc:"flag without argument" tag:"flag styles"`
+	FlagOptArg   string `desc:"flag with optional argument" tag:"flag styles"`
 }
 
 var Carapace = carapace{
@@ -96,10 +96,10 @@ var Carapace = carapace{
 	Highlight11: Bold,
 	Highlight12: Of(Bold, Dim),
 
-	FlagArg:    Blue,
-	FlagNoArg:  Default,
-	FlagOptArg: Yellow,
-	FlagNargs:  Magenta,
+	FlagArg:      Blue,
+	FlagMultiArg: Magenta,
+	FlagNoArg:    Default,
+	FlagOptArg:   Yellow,
 }
 
 // Highlight returns the style for given level (0..n)

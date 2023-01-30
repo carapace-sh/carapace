@@ -9,13 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type InFlag struct {
+type _inFlag struct { // TODO rename or integrate into pflagfork.Flag?
 	*pflagfork.Flag
 	// currently consumed args since encountered flag
 	Args []string
 }
 
-func (f InFlag) Consumes(arg string) bool {
+func (f _inFlag) Consumes(arg string) bool {
 	switch {
 	case f.Flag == nil:
 		return false
@@ -44,7 +44,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	}
 
 	inArgs := []string{} // args consumed by current command
-	var inFlag *InFlag   // last encountered flag that still expects arguments
+	var inFlag *_inFlag  // last encountered flag that still expects arguments
 	c.LocalFlags()       // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
@@ -73,7 +73,7 @@ loop:
 		case !c.DisableFlagParsing && strings.HasPrefix(arg, "-"):
 			logger.Printf("arg %#v is a flag\n", arg)
 			inArgs = append(inArgs, arg)
-			inFlag = &InFlag{
+			inFlag = &_inFlag{
 				Flag: fs.LookupArg(arg),
 				Args: []string{},
 			}
@@ -114,7 +114,7 @@ loop:
 		toParse = toParse[:len(toParse)-1]
 	} else if fs.IsShorthandSeries(context.CallbackValue) {
 		logger.Printf("arg %#v is a shorthand flag series", context.CallbackValue)
-		localInFlag := &InFlag{
+		localInFlag := &_inFlag{
 			Flag: fs.LookupArg(context.CallbackValue),
 			Args: []string{},
 		}

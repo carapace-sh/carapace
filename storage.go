@@ -62,7 +62,7 @@ func (s _storage) getFlag(cmd *cobra.Command, name string) Action {
 
 func (s _storage) preRun(cmd *cobra.Command, args []string) {
 	if entry := s.get(cmd); entry.prerun != nil {
-		logger.Printf("executing PreRun for %#v with args %#v", cmd.Name(), args)
+		LOG.Printf("executing PreRun for %#v with args %#v", cmd.Name(), args)
 		entry.prerun(cmd, args)
 	}
 }

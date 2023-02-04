@@ -14,6 +14,7 @@ import (
 	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/xdg"
 )
 
 // Write persistests given values to file as json.
@@ -41,9 +42,9 @@ func Load(file string, timeout time.Duration) (e export.Export, err error) {
 
 // CacheDir creates a cache folder for current user and returns the path.
 func CacheDir(name string) (dir string, err error) {
-	var userCacheDir string
-	if userCacheDir, err = os.UserCacheDir(); err == nil {
-		dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)
+	var cacheDir string
+	if cacheDir, err = xdg.CacheDir(); err == nil {
+		dir = fmt.Sprintf("%v/%v/%v", cacheDir, uid.Executable(), name)
 		err = os.MkdirAll(dir, 0700)
 	}
 	return

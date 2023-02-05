@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'master'
+    tags:
+      - 'v*'
 
 jobs:
   docker:
@@ -20,5 +22,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the Docker image
         run: |
-         docker build . --tag ghcr.io/rsteube/carapace:latest
-         docker push ghcr.io/rsteube/carapace:latest
+         tag=latest
+         [[ "$GITHUB_REF" =~ ^refs/tags/ ]] && tag="${GITHUB_REF/refs\/tags\//}"
+         docker build . --tag "ghcr.io/rsteube/carapace:${tag}"
+         docker push "ghcr.io/rsteube/carapace:${tag}"

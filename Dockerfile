@@ -82,6 +82,8 @@ RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh prompt_toolkit
 
 RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 
+RUN git config --system safe.directory '*'
+
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=ble /go/ble.sh /opt/ble.sh
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/

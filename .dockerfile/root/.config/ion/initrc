@@ -1,0 +1,3 @@
+fn PROMPT
+printf 'carapace-ion '
+end

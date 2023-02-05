@@ -32,17 +32,6 @@ func (z zstyles) valueSGR(val common.RawValue) string {
 
 }
 
-func (z zstyles) hasAliases() bool {
-	descriptions := make(map[string]bool)
-	for _, val := range z.rawValues {
-		if _, exists := descriptions[val.Description]; exists && val.Description != "" {
-			return true
-		}
-		descriptions[val.Description] = true
-	}
-	return false
-}
-
 func (z zstyles) Format() string {
 	replacer := strings.NewReplacer(
 		"#", `\#`,

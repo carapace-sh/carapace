@@ -1,7 +1,6 @@
 package pflagfork
 
 import (
-	"encoding/csv"
 	"reflect"
 	"strings"
 
@@ -26,15 +25,6 @@ func (f Flag) Nargs() int {
 		return int(field.Int())
 	}
 	return 0
-}
-
-func readAsCSV(val string) ([]string, error) {
-	if val == "" {
-		return []string{}, nil
-	}
-	stringReader := strings.NewReader(val)
-	csvReader := csv.NewReader(stringReader)
-	return csvReader.Read()
 }
 
 func (f Flag) Style() style {

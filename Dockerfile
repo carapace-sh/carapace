@@ -1,4 +1,4 @@
-FROM golang:1.19-bullseye as base
+FROM golang:1.20-bullseye as base
 LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 
@@ -19,7 +19,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=1.14.1
+ARG version=1.15.1
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
@@ -33,12 +33,12 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make update-shells prefix=/usr
 
 FROM base as nushell
-ARG version=0.73.0
+ARG version=0.75.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
 FROM base as oil
-ARG version=0.13.1
+ARG version=0.14.0
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && cd oil-*/ \
@@ -94,122 +94,8 @@ COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=starship /usr/local/bin/* /usr/local/bin/
 COPY --from=vivid /usr/local/bin/* /usr/local/bin/
 
-RUN ln -s /carapace/example/example /usr/local/bin/example
-
-RUN echo "\n\
-[shell]\n\
-disabled = false\n\
-unknown_indicator = \"oil\"" \
-  > ~/.config/starship.toml
-
-# bash
-RUN echo "\n\
-export SHELL=bash\n\
-export STARSHIP_SHELL=bash\n\
-export LS_COLORS=\"\$(vivid generate dracula)\"\n\
-[[ ! -z \$BLE ]] && source /opt/ble.sh/out/ble.sh \n\
-eval \"\$(starship init bash)\"\n\
-source <(\${TARGET} _carapace)" \
-  > ~/.bashrc
-
-# fish
-RUN mkdir -p ~/.config/fish \
-  && echo "\n\
-  set SHELL 'fish'\n\
-  set STARSHIP_SHELL 'fish'\n\
-  set LS_COLORS (vivid generate dracula)\n\
-  starship init fish | source \n\
-  mkdir -p ~/.config/fish/completions\n\
-  \$TARGET _carapace fish | source" \
-  > ~/.config/fish/config.fish
-
-# elvish
-RUN mkdir -p ~/.elvish/lib \
-  && echo "\
-  set-env SHELL elvish\n\
-  set-env STARSHIP_SHELL elvish\n\
-  set-env LS_COLORS (vivid generate dracula)\n\
-  set edit:prompt = { starship prompt }\n\
-  eval (\$E:TARGET _carapace|slurp)" \
-  > ~/.elvish/rc.elv
-
-# ion
-RUN mkdir -p ~/.config/ion \
-  && echo "\
-  fn PROMPT\n\
-  printf 'carapace-ion '\n\
-  end" \
-  > ~/.config/ion/initrc
-
-# nushell
-RUN touch /carapace.nu \
-  && mkdir -p ~/.config/nushell \
-  && starship init nushell > ~/.config/nushell/starship.nu \
-  && echo "\
-ln -s \$env.TARGET /tmp/target \n\
-/tmp/target _carapace | save /carapace.nu \n\
-source /carapace.nu \n\
-" > ~/.config/nushell/config.nu \
-  && echo "\
-source ~/.config/nushell/starship.nu \n\
-" > ~/.config/nushell/env.nu
-
-# oil
-RUN mkdir -p ~/.config/oil \
-  && echo "\n\
-  export SHELL='oil'\n\
-  export STARSHIP_SHELL='oil'\n\
-  export LS_COLORS=\"\$(vivid generate dracula)\"\n\
-  PS1=\"\$(starship prompt)\"\n\
-  source <(\${TARGET} _carapace)" \
-  > ~/.config/oil/oshrc
-
-# powershell
-RUN mkdir -p ~/.config/powershell \
-  && echo "\n\
-  \$env:SHELL = 'powershell'\n\
-  \$env:STARSHIP_SHELL = 'powershell'\n\
-  \$env:LS_COLORS = (&vivid generate dracula)\n\
-  Invoke-Expression (&starship init powershell)\n\
-  Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete\n\
-  & \$Env:TARGET _carapace | out-string | Invoke-Expression" \
-  > ~/.config/powershell/Microsoft.PowerShell_profile.ps1
-
-# tcsh
-RUN  echo "\n\
-  eval `starship init tcsh`\n\
-  set autolist\n\
-  eval "'`'"\${TARGET} _carapace"'`'"" \
-  > ~/.tcshrc
-
-# xonsh
-RUN mkdir -p ~/.config/xonsh \
-  && echo "\n\
-\$SHELL=\"xonsh\"\n\
-\$STARSHIP_SHELL=\"xonsh\"\n\
-\$LS_COLORS=\$(vivid generate dracula)\n\
-\$PROMPT=lambda: \$(starship prompt)\n\
-\$COMPLETIONS_CONFIRM=True\n\
-exec(\$(\$TARGET _carapace xonsh))"\
-  > ~/.config/xonsh/rc.xsh
-
-# zsh
-RUN echo "\n\
-  export SHELL=zsh\n\
-  export STARSHIP_SHELL=zsh\n\
-  export LS_COLORS=\"\$(vivid generate dracula)\"\n\
-  eval \"\$(starship init zsh)\"\n\
-  \n\
-  zstyle ':completion:*' menu select \n\
-  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*' \n\
-  \n\
-  autoload -U compinit && compinit \n\
-  source <(\$TARGET _carapace zsh)"  > ~/.zshrc
+ADD .dockerfile/root /root
+ADD .dockerfile/usr/local/bin/* /usr/local/bin/
 
 ENV TERM xterm
-RUN echo "#"'!'"/bin/bash\n\
-  export PATH=\${PATH}:\$(dirname \"\${TARGET}\")\n\
-  exec \"\$@\"" \
-  > /entrypoint.sh \
-  && chmod a+x /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "entrypoint.sh" ]

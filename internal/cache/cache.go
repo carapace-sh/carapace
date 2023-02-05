@@ -42,9 +42,9 @@ func Load(file string, timeout time.Duration) (e export.Export, err error) {
 
 // CacheDir creates a cache folder for current user and returns the path.
 func CacheDir(name string) (dir string, err error) {
-	var cacheDir string
-	if cacheDir, err = xdg.CacheDir(); err == nil {
-		dir = fmt.Sprintf("%v/%v/%v", cacheDir, uid.Executable(), name)
+	var userCacheDir string
+	if userCacheDir, err = xdg.UserCacheDir(); err == nil {
+		dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)
 		err = os.MkdirAll(dir, 0700)
 	}
 	return

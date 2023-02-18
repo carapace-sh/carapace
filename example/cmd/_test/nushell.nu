@@ -6,5 +6,10 @@ let external_completer = {|spans|
 }
 
 let-env config = {
-  external_completer: $external_completer
+  completions: {
+    external: {
+      enable: true
+      completer: $external_completer
+    }
+  }
 }

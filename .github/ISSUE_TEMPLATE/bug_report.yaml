@@ -15,6 +15,12 @@ body:
     description: A concise description of what you expected to happen.
   validations:
     required: false
+- type: input
+  attributes:
+    label: Version
+    description: Version where this occured.
+  validations:
+    required: false
 - type: textarea
   attributes:
     label: Steps To Reproduce

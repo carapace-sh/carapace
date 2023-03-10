@@ -3,7 +3,9 @@ package carapace
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -28,18 +30,45 @@ func ActionCallback(callback CompletionCallback) Action {
 //	})
 func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Action) Action {
 	return func(f func(output []byte) Action) Action {
+		return ActionExecCommandE(name, arg...)(func(output []byte, err error) Action {
+			if err != nil {
+				if exitErr, ok := err.(*exec.ExitError); ok {
+					if firstLine := strings.SplitN(string(exitErr.Stderr), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
+						err = errors.New(stripansi.Strip(firstLine))
+					}
+				}
+				return ActionMessage(err.Error())
+			}
+			return f(output)
+		})
+	}
+}
+
+// ActionExecCommandE is like ActionExecCommand but with custom error handling.
+//
+//	carapace.ActionExecCommandE("supervisorctl", "--configuration", path, "status")(func(output []byte, err error) carapace.Action {
+//		if err != nil {
+//			const NOT_RUNNING = 3
+//			if exitErr, ok := err.(*exec.ExitError); !ok || exitErr.ExitCode() != NOT_RUNNING {
+//				return carapace.ActionMessage(err.Error())
+//			}
+//		}
+//		return carapace.ActionValues("success")
+//	})
+func ActionExecCommandE(name string, arg ...string) func(f func(output []byte, err error) Action) Action {
+	return func(f func(output []byte, err error) Action) Action {
 		return ActionCallback(func(c Context) Action {
 			var stdout, stderr bytes.Buffer
 			cmd := c.Command(name, arg...)
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr
 			if err := cmd.Run(); err != nil {
-				if firstLine := strings.SplitN(stderr.String(), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
-					return ActionMessage(stripansi.Strip(firstLine))
+				if exitErr, ok := err.(*exec.ExitError); ok {
+					exitErr.Stderr = stderr.Bytes() // seems this needs to be set manually due to stdout being collected?
 				}
-				return ActionMessage(err.Error())
+				return f(stdout.Bytes(), err)
 			}
-			return f(stdout.Bytes())
+			return f(stdout.Bytes(), nil)
 		})
 	}
 }

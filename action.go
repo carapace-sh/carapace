@@ -31,17 +31,22 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
 		a.callback = func(c Context) Action {
-			if cacheFile, err := cache.File(file, line, keys...); err == nil {
-				if cached, err := cache.Load(cacheFile, timeout); err == nil {
-					return Action{meta: cached.Meta, rawValues: cached.Values}
-				}
-				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
-				if invokedAction.meta.Messages.IsEmpty() {
+			cacheFile, err := cache.File(file, line, keys...)
+			if err != nil {
+				return cachedCallback(c)
+			}
+
+			if cached, err := cache.Load(cacheFile, timeout); err == nil {
+				return Action{meta: cached.Meta, rawValues: cached.Values}
+			}
+
+			invokedAction := (Action{callback: cachedCallback}).Invoke(c)
+			if invokedAction.meta.Messages.IsEmpty() {
+				if cacheFile, err := cache.File(file, line, keys...); err == nil { // regenerate as cache keys might have changed due to invocation
 					_ = cache.Write(cacheFile, invokedAction.export())
 				}
-				return invokedAction.ToA()
 			}
-			return cachedCallback(c)
+			return invokedAction.ToA()
 		}
 	}
 	return a

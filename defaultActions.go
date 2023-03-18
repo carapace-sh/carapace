@@ -34,7 +34,7 @@ func ActionExecCommand(name string, arg ...string) func(f func(output []byte) Ac
 			if err != nil {
 				if exitErr, ok := err.(*exec.ExitError); ok {
 					if firstLine := strings.SplitN(string(exitErr.Stderr), "\n", 2)[0]; strings.TrimSpace(firstLine) != "" {
-						err = errors.New(stripansi.Strip(firstLine))
+						err = errors.New(firstLine)
 					}
 				}
 				return ActionMessage(err.Error())
@@ -203,7 +203,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 			msg = fmt.Sprintf(msg, args...)
 		}
 		a := ActionValues().NoSpace()
-		a.meta.Messages.Add(msg)
+		a.meta.Messages.Add(stripansi.Strip(msg))
 		return a
 	})
 }

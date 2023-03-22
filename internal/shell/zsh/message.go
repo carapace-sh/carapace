@@ -18,7 +18,7 @@ func (m message) Format() string {
 		formatted = append(formatted, m.formatMessage(message, style.Carapace.Error))
 	}
 	if m.Usage != "" {
-		formatted = append(formatted, m.formatMessage(m.Usage, style.Carapace.Description))
+		formatted = append(formatted, m.formatMessage(m.Usage, style.Carapace.Usage))
 	}
 
 	if len(formatted) > 0 {

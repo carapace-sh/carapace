@@ -28,6 +28,7 @@ type carapace struct {
 	Value       string `desc:"default style for values" tag:"core styles"`
 	Description string `desc:"default style for descriptions" tag:"core styles"`
 	Error       string `desc:"default style for errors" tag:"core styles"`
+	Usage       string `desc:"default style for usage" tag:"core styles"`
 
 	KeywordAmbiguous string `desc:"keyword describing a ambiguous state" tag:"keyword styles"`
 	KeywordNegative  string `desc:"keyword describing a negative state" tag:"keyword styles"`
@@ -67,6 +68,7 @@ var Carapace = carapace{
 	Value:       Default,
 	Description: Gray,
 	Error:       Of(Bold, Red),
+	Usage:       Gray,
 
 	KeywordAmbiguous: Yellow,
 	KeywordNegative:  Red,

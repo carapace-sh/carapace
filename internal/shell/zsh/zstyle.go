@@ -50,7 +50,7 @@ func (z zstyles) Format() string {
 			// match value with description
 			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)( * -- *)=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
 			// only match value (also matches aliased completions that are placed on the same line if the space allows it)
-			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)()=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
+			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)=0=%v", replacer.Replace(val.Display), z.valueSGR(val)))
 		}
 	}
 	formatted = append(formatted, fmt.Sprintf("=(#b)(%v)=0=%v", "-- *", z.descriptionSGR())) // match description for aliased completions

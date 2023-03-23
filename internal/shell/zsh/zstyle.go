@@ -48,7 +48,7 @@ func (z zstyles) Format() string {
 	if len(z.rawValues) < 1000 { // disable styling for large amount of values (bad performance)
 		for _, val := range z.rawValues {
 			// match value with description
-			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)( * -- *)=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
+			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)([ ]## -- *)=0=%v=%v", replacer.Replace(val.Display), z.valueSGR(val), z.descriptionSGR()))
 			// only match value (also matches aliased completions that are placed on the same line if the space allows it)
 			formatted = append(formatted, fmt.Sprintf("=(#b)(%v)=0=%v", replacer.Replace(val.Display), z.valueSGR(val)))
 		}

@@ -1,67 +1,67 @@
 # Export
 
-Export generates json from the command structure and [Action] (for reuse with [ActionImport]).
+[`Export`] generates `json` from an invoked [Action] (see [ActionImport]).
 
-## Command structure
+```go	
+type Export struct {
+	Version  string   `json:"version"`
+	Messages []string `json:"messages"`
+	Nospace  string   `json:"nospace"`
+	Usage    string   `json:"usage"`
+	Values   []struct {
+		Value       string `json:"value"`
+		Display     string `json:"display"`
+		Description string `json:"description,omitempty"`
+		Style       string `json:"style,omitempty"`
+		Tag         string `json:"tag,omitempty"`
+	} `json:"values"`
+}
+```
+
+| Key            | Description                                                    |
+|----------------|----------------------------------------------------------------|
+| Version        | version of `carapace` being used                               | 
+| Messages       | list of error messages                                         | 
+| Nospace        | character suffixes that prevent space suffix (`*` matches all) | 
+| Usage          | usage message                                                  | 
+| Values         | list of completion values                                      | 
+|	Value          | value to insert                                                |
+|	Display        | value to display during completion                             |
+|	Description    | description of the value                                       |
+|	Style          | style of the value                                             |
+|	Tag            | tag of the value                                               |
+
+## Example
+
 ```sh
-example _carapace export
+example _carapace export example m<TAB>
 ```
 
 ```json
 {
-  "Name": "example",
-  "Short": "example completion",
-  "Commands": [
+  "version": "unknown",
+  "messages": [],
+  "nospace": "",
+  "usage": "",
+  "values": [
     {
-      "Name": "action",
-      "Short": "action example",
-      "Aliases": [
-        "alias"
-      ],
-      "LocalFlags": [
-        {
-          "Longhand": "count",
-          "Shorthand": "c",
-          "Usage": "count flag",
-          "Type": "count",
-          "NoOptDefVal": "+1"
-        },
-        {
-          "Longhand": "directories",
-          "Usage": "files flag",
-          "Type": "string"
-        },
-...
-```
-
-## Action
-
-```sh
-example _carapace export example action --usergroup root:
-```
-
-```json
-{
-  "Version": "v0.14.0",
-  "Nospace": true,
-  "RawValues": [
-    {
-      "Value": "root:root",
-      "Display": "root",
-      "Description": "0"
+      "value": "modifier",
+      "display": "modifier",
+      "description": "modifier example",
+      "style": "yellow",
+      "tag": "modifier commands"
     },
     {
-      "Value": "root:adm",
-      "Display": "adm",
-      "Description": "999"
-    },
-    {
-      "Value": "root:wheel",
-      "Display": "wheel",
-      "Description": "998"
-    },
-...
+      "value": "multiparts",
+      "display": "multiparts",
+      "description": "multiparts example",
+      "tag": "other commands"
+    }
+  ]
+}
 ```
+
 
 [Action]:./action.md
-[ActionImport]:./action/actionImport.md
+[ActionImport]:./defaultActions/actionImport.md
+[`Export`]:https://pkg.go.dev/github.com/rsteube/carapace/internal/export#Export

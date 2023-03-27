@@ -21,5 +21,5 @@ func ActionExample(opts ExampleOpts) carapace.Action {
 }
 ```
 
-> Unless static values are returned the code should be wrapped in a [callback](./actionCallback.md) or the code would be executed at program start (and slow it down considerably).
+> Unless static values are returned the code should be wrapped in a [callback](../defaultActions/actionCallback.md) or the code would be executed at program start (and slow it down considerably).
 > It is also mandatory when accessing the commands flag values as the callback function is invoked after these are parsed.

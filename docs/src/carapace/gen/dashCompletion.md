@@ -27,7 +27,7 @@ carapace.Gen(rootCmd).DashAnyCompletion(
 
 [`DashAnyCompletion`] can be combined with [`ActionExecute`] or [`ActionImport`] to complete the arguments after dash with a different completer.
 
-[`ActionExecute`]:../action/actionExecute.md
-[`ActionImport`]:../action/actionImport.md
+[`ActionExecute`]:../defaultActions/actionExecute.md
+[`ActionImport`]:../defaultActions/actionImport.md
 [`DashCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.DashCompletion
 [`DashAnyCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.DashAnyCompletion

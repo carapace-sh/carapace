@@ -1,6 +1,7 @@
 # Export
 
-[`Export`] generates `json` from an invoked [Action] (see [ActionImport]).
+[`Export`] provides a `json` representation of an [InvokedAction].
+It is used to exchange completions between commands with [ActionImport] as well as for [Cache].
 
 ```go	
 type Export struct {
@@ -25,6 +26,7 @@ type Export struct {
 | Nospace        | character suffixes that prevent space suffix (`*` matches all) | 
 | Usage          | usage message                                                  | 
 | Values         | list of completion values                                      | 
+| -              |                                                                | 
 |	Value          | value to insert                                                |
 |	Display        | value to display during completion                             |
 |	Description    | description of the value                                       |
@@ -61,7 +63,10 @@ example _carapace export example m<TAB>
 }
 ```
 
+![](./export.cast)
 
-[Action]:./action.md
+
 [ActionImport]:./defaultActions/actionImport.md
+[Cache]:./cache.md
 [`Export`]:https://pkg.go.dev/github.com/rsteube/carapace/internal/export#Export
+[InvokedAction]:./invokedAction.md

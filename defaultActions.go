@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -390,4 +392,57 @@ func ActionStyles(styles ...string) Action {
 
 		return batch.ToA()
 	}).Tag("styles")
+}
+
+// ActionPathExecutables completes executable files from PATH
+//
+//	nvim
+//	chmod
+func ActionPathExecutables() Action { // TODO vararg for additional descriptions (key, value,...)
+	return ActionCallback(func(c Context) Action {
+		batch := Batch()
+		manDescriptions := manDescriptions(c)
+		dirs := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
+		for i := len(dirs) - 1; i >= 0; i-- {
+			batch = append(batch, actionDirectoryExecutables(dirs[i], c.CallbackValue, manDescriptions))
+		}
+		return batch.ToA()
+	}).Tag("path executables")
+}
+
+func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[string]string) Action {
+	return ActionCallback(func(c Context) Action {
+		if files, err := os.ReadDir(dir); err == nil {
+			vals := make([]string, 0)
+			for _, f := range files {
+				if strings.HasPrefix(f.Name(), prefix) {
+					if info, err := f.Info(); err == nil && !f.IsDir() && isExecAny(info.Mode()) {
+						vals = append(vals, f.Name(), manDescriptions[f.Name()], style.ForPath(dir+"/"+f.Name(), c))
+					}
+				}
+			}
+			return ActionStyledValuesDescribed(vals...)
+		}
+		return ActionValues()
+	})
+}
+
+func isExecAny(mode os.FileMode) bool {
+	return mode&0111 != 0
+}
+
+func manDescriptions(c Context) (descriptions map[string]string) {
+	descriptions = make(map[string]string)
+	if !strings.HasPrefix(c.CallbackValue, ".") && !strings.HasPrefix(c.CallbackValue, "~") && !strings.HasPrefix(c.CallbackValue, "/") {
+		if output, err := c.Command("man", "--names-only", "-k", "^"+c.CallbackValue).Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			r := regexp.MustCompile(`^(?P<name>[^ ]+) [^-]+- (?P<description>.*)$`)
+			for _, line := range lines {
+				if matches := r.FindStringSubmatch(line); len(matches) > 2 {
+					descriptions[matches[1]] = matches[2]
+				}
+			}
+		}
+	}
+	return
 }

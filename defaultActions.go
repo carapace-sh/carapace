@@ -446,3 +446,26 @@ func manDescriptions(c Context) (descriptions map[string]string) {
 	}
 	return
 }
+
+// ActionPositional completes positional arguments for given command ignoring `--` (dash).
+// TODO: experimental - likely gives issues with preinvoke (does not have the full args)
+//
+//	carapace.Gen(cmd).DashAnyCompletion(
+//		carapace.ActionPositional(cmd),
+//	)
+func ActionPositional(cmd *cobra.Command) Action {
+	return ActionCallback(func(c Context) Action {
+		if cmd.ArgsLenAtDash() < 0 {
+			return ActionMessage("only allowed for dash arguments [ActionPositional]")
+		}
+
+		c.Args = cmd.Flags().Args()
+		entry := storage.get(cmd)
+
+		a := entry.positionalAny
+		if index := len(c.Args); index < len(entry.positional) {
+			a = entry.positional[len(c.Args)]
+		}
+		return a.Invoke(c).ToA()
+	})
+}

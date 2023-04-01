@@ -19,7 +19,7 @@ jobs:
       - name: "push gh-pages"
         if: github.ref == 'refs/heads/master'
         run: |
-            cd docs/book/
+            cd docs/book/html/
             git init
             git config user.name rsteube
             git config user.email rsteube@users.noreply.github.com

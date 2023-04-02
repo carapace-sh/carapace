@@ -6,6 +6,7 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/pflagfork"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 
@@ -161,7 +162,13 @@ loop:
 			LOG.Printf("completing optional flag argument for arg %#v\n", context.CallbackValue)
 			prefix, optarg := f.Split(context.CallbackValue)
 			context.CallbackValue = optarg
-			return storage.getFlag(c, f.Name).Prefix(prefix), context
+
+			switch f.Value.Type() {
+			case "bool":
+				return ActionValues("true", "false").StyleF(style.ForKeyword).Prefix(prefix), context
+			default:
+				return storage.getFlag(c, f.Name).Prefix(prefix), context
+			}
 		}
 		LOG.Printf("completing flags for arg %#v\n", context.CallbackValue)
 		return actionFlags(c), context

@@ -128,5 +128,11 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
+
+		s.Run("--toggle=").
+			Expect(carapace.ActionStyledValues(
+				"false", style.Red,
+				"true", style.Green,
+			).Prefix("--toggle="))
 	})
 }

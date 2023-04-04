@@ -3,6 +3,9 @@ package style
 import "strings"
 
 var keywords = map[string]*string{
+	"y": &Carapace.KeywordPositive,
+	"n": &Carapace.KeywordNegative,
+
 	"yes": &Carapace.KeywordPositive,
 	"no":  &Carapace.KeywordNegative,
 
@@ -13,6 +16,7 @@ var keywords = map[string]*string{
 	"off": &Carapace.KeywordNegative,
 
 	"all":  &Carapace.KeywordPositive,
+	"some": &Carapace.KeywordAmbiguous,
 	"none": &Carapace.KeywordNegative,
 
 	"full":  &Carapace.KeywordPositive,

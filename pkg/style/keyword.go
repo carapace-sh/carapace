@@ -25,6 +25,11 @@ var keywords = map[string]*string{
 	"strict": &Carapace.KeywordPositive,
 	"loose":  &Carapace.KeywordNegative,
 
+	"open":   &Carapace.KeywordPositive,
+	"opened": &Carapace.KeywordPositive,
+	"close":  &Carapace.KeywordNegative,
+	"closed": &Carapace.KeywordNegative,
+
 	"always": &Carapace.KeywordPositive,
 	"auto":   &Carapace.KeywordAmbiguous,
 	"never":  &Carapace.KeywordNegative,

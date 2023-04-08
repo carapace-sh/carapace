@@ -50,5 +50,6 @@ See [carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
 - [carapace-spec](https://github.com/rsteube/carapace-spec) define simple completions using a spec file
 - [carapace-spec-clap](https://github.com/rsteube/carapace-spec-clap) spec generation for clap-rs/clap
 - [carapace-spec-kong](https://github.com/rsteube/carapace-spec-kong) spec generation for alecthomas/kong
+- [carapace-spec-urfavecli](https://github.com/rsteube/carapace-spec-urfavecli) spec generation for urfave/cli
 
 [cobra]:https://github.com/spf13/cobra

@@ -13,6 +13,7 @@
     - [ActionStyledValuesDescribed](./carapace/defaultActions/actionStyledValuesDescribed.md)
     - [ActionFiles](./carapace/defaultActions/actionFiles.md)
     - [ActionDirectories](./carapace/defaultActions/actionDirectories.md)
+    - [ActionExecutables](./carapace/defaultActions/actionExecutables.md)
     - [ActionMessage](./carapace/defaultActions/actionMessage.md)
     - [ActionCallback](./carapace/defaultActions/actionCallback.md)
     - [ActionMultiParts](./carapace/defaultActions/actionMultiParts.md)

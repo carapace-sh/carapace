@@ -394,7 +394,7 @@ func ActionStyles(styles ...string) Action {
 	}).Tag("styles")
 }
 
-// ActionExecutables completes executable files from PATH
+// ActionExecutables completes PATH executables
 //
 //	nvim
 //	chmod

@@ -22,6 +22,7 @@ func init() {
 	actionCmd.Flags().String("callback", "", "ActionCallback()")
 	actionCmd.Flags().String("directories", "", "ActionDirectories()")
 	actionCmd.Flags().String("exec-command", "", "ActionExecCommand()")
+	actionCmd.Flags().String("executables", "", "ActionExecutables()")
 	actionCmd.Flags().String("files", "", "ActionFiles()")
 	actionCmd.Flags().String("files-filtered", "", "ActionFiles(\".md\", \"go.mod\", \"go.sum\")")
 	actionCmd.Flags().String("import", "", "ActionImport()")
@@ -46,6 +47,7 @@ func init() {
 			lines := strings.Split(string(output), "\n")
 			return carapace.ActionValues(lines[:len(lines)-1]...)
 		}),
+		"executables":    carapace.ActionExecutables(),
 		"files":          carapace.ActionFiles(),
 		"files-filtered": carapace.ActionFiles(".md", "go.mod", "go.sum"),
 		"import": carapace.ActionImport([]byte(`

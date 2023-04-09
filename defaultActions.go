@@ -394,12 +394,13 @@ func ActionStyles(styles ...string) Action {
 	}).Tag("styles")
 }
 
-// ActionPathExecutables completes executable files from PATH
+// ActionExecutables completes executable files from PATH
 //
 //	nvim
 //	chmod
-func ActionPathExecutables() Action { // TODO vararg for additional descriptions (key, value,...)
+func ActionExecutables() Action {
 	return ActionCallback(func(c Context) Action {
+		// TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
 		batch := Batch()
 		manDescriptions := manDescriptions(c)
 		dirs := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))

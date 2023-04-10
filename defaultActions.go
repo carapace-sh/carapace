@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/export"
+	"github.com/rsteube/carapace/internal/man"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
 	"github.com/spf13/cobra"
@@ -402,13 +402,13 @@ func ActionExecutables() Action {
 	return ActionCallback(func(c Context) Action {
 		// TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
 		batch := Batch()
-		manDescriptions := manDescriptions(c)
+		manDescriptions := man.Descriptions(c.CallbackValue)
 		dirs := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
 		for i := len(dirs) - 1; i >= 0; i-- {
 			batch = append(batch, actionDirectoryExecutables(dirs[i], c.CallbackValue, manDescriptions))
 		}
 		return batch.ToA()
-	}).Tag("path executables")
+	}).Tag("executables")
 }
 
 func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[string]string) Action {
@@ -430,22 +430,6 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 
 func isExecAny(mode os.FileMode) bool {
 	return mode&0111 != 0
-}
-
-func manDescriptions(c Context) (descriptions map[string]string) {
-	descriptions = make(map[string]string)
-	if !strings.HasPrefix(c.CallbackValue, ".") && !strings.HasPrefix(c.CallbackValue, "~") && !strings.HasPrefix(c.CallbackValue, "/") {
-		if output, err := c.Command("man", "--names-only", "-k", "^"+c.CallbackValue).Output(); err == nil {
-			lines := strings.Split(string(output), "\n")
-			r := regexp.MustCompile(`^(?P<name>[^ ]+) [^-]+- (?P<description>.*)$`)
-			for _, line := range lines {
-				if matches := r.FindStringSubmatch(line); len(matches) > 2 {
-					descriptions[matches[1]] = matches[2]
-				}
-			}
-		}
-	}
-	return
 }
 
 // ActionPositional completes positional arguments for given command ignoring `--` (dash).

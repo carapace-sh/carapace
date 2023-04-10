@@ -15,15 +15,15 @@ import (
 
 // Context provides information during completion.
 type Context struct {
-	// CallbackValue contains the value currently being completed (or part of it during an ActionMultiParts)
+	// CallbackValue contains the value currently being completed (or part of it during an ActionMultiParts).
 	CallbackValue string
-	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed)
+	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed).
 	Args []string
-	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
+	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed).
 	Parts []string
-	// Env contains environment variables for current context
+	// Env contains environment variables for current context.
 	Env []string
-	// Dir contains the working directory for current context
+	// Dir contains the working directory for current context.
 	Dir string
 
 	mockedReplies map[string]string
@@ -120,7 +120,7 @@ func expandHome(s string) (string, error) {
 	return s, nil
 }
 
-// Abs returns an absolute representation of path
+// Abs returns an absolute representation of path.
 func (c Context) Abs(path string) (string, error) {
 	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") { // path is relative
 		switch c.Dir {

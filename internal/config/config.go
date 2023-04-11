@@ -110,7 +110,9 @@ func set(name, key, value string) error {
 		if !os.IsNotExist(err) {
 			return err
 		}
-		os.MkdirAll(filepath.Dir(file), os.ModePerm)
+		if err := os.MkdirAll(filepath.Dir(file), os.ModePerm); err != nil {
+			return err
+		}
 		content = []byte("{}")
 	}
 
@@ -136,7 +138,5 @@ func set(name, key, value string) error {
 	if err != nil {
 		return err
 	}
-	os.WriteFile(file, marshalled, os.ModePerm)
-
-	return nil
+	return os.WriteFile(file, marshalled, os.ModePerm)
 }

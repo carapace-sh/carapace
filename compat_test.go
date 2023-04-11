@@ -51,7 +51,7 @@ func TestRegisterFlagCompletion(t *testing.T) {
 	os.Stdout = w
 
 	os.Args = []string{"", "__complete", "--flag", ""}
-	cmd.Execute()
+	_ = cmd.Execute()
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)

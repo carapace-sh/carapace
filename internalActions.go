@@ -97,7 +97,7 @@ func actionFlags(cmd *cobra.Command) Action {
 					vals = append(vals, f.Shorthand, f.Usage, f.Style())
 				}
 			} else {
-				if flagstyle := f.FlagStyle(); flagstyle != pflagfork.ShorthandOnly {
+				if flagstyle := f.Mode(); flagstyle != pflagfork.ShorthandOnly {
 					if flagstyle == pflagfork.NameAsShorthand {
 						vals = append(vals, "-"+f.Name, f.Usage, f.Style())
 					} else {

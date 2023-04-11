@@ -8,13 +8,13 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// flagstyle defines how flags are represented.
-type flagstyle int // TODO rename style in pflag fork
+// mode defines how flags are represented.
+type mode int
 
 const (
-	Default         flagstyle = iota // default behaviour
-	ShorthandOnly                    // only the shorthand should be used
-	NameAsShorthand                  // non-posix style where the name is also added as shorthand (single `-` prefix)
+	Default         mode = iota // default behaviour
+	ShorthandOnly               // only the shorthand should be used
+	NameAsShorthand             // non-posix mode where the name is also added as shorthand (single `-` prefix)
 )
 
 type Flag struct {
@@ -28,9 +28,9 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
-func (f Flag) FlagStyle() flagstyle {
-	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Style"); field.IsValid() && field.Kind() == reflect.Int {
-		return flagstyle(field.Int())
+func (f Flag) Mode() mode {
+	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Mode"); field.IsValid() && field.Kind() == reflect.Int {
+		return mode(field.Int())
 	}
 	return Default
 }
@@ -68,7 +68,7 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		name := strings.TrimPrefix(arg, "--")
 		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
 
-		switch f.FlagStyle() {
+		switch f.Mode() {
 		case ShorthandOnly, NameAsShorthand:
 			return false
 		default:
@@ -83,7 +83,7 @@ func (f Flag) Matches(arg string, posix bool) bool {
 			return false
 		}
 
-		switch f.FlagStyle() {
+		switch f.Mode() {
 		case ShorthandOnly:
 			return name == f.Shorthand
 		default:

@@ -29,7 +29,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 			}
 
 			if !cmd.HasParent() {
-				panic("missing parent command") // TODO this should never happen
+				panic("missing parent command") // this should never happen
 			}
 
 			if s, err := complete(cmd.Parent(), args); err != nil {
@@ -68,7 +68,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		ActionCallback(func(c Context) Action {
 			args := []string{"_carapace", "export", ""}
 			args = append(args, c.Args[2:]...)
-			args = append(args, c.CallbackValue)
+			args = append(args, c.Value)
 			return ActionExecCommand(uid.Executable(), args...)(func(output []byte) Action {
 				if string(output) == "" {
 					return ActionValues()

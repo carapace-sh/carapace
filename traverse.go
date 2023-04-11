@@ -113,17 +113,17 @@ loop:
 	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
 		LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1]
-	} else if fs.IsShorthandSeries(context.CallbackValue) {
-		LOG.Printf("arg %#v is a shorthand flag series", context.CallbackValue)
+	} else if fs.IsShorthandSeries(context.Value) {
+		LOG.Printf("arg %#v is a shorthand flag series", context.Value)
 		localInFlag := &_inFlag{
-			Flag: fs.LookupArg(context.CallbackValue),
+			Flag: fs.LookupArg(context.Value),
 			Args: []string{},
 		}
-		if localInFlag.Consumes("") && len(context.CallbackValue) > 2 {
+		if localInFlag.Consumes("") && len(context.Value) > 2 {
 			LOG.Printf("removing shorthand %#v from flag series since it is missing its argument\n", localInFlag.Shorthand)
-			toParse = append(toParse, strings.TrimSuffix(context.CallbackValue, localInFlag.Shorthand))
+			toParse = append(toParse, strings.TrimSuffix(context.Value, localInFlag.Shorthand))
 		} else {
-			toParse = append(toParse, context.CallbackValue)
+			toParse = append(toParse, context.Value)
 		}
 
 	}
@@ -144,24 +144,24 @@ loop:
 	switch {
 	// dash argument
 	case common.IsDash(c):
-		LOG.Printf("completing dash for arg %#v\n", context.CallbackValue)
+		LOG.Printf("completing dash for arg %#v\n", context.Value)
 		context.Args = c.Flags().Args()[c.ArgsLenAtDash():]
 		LOG.Printf("context: %#v\n", context.Args)
 
 		return storage.getPositional(c, len(context.Args)), context
 
 	// flag argument
-	case inFlag != nil && inFlag.Consumes(context.CallbackValue):
-		LOG.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.CallbackValue)
+	case inFlag != nil && inFlag.Consumes(context.Value):
+		LOG.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.Value)
 		context.Parts = inFlag.Args
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag
-	case !c.DisableFlagParsing && strings.HasPrefix(context.CallbackValue, "-"):
-		if f := fs.LookupArg(context.CallbackValue); f != nil && f.IsOptarg() && strings.Contains(context.CallbackValue, string(f.OptargDelimiter())) {
-			LOG.Printf("completing optional flag argument for arg %#v\n", context.CallbackValue)
-			prefix, optarg := f.Split(context.CallbackValue)
-			context.CallbackValue = optarg
+	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-"):
+		if f := fs.LookupArg(context.Value); f != nil && f.IsOptarg() && strings.Contains(context.Value, string(f.OptargDelimiter())) {
+			LOG.Printf("completing optional flag argument for arg %#v\n", context.Value)
+			prefix, optarg := f.Split(context.Value)
+			context.Value = optarg
 
 			switch f.Value.Type() {
 			case "bool":
@@ -170,12 +170,12 @@ loop:
 				return storage.getFlag(c, f.Name).Prefix(prefix), context
 			}
 		}
-		LOG.Printf("completing flags for arg %#v\n", context.CallbackValue)
+		LOG.Printf("completing flags for arg %#v\n", context.Value)
 		return actionFlags(c), context
 
 	// positional or subcommand
 	default:
-		LOG.Printf("completing positionals and subcommands for arg %#v\n", context.CallbackValue)
+		LOG.Printf("completing positionals and subcommands for arg %#v\n", context.Value)
 		batch := Batch(storage.getPositional(c, len(context.Args)))
 		if c.HasAvailableSubCommands() && len(context.Args) == 0 {
 			batch = append(batch, actionSubcommands(c))

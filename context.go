@@ -15,8 +15,8 @@ import (
 
 // Context provides information during completion.
 type Context struct {
-	// CallbackValue contains the value currently being completed (or part of it during an ActionMultiParts).
-	CallbackValue string
+	// Value contains the value currently being completed (or part of it during an ActionMultiParts).
+	Value string
 	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed).
 	Args []string
 	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed).
@@ -36,9 +36,9 @@ func NewContext(args ...string) Context {
 	}
 
 	context := Context{
-		CallbackValue: args[len(args)-1],
-		Args:          args[:len(args)-1],
-		Env:           os.Environ(),
+		Value: args[len(args)-1],
+		Args:  args[:len(args)-1],
+		Env:   os.Environ(),
 	}
 
 	if wd, err := os.Getwd(); err == nil {

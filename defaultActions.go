@@ -106,7 +106,7 @@ func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		args := []string{"_carapace", "export", cmd.Name()}
 		args = append(args, c.Args...)
-		args = append(args, c.CallbackValue)
+		args = append(args, c.Value)
 		cmd.SetArgs(args)
 
 		Gen(cmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action {
@@ -213,14 +213,14 @@ func ActionMessage(msg string, args ...interface{}) Action {
 // ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
-		index := strings.LastIndex(c.CallbackValue, string(divider))
+		index := strings.LastIndex(c.Value, string(divider))
 		prefix := ""
 		if len(divider) == 0 {
-			prefix = c.CallbackValue
-			c.CallbackValue = ""
+			prefix = c.Value
+			c.Value = ""
 		} else if index != -1 {
-			prefix = c.CallbackValue[0 : index+len(divider)]
-			c.CallbackValue = c.CallbackValue[index+len(divider):] // update CallbackValue to only contain the currently completed part
+			prefix = c.Value[0 : index+len(divider)]
+			c.Value = c.Value[index+len(divider):] // update CallbackValue to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 && len(divider) > 0 {
@@ -338,7 +338,7 @@ func ActionStyles(styles ...string) Action {
 				style.BrightWhite, _s(style.BrightWhite),
 			))
 
-			if strings.HasPrefix(c.CallbackValue, "color") {
+			if strings.HasPrefix(c.Value, "color") {
 				for i := 0; i <= 255; i++ {
 					batch = append(batch, ActionStyledValues(
 						fmt.Sprintf("color%v", i), _s(style.XTerm256Color(uint8(i))),
@@ -370,7 +370,7 @@ func ActionStyles(styles ...string) Action {
 				style.BgBrightWhite, _s(style.BgBrightWhite),
 			))
 
-			if strings.HasPrefix(c.CallbackValue, "bg-color") {
+			if strings.HasPrefix(c.Value, "bg-color") {
 				for i := 0; i <= 255; i++ {
 					batch = append(batch, ActionStyledValues(
 						fmt.Sprintf("bg-color%v", i), _s("bg-"+style.XTerm256Color(uint8(i))),
@@ -402,10 +402,10 @@ func ActionExecutables() Action {
 	return ActionCallback(func(c Context) Action {
 		// TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
 		batch := Batch()
-		manDescriptions := man.Descriptions(c.CallbackValue)
+		manDescriptions := man.Descriptions(c.Value)
 		dirs := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
 		for i := len(dirs) - 1; i >= 0; i-- {
-			batch = append(batch, actionDirectoryExecutables(dirs[i], c.CallbackValue, manDescriptions))
+			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
 		}
 		return batch.ToA()
 	}).Tag("executables")

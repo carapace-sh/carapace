@@ -13,7 +13,7 @@ func ActionExample(opts ExampleOpts) carapace.Action {
 		if opts.Static {
 			return carapace.ActionValues("a", "b")
 		}
-		if strings.HasPrefix(c.CallbackValue, "file://") {
+		if strings.HasPrefix(c.Value, "file://") {
 			return carapace.ActionFiles().Invoke(c).Prefix("file://").ToA()
 		}
 		return carapace.ActionValues()

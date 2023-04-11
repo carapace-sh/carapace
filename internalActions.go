@@ -75,15 +75,12 @@ func actionFlags(cmd *cobra.Command) Action {
 
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
-			if f.Deprecated != "" {
+			switch {
+			case f.Deprecated != "":
 				return // skip deprecated flags
-			}
-
-			if f.Changed && !f.IsRepeatable() {
+			case f.Changed && !f.IsRepeatable():
 				return // don't repeat flag
-			}
-
-			if flagSet.IsMutuallyExclusive(f.Flag) {
+			case flagSet.IsMutuallyExclusive(f.Flag):
 				return // skip flag of group already set
 			}
 
@@ -97,13 +94,13 @@ func actionFlags(cmd *cobra.Command) Action {
 					vals = append(vals, f.Shorthand, f.Usage, f.Style())
 				}
 			} else {
-				if flagstyle := f.Mode(); flagstyle != pflagfork.ShorthandOnly {
-					if flagstyle == pflagfork.NameAsShorthand {
-						vals = append(vals, "-"+f.Name, f.Usage, f.Style())
-					} else {
-						vals = append(vals, "--"+f.Name, f.Usage, f.Style())
-					}
+				switch f.Mode() {
+				case pflagfork.NameAsShorthand:
+					vals = append(vals, "-"+f.Name, f.Usage, f.Style())
+				case pflagfork.Default:
+					vals = append(vals, "--"+f.Name, f.Usage, f.Style())
 				}
+
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
 				}

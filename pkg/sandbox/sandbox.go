@@ -147,7 +147,7 @@ type run struct {
 
 func (r run) invoke(a carapace.Action) string {
 	meta, rawValues := common.FromInvokedAction(a.Invoke(r.context))
-	rawValues = rawValues.FilterPrefix(r.context.CallbackValue)
+	rawValues = rawValues.FilterPrefix(r.context.Value)
 	sort.Sort(common.ByValue(rawValues))
 
 	m, err := json.MarshalIndent(export.Export{
@@ -188,7 +188,7 @@ func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 			carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 				args := []string{"run", pkg, "_carapace", "export", ""}
 				args = append(args, c.Args...)
-				args = append(args, c.CallbackValue)
+				args = append(args, c.Value)
 
 				var err error
 				if c.Dir, err = os.Getwd(); err != nil { // `go run` needs to run in actual workdir and not the sandbox dir

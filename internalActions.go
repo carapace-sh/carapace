@@ -14,12 +14,12 @@ import (
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		abs, err := c.Abs(c.CallbackValue)
+		abs, err := c.Abs(c.Value)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
-		displayFolder := filepath.Dir(c.CallbackValue)
+		displayFolder := filepath.Dir(c.Value)
 		if displayFolder == "." {
 			displayFolder = ""
 		} else if !strings.HasSuffix(displayFolder, "/") {
@@ -61,7 +61,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 				}
 			}
 		}
-		if strings.HasPrefix(c.CallbackValue, "./") {
+		if strings.HasPrefix(c.Value, "./") {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
@@ -71,7 +71,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
-		isShorthandSeries := flagSet.IsShorthandSeries(c.CallbackValue)
+		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
@@ -100,7 +100,7 @@ func actionFlags(cmd *cobra.Command) Action {
 
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					for _, shorthand := range c.CallbackValue[1:] {
+					for _, shorthand := range c.Value[1:] {
 						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
@@ -122,7 +122,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		})
 
 		if isShorthandSeries {
-			return ActionStyledValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().NoSpace('*')
+			return ActionStyledValuesDescribed(vals...).Invoke(c).Prefix(c.Value).ToA().NoSpace('*')
 		}
 		return ActionStyledValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".") // multiparts completion for flags grouped with `.`
 	}).Tag("flags")

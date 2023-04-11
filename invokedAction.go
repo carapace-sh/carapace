@@ -87,11 +87,11 @@ func tokenize(s string, dividers ...string) []string {
 //	b := a.ToMultiPartsA("/") // completes segments separately (first one is ["A/", "B/", "C"])
 func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		splittedCV := tokenize(c.CallbackValue, dividers...)
+		splittedCV := tokenize(c.Value, dividers...)
 
 		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, c.CallbackValue) {
+			if strings.HasPrefix(val.Value, c.Value) {
 				if splitted := tokenize(val.Value, dividers...); len(splitted) >= len(splittedCV) {
 					v := strings.Join(splitted[:len(splittedCV)], "")
 					d := splitted[len(splittedCV)-1]

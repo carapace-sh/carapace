@@ -20,7 +20,7 @@ func TestToMultiParts(t *testing.T) {
 			"C/d/1()2", "withbrackets", style.Yellow,
 		)
 		a = a.Invoke(Context{}).ToMultiPartsA(delimiter...)
-		if actual := a.Invoke(Context{CallbackValue: cv}).value("export", cv); !strings.Contains(actual, expected) {
+		if actual := a.Invoke(Context{Value: cv}).value("export", cv); !strings.Contains(actual, expected) {
 			t.Errorf("expected '%v' in '%v' for '%v'", expected, actual, cv)
 		}
 	}

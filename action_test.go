@@ -123,7 +123,7 @@ func TestActionDirectories(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}),
-		ActionDirectories().Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
+		ActionDirectories().Invoke(Context{Value: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
@@ -135,7 +135,7 @@ func TestActionDirectories(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("./"),
-		ActionDirectories().Invoke(Context{CallbackValue: "./"}).Filter([]string{"./vendor/"}),
+		ActionDirectories().Invoke(Context{Value: "./"}).Filter([]string{"./vendor/"}),
 	)
 
 	assertEqual(t,
@@ -143,14 +143,14 @@ func TestActionDirectories(t *testing.T) {
 			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
-		ActionDirectories().Invoke(Context{CallbackValue: "example/"}),
+		ActionDirectories().Invoke(Context{Value: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
 			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
-		ActionDirectories().Invoke(Context{CallbackValue: "example/cm"}),
+		ActionDirectories().Invoke(Context{Value: "example/cm"}),
 	)
 }
 
@@ -165,7 +165,7 @@ func TestActionFiles(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("files").Invoke(Context{}),
-		ActionFiles(".md").Invoke(Context{CallbackValue: ""}).Filter([]string{"vendor/"}),
+		ActionFiles(".md").Invoke(Context{Value: ""}).Filter([]string{"vendor/"}),
 	)
 
 	assertEqual(t,
@@ -176,7 +176,7 @@ func TestActionFiles(t *testing.T) {
 			"main.go", style.Of("fg-default", "bg-default"),
 			"main_test.go", style.Of("fg-default", "bg-default"),
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/"),
-		ActionFiles().Invoke(Context{CallbackValue: "example/"}).Filter([]string{"example/example"}),
+		ActionFiles().Invoke(Context{Value: "example/"}).Filter([]string{"example/example"}),
 	)
 }
 
@@ -190,7 +190,7 @@ func TestActionFilesChdir(t *testing.T) {
 
 	assertEqual(t,
 		ActionMessage(fmt.Sprintf("not a directory: %v/go.mod", wd(""))).Invoke(Context{}),
-		ActionFiles(".md").Chdir("go.mod").Invoke(Context{CallbackValue: ""}),
+		ActionFiles(".md").Chdir("go.mod").Invoke(Context{Value: ""}),
 	)
 
 	assertEqual(t,
@@ -198,7 +198,7 @@ func TestActionFilesChdir(t *testing.T) {
 			"action.go", style.Of("fg-default", "bg-default"),
 			"snippet.go", style.Of("fg-default", "bg-default"),
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("elvish/"),
-		ActionFiles().Chdir("internal/shell").Invoke(Context{CallbackValue: "elvish/"}),
+		ActionFiles().Chdir("internal/shell").Invoke(Context{Value: "elvish/"}),
 	)
 
 	if newWd, _ := os.Getwd(); oldWd != newWd {
@@ -212,7 +212,7 @@ func TestActionMessage(t *testing.T) {
 
 	assertEqual(t,
 		expected.Invoke(Context{}),
-		ActionMessage("example message").Invoke(Context{CallbackValue: "docs/"}),
+		ActionMessage("example message").Invoke(Context{Value: "docs/"}),
 	)
 }
 
@@ -229,7 +229,7 @@ func TestActionMessageSuppress(t *testing.T) {
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
 		ActionMessage("go unknown: unknown command").NoSpace('/').Invoke(Context{}).Prefix("docs/"),
-		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{CallbackValue: "docs/"}),
+		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{Value: "docs/"}),
 	)
 
 	assertEqual(t,

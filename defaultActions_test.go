@@ -38,7 +38,7 @@ func TestActionFlags(t *testing.T) {
 	cmd.Flags().BoolP("beta", "b", false, "")
 
 	cmd.Flag("alpha").Changed = true
-	a := actionFlags(cmd).Invoke(Context{CallbackValue: "-a"})
+	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
 	assertEqual(t, ActionValuesDescribed("b", "").Tag("flags").NoSpace().Invoke(Context{}).Prefix("-a"), a)
 }
 

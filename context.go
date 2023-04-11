@@ -19,7 +19,7 @@ type Context struct {
 	Value string
 	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed).
 	Args []string
-	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed).
+	// Parts contains the splitted Value during an ActionMultiParts (exclusive the part currently being completed).
 	Parts []string
 	// Env contains environment variables for current context.
 	Env []string

@@ -133,8 +133,8 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 	})
 }
 
-func (a InvokedAction) value(shell string, callbackValue string) string {
-	return _shell.Value(shell, callbackValue, a.meta, a.rawValues)
+func (a InvokedAction) value(shell string, value string) string {
+	return _shell.Value(shell, value, a.meta, a.rawValues)
 }
 
 func init() {

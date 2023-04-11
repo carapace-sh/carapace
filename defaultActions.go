@@ -81,7 +81,7 @@ func ActionExecCommandE(name string, arg ...string) func(f func(output []byte, e
 //		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 //			args := []string{"_carapace", "export", ""}
 //			args = append(args, c.Args...)
-//			args = append(args, c.CallbackValue)
+//			args = append(args, c.Value)
 //			return carapace.ActionExecCommand("command", args...)(func(output []byte) carapace.Action {
 //				return carapace.ActionImport(output)
 //			})
@@ -210,7 +210,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (CallbackValue is set to the currently completed part during invocation)
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (Context.Value is set to the currently completed part during invocation)
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		index := strings.LastIndex(c.Value, string(divider))
@@ -220,7 +220,7 @@ func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 			c.Value = ""
 		} else if index != -1 {
 			prefix = c.Value[0 : index+len(divider)]
-			c.Value = c.Value[index+len(divider):] // update CallbackValue to only contain the currently completed part
+			c.Value = c.Value[index+len(divider):] // update Context.Value to only contain the currently completed part
 		}
 		parts := strings.Split(prefix, string(divider))
 		if len(parts) > 0 && len(divider) > 0 {

@@ -4,16 +4,17 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/pflag"
 )
 
-// style defines how flags are represented.
-type style int
+// flagstyle defines how flags are represented.
+type flagstyle int // TODO rename style in pflag fork
 
 const (
-	Default         style = iota // default behaviour
-	ShorthandOnly                // only the shorthand should be used
-	NameAsShorthand              // non-posix style where the name is also added as shorthand (single `-` prefix)
+	Default         flagstyle = iota // default behaviour
+	ShorthandOnly                    // only the shorthand should be used
+	NameAsShorthand                  // non-posix style where the name is also added as shorthand (single `-` prefix)
 )
 
 type Flag struct {
@@ -27,9 +28,9 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
-func (f Flag) Style() style {
+func (f Flag) FlagStyle() flagstyle {
 	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Style"); field.IsValid() && field.Kind() == reflect.Int {
-		return style(field.Int())
+		return flagstyle(field.Int())
 	}
 	return Default
 }
@@ -67,7 +68,7 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		name := strings.TrimPrefix(arg, "--")
 		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
 
-		switch f.Style() {
+		switch f.FlagStyle() {
 		case ShorthandOnly, NameAsShorthand:
 			return false
 		default:
@@ -82,7 +83,7 @@ func (f Flag) Matches(arg string, posix bool) bool {
 			return false
 		}
 
-		switch f.Style() {
+		switch f.FlagStyle() {
 		case ShorthandOnly:
 			return name == f.Shorthand
 		default:
@@ -108,4 +109,17 @@ func (f Flag) TakesValue() bool {
 
 func (f Flag) IsOptarg() bool {
 	return f.NoOptDefVal != ""
+}
+
+func (f Flag) Style() string {
+	switch {
+	case !f.TakesValue():
+		return style.Carapace.FlagNoArg
+	case f.IsOptarg():
+		return style.Carapace.FlagOptArg
+	case f.Nargs() != 0:
+		return style.Carapace.FlagMultiArg
+	default:
+		return style.Carapace.FlagArg
+	}
 }

@@ -87,17 +87,6 @@ func actionFlags(cmd *cobra.Command) Action {
 				return // skip flag of group already set
 			}
 
-			s := style.Carapace.FlagNoArg
-			if f.TakesValue() {
-				if f.IsOptarg() {
-					s = style.Carapace.FlagOptArg
-				} else if f.Nargs() != 0 {
-					s = style.Carapace.FlagMultiArg
-				} else {
-					s = style.Carapace.FlagArg
-				}
-			}
-
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					for _, shorthand := range c.Value[1:] {
@@ -105,18 +94,18 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					vals = append(vals, f.Shorthand, f.Usage, s)
+					vals = append(vals, f.Shorthand, f.Usage, f.Style())
 				}
 			} else {
-				if flagstyle := f.Style(); flagstyle != pflagfork.ShorthandOnly {
+				if flagstyle := f.FlagStyle(); flagstyle != pflagfork.ShorthandOnly {
 					if flagstyle == pflagfork.NameAsShorthand {
-						vals = append(vals, "-"+f.Name, f.Usage, s)
+						vals = append(vals, "-"+f.Name, f.Usage, f.Style())
 					} else {
-						vals = append(vals, "--"+f.Name, f.Usage, s)
+						vals = append(vals, "--"+f.Name, f.Usage, f.Style())
 					}
 				}
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage, s)
+					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
 				}
 			}
 		})

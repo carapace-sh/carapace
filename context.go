@@ -48,9 +48,7 @@ func NewContext(args ...string) Context {
 	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
 	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists && isGoRun() {
 		var m common.Mock
-		if err := json.Unmarshal([]byte(value), &m); err != nil {
-			panic(err.Error()) // TODO
-		}
+		_ = json.Unmarshal([]byte(value), &m)
 		context.Dir = m.Dir
 		context.mockedReplies = m.Replies
 	}
@@ -111,7 +109,7 @@ func expandHome(s string) (string, error) {
 			return zsh.NamedDirectories.Replace(s), nil
 		}
 
-		home, err := os.UserHomeDir() // TODO duplicated code
+		home, err := os.UserHomeDir()
 		if err != nil {
 			return "", err
 		}

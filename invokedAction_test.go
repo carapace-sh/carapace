@@ -8,7 +8,7 @@ import (
 )
 
 func TestToMultiParts(t *testing.T) {
-	_test := func(cv, expected string, delimiter ...string) {
+	_test := func(value, expected string, delimiter ...string) {
 		a := ActionStyledValuesDescribed(
 			"A/a:1", "one", style.Green,
 			"A/a:2", "two", style.BgBlue,
@@ -20,8 +20,8 @@ func TestToMultiParts(t *testing.T) {
 			"C/d/1()2", "withbrackets", style.Yellow,
 		)
 		a = a.Invoke(Context{}).ToMultiPartsA(delimiter...)
-		if actual := a.Invoke(Context{Value: cv}).value("export", cv); !strings.Contains(actual, expected) {
-			t.Errorf("expected '%v' in '%v' for '%v'", expected, actual, cv)
+		if actual := a.Invoke(Context{Value: value}).value("export", value); !strings.Contains(actual, expected) {
+			t.Errorf("expected '%v' in '%v' for '%v'", expected, actual, value)
 		}
 	}
 

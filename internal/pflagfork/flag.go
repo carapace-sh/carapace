@@ -1,6 +1,7 @@
 package pflagfork
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -122,4 +123,38 @@ func (f Flag) Style() string {
 	default:
 		return style.Carapace.FlagArg
 	}
+}
+
+func (f Flag) Definition() string {
+	var definition string
+	switch f.Mode() {
+	case ShorthandOnly:
+		definition = fmt.Sprintf("-%v", f.Shorthand)
+	case NameAsShorthand:
+		definition = fmt.Sprintf("-%v, -%v", f.Shorthand, f.Name)
+	default:
+		switch f.Shorthand {
+		case "":
+			definition = fmt.Sprintf("--%v", f.Name)
+		default:
+			definition = fmt.Sprintf("-%v, --%v", f.Shorthand, f.Name)
+		}
+	}
+
+	if f.IsRepeatable() {
+		definition += "*"
+	}
+
+	switch {
+	case f.IsOptarg():
+		switch f.Value.Type() {
+		case "bool", "boolSlice", "count":
+		default:
+			definition += "?"
+		}
+	case f.TakesValue():
+		definition += "="
+	}
+
+	return definition
 }

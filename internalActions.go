@@ -108,9 +108,9 @@ func actionFlags(cmd *cobra.Command) Action {
 		})
 
 		if isShorthandSeries {
-			return ActionStyledValuesDescribed(vals...).Invoke(c).Prefix(c.Value).ToA().NoSpace('*')
+			return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace('*')
 		}
-		return ActionStyledValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".") // multiparts completion for flags grouped with `.`
+		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
 	}).Tag("flags")
 }
 

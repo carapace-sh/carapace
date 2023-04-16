@@ -31,17 +31,22 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
 		a.callback = func(c Context) Action {
-			if cacheFile, err := cache.File(file, line, keys...); err == nil {
-				if rawValues, err := cache.Load(cacheFile, timeout); err == nil {
-					return Action{rawValues: rawValues}
-				}
-				invokedAction := (Action{callback: cachedCallback}).Invoke(c)
-				if invokedAction.meta.Messages.IsEmpty() {
-					_ = cache.Write(cacheFile, invokedAction.rawValues)
-				}
-				return invokedAction.ToA()
+			cacheFile, err := cache.File(file, line, keys...)
+			if err != nil {
+				return cachedCallback(c)
 			}
-			return cachedCallback(c)
+
+			if cached, err := cache.Load(cacheFile, timeout); err == nil {
+				return Action{meta: cached.Meta, rawValues: cached.Values}
+			}
+
+			invokedAction := (Action{callback: cachedCallback}).Invoke(c)
+			if invokedAction.meta.Messages.IsEmpty() {
+				if cacheFile, err := cache.File(file, line, keys...); err == nil { // regenerate as cache keys might have changed due to invocation
+					_ = cache.Write(cacheFile, invokedAction.export())
+				}
+			}
+			return invokedAction.ToA()
 		}
 	}
 	return a
@@ -58,19 +63,13 @@ func (a Action) Invoke(c Context) InvokedAction {
 	if c.Parts == nil {
 		c.Parts = []string{}
 	}
-	return InvokedAction{a.nestedAction(c, 10)}
-}
 
-func (a Action) nestedAction(c Context, maxDepth int) Action {
-	if maxDepth < 0 {
-		return ActionMessage("maximum recursion depth exceeded")
-	}
 	if a.rawValues == nil && a.callback != nil {
-		result := a.callback(c).nestedAction(c, maxDepth-1)
+		result := a.callback(c).Invoke(c)
 		result.meta.Merge(a.meta)
 		return result
 	}
-	return a
+	return InvokedAction{a}
 }
 
 // NoSpace disables space suffix for given characters (or all if none are given).
@@ -101,7 +100,7 @@ func (a Action) UsageF(f func() string) Action {
 	})
 }
 
-// Style sets the style
+// Style sets the style.
 //
 //	ActionValues("yes").Style(style.Green)
 //	ActionValues("no").Style(style.Red)
@@ -111,7 +110,7 @@ func (a Action) Style(s string) Action {
 	})
 }
 
-// Style sets the style using a reference
+// Style sets the style using a reference.
 //
 //	ActionValues("value").StyleR(&style.Carapace.Value)
 //	ActionValues("description").StyleR(&style.Carapace.Value)
@@ -124,7 +123,7 @@ func (a Action) StyleR(s *string) Action {
 	})
 }
 
-// Style sets the style using a function
+// Style sets the style using a function.
 //
 //	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
 //	ActionValues("true", "false").StyleF(style.ForKeyword)
@@ -162,7 +161,7 @@ func (a Action) TagF(f func(value string) string) Action {
 	})
 }
 
-// Chdir changes the current working directory to the named directory during invocation.
+// Chdir changes the current working directory to the named directory for the duration of invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {
 		abs, err := c.Abs(dir)
@@ -211,7 +210,7 @@ func (a Action) UniqueList(divider string) Action {
 	})
 }
 
-// Prefix adds a prefix to values (only the ones inserted, not the display values)
+// Prefix adds a prefix to values (only the ones inserted, not the display values).
 //
 //	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
 func (a Action) Prefix(prefix string) Action {
@@ -220,11 +219,36 @@ func (a Action) Prefix(prefix string) Action {
 	})
 }
 
-// Suffix adds a suffx to values (only the ones inserted, not the display values)
+// Suffix adds a suffx to values (only the ones inserted, not the display values).
 //
 //	carapace.ActionValues("apple", "melon", "orange").Suffix("juice")
 func (a Action) Suffix(suffix string) Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Invoke(c).Suffix(suffix).ToA()
+	})
+}
+
+// Timeout sets the maximum duration an Action may take to invoke.
+//
+//	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+//		time.Sleep(2*time.Second)
+//		return carapace.ActionValues("done")
+//	}).Timeout(1*time.Second, carapace.ActionMessage("timeout exceeded"))
+func (a Action) Timeout(d time.Duration, alternative Action) Action {
+	return ActionCallback(func(c Context) Action {
+		currentChannel := make(chan string, 1)
+
+		var result InvokedAction
+		go func() {
+			result = a.Invoke(c)
+			currentChannel <- ""
+		}()
+
+		select {
+		case <-currentChannel:
+		case <-time.After(d):
+			return alternative
+		}
+		return result.ToA()
 	})
 }

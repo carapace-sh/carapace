@@ -48,7 +48,7 @@ func TestGetDash(t *testing.T) {
 		ActionValues("dash", "any"),
 	)
 
-	cmd.Flags().Parse([]string{"--", ""})
+	_ = cmd.Flags().Parse([]string{"--", ""})
 
 	assertEqual(t, ActionValues("dash", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
 	assertEqual(t, ActionValues("dash", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))

@@ -28,4 +28,4 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 ![](./actionExecute.cast)
 
 [`ActionExecute`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionExecute
-[`ActionImport`]:../action/actionImport.md
+[`ActionImport`]:../defaultActions/actionImport.md

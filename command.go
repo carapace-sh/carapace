@@ -21,17 +21,21 @@ func addCompletionCommand(cmd *cobra.Command) {
 	carapaceCmd := &cobra.Command{
 		Use:    "_carapace",
 		Hidden: true,
-		PreRun: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, args []string) {
+			LOG.Printf("%#v", os.Args)
+
 			if len(args) > 2 && strings.HasPrefix(args[2], "_") {
 				cmd.Hidden = false
 			}
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			logger.PrintArgs(os.Args)
-			if s, err := complete(cmd, args); err != nil {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), logger.Writer()), err.Error())
+
+			if !cmd.HasParent() {
+				panic("missing parent command") // this should never happen
+			}
+
+			if s, err := complete(cmd.Parent(), args); err != nil {
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), LOG.Writer()), err.Error())
 			} else {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), logger.Writer()), s)
+				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), LOG.Writer()), s)
 			}
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
@@ -64,7 +68,7 @@ func addCompletionCommand(cmd *cobra.Command) {
 		ActionCallback(func(c Context) Action {
 			args := []string{"_carapace", "export", ""}
 			args = append(args, c.Args[2:]...)
-			args = append(args, c.CallbackValue)
+			args = append(args, c.Value)
 			return ActionExecCommand(uid.Executable(), args...)(func(output []byte) Action {
 				if string(output) == "" {
 					return ActionValues()

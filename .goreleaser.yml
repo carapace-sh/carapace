@@ -2,13 +2,24 @@ before:
   hooks:
     - go mod download
 builds:
-  - env:
+  - id: example
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
+    main: ./example
     binary: example
+  - id: example-nonposix
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    main: ./example-nonposix
+    binary: example-nonposix
 archives:
   - replacements:
       darwin: Darwin

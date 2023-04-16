@@ -4,12 +4,11 @@ services:
   build: &base
     build: .
     image: ghcr.io/rsteube/carapace
-    command: sh -c 'cd /carapace/example && go build .'
+    command: sh -c 'cd /carapace/example && go build -buildvcs=false .'
     environment:
       TARGET: /carapace/example/example
     volumes:
       - '.:/carapace/'
-      - 'go:/home/circleci/go/'
 
   bash:
     <<: *base

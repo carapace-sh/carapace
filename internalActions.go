@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -15,12 +14,12 @@ import (
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		abs, err := c.Abs(c.CallbackValue)
+		abs, err := c.Abs(c.Value)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
-		displayFolder := filepath.Dir(c.CallbackValue)
+		displayFolder := filepath.Dir(c.Value)
 		if displayFolder == "." {
 			displayFolder = ""
 		} else if !strings.HasSuffix(displayFolder, "/") {
@@ -62,7 +61,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 				}
 			}
 		}
-		if strings.HasPrefix(c.CallbackValue, "./") {
+		if strings.HasPrefix(c.Value, "./") {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
@@ -72,55 +71,46 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
-		re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
-		isShorthandSeries := re.MatchString(c.CallbackValue) && flagSet.IsPosix()
+		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
-			if f.Deprecated != "" {
+			switch {
+			case f.Deprecated != "":
 				return // skip deprecated flags
-			}
-
-			if f.Changed && !f.IsRepeatable() {
+			case f.Changed && !f.IsRepeatable():
 				return // don't repeat flag
-			}
-
-			if flagSet.IsMutuallyExclusive(f.Flag) {
+			case flagSet.IsMutuallyExclusive(f.Flag):
 				return // skip flag of group already set
 			}
 
 			if isShorthandSeries {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					for _, shorthand := range c.CallbackValue[1:] {
+					for _, shorthand := range c.Value[1:] {
 						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					vals = append(vals, f.Shorthand, f.Usage)
+					vals = append(vals, f.Shorthand, f.Usage, f.Style())
 				}
 			} else {
-				if flagstyle := f.Style(); flagstyle != pflagfork.ShorthandOnly {
-					if flagstyle == pflagfork.NameAsShorthand {
-						vals = append(vals, "-"+f.Name, f.Usage)
-					} else {
-						vals = append(vals, "--"+f.Name, f.Usage)
-					}
+				switch f.Mode() {
+				case pflagfork.NameAsShorthand:
+					vals = append(vals, "-"+f.Name, f.Usage, f.Style())
+				case pflagfork.Default:
+					vals = append(vals, "--"+f.Name, f.Usage, f.Style())
 				}
+
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage)
+					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
 				}
 			}
 		})
 
 		if isShorthandSeries {
-			return ActionValuesDescribed(vals...).Invoke(c).Prefix(c.CallbackValue).ToA().NoSpace('*')
+			return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace('*')
 		}
-		for i := 0; i < len(vals); i = i + 2 { // TODO experimental - hardcoded multiparts completion if flags are "grouped" with `.`
-			if strings.Contains(vals[i], ".") {
-				return ActionValuesDescribed(vals...).Invoke(c).ToMultiPartsA(".")
-			}
-		}
-		return ActionValuesDescribed(vals...)
+		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
 	}).Tag("flags")
 }
 

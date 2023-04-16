@@ -57,7 +57,7 @@ func TestZsh(t *testing.T) {
 }
 
 func TestRoot(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("").
 			Expect(carapace.Batch(
 				carapace.ActionValuesDescribed(
@@ -91,40 +91,48 @@ func TestRoot(t *testing.T) {
 			).Tag("main commands"))
 
 		s.Run("-").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-				"-a", "multiflag",
-				"--persistentFlag", "Help message for persistentFlag",
-				"-p", "Help message for persistentFlag",
-				"--toggle", "Help message for toggle",
-				"-t", "Help message for toggle",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+				"-a", "multiflag", style.Blue,
+				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
+				"-p", "Help message for persistentFlag", style.Yellow,
+				"--toggle", "Help message for toggle", style.Default,
+				"-t", "Help message for toggle", style.Default,
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-				"--persistentFlag", "Help message for persistentFlag",
-				"--toggle", "Help message for toggle",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
+				"--toggle", "Help message for toggle", style.Default,
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("--array", "", "--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+			).NoSpace('.').Tag("flags"))
 
 		s.Run("-a", "", "--a").
-			Expect(carapace.ActionValuesDescribed(
-				"--array", "multiflag",
-			).Tag("flags"))
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--array", "multiflag", style.Blue,
+			).NoSpace('.').Tag("flags"))
+
+		s.Run("--toggle=").
+			Expect(carapace.ActionStyledValues(
+				"false", style.Red,
+				"true", style.Green,
+			).Prefix("--toggle="))
 	})
 }

@@ -13,7 +13,7 @@ func TestIsDash(t *testing.T) {
 		t.Error("IsDash should be false")
 	}
 
-	cmd.Flags().Parse([]string{"--", ""})
+	_ = cmd.Flags().Parse([]string{"--", ""})
 
 	if !IsDash(cmd) {
 		t.Error("IsDash should be true")

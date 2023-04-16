@@ -51,7 +51,7 @@ func execCompletion(args ...string) (context Context) {
 	rootCmd.AddCommand(subCmd)
 
 	os.Args = append([]string{"root", "_carapace", "elvish", "root"}, args...)
-	rootCmd.Execute()
+	_ = rootCmd.Execute()
 	return
 }
 
@@ -78,83 +78,83 @@ func testContext(t *testing.T, expected Context, args ...string) {
 
 func TestContext(t *testing.T) {
 	testContext(t, Context{
-		CallbackValue: "",
-		Args:          []string{},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "",
+		Args:  []string{},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"")
 
 	testContext(t, Context{
-		CallbackValue: "",
-		Args:          []string{"pos1"},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "",
+		Args:  []string{"pos1"},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"pos1", "")
 
 	testContext(t, Context{
-		CallbackValue: "po",
-		Args:          []string{"pos1", "pos2"},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "po",
+		Args:  []string{"pos1", "pos2"},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"pos1", "pos2", "po")
 
 	testContext(t, Context{
-		CallbackValue: "",
-		Args:          []string{},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "",
+		Args:  []string{},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"--multiparts", "")
 
 	testContext(t, Context{
-		CallbackValue: "fir",
-		Args:          []string{},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "fir",
+		Args:  []string{},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"--multiparts", "fir")
 
 	testContext(t, Context{
-		CallbackValue: "seco",
-		Args:          []string{"pos1"},
-		Parts:         []string{"first"},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "seco",
+		Args:  []string{"pos1"},
+		Parts: []string{"first"},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"pos1", "--multiparts", "first,seco")
 
 	testContext(t, Context{
-		CallbackValue: "pos",
-		Args:          []string{},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "pos",
+		Args:  []string{},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"pos")
 
 	testContext(t, Context{
-		CallbackValue: "sec",
-		Args:          []string{},
-		Parts:         []string{"first"},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "sec",
+		Args:  []string{},
+		Parts: []string{"first"},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"first:sec")
 
 	testContext(t, Context{
-		CallbackValue: "thi",
-		Args:          []string{"first:second"},
-		Parts:         []string{},
-		Env:           []string{},
-		Dir:           wd(""),
+		Value: "thi",
+		Args:  []string{"first:second"},
+		Parts: []string{},
+		Env:   []string{},
+		Dir:   wd(""),
 	},
 		"first:second", "thi")
 }

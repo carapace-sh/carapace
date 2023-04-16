@@ -9,7 +9,7 @@ import (
 )
 
 func TestAction(t *testing.T) {
-	sandbox.Run(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"dirA/file1.txt", "",
 			"dirA/file2.png", "",
@@ -161,5 +161,69 @@ func TestAction(t *testing.T) {
 
 		s.Run("action", "--unknown", "").
 			Expect(carapace.ActionMessage("unknown flag: --unknown"))
+	})
+}
+
+func TestDash(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--", "").
+			Expect(carapace.ActionValues("embeddedP1", "embeddedPositional1").
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
+
+		s.Run("action", "--", "-").
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--embedded-bool", "embedded bool flag", style.Default,
+				"--embedded-optarg", "embedded optarg flag", style.Yellow,
+				"--embedded-string", "embedded string flag", style.Blue).
+				NoSpace('.').
+				Usage("action [pos1] [pos2] [--] [dashAny]...").
+				Tag("flags"))
+
+		s.Run("action", "--", "--").
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--embedded-bool", "embedded bool flag", style.Default,
+				"--embedded-optarg", "embedded optarg flag", style.Yellow,
+				"--embedded-string", "embedded string flag", style.Blue).
+				NoSpace('.').
+				Usage("action [pos1] [pos2] [--] [dashAny]...").
+				Tag("flags"))
+
+		s.Run("action", "--", "embeddedP1", "--embedded-optarg=").
+			Expect(carapace.ActionValues("eo1", "eo2", "eo3").
+				Prefix("--embedded-optarg=").
+				Usage("embedded optarg flag"))
+
+		s.Run("action", "--", "embeddedP1", "--embedded-string", "").
+			Expect(carapace.ActionValues("es1", "es2", "es3").
+				Usage("embedded string flag"))
+
+		s.Run("action", "p1", "--styled-values", "second", "p2", "--", "embeddedP1", "--embedded-string", "es1", "").
+			Expect(carapace.ActionValues("embeddedPositional2", "embeddedP2").
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
+	})
+}
+
+func TestUnknownFlag(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--unknown", "").
+			Expect(carapace.ActionMessage("unknown flag: --unknown").NoSpace())
+
+		s.Env("CARAPACE_LENIENT", "1")
+		s.Run("action", "--unknown", "").
+			Expect(carapace.ActionValues("p1", "positional1", "positional1 with space").
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
+	})
+}
+
+func TestPersistentFlag(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--persistentFlag=").
+			Expect(carapace.ActionValues("p1", "p2", "p3").
+				Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
+
+		s.Run("action", "--persistentFlag2", "").
+			Expect(carapace.ActionValues("p4", "p5", "p6").
+				Usage("Help message for persistentFlag2"))
 	})
 }

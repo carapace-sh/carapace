@@ -22,6 +22,7 @@ func init() {
 	actionCmd.Flags().String("callback", "", "ActionCallback()")
 	actionCmd.Flags().String("directories", "", "ActionDirectories()")
 	actionCmd.Flags().String("exec-command", "", "ActionExecCommand()")
+	actionCmd.Flags().String("executables", "", "ActionExecutables()")
 	actionCmd.Flags().String("files", "", "ActionFiles()")
 	actionCmd.Flags().String("files-filtered", "", "ActionFiles(\".md\", \"go.mod\", \"go.sum\")")
 	actionCmd.Flags().String("import", "", "ActionImport()")
@@ -46,24 +47,25 @@ func init() {
 			lines := strings.Split(string(output), "\n")
 			return carapace.ActionValues(lines[:len(lines)-1]...)
 		}),
+		"executables":    carapace.ActionExecutables(),
 		"files":          carapace.ActionFiles(),
 		"files-filtered": carapace.ActionFiles(".md", "go.mod", "go.sum"),
 		"import": carapace.ActionImport([]byte(`
 {
-  "Version": "unknown",
-  "Nospace": "",
-  "RawValues": [
+  "version": "unknown",
+  "nospace": "",
+  "values": [
     {
-      "Value": "first",
-      "Display": "first"
+      "value": "first",
+      "display": "first"
     },
     {
-      "Value": "second",
-      "Display": "second"
+      "value": "second",
+      "display": "second"
     },
     {
-      "Value": "third",
-      "Display": "third"
+      "value": "third",
+      "display": "third"
     }
   ]
 }
@@ -145,7 +147,16 @@ func init() {
 				Run: func(cmd *cobra.Command, args []string) {},
 			}
 
-			cmd.Flags().Bool("embedded-flag", false, "embedded flag")
+			cmd.Flags().Bool("embedded-bool", false, "embedded bool flag")
+			cmd.Flags().String("embedded-string", "", "embedded string flag")
+			cmd.Flags().String("embedded-optarg", "", "embedded optarg flag")
+
+			cmd.Flag("embedded-optarg").NoOptDefVal = " "
+
+			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
+				"embedded-string": carapace.ActionValues("es1", "es2", "es3"),
+				"embedded-optarg": carapace.ActionValues("eo1", "eo2", "eo3"),
+			})
 
 			carapace.Gen(cmd).PositionalCompletion(
 				carapace.ActionValues("embeddedPositional1", "embeddedP1"),

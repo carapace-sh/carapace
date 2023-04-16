@@ -28,6 +28,7 @@ type carapace struct {
 	Value       string `desc:"default style for values" tag:"core styles"`
 	Description string `desc:"default style for descriptions" tag:"core styles"`
 	Error       string `desc:"default style for errors" tag:"core styles"`
+	Usage       string `desc:"default style for usage" tag:"core styles"`
 
 	KeywordAmbiguous string `desc:"keyword describing a ambiguous state" tag:"keyword styles"`
 	KeywordNegative  string `desc:"keyword describing a negative state" tag:"keyword styles"`
@@ -56,12 +57,18 @@ type carapace struct {
 
 	Highlight11 string `desc:"Highlight 11" tag:"highlight styles"`
 	Highlight12 string `desc:"Highlight 12" tag:"highlight styles"`
+
+	FlagArg      string `desc:"flag with argument" tag:"flag styles"`
+	FlagMultiArg string `desc:"flag with multiple arguments" tag:"flag styles"`
+	FlagNoArg    string `desc:"flag without argument" tag:"flag styles"`
+	FlagOptArg   string `desc:"flag with optional argument" tag:"flag styles"`
 }
 
 var Carapace = carapace{
 	Value:       Default,
 	Description: Gray,
 	Error:       Of(Bold, Red),
+	Usage:       Gray,
 
 	KeywordAmbiguous: Yellow,
 	KeywordNegative:  Red,
@@ -90,6 +97,11 @@ var Carapace = carapace{
 
 	Highlight11: Bold,
 	Highlight12: Of(Bold, Dim),
+
+	FlagArg:      Blue,
+	FlagMultiArg: Magenta,
+	FlagNoArg:    Default,
+	FlagOptArg:   Yellow,
 }
 
 // Highlight returns the style for given level (0..n).

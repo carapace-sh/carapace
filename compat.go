@@ -10,7 +10,7 @@ import (
 func registerValidArgsFunction(cmd *cobra.Command) {
 	if cmd.ValidArgsFunction == nil {
 		cmd.ValidArgsFunction = func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			action := storage.getPositional(cmd, len(args)).Invoke(Context{Args: args, CallbackValue: toComplete})
+			action := storage.getPositional(cmd, len(args)).Invoke(Context{Args: args, Value: toComplete})
 			return cobraValuesFor(action), cobraDirectiveFor(action)
 		}
 	}
@@ -18,11 +18,14 @@ func registerValidArgsFunction(cmd *cobra.Command) {
 
 func registerFlagCompletion(cmd *cobra.Command) {
 	cmd.Flags().VisitAll(func(f *pflag.Flag) {
-		cmd.RegisterFlagCompletionFunc(f.Name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		err := cmd.RegisterFlagCompletionFunc(f.Name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			a := storage.getFlag(cmd, f.Name)
-			action := a.Invoke(Context{Args: args, CallbackValue: toComplete})
+			action := a.Invoke(Context{Args: args, Value: toComplete})
 			return cobraValuesFor(action), cobraDirectiveFor(action)
 		})
+		if err != nil {
+			LOG.Printf("failed to register flag completion func: %v", err.Error())
+		}
 	})
 }
 

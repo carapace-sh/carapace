@@ -1,9 +1,9 @@
 package common
 
 type Meta struct {
-	Messages Messages
-	Nospace  SuffixMatcher
-	Usage    string
+	Messages Messages      `json:"messages"`
+	Nospace  SuffixMatcher `json:"nospace"`
+	Usage    string        `json:"usage"`
 }
 
 func (m *Meta) Merge(other Meta) {

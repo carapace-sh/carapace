@@ -10,22 +10,22 @@ import (
 func TestActionImport(t *testing.T) {
 	s := `
 {
-  "Version": "unknown",
-  "Nospace": "",
-  "RawValues": [
+  "version": "unknown",
+  "nospace": "",
+  "values": [
     {
-      "Value": "positional1",
-      "Display": "positional1",
-      "Description": "",
-      "Style": "",
-	  "Tag": "first"
+      "value": "positional1",
+      "display": "positional1",
+      "description": "",
+      "style": "",
+	  "tag": "first"
     },
     {
-      "Value": "p1",
-      "Display": "p1",
-      "Description": "",
-      "Style": "",
-	  "Tag": "first"
+      "value": "p1",
+      "display": "p1",
+      "description": "",
+      "style": "",
+	  "tag": "first"
     }
   ]
 }`
@@ -38,7 +38,7 @@ func TestActionFlags(t *testing.T) {
 	cmd.Flags().BoolP("beta", "b", false, "")
 
 	cmd.Flag("alpha").Changed = true
-	a := actionFlags(cmd).Invoke(Context{CallbackValue: "-a"})
+	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
 	assertEqual(t, ActionValuesDescribed("b", "").Tag("flags").NoSpace().Invoke(Context{}).Prefix("-a"), a)
 }
 

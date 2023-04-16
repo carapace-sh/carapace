@@ -14,7 +14,7 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 })
 ```
 
-- `c.CallbackValue` provides access to the current (partial) value of the flag or positional argument being completed
+- `c.Value` provides access to the current (partial) value of the flag or positional argument being completed
 - return [ActionValues](./actionValues.md) without arguments to silently skip completion
 - return [ActionMessage](./actionMessage.md) to provide an error message (e.g. failure during invocation of an external command)
 - `c.Args` provides access to the positional arguments of the current subcommand (excluding the one currently being completed)

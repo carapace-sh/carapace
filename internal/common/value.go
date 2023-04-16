@@ -14,11 +14,11 @@ var FromInvokedAction func(action interface{}) (Meta, RawValues)
 
 // RawValue represents a completion candidate.
 type RawValue struct {
-	Value       string
-	Display     string
-	Description string `json:",omitempty"`
-	Style       string `json:",omitempty"`
-	Tag         string `json:",omitempty"`
+	Value       string `json:"value"`
+	Display     string `json:"display"`
+	Description string `json:"description,omitempty"`
+	Style       string `json:"style,omitempty"`
+	Tag         string `json:"tag,omitempty"`
 }
 
 // TrimmedDescription returns the trimmed description.

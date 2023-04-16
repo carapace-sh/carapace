@@ -15,25 +15,30 @@ import (
 
 // Context provides information during completion.
 type Context struct {
-	// CallbackValue contains the (partial) value (or part of it during an ActionMultiParts) currently being completed
-	CallbackValue string
-	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed)
+	// Value contains the value currently being completed (or part of it during an ActionMultiParts).
+	Value string
+	// Args contains the positional arguments of current (sub)command (exclusive the one currently being completed).
 	Args []string
-	// Parts contains the splitted CallbackValue during an ActionMultiParts (exclusive the part currently being completed)
+	// Parts contains the splitted Value during an ActionMultiParts (exclusive the part currently being completed).
 	Parts []string
-	// Env contains environment variables for current context
+	// Env contains environment variables for current context.
 	Env []string
-	// Dir contains the working directory for current context
+	// Dir contains the working directory for current context.
 	Dir string
 
 	mockedReplies map[string]string
 }
 
-func NewContext(args []string) Context {
+// NewContext creates a new context for given arguments.
+func NewContext(args ...string) Context {
+	if len(args) == 0 {
+		args = append(args, "")
+	}
+
 	context := Context{
-		CallbackValue: args[len(args)-1],
-		Args:          args[:len(args)-1],
-		Env:           os.Environ(),
+		Value: args[len(args)-1],
+		Args:  args[:len(args)-1],
+		Env:   os.Environ(),
 	}
 
 	if wd, err := os.Getwd(); err == nil {
@@ -43,9 +48,7 @@ func NewContext(args []string) Context {
 	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
 	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists && isGoRun() {
 		var m common.Mock
-		if err := json.Unmarshal([]byte(value), &m); err != nil {
-			panic(err.Error()) // TODO
-		}
+		_ = json.Unmarshal([]byte(value), &m)
 		context.Dir = m.Dir
 		context.mockedReplies = m.Replies
 	}
@@ -77,6 +80,7 @@ func (c *Context) Setenv(key, value string) {
 	c.Env = append(c.Env, fmt.Sprintf("%v=%v", key, value))
 }
 
+// Envsubst replaces ${var} in the string based on environment variables in current context.
 func (c Context) Envsubst(s string) (string, error) {
 	return envsubst.Eval(s, c.Getenv)
 }
@@ -105,7 +109,7 @@ func expandHome(s string) (string, error) {
 			return zsh.NamedDirectories.Replace(s), nil
 		}
 
-		home, err := os.UserHomeDir() // TODO duplicated code
+		home, err := os.UserHomeDir()
 		if err != nil {
 			return "", err
 		}
@@ -114,27 +118,21 @@ func expandHome(s string) (string, error) {
 	return s, nil
 }
 
-func (c Context) Abs(s string) (string, error) {
-	var path string
-	if strings.HasPrefix(s, "/") || strings.HasPrefix(s, "~") {
-		path = s // path is absolute
-	} else {
-		expanded, err := expandHome(c.Dir)
-		if err != nil {
-			return "", err
+// Abs returns an absolute representation of path.
+func (c Context) Abs(path string) (string, error) {
+	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") { // path is relative
+		switch c.Dir {
+		case "":
+			path = "./" + path
+		default:
+			path = c.Dir + "/" + path
 		}
-		abs, err := filepath.Abs(expanded)
-		if err != nil {
-			return "", err
-		}
-		path = abs + "/" + s
 	}
 
-	expanded, err := expandHome(path)
+	path, err := expandHome(path)
 	if err != nil {
 		return "", err
 	}
-	path = expanded
 
 	result, err := filepath.Abs(path)
 	if err != nil {

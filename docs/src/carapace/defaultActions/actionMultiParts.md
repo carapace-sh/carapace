@@ -1,7 +1,7 @@
 # ActionMultiParts
 
 [`ActionMultiParts`] completes parts of an argument separately (e.g. `user:group` from chown).
-For this the `Context.CallbackValue` is split with given divider and then updated to only contain the currently completed part.
+For this the `Context.Value` is split with given divider and then updated to only contain the currently completed part.
 `Context.Parts` contains the preceding parts and can be used in a `switch` statement to return the corresponding [Action](../action.md).
 
 > An empty divider splits per character, but be aware that fish will add space suffix for anything other than `/=@:.,`.
@@ -61,6 +61,5 @@ carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
 
 ![](./actionMultiParts-nested.cast)
 
-[`carapace.CallbackValue`]:https://pkg.go.dev/github.com/rsteube/carapace#pkg-variables
 [`ActionMultiParts`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionMultiParts
 [`NoSpace`]:../action/noSpace.md

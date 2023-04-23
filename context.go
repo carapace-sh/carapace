@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
@@ -46,9 +47,9 @@ func NewContext(args ...string) Context {
 	}
 
 	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
-	if value, exists := os.LookupEnv("CARAPACE_SANDBOX"); exists && isGoRun() {
+	if sandbox := env.Sandbox(); sandbox != "" && isGoRun() {
 		var m common.Mock
-		_ = json.Unmarshal([]byte(value), &m)
+		_ = json.Unmarshal([]byte(sandbox), &m)
 		context.Dir = m.Dir
 		context.mockedReplies = m.Replies
 	}

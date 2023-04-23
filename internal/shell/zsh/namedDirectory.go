@@ -1,8 +1,9 @@
 package zsh
 
 import (
-	"os"
 	"strings"
+
+	"github.com/rsteube/carapace/internal/env"
 )
 
 type namedDirectories map[string]string
@@ -34,7 +35,7 @@ func (nd *namedDirectories) Replace(s string) string {
 }
 
 func init() {
-	if hashDirs, ok := os.LookupEnv("CARAPACE_ZSH_HASH_DIRS"); ok {
+	if hashDirs := env.Hashdirs(); hashDirs != "" {
 		for _, line := range strings.Split(hashDirs, "\n") {
 			if splitted := strings.SplitN(line, "=", 2); len(splitted) == 2 {
 				NamedDirectories[splitted[0]] = splitted[1]

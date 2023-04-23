@@ -82,6 +82,16 @@ func (r RawValues) Filter(values ...string) RawValues {
 	return filtered
 }
 
+// Decolor clears style for all values.
+func (r RawValues) Decolor() RawValues {
+	rawValues := make(RawValues, len(r))
+	for index, value := range r {
+		value.Style = ""
+		rawValues[index] = value
+	}
+	return rawValues
+}
+
 // FilterPrefix filters values with given prefix.
 func (r RawValues) FilterPrefix(prefix string) RawValues {
 	filtered := make(RawValues, 0)

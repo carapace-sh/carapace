@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -103,5 +104,36 @@ func addCompletionCommand(cmd *cobra.Command) {
 	styleCmd.AddCommand(styleSetCmd)
 	Carapace{styleSetCmd}.PositionalAnyCompletion(
 		ActionStyleConfig(),
+	)
+
+	addConfigCommand(carapaceCmd)
+}
+
+func addConfigCommand(cmd *cobra.Command) {
+	configCmd := &cobra.Command{
+		Use:  "config",
+		Args: cobra.ExactArgs(1),
+		Run:  func(cmd *cobra.Command, args []string) {},
+	}
+	cmd.AddCommand(configCmd)
+
+	configSetCmd := &cobra.Command{
+		Use:  "set",
+		Args: cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			for _, arg := range args {
+				if splitted := strings.SplitN(arg, "=", 2); len(splitted) == 2 {
+					if err := config.SetConfig(splitted[0], splitted[1]); err != nil {
+						fmt.Fprint(cmd.ErrOrStderr(), err.Error())
+					}
+				} else {
+					fmt.Fprintf(cmd.ErrOrStderr(), "invalid format: '%v'", arg)
+				}
+			}
+		},
+	}
+	configCmd.AddCommand(configSetCmd)
+	Carapace{configSetCmd}.PositionalAnyCompletion(
+		ActionConfigs(),
 	)
 }

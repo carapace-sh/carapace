@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/ps"
 )
@@ -13,7 +14,7 @@ import (
 var LOG = log.New(ioutil.Discard, "", log.Flags())
 
 func init() {
-	if _, enabled := os.LookupEnv("CARAPACE_LOG"); !enabled {
+	if !env.Log() {
 		return
 	}
 

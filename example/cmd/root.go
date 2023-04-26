@@ -34,4 +34,8 @@ func init() {
 		&cobra.Group{ID: "modifier", Title: "Modifier Commands"},
 		&cobra.Group{ID: "test", Title: "Test Commands"},
 	)
+
+	rootCmd.Run = func(cmd *cobra.Command, args []string) {
+		println(rootCmd.Flag("persistentFlag").Value.String())
+	}
 }

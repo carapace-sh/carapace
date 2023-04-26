@@ -58,16 +58,13 @@ func (f Flag) Split(arg string) (prefix, optarg string) {
 	return splitted[0] + delimiter, splitted[1]
 }
 
-func (f Flag) Matches(arg string, posix bool) bool {
-	if !strings.HasPrefix(arg, "-") { // not a flag
-		return false
-	}
-
+func (f Flag) NameMatches(arg string) bool {
 	switch {
-
 	case strings.HasPrefix(arg, "--"):
 		name := strings.TrimPrefix(arg, "--")
-		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
+		if f.IsOptarg() {
+			name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
+		}
 
 		switch f.Mode() {
 		case ShorthandOnly, NameAsShorthand:
@@ -76,7 +73,7 @@ func (f Flag) Matches(arg string, posix bool) bool {
 			return name == f.Name
 		}
 
-	case !posix:
+	case strings.HasPrefix(arg, "-"):
 		name := strings.TrimPrefix(arg, "-")
 		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
 
@@ -87,14 +84,12 @@ func (f Flag) Matches(arg string, posix bool) bool {
 		switch f.Mode() {
 		case ShorthandOnly:
 			return name == f.Shorthand
-		default:
+		case NameAsShorthand:
 			return name == f.Name || name == f.Shorthand
+		default:
+			return false
 		}
-
 	default:
-		if f.Shorthand != "" {
-			return strings.HasSuffix(arg, f.Shorthand)
-		}
 		return false
 	}
 }

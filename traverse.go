@@ -111,8 +111,15 @@ loop:
 
 	toParse := inArgs
 	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
-		LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
-		toParse = toParse[:len(toParse)-1]
+		switch {
+		case fs.IsShorthandSeries(toParse[len(toParse)-1]):
+			LOG.Printf("removing shorthand %#v from %#v since it is missing its argument\n", inFlag.Shorthand, toParse[len(toParse)-1])
+			toParse[len(toParse)-1] = strings.SplitN(toParse[len(toParse)-1], inFlag.Shorthand, 2)[0]
+
+		default:
+			LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
+			toParse = toParse[:len(toParse)-1]
+		}
 	} else if fs.IsShorthandSeries(context.Value) {
 		LOG.Printf("arg %#v is a shorthand flag series", context.Value)
 		localInFlag := &_inFlag{
@@ -121,7 +128,7 @@ loop:
 		}
 		if localInFlag.Consumes("") && len(context.Value) > 2 {
 			LOG.Printf("removing shorthand %#v from flag series since it is missing its argument\n", localInFlag.Shorthand)
-			toParse = append(toParse, strings.TrimSuffix(context.Value, localInFlag.Shorthand))
+			toParse = append(toParse, strings.SplitN(context.Value, localInFlag.Shorthand, 2)[0])
 		} else {
 			toParse = append(toParse, context.Value)
 		}

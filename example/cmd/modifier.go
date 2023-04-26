@@ -19,6 +19,12 @@ func init() {
 	modifierCmd.Flags().String("timeout", "", "Timeout()")
 	modifierCmd.Flags().String("tomultiparts", "", "ToMultiPartsA()")
 	modifierCmd.Flags().String("usage", "", "Usage()")
+	modifierCmd.Flags().StringS("x", "x", "", "xxxx")
+	modifierCmd.Flags().StringS("y", "y", "", "xxxx")
+	modifierCmd.Flags().StringS("z", "z", "", "xxxx")
+	modifierCmd.Flags().BoolS("u", "u", false, "xxxx")
+	modifierCmd.Flags().BoolS("v", "v", false, "xxxx")
+	modifierCmd.Flags().BoolS("w", "w", false, "xxxx")
 
 	rootCmd.AddCommand(modifierCmd)
 

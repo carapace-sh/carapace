@@ -39,7 +39,7 @@ func TestActionFlags(t *testing.T) {
 
 	cmd.Flag("alpha").Changed = true
 	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
-	assertEqual(t, ActionValuesDescribed("b", "").Tag("flags").NoSpace().Invoke(Context{}).Prefix("-a"), a)
+	assertEqual(t, ActionValuesDescribed("b", "", "h", "help for this command").Tag("flags").NoSpace().Invoke(Context{}).Prefix("-a"), a)
 }
 
 func TestActionExecCommandEnv(t *testing.T) {

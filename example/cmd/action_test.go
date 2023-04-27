@@ -174,7 +174,9 @@ func TestDash(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--embedded-bool", "embedded bool flag", style.Default,
 				"--embedded-optarg", "embedded optarg flag", style.Yellow,
-				"--embedded-string", "embedded string flag", style.Blue).
+				"--embedded-string", "embedded string flag", style.Blue,
+				"-h", "help for embedded", style.Default,
+				"--help", "help for embedded", style.Default).
 				NoSpace('.').
 				Usage("action [pos1] [pos2] [--] [dashAny]...").
 				Tag("flags"))
@@ -183,7 +185,8 @@ func TestDash(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--embedded-bool", "embedded bool flag", style.Default,
 				"--embedded-optarg", "embedded optarg flag", style.Yellow,
-				"--embedded-string", "embedded string flag", style.Blue).
+				"--embedded-string", "embedded string flag", style.Blue,
+				"--help", "help for embedded", style.Default).
 				NoSpace('.').
 				Usage("action [pos1] [pos2] [--] [dashAny]...").
 				Tag("flags"))

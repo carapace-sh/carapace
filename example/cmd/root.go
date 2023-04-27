@@ -6,8 +6,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "example",
-	Short: "example completion",
+	Use:     "example",
+	Short:   "example completion",
+	Version: "example",
 }
 
 // Execute executes cmd.

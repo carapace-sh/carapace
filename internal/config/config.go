@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/rsteube/carapace/pkg/xdg"
@@ -22,24 +23,44 @@ func (c configMap) Keys() []string {
 	return keys
 }
 
-type Field struct {
-	Name        string
-	Description string
-	Style       string
-	Tag         string
-}
+// func (c configMap) Fields(name string, styled bool) ([]string, error) {
+// 	if i, ok := c[name]; ok {
+// 		fields := make([]string, 0)
+// 		t := reflect.TypeOf(i).Elem()
+// 		for index := 0; index < t.NumField(); index++ {
+// 			field := t.Field(index)
+// 			style := ""
+// 			if styled {
+// 				if field.Type.Name() != "string" {
+// 					return nil, fmt.Errorf("invalid field type [name: '%v', type: '%v']", field.Name, field.Type.Name())
+// 				}
+// 				v := reflect.ValueOf(i).Elem()
+// 				style = v.FieldByName(field.Name).String()
+// 			}
+// 			fields = append(fields, field.Name, field.Tag.Get("desc"), style)
+// 		}
+// 		return fields, nil
+// 	}
+// 	return nil, fmt.Errorf("unknown config: '%v'", name)
+// }
 
-func (c configMap) Fields(name string) ([]Field, error) {
+func (c configMap) Fields(name string, styled bool) ([]Field, error) {
 	if i, ok := c[name]; ok {
 		fields := make([]Field, 0)
 		t := reflect.TypeOf(i).Elem()
 		v := reflect.ValueOf(i).Elem()
 		for index := 0; index < t.NumField(); index++ {
 			field := t.Field(index)
-			if field.Type.Name() != "string" {
+			if styled && field.Type.Name() != "string" {
 				return nil, fmt.Errorf("invalid field type [name: '%v', type: '%v']", field.Name, field.Type.Name())
 			}
-			fields = append(fields, Field{field.Name, field.Tag.Get("desc"), v.FieldByName(field.Name).String(), field.Tag.Get("tag")})
+			fields = append(fields, Field{
+				Name:        field.Name,
+				Description: field.Tag.Get("desc"),
+				Style:       v.FieldByName(field.Name).String(), // TODO only if styled
+				Tag:         field.Tag.Get("tag"),
+				Type:        field.Type,
+			})
 		}
 		return fields, nil
 	}
@@ -47,9 +68,15 @@ func (c configMap) Fields(name string) ([]Field, error) {
 }
 
 var config = struct {
-	Styles configMap
+	Configs configMap
+	Styles  configMap
 }{
-	Styles: make(configMap),
+	Configs: make(configMap),
+	Styles:  make(configMap),
+}
+
+func RegisterConfig(name string, i interface{}) {
+	config.Configs[name] = i
 }
 
 func RegisterStyle(name string, i interface{}) {
@@ -58,6 +85,11 @@ func RegisterStyle(name string, i interface{}) {
 
 func Load() error {
 	if err := load("styles", config.Styles); err != nil {
+		return err
+	}
+
+	// TODO duplicated, ok or improve?
+	if err := load("configs", config.Configs); err != nil {
 		return err
 	}
 	return nil
@@ -73,7 +105,7 @@ func load(name string, c configMap) error {
 			return err
 		}
 
-		var unmarshalled map[string]map[string]string
+		var unmarshalled map[string]map[string]interface{}
 		if err := json.Unmarshal(content, &unmarshalled); err != nil {
 			return err
 		}
@@ -83,7 +115,7 @@ func load(name string, c configMap) error {
 				elem := reflect.ValueOf(s).Elem()
 				for k, v := range value {
 					if field := elem.FieldByName(k); field != (reflect.Value{}) {
-						field.SetString(v)
+						field.Set(reflect.ValueOf(v).Convert(field.Type()))
 					}
 				}
 			}
@@ -92,8 +124,16 @@ func load(name string, c configMap) error {
 	return nil
 }
 
+func SetConfig(key, value string) error {
+	return set("configs", key, strings.Replace(value, ",", " ", -1))
+}
+
+func GetConfigs() []string                         { return config.Configs.Keys() }
+func GetConfigFields(name string) ([]Field, error) { return config.Configs.Fields(name, false) }
+func GetConfigMap(name string) interface{}         { return config.Configs[name] }
+
 func GetStyleConfigs() []string                   { return config.Styles.Keys() }
-func GetStyleFields(name string) ([]Field, error) { return config.Styles.Fields(name) }
+func GetStyleFields(name string) ([]Field, error) { return config.Styles.Fields(name, true) }
 func SetStyle(key, value string) error {
 	return set("styles", key, strings.Replace(value, ",", " ", -1))
 }
@@ -116,7 +156,7 @@ func set(name, key, value string) error {
 		content = []byte("{}")
 	}
 
-	var config map[string]map[string]string
+	var config map[string]map[string]interface{}
 	if err := json.Unmarshal(content, &config); err != nil {
 		return err
 	}
@@ -125,12 +165,25 @@ func set(name, key, value string) error {
 		return errors.New("invalid key")
 	} else {
 		if _, ok := config[splitted[0]]; !ok {
-			config[splitted[0]] = make(map[string]string, 0)
+			config[splitted[0]] = make(map[string]interface{}, 0)
 		}
 		if strings.TrimSpace(value) == "" {
 			delete(config[splitted[0]], splitted[1])
 		} else {
-			config[splitted[0]][splitted[1]] = value
+			switch reflect.TypeOf(config[splitted[0]][splitted[1]]).Kind() {
+			case reflect.Int:
+				intValue, err := strconv.Atoi(value)
+				if err != nil {
+					return err
+				}
+				config[splitted[0]][splitted[1]] = intValue
+
+			case reflect.String:
+				config[splitted[0]][splitted[1]] = value
+
+			case reflect.Slice:
+				// TODO
+			}
 		}
 	}
 
@@ -138,5 +191,7 @@ func set(name, key, value string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(file, marshalled, os.ModePerm)
+	os.WriteFile(file, marshalled, os.ModePerm)
+
+	return nil
 }

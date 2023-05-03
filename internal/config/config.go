@@ -39,7 +39,7 @@ func (c configMap) Fields(name string) ([]Field, error) {
 			if field.Type.Name() != "string" {
 				return nil, fmt.Errorf("invalid field type [name: '%v', type: '%v']", field.Name, field.Type.Name())
 			}
-			fields = append(fields, Field{field.Name, field.Tag.Get("desc"), v.FieldByName(field.Name).String(), field.Tag.Get("tag")})
+			fields = append(fields, Field{field.Name, field.Tag.Get("description"), v.FieldByName(field.Name).String(), field.Tag.Get("tag")})
 		}
 		return fields, nil
 	}

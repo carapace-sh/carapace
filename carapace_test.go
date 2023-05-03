@@ -230,7 +230,7 @@ func TestComplete(t *testing.T) {
 	cmd.Flags().BoolP("a", "1", false, "")
 	cmd.Flags().BoolP("b", "2", false, "")
 
-	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim white","Candidates":[{"Value":"-12","Display":"2","Description":"","CodeSuffix":"","Style":"default"},{"Value":"-1h","Display":"h","Description":"help for test","CodeSuffix":"","Style":"default"}]}` {
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim","Candidates":[{"Value":"-12","Display":"2","Description":"","CodeSuffix":"","Style":"default"},{"Value":"-1h","Display":"h","Description":"help for test","CodeSuffix":"","Style":"default"}]}` {
 		t.Error(s)
 	}
 }
@@ -246,7 +246,7 @@ func TestCompleteOptarg(t *testing.T) {
 		"opt": ActionValuesDescribed("value", "description"),
 	})
 
-	if s, err := complete(cmd, []string{"elvish", "_", "test", "--opt="}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim white","Candidates":[{"Value":"--opt=value","Display":"value","Description":"description","CodeSuffix":" ","Style":"default"}]}` {
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "--opt="}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim","Candidates":[{"Value":"--opt=value","Display":"value","Description":"description","CodeSuffix":" ","Style":"default"}]}` {
 		t.Error(s)
 	}
 }
@@ -270,7 +270,7 @@ func TestCompletePositionalWithSpace(t *testing.T) {
 		ActionValues("positional with space"),
 	)
 
-	if s, err := complete(cmd, []string{"elvish", "_", "positional "}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim white","Candidates":[{"Value":"positional with space","Display":"positional with space","Description":"","CodeSuffix":" ","Style":"default"}]}` {
+	if s, err := complete(cmd, []string{"elvish", "_", "positional "}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim","Candidates":[{"Value":"positional with space","Display":"positional with space","Description":"","CodeSuffix":" ","Style":"default"}]}` {
 		t.Error(s)
 	}
 }

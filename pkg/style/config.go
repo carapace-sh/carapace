@@ -66,17 +66,17 @@ type carapace struct {
 
 var Carapace = carapace{
 	Value:       Default,
-	Description: Gray,
+	Description: Dim,
 	Error:       Of(Bold, Red),
-	Usage:       Gray,
+	Usage:       Dim,
 
 	KeywordAmbiguous: Yellow,
 	KeywordNegative:  Red,
 	KeywordPositive:  Green,
-	KeywordUnknown:   Gray,
+	KeywordUnknown:   Of(Dim, White),
 
 	LogLevelTrace:    Blue,
-	LogLevelDebug:    Gray,
+	LogLevelDebug:    Of(Dim, White),
 	LogLevelInfo:     Green,
 	LogLevelWarning:  Yellow,
 	LogLevelError:    Magenta,
@@ -134,7 +134,6 @@ func (c carapace) Highlight(level int) string {
 	default:
 		return Default
 	}
-
 }
 
 func init() {

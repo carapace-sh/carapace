@@ -75,7 +75,7 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 	if f, ok := shellFuncs[shell]; ok {
 		if env.ColorDisabled() {
 			style.Carapace.Value = style.Default
-			style.Carapace.Description = style.Default
+			style.Carapace.Description = style.Dim
 			style.Carapace.Error = style.Underlined
 			style.Carapace.Usage = style.Italic
 			values = values.Decolor()

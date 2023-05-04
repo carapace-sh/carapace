@@ -43,18 +43,16 @@ type carapace struct {
 	LogLevelCritical string `description:"LogLevel CRITICAL" tag:"loglevel styles"`
 	LogLevelFatal    string `description:"LogLevel FATAL" tag:"loglevel styles"`
 
-	Highlight1 string `description:"Highlight 1" tag:"highlight styles"`
-	Highlight2 string `description:"Highlight 2" tag:"highlight styles"`
-	Highlight3 string `description:"Highlight 3" tag:"highlight styles"`
-	Highlight4 string `description:"Highlight 4" tag:"highlight styles"`
-	Highlight5 string `description:"Highlight 5" tag:"highlight styles"`
-	Highlight6 string `description:"Highlight 6" tag:"highlight styles"`
-
+	Highlight1  string `description:"Highlight 1" tag:"highlight styles"`
+	Highlight2  string `description:"Highlight 2" tag:"highlight styles"`
+	Highlight3  string `description:"Highlight 3" tag:"highlight styles"`
+	Highlight4  string `description:"Highlight 4" tag:"highlight styles"`
+	Highlight5  string `description:"Highlight 5" tag:"highlight styles"`
+	Highlight6  string `description:"Highlight 6" tag:"highlight styles"`
 	Highlight7  string `description:"Highlight 7" tag:"highlight styles"`
 	Highlight8  string `description:"Highlight 8" tag:"highlight styles"`
 	Highlight9  string `description:"Highlight 9" tag:"highlight styles"`
 	Highlight10 string `description:"Highlight 10" tag:"highlight styles"`
-
 	Highlight11 string `description:"Highlight 11" tag:"highlight styles"`
 	Highlight12 string `description:"Highlight 12" tag:"highlight styles"`
 
@@ -83,20 +81,18 @@ var Carapace = carapace{
 	LogLevelCritical: Red,
 	LogLevelFatal:    Cyan,
 
-	Highlight1: Blue,
-	Highlight2: Yellow,
-	Highlight3: Magenta,
-	Highlight4: Cyan,
-	Highlight5: Green,
-
-	Highlight6:  Of(Blue, Dim),
-	Highlight7:  Of(Yellow, Dim),
-	Highlight8:  Of(Magenta, Dim),
-	Highlight9:  Of(Cyan, Dim),
-	Highlight10: Of(Green, Dim),
-
+	Highlight1:  Blue,
+	Highlight2:  Yellow,
+	Highlight3:  Magenta,
+	Highlight4:  Cyan,
+	Highlight5:  Green,
+	Highlight6:  Of(Dim, Blue),
+	Highlight7:  Of(Dim, Yellow),
+	Highlight8:  Of(Dim, Magenta),
+	Highlight9:  Of(Dim, Cyan),
+	Highlight10: Of(Dim, Green),
 	Highlight11: Bold,
-	Highlight12: Of(Bold, Dim),
+	Highlight12: Of(Dim, Bold),
 
 	FlagArg:      Blue,
 	FlagMultiArg: Magenta,

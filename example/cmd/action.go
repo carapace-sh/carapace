@@ -132,12 +132,7 @@ func init() {
 		),
 	})
 
-	carapace.Gen(actionCmd).PositionalCompletion(
-		carapace.ActionValues("positional1", "p1", "positional1 with space"),
-		carapace.ActionValues("positional2", "p2", "positional2 with space"),
-	)
-
-	carapace.Gen(actionCmd).DashAnyCompletion(
+	carapace.Gen(actionCmd).PositionalAnyCompletion(
 		carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			cmd := &cobra.Command{
 				Use: "embedded",
@@ -160,10 +155,14 @@ func init() {
 
 			carapace.Gen(cmd).PositionalCompletion(
 				carapace.ActionValues("embeddedPositional1", "embeddedP1"),
-				carapace.ActionValues("embeddedPositional2", "embeddedP2"),
+				carapace.ActionValues("embeddedPositional2 with space", "embeddedP2 with space"),
 			)
 
 			return carapace.ActionExecute(cmd)
 		}),
+	)
+
+	carapace.Gen(actionCmd).DashAnyCompletion(
+		carapace.ActionPositional(actionCmd),
 	)
 }

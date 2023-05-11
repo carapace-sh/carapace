@@ -29,6 +29,11 @@ func command(cmd *cobra.Command) Command {
 		if flag.Hidden {
 			return
 		}
+
+		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
+			return
+		}
+
 		f := pflagfork.Flag{Flag: flag}
 		c.Flags[f.Definition()] = f.Usage
 

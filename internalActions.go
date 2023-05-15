@@ -70,6 +70,9 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 
 func actionFlags(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
+		cmd.InitDefaultHelpFlag()
+		cmd.InitDefaultVersionFlag()
+
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 

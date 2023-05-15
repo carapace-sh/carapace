@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -39,7 +39,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 	LOG.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
 	storage.preRun(c, args)
 
-	if config.IsLenient() {
+	if env.Lenient() {
 		LOG.Printf("allowing unknown flags")
 		c.FParseErrWhitelist.UnknownFlags = true
 	}

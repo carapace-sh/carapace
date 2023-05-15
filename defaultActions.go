@@ -295,7 +295,6 @@ func ActionStyles(styles ...string) Action {
 				s == style.Magenta ||
 				s == style.Cyan ||
 				s == style.White ||
-				s == style.Gray ||
 				s == style.BrightBlack ||
 				s == style.BrightRed ||
 				s == style.BrightGreen ||
@@ -326,7 +325,6 @@ func ActionStyles(styles ...string) Action {
 				style.Magenta, _s(style.Magenta),
 				style.Cyan, _s(style.Cyan),
 				style.White, _s(style.White),
-				style.Gray, _s(style.Gray),
 
 				style.BrightBlack, _s(style.BrightBlack),
 				style.BrightRed, _s(style.BrightRed),

@@ -18,7 +18,6 @@ var (
 	Magenta = "magenta"
 	Cyan    = "cyan"
 	White   = "white"
-	Gray    = Of(Dim, White)
 
 	BrightBlack   = "bright-black"
 	BrightRed     = "bright-red"

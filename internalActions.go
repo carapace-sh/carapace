@@ -73,6 +73,8 @@ func actionFlags(cmd *cobra.Command) Action {
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 
+		needsMultipart := false
+
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
 			switch {
@@ -104,13 +106,25 @@ func actionFlags(cmd *cobra.Command) Action {
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
 				}
+
+				if strings.Contains(f.Name, ".") {
+					needsMultipart = true
+				}
 			}
 		})
 
 		if isShorthandSeries {
 			return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace('*')
 		}
-		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
+
+		action := ActionStyledValuesDescribed(vals...)
+
+		// multiparts completion for flags grouped with `.`
+		if needsMultipart {
+			action = action.MultiParts(".")
+		}
+
+		return action
 	}).Tag("flags")
 }
 

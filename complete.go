@@ -20,6 +20,10 @@ func Complete(cmd *cobra.Command, args []string, onFinalize func()) (common.RawV
 	// action, current := generate(cmd, args)
 	action, context := traverse(cmd, args[2:])
 
+	if err := config.Load(); err != nil {
+		action = ActionMessage("failed to load config: " + err.Error())
+	}
+
 	invoked := action.Invoke(context)
 
 	// And adapt/fetch the results from invoked action

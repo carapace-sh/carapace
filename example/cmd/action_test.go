@@ -151,12 +151,12 @@ func TestAction(t *testing.T) {
 			Expect(carapace.ActionValuesDescribed("third", "description of third").
 				Usage("ActionValuesDescribed()"))
 
-		s.Run("action", "pos").
-			Expect(carapace.ActionValues("positional1", "positional1 with space").
+		s.Run("action", "embe").
+			Expect(carapace.ActionValues("embeddedP1", "embeddedPositional1").
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 
-		s.Run("action", "p1", "positional2 ").
-			Expect(carapace.ActionValues("positional2 with space").
+		s.Run("action", "embeddedP1", "embeddedP2 ").
+			Expect(carapace.ActionValues("embeddedP2 with space").
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 
 		s.Run("action", "--unknown", "").
@@ -174,7 +174,9 @@ func TestDash(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--embedded-bool", "embedded bool flag", style.Default,
 				"--embedded-optarg", "embedded optarg flag", style.Yellow,
-				"--embedded-string", "embedded string flag", style.Blue).
+				"--embedded-string", "embedded string flag", style.Blue,
+				"-h", "help for embedded", style.Default,
+				"--help", "help for embedded", style.Default).
 				NoSpace('.').
 				Usage("action [pos1] [pos2] [--] [dashAny]...").
 				Tag("flags"))
@@ -183,7 +185,8 @@ func TestDash(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--embedded-bool", "embedded bool flag", style.Default,
 				"--embedded-optarg", "embedded optarg flag", style.Yellow,
-				"--embedded-string", "embedded string flag", style.Blue).
+				"--embedded-string", "embedded string flag", style.Blue,
+				"--help", "help for embedded", style.Default).
 				NoSpace('.').
 				Usage("action [pos1] [pos2] [--] [dashAny]...").
 				Tag("flags"))
@@ -197,8 +200,8 @@ func TestDash(t *testing.T) {
 			Expect(carapace.ActionValues("es1", "es2", "es3").
 				Usage("embedded string flag"))
 
-		s.Run("action", "p1", "--styled-values", "second", "p2", "--", "embeddedP1", "--embedded-string", "es1", "").
-			Expect(carapace.ActionValues("embeddedPositional2", "embeddedP2").
+		s.Run("action", "embeddedP1", "--styled-values", "second", "--", "--embedded-string", "es1", "").
+			Expect(carapace.ActionValues("embeddedP2 with space", "embeddedPositional2 with space").
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 	})
 }
@@ -210,7 +213,7 @@ func TestUnknownFlag(t *testing.T) {
 
 		s.Env("CARAPACE_LENIENT", "1")
 		s.Run("action", "--unknown", "").
-			Expect(carapace.ActionValues("p1", "positional1", "positional1 with space").
+			Expect(carapace.ActionValues("embeddedP1", "embeddedPositional1").
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 	})
 }

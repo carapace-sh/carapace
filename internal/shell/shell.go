@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/shell/bash"
 	"github.com/rsteube/carapace/internal/shell/bash_ble"
 	"github.com/rsteube/carapace/internal/shell/elvish"
@@ -20,6 +21,7 @@ import (
 	"github.com/rsteube/carapace/internal/shell/xonsh"
 	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 
@@ -71,6 +73,13 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		"zsh":        zsh.ActionRawValues,
 	}
 	if f, ok := shellFuncs[shell]; ok {
+		if env.ColorDisabled() {
+			style.Carapace.Value = style.Default
+			style.Carapace.Description = style.Default
+			style.Carapace.Error = style.Underlined
+			style.Carapace.Usage = style.Italic
+			values = values.Decolor()
+		}
 		filtered := values.FilterPrefix(value)
 		switch shell {
 		case "elvish", "export", "zsh": // shells with support for showing messages

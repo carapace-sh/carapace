@@ -94,19 +94,25 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
 				"-a", "multiflag", style.Blue,
+				"-h", "help for example", style.Default,
+				"--help", "help for example", style.Default,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
 				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
 				"-p", "Help message for persistentFlag", style.Yellow,
 				"--toggle", "Help message for toggle", style.Default,
 				"-t", "Help message for toggle", style.Default,
+				"-v", "version for example", style.Default,
+				"--version", "version for example", style.Default,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
+				"--help", "help for example", style.Default,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
 				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
 				"--toggle", "Help message for toggle", style.Default,
+				"--version", "version for example", style.Default,
 			).NoSpace('.').Tag("flags"))
 
 		s.Run("--a").

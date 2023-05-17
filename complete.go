@@ -13,6 +13,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 	case 1:
 		return Gen(cmd).Snippet(args[0])
 	default:
+		initHelpCompletion(cmd)
 		action, context := traverse(cmd, args[2:])
 		if err := config.Load(); err != nil {
 			action = ActionMessage("failed to load config: " + err.Error())

@@ -17,8 +17,8 @@ import (
 // Also, and before calling `onFinalize` if not nil, the completion storage is cleared.
 func Complete(cmd *cobra.Command, args []string, onFinalize func()) (common.RawValues, common.Meta) {
 	// Generate the completion as normally done for an external system shell
-	// action, current := generate(cmd, args)
-	action, context := traverse(cmd, args[2:])
+	initHelpCompletion(cmd)
+	action, context := traverse(cmd, args)
 
 	if err := config.Load(); err != nil {
 		action = ActionMessage("failed to load config: " + err.Error())
@@ -37,6 +37,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 	case 1:
 		return Gen(cmd).Snippet(args[0])
 	default:
+		initHelpCompletion(cmd)
 		action, context := traverse(cmd, args[2:])
 		if err := config.Load(); err != nil {
 			action = ActionMessage("failed to load config: " + err.Error())

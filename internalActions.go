@@ -132,3 +132,26 @@ func actionSubcommands(cmd *cobra.Command) Action {
 		return batch.ToA()
 	})
 }
+
+func initHelpCompletion(cmd *cobra.Command) {
+	helpCmd, _, err := cmd.Find([]string{"help"})
+	if err != nil {
+		return
+	}
+
+	if helpCmd.Name() != "help" ||
+		helpCmd.Short != "Help about any command" ||
+		!strings.HasPrefix(helpCmd.Long, `Help provides help for any command in the application.`) {
+		return
+	}
+
+	Gen(helpCmd).PositionalAnyCompletion(
+		ActionCallback(func(c Context) Action {
+			lastCmd, _, err := cmd.Find(c.Args)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
+			return actionSubcommands(lastCmd)
+		}),
+	)
+}

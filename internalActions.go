@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -135,45 +134,24 @@ func actionSubcommands(cmd *cobra.Command) Action {
 }
 
 func initHelpCompletion(cmd *cobra.Command) {
-	// We must use this raw array to find a help command:
-	// cmd.HasHelpCommands() returns false because the default
-	// cobra command has a non-nil Run field. I think this is
-	// NOT a bug, it's intended to avoid overwriting helps...
 	helpCmd, _, err := cmd.Find([]string{"help"})
-	if err != nil || helpCmd == nil {
+	if err != nil {
 		return
 	}
 
-	// But we can now verify that the help command is a default.
-	// cobra does not add a special annotation to the command
-	// it binds, so we just check that the name, short and long
-	// description are the default ones.
 	if helpCmd.Name() != "help" ||
 		helpCmd.Short != "Help about any command" ||
 		!strings.HasPrefix(helpCmd.Long, `Help provides help for any command in the application.`) {
 		return
 	}
 
-	storage.bridge(helpCmd)
-
-	storage.get(helpCmd).positionalAny = ActionCallback(func(c Context) Action {
-		lastCmd, _, err := cmd.Find(c.Args)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		// The user might have mistyped one of the subcommands,
-		// which whould result in the lastCmd being the helpCmd.
-		if lastCmd == helpCmd && len(c.Args) > 0 {
-			return ActionMessage(fmt.Sprintf("unknown help topic `%s`", c.Args[len(c.Args)-1]))
-		}
-
-		// Else either complete subcommands for the last argument,
-		// or subcommands of the root command itself.
-		if len(c.Args) > 0 {
+	Gen(helpCmd).PositionalAnyCompletion(
+		ActionCallback(func(c Context) Action {
+			lastCmd, _, err := cmd.Find(c.Args)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
 			return actionSubcommands(lastCmd)
-		}
-
-		return actionSubcommands(cmd)
-	})
+		}),
+	)
 }

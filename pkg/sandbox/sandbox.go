@@ -183,6 +183,7 @@ func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 	return Command(t, func() *cobra.Command {
 		cmd := &cobra.Command{DisableFlagParsing: true}
 		cmd.CompletionOptions.DisableDefaultCmd = true
+		cmd.SetHelpCommand(&cobra.Command{})
 
 		carapace.Gen(cmd).PositionalAnyCompletion(
 			carapace.ActionCallback(func(c carapace.Context) carapace.Action {

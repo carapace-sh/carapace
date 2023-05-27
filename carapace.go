@@ -32,7 +32,6 @@ func (c Carapace) PreRun(f func(cmd *cobra.Command, args []string)) {
 			// TODO yuck - probably best to append to a slice in storage
 			_f(cmd, args)
 			f(cmd, args)
-
 		}
 	} else {
 		entry.prerun = f

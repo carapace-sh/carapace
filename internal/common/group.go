@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
@@ -14,7 +15,11 @@ type Group struct {
 func (g Group) Tag() string {
 	tag := "commands"
 	if id := g.Cmd.GroupID; id != "" {
-		tag = fmt.Sprintf("%v %v", id, tag)
+		if strings.HasSuffix(id, "commands") {
+			tag = id
+		} else {
+			tag = fmt.Sprintf("%v %v", id, tag)
+		}
 	} else if len(g.Cmd.Parent().Groups()) != 0 {
 		tag = "other commands"
 	}

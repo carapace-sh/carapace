@@ -20,10 +20,16 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		}
 
 		displayFolder := filepath.Dir(c.Value)
-		if displayFolder == "." {
-			displayFolder = ""
-		} else if !strings.HasSuffix(displayFolder, "/") {
-			displayFolder = displayFolder + "/"
+
+		// Always try to trim/adapt for absolute Windows paths (starting with C:).
+		// On all other platforms, adapt as usual
+		displayFolder, trimmed := windowsDisplayTrimmed(abs, c.Value, displayFolder)
+		if !trimmed {
+			if displayFolder == "." {
+				displayFolder = ""
+			} else if !strings.HasSuffix(displayFolder, "/") {
+				displayFolder = displayFolder + "/"
+			}
 		}
 
 		actualFolder := filepath.Dir(abs)
@@ -48,14 +54,18 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 
 			if resolvedFile.IsDir() {
-				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
+				// Use forward slahes regardless of the OS, since even Powershell understands them.
+				slashed := filepath.ToSlash(displayFolder + file.Name() + "/")
+				vals = append(vals, slashed, style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
+						// Use forward slahes regardless of the OS, since even Powershell understands them.
+						slashed := filepath.ToSlash(displayFolder + file.Name())
+						vals = append(vals, slashed, style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
 						break
 					}
 				}

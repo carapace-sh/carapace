@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/env"
@@ -119,9 +120,46 @@ func expandHome(s string) (string, error) {
 	return s, nil
 }
 
+func isWindowsVolume(path string) bool {
+	if len(path) <= 1 {
+		return false
+	}
+
+	// We need at least two characters,
+	// of which the first must be a letter
+	// and the second as colon.
+	if unicode.IsLetter(rune(path[0])) && path[1] == ':' {
+		return true
+	}
+
+	return false
+}
+
+// windowsDisplayTrimmed returns a trimmed display folder and true if
+// the context value is a Windows volume (absolute path), or nothing and false.
+func windowsDisplayTrimmed(abs, cValue, displayFolder string) (string, bool) {
+	if !isWindowsVolume(cValue) {
+		return displayFolder, false
+	}
+
+	// volume name such as C: => displayFolder then becomes C:.
+	if !strings.HasSuffix(abs, ".") {
+		displayFolder = strings.TrimSuffix(displayFolder, ".")
+	}
+
+	// If the context value is C:/, the display folder is still C:,
+	// so we only add a trailing slash when the context value is C:
+	// or if it's C:/Us (eg. longer than the volume root with slash).
+	if len(cValue) == 2 || (len(displayFolder) > 3) && !strings.HasSuffix(displayFolder, "/") {
+		displayFolder = displayFolder + "/"
+	}
+
+	return displayFolder, true
+}
+
 // Abs returns an absolute representation of path.
 func (c Context) Abs(path string) (string, error) {
-	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") { // path is relative
+	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") && !isWindowsVolume(path) { // path is relative
 		switch c.Dir {
 		case "":
 			path = "./" + path

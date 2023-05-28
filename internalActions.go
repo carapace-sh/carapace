@@ -1,7 +1,6 @@
 package carapace
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -21,10 +20,16 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		}
 
 		displayFolder := filepath.Dir(c.Value)
-		if displayFolder == "." {
-			displayFolder = ""
-		} else if !strings.HasSuffix(displayFolder, "/") {
-			displayFolder = displayFolder + "/"
+
+		// Always try to trim/adapt for absolute Windows paths (starting with C:).
+		// On all other platforms, adapt as usual
+		displayFolder, trimmed := windowsDisplayTrimmed(abs, c.Value, displayFolder)
+		if !trimmed {
+			if displayFolder == "." {
+				displayFolder = ""
+			} else if !strings.HasSuffix(displayFolder, "/") {
+				displayFolder = displayFolder + "/"
+			}
 		}
 
 		actualFolder := filepath.Dir(abs)
@@ -49,14 +54,18 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			}
 
 			if resolvedFile.IsDir() {
-				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
+				// Use forward slahes regardless of the OS, since even Powershell understands them.
+				slashed := filepath.ToSlash(displayFolder + file.Name() + "/")
+				vals = append(vals, slashed, style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
 			} else if !dirOnly {
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}
 				for _, suffix := range fileSuffixes {
 					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
+						// Use forward slahes regardless of the OS, since even Powershell understands them.
+						slashed := filepath.ToSlash(displayFolder + file.Name())
+						vals = append(vals, slashed, style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
 						break
 					}
 				}
@@ -149,45 +158,24 @@ func actionSubcommands(cmd *cobra.Command) Action {
 }
 
 func initHelpCompletion(cmd *cobra.Command) {
-	// We must use this raw array to find a help command:
-	// cmd.HasHelpCommands() returns false because the default
-	// cobra command has a non-nil Run field. I think this is
-	// NOT a bug, it's intended to avoid overwriting helps...
 	helpCmd, _, err := cmd.Find([]string{"help"})
-	if err != nil || helpCmd == nil {
+	if err != nil {
 		return
 	}
 
-	// But we can now verify that the help command is a default.
-	// cobra does not add a special annotation to the command
-	// it binds, so we just check that the name, short and long
-	// description are the default ones.
 	if helpCmd.Name() != "help" ||
 		helpCmd.Short != "Help about any command" ||
 		!strings.HasPrefix(helpCmd.Long, `Help provides help for any command in the application.`) {
 		return
 	}
 
-	storage.bridge(helpCmd)
-
-	storage.get(helpCmd).positionalAny = ActionCallback(func(c Context) Action {
-		lastCmd, _, err := cmd.Find(c.Args)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		// The user might have mistyped one of the subcommands,
-		// which whould result in the lastCmd being the helpCmd.
-		if lastCmd == helpCmd && len(c.Args) > 0 {
-			return ActionMessage(fmt.Sprintf("unknown help topic `%s`", c.Args[len(c.Args)-1]))
-		}
-
-		// Else either complete subcommands for the last argument,
-		// or subcommands of the root command itself.
-		if len(c.Args) > 0 {
+	Gen(helpCmd).PositionalAnyCompletion(
+		ActionCallback(func(c Context) Action {
+			lastCmd, _, err := cmd.Find(c.Args)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
 			return actionSubcommands(lastCmd)
-		}
-
-		return actionSubcommands(cmd)
-	})
+		}),
+	)
 }

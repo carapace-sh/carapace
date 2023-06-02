@@ -14,7 +14,7 @@ var sanitizer = strings.NewReplacer(
 )
 
 var quoter = strings.NewReplacer(
-	`\`, `\\`,
+	// `\`, `\\`,
 	` `, `\ `,
 )
 

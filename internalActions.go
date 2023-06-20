@@ -14,19 +14,24 @@ import (
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
+		if len(c.Value) == 2 && hasVolumePrefix(c.Value) {
+			// TODO should be fixed in Abs or wherever this is happening
+			return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`
+		}
+
 		abs, err := c.Abs(c.Value)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
-		displayFolder := filepath.Dir(c.Value)
+		displayFolder := filepath.ToSlash(filepath.Dir(c.Value))
 		if displayFolder == "." {
 			displayFolder = ""
 		} else if !strings.HasSuffix(displayFolder, "/") {
 			displayFolder = displayFolder + "/"
 		}
 
-		actualFolder := filepath.Dir(abs)
+		actualFolder := filepath.ToSlash(filepath.Dir(abs))
 		files, err := ioutil.ReadDir(actualFolder)
 		if err != nil {
 			return ActionMessage(err.Error())

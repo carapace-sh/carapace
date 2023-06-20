@@ -1,5 +1,5 @@
-.vscode
-example/example
-example/cmd/_test_files/*.txt
 caraparse/caraparse
 docs/book
+example/cmd/_test_files/*.txt
+example/example
+.vscode

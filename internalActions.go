@@ -9,12 +9,13 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/pkg/util"
 	"github.com/spf13/cobra"
 )
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		if len(c.Value) == 2 && hasVolumePrefix(c.Value) {
+		if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
 			// TODO should be fixed in Abs or wherever this is happening
 			return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`
 		}

@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
-	"unicode"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/shell/zsh"
+	"github.com/rsteube/carapace/pkg/util"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
@@ -122,24 +121,10 @@ func expandHome(s string) (string, error) {
 	return s, nil
 }
 
-// hasVolumePrefix checks if given path has a volume prefix (only for GOOS=windows)
-func hasVolumePrefix(path string) bool {
-	switch {
-	case runtime.GOOS != "windows":
-		return false
-	case len(path) < 2:
-		return false
-	case unicode.IsLetter(rune(path[0])) && path[1] == ':':
-		return true
-	default:
-		return false
-	}
-}
-
 // Abs returns an absolute representation of path.
 func (c Context) Abs(path string) (string, error) {
 	path = filepath.ToSlash(path)
-	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") && !hasVolumePrefix(path) { // path is relative
+	if !strings.HasPrefix(path, "/") && !strings.HasPrefix(path, "~") && !util.HasVolumePrefix(path) { // path is relative
 		switch c.Dir {
 		case "":
 			path = "./" + path
@@ -153,7 +138,7 @@ func (c Context) Abs(path string) (string, error) {
 		return "", err
 	}
 
-	if len(path) == 2 && hasVolumePrefix(path) {
+	if len(path) == 2 && util.HasVolumePrefix(path) {
 		path += "/" // prevent `C:` -> `C:./current/working/directory`
 	}
 	result, err := filepath.Abs(path)

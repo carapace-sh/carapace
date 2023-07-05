@@ -38,8 +38,15 @@ func TestTimeout(t *testing.T) {
 func TestUsage(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--usage", "").
+			Expect(carapace.ActionValues("explicit", "implicit").
+				Suffix(":").
+				NoSpace(':').
+				Usage("Usage()"))
+
+		s.Run("modifier", "--usage", "explicit:").
 			Expect(carapace.ActionValues().
-				Usage("explicit flag usage"))
+				NoSpace(':').
+				Usage("explicit usage"))
 	})
 }
 
@@ -59,31 +66,29 @@ func TestChdir(t *testing.T) {
 	})
 }
 
-func TestToMultiPartsA(t *testing.T) {
+func TestMultiParts(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
-		s.Run("modifier", "--tomultiparts", "").
-			Expect(carapace.ActionValues("1=", "2=").
-				NoSpace('/', '=').
-				Usage("ToMultiPartsA()"))
+		s.Run("modifier", "--multiparts", "").
+			Expect(carapace.ActionValues("dir/").
+				NoSpace('/').
+				Usage("MultiParts()"))
 
-		s.Run("modifier", "--tomultiparts", "1=").
-			Expect(carapace.ActionValues("1==", "2==").
-				Prefix("1=").
-				NoSpace('/', '=').
-				Usage("ToMultiPartsA()"))
+		s.Run("modifier", "--multiparts", "dir/").
+			Expect(carapace.ActionValues("subdir1/", "subdir2/").
+				Prefix("dir/").
+				NoSpace('/').
+				Usage("MultiParts()"))
 
-		s.Run("modifier", "--tomultiparts", "1=1==").
-			Expect(carapace.ActionValues("1/", "2/").
-				Prefix("1=1==").
-				NoSpace('/', '=').
-				Usage("ToMultiPartsA()"))
+		s.Run("modifier", "--multiparts", "dir/subdir1/").
+			Expect(carapace.ActionValues("fileA.txt", "fileB.txt").
+				Prefix("dir/subdir1/").
+				NoSpace('/').
+				Usage("MultiParts()"))
 
-		s.Run("modifier", "--tomultiparts", "1=1==1/").
-			Expect(carapace.ActionValuesDescribed(
-				"1", "one",
-				"2", "two").
-				Prefix("1=1==1/").
-				NoSpace('/', '=').
-				Usage("ToMultiPartsA()"))
+		s.Run("modifier", "--multiparts", "dir/subdir2/").
+			Expect(carapace.ActionValues("fileC.txt").
+				Prefix("dir/subdir2/").
+				NoSpace('/').
+				Usage("MultiParts()"))
 	})
 }

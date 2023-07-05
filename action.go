@@ -151,7 +151,7 @@ func (a Action) Tag(tag string) Action {
 //	ActionValues("192.168.1.1", "127.0.0.1").TagF(func(value string) string {
 //		return "interfaces"
 //	})
-func (a Action) TagF(f func(value string) string) Action {
+func (a Action) TagF(f func(s string) string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 		for index, v := range invoked.rawValues {

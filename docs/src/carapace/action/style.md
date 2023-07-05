@@ -4,10 +4,11 @@
 
 ```go
 carapace.ActionValues(
-  "first",
-  "second",
+    "one",
+    "two",
 ).Style(style.Green)
 ```
 
+![](./style.cast)
 
 [`Style`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Style

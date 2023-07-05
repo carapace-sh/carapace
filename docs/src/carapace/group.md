@@ -54,4 +54,4 @@ func init() {
 }
 ```
 
-[Command Groups]:https://github.com/spf13/cobra/blob/main/user_guide.md#grouping-commands-in-help
+[Command Groups]:https://github.com/spf13/cobra/blob/main/site/content/user_guide.md#grouping-commands-in-help

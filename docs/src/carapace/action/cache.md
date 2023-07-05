@@ -3,9 +3,11 @@
 [`Cache`] caches an [Action] for a given duration.
 
 ```go
-return carapace.ActionValues(
-	time.Now().Format("15:04:05"),
-).Cache(5 * time.Second)
+carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+	return carapace.ActionValues(
+		time.Now().Format("15:04:05"),
+	)
+}).Cache(5 * time.Second)
 ```
 
 ![](./cache.cast)
@@ -23,13 +25,15 @@ carapace.ActionMultiParts("/", func(c carapace.Context) carapace.Action {
 	case 0:
 		return carapace.ActionValues("one", "two").Suffix("/")
 	case 1:
-		return carapace.ActionValues(
-			time.Now().Format("15:04:05"),
-		).Cache(10*time.Second, cache.String(c.Parts[0]))
+		return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionValues(
+				time.Now().Format("15:04:05"),
+			)
+		}).Cache(10*time.Second, cache.String(c.Parts[0]))
 	default:
 		return carapace.ActionValues()
 	}
-}),
+})
 ```
 
 ![](./cache-key.cast)

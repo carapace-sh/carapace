@@ -43,7 +43,7 @@ func TestAction(t *testing.T) {
 				NoSpace('/').
 				Usage("ActionDirectories()"))
 
-		s.Run("action", "--exec-command", "").
+		s.Run("action", "--execcommand", "").
 			Expect(carapace.ActionValues("origin", "fork").
 				Usage("ActionExecCommand()"))
 

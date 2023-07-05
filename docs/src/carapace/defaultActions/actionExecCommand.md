@@ -1,6 +1,6 @@
 # ActionExecCommand
 
-[`ActionExecCommand`] executes given command and transforms its output using the provided function. If an error occurs during execution [ActionMessage](./actionMessage.md) is returned instead with the first line of `stderr` or an exit code.
+[`ActionExecCommand`] executes an external command.
 
 ```go
 carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {

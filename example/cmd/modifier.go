@@ -64,16 +64,18 @@ func init() {
 		"cache": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues(
 				time.Now().Format("15:04:05"),
-			).Cache(5 * time.Second)
-		}),
+			)
+		}).Cache(5 * time.Second),
 		"cache-key": carapace.ActionMultiParts("/", func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {
 			case 0:
 				return carapace.ActionValues("one", "two").Suffix("/")
 			case 1:
-				return carapace.ActionValues(
-					time.Now().Format("15:04:05"),
-				).Cache(10*time.Second, cache.String(c.Parts[0]))
+				return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+					return carapace.ActionValues(
+						time.Now().Format("15:04:05"),
+					)
+				}).Cache(10*time.Second, cache.String(c.Parts[0]))
 			default:
 				return carapace.ActionValues()
 			}
@@ -87,11 +89,14 @@ func init() {
 		).Filter([]string{"2", "4"}),
 		"list": carapace.ActionValues("one", "two", "three").List(","),
 		"invoke": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-			if !strings.HasPrefix(c.Value, "file://") {
-				return carapace.ActionValues("file://").NoSpace()
+			switch {
+			case strings.HasPrefix(c.Value, "file://"):
+				c.Value = strings.TrimPrefix(c.Value, "file://")
+			case strings.HasPrefix("file://", c.Value):
+				c.Value = ""
+			default:
+				return carapace.ActionValues()
 			}
-
-			c.Value = strings.TrimPrefix(c.Value, "file://")
 			return carapace.ActionFiles().Invoke(c).Prefix("file://").ToA()
 		}),
 		"nospace": carapace.ActionValues(
@@ -99,27 +104,10 @@ func init() {
 			"two/",
 			"three",
 		).NoSpace(',', '/'),
-		"timeout": carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
-			switch len(c.Parts) {
-			case 0:
-				return carapace.ActionValuesDescribed(
-					"1s", "within timeout",
-					"3s", "exceeding timeout",
-				).Suffix(":")
-			case 1:
-				d, err := time.ParseDuration(c.Parts[0])
-				if err != nil {
-					return carapace.ActionMessage(err.Error())
-				}
-
-				return carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-					time.Sleep(d)
-					return carapace.ActionValues("within timeout")
-				}).Timeout(2*time.Second, carapace.ActionMessage("timeout exceeded"))
-			default:
-				return carapace.ActionValues()
-			}
-		}),
+		"timeout": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			time.Sleep(3 * time.Second)
+			return carapace.ActionValues("within timeout")
+		}).Timeout(2*time.Second, carapace.ActionMessage("timeout exceeded")),
 		"multiparts": carapace.ActionValues(
 			"dir/subdir1/fileA.txt",
 			"dir/subdir1/fileB.txt",

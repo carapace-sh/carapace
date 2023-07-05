@@ -24,7 +24,7 @@ func ActionCallback(callback CompletionCallback) Action {
 	return Action{callback: callback}
 }
 
-// ActionExecCommand invokes given command and transforms its output using given function on success or returns ActionMessage with the first line of stderr if available.
+// ActionExecCommand executes an external command.
 //
 //	carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
 //	  lines := strings.Split(string(output), "\n")
@@ -389,7 +389,7 @@ func ActionStyles(styles ...string) Action {
 			style.Inverse, _s(style.Inverse),
 		))
 
-		return batch.ToA()
+		return batch.ToA().NoSpace('r')
 	}).Tag("styles")
 }
 

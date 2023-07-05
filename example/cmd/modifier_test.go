@@ -53,15 +53,8 @@ func TestShift(t *testing.T) {
 
 func TestTimeout(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
-		s.Run("modifier", "--timeout", "1s:").
-			Expect(carapace.ActionValues("within timeout").
-				Prefix("1s:").
-				NoSpace(':').
-				Usage("Timeout()"))
-
-		s.Run("modifier", "--timeout", "3s:").
+		s.Run("modifier", "--timeout", "").
 			Expect(carapace.ActionMessage("timeout exceeded").
-				NoSpace(':').
 				Usage("Timeout()"))
 	})
 }

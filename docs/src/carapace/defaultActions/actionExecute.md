@@ -1,6 +1,6 @@
 # ActionExecute
 
-[`ActionExecute`] invokes an internal command and parses it's output using [`ActionImport`].
+[`ActionExecute`] executes completion on an internal [`Command`].
 
 > Cobra commands can only be executed **once** so be sure each invocation uses a new instance.
 
@@ -28,4 +28,4 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 ![](./actionExecute.cast)
 
 [`ActionExecute`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionExecute
-[`ActionImport`]:../defaultActions/actionImport.md
+[`Command`]:https://pkg.go.dev/github.com/spf13/cobra#Command

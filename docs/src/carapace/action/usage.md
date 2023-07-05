@@ -1,6 +1,6 @@
 # Usage
 
-[`Usage`] sets the `usage` message.
+[`Usage`] sets the usage message.
 
 ```go
 carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {

@@ -87,12 +87,17 @@ func (c Carapace) Standalone() {
 	c.cmd.CompletionOptions = cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	}
-	// TODO probably needs to be done for each subcommand
-	// TODO still needed?
-	if c.cmd.Flag("help") != nil {
-		c.cmd.Flags().Bool("help", false, "skip")
-		c.cmd.Flag("help").Hidden = true
-	}
+
+	c.PreRun(func(cmd *cobra.Command, args []string) {
+		if f := cmd.Flag("help"); f == nil {
+			cmd.Flags().Bool("help", false, "")
+			cmd.Flag("help").Hidden = true
+		} else if f.Annotations != nil {
+			if _, ok := f.Annotations[cobra.FlagSetByCobraAnnotation]; ok {
+				cmd.Flag("help").Hidden = true
+			}
+		}
+	})
 	c.cmd.SetHelpCommand(&cobra.Command{Hidden: true})
 }
 

@@ -85,6 +85,8 @@ func actionFlags(cmd *cobra.Command) Action {
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
 			switch {
+			case f.Hidden:
+				return // skip hidden flags
 			case f.Deprecated != "":
 				return // skip deprecated flags
 			case f.Changed && !f.IsRepeatable():

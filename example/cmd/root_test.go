@@ -74,6 +74,7 @@ func TestRoot(t *testing.T) {
 				carapace.ActionValuesDescribed(
 					"completion", "Generate the autocompletion script for the specified shell",
 					"help", "Help about any command",
+					"interspersed", "interspersed example",
 					"multiparts", "multiparts example",
 					"special", "",
 				).Tag("other commands"),

@@ -44,9 +44,10 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		c.FParseErrWhitelist.UnknownFlags = true
 	}
 
-	inArgs := []string{} // args consumed by current command
-	var inFlag *_inFlag  // last encountered flag that still expects arguments
-	c.LocalFlags()       // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
+	inArgs := []string{}        // args consumed by current command
+	inPositionals := []string{} // positionals consumed by current command
+	var inFlag *_inFlag         // last encountered flag that still expects arguments
+	c.LocalFlags()              // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
 	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
 
 	context := NewContext(args...)
@@ -71,7 +72,7 @@ loop:
 			break loop
 
 		// flag
-		case !c.DisableFlagParsing && strings.HasPrefix(arg, "-"):
+		case !c.DisableFlagParsing && strings.HasPrefix(arg, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 			LOG.Printf("arg %#v is a flag\n", arg)
 			inArgs = append(inArgs, arg)
 			inFlag = &_inFlag{
@@ -106,6 +107,7 @@ loop:
 		default:
 			LOG.Printf("arg %#v is a positional\n", arg)
 			inArgs = append(inArgs, arg)
+			inPositionals = append(inPositionals, arg)
 		}
 	}
 
@@ -157,7 +159,7 @@ loop:
 		return storage.getFlag(c, inFlag.Name), context
 
 	// flag
-	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-"):
+	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 		if f := fs.LookupArg(context.Value); f != nil && f.IsOptarg() && strings.Contains(context.Value, string(f.OptargDelimiter())) {
 			LOG.Printf("completing optional flag argument for arg %#v\n", context.Value)
 			prefix, optarg := f.Split(context.Value)

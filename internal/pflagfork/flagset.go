@@ -12,6 +12,13 @@ type FlagSet struct {
 	*pflag.FlagSet
 }
 
+func (f FlagSet) IsInterspersed() bool {
+	if fv := reflect.ValueOf(f.FlagSet).Elem().FieldByName("interspersed"); fv.IsValid() {
+		return fv.Bool()
+	}
+	return false
+}
+
 func (f FlagSet) IsPosix() bool {
 	if method := reflect.ValueOf(f.FlagSet).MethodByName("IsPosix"); method.IsValid() {
 		if values := method.Call([]reflect.Value{}); len(values) == 1 && values[0].Kind() == reflect.Bool {

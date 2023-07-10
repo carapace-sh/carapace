@@ -20,16 +20,15 @@ func command(cmd *cobra.Command) Command {
 		Description:     cmd.Short,
 		Aliases:         cmd.Aliases,
 		Group:           cmd.GroupID,
+		Hidden:          cmd.Hidden,
 		Flags:           make(map[string]string),
 		PersistentFlags: make(map[string]string),
 		Commands:        make([]Command, 0),
 	}
 
-	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
-		if flag.Hidden {
-			return
-		}
+	// TODO mutually exclusive flags
 
+	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
 		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
 			return
 		}
@@ -40,16 +39,13 @@ func command(cmd *cobra.Command) Command {
 	})
 
 	cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
-		if flag.Hidden {
-			return
-		}
 		f := pflagfork.Flag{Flag: flag}
 		c.PersistentFlags[f.Definition()] = f.Usage
 
 	})
 
 	for _, subcmd := range cmd.Commands() {
-		if !subcmd.Hidden {
+		if subcmd.Name() != "_carapace" {
 			c.Commands = append(c.Commands, command(subcmd))
 		}
 	}

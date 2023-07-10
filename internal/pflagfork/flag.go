@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/pkg/style"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
@@ -125,6 +126,13 @@ func (f Flag) Style() string {
 	}
 }
 
+func (f Flag) Required() bool {
+	if annotation := f.Annotations[cobra.BashCompOneRequiredFlag]; len(annotation) == 1 && annotation[0] == "true" {
+		return true
+	}
+	return false
+}
+
 func (f Flag) Definition() string {
 	var definition string
 	switch f.Mode() {
@@ -139,6 +147,14 @@ func (f Flag) Definition() string {
 		default:
 			definition = fmt.Sprintf("-%v, --%v", f.Shorthand, f.Name)
 		}
+	}
+
+	if f.Hidden {
+		definition += "&"
+	}
+
+	if f.Required() {
+		definition += "!"
 	}
 
 	if f.IsRepeatable() {

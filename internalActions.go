@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/pkg/util"
@@ -85,7 +86,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		vals := make([]string, 0)
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
 			switch {
-			case f.Hidden:
+			case f.Hidden && !env.Hidden():
 				return // skip hidden flags
 			case f.Deprecated != "":
 				return // skip deprecated flags
@@ -129,7 +130,7 @@ func actionSubcommands(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		batch := Batch()
 		for _, subcommand := range cmd.Commands() {
-			if !subcommand.Hidden && subcommand.Deprecated == "" {
+			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
 				group := common.Group{Cmd: subcommand}
 				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
 				for _, alias := range subcommand.Aliases {

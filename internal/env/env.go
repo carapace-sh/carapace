@@ -21,3 +21,7 @@ func Sandbox() string {
 func Log() bool {
 	return os.Getenv("CARAPACE_LOG") != ""
 }
+
+func Hidden() bool {
+	return os.Getenv("CARAPACE_HIDDEN") != ""
+}

@@ -102,7 +102,7 @@ func ActionImport(output []byte) Action {
 }
 
 // ActionExecute executes completion on an internal command
-// TODO example
+// TODO example.
 func ActionExecute(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		args := []string{"_carapace", "export", cmd.Name()}
@@ -211,7 +211,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (Context.Value is set to the currently completed part during invocation)
+// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (Context.Value is set to the currently completed part during invocation).
 func ActionMultiParts(divider string, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		index := strings.LastIndex(c.Value, string(divider))
@@ -428,7 +428,7 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 }
 
 func isExecAny(mode os.FileMode) bool {
-	return mode&0111 != 0
+	return mode&0o111 != 0
 }
 
 // ActionPositional completes positional arguments for given command ignoring `--` (dash).

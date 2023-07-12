@@ -28,6 +28,11 @@ var keywords = map[string]*string{
 	"public":  &Carapace.KeywordPositive,
 	"private": &Carapace.KeywordNegative,
 
+	"asc":        &Carapace.KeywordPositive,
+	"ascending":  &Carapace.KeywordPositive,
+	"desc":       &Carapace.KeywordNegative,
+	"descending": &Carapace.KeywordNegative,
+
 	"open":   &Carapace.KeywordPositive,
 	"opened": &Carapace.KeywordPositive,
 	"close":  &Carapace.KeywordNegative,

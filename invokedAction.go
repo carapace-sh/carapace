@@ -17,7 +17,7 @@ func (a InvokedAction) export() export.Export {
 	return export.Export{Meta: a.meta, Values: a.rawValues}
 }
 
-// Filter filters given values (this should be done before any call to Prefix/Suffix as those alter the values being filtered)
+// Filter filters given values.
 //
 //	a := carapace.ActionValues("A", "B", "C").Invoke(c)
 //	b := a.Filter([]string{"B"}) // ["A", "C"]
@@ -47,6 +47,15 @@ func (a InvokedAction) Prefix(prefix string) InvokedAction {
 	for index, val := range a.rawValues {
 		a.rawValues[index].Value = prefix + val.Value
 	}
+	return a
+}
+
+// Retain retains given values.
+//
+//	a := carapace.ActionValues("A", "B", "C").Invoke(c)
+//	b := a.Retain([]string{"A", "C"}) // ["A", "C"]
+func (a InvokedAction) Retain(values []string) InvokedAction {
+	a.rawValues = a.rawValues.Retain(values...)
 	return a
 }
 

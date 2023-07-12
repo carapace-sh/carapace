@@ -21,6 +21,26 @@ func TestBatch(t *testing.T) {
 	})
 }
 
+func TestFilter(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--filter", "").
+			Expect(carapace.ActionValuesDescribed(
+				"1", "one",
+				"3", "three",
+			).Usage("Filter()"))
+	})
+}
+
+func TestRetain(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--retain", "").
+			Expect(carapace.ActionValuesDescribed(
+				"2", "two",
+				"4", "four",
+			).Usage("Retain()"))
+	})
+}
+
 func TestTimeout(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--timeout", "1s:").

@@ -82,6 +82,21 @@ func (r RawValues) Filter(values ...string) RawValues {
 	return filtered
 }
 
+// Retain retains given values.
+func (r RawValues) Retain(values ...string) RawValues {
+	toretain := make(map[string]bool)
+	for _, v := range values {
+		toretain[v] = true
+	}
+	filtered := make([]RawValue, 0)
+	for _, rawValue := range r {
+		if _, ok := toretain[rawValue.Value]; ok {
+			filtered = append(filtered, rawValue)
+		}
+	}
+	return filtered
+}
+
 // Decolor clears style for all values.
 func (r RawValues) Decolor() RawValues {
 	rawValues := make(RawValues, len(r))

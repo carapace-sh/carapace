@@ -25,11 +25,13 @@ func init() {
 	modifierCmd.Flags().String("cache", "", "Cache()")
 	modifierCmd.Flags().String("cache-key", "", "Cache()")
 	modifierCmd.Flags().String("chdir", "", "Chdir()")
+	modifierCmd.Flags().String("filter", "", "Filter()")
 	modifierCmd.Flags().String("invoke", "", "Invoke()")
 	modifierCmd.Flags().String("list", "", "List()")
 	modifierCmd.Flags().String("multiparts", "", "MultiParts()")
 	modifierCmd.Flags().String("nospace", "", "NoSpace()")
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
+	modifierCmd.Flags().String("retain", "", "Retain()")
 	modifierCmd.Flags().String("style", "", "Style()")
 	modifierCmd.Flags().String("stylef", "", "StyleF()")
 	modifierCmd.Flags().String("styler", "", "StyleR()")
@@ -76,7 +78,13 @@ func init() {
 			}
 		}),
 		"chdir": carapace.ActionFiles().Chdir(os.TempDir()),
-		"list":  carapace.ActionValues("one", "two", "three").List(","),
+		"filter": carapace.ActionValuesDescribed(
+			"1", "one",
+			"2", "two",
+			"3", "three",
+			"4", "four",
+		).Filter([]string{"2", "4"}),
+		"list": carapace.ActionValues("one", "two", "three").List(","),
 		"invoke": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			if !strings.HasPrefix(c.Value, "file://") {
 				return carapace.ActionValues("file://").NoSpace()
@@ -121,6 +129,12 @@ func init() {
 			"drop",
 			"fall",
 		).Prefix("water"),
+		"retain": carapace.ActionValuesDescribed(
+			"1", "one",
+			"2", "two",
+			"3", "three",
+			"4", "four",
+		).Retain([]string{"2", "4"}),
 		"style": carapace.ActionValues(
 			"one",
 			"two",

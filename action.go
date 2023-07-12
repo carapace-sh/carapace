@@ -52,6 +52,32 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 	return a
 }
 
+// Chdir changes the current working directory to the named directory for the duration of invocation.
+func (a Action) Chdir(dir string) Action {
+	return ActionCallback(func(c Context) Action {
+		abs, err := c.Abs(dir)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+		if info, err := os.Stat(abs); err != nil {
+			return ActionMessage(err.Error())
+		} else if !info.IsDir() {
+			return ActionMessage("not a directory: %v", abs)
+		}
+		c.Dir = abs
+		return a.Invoke(c).ToA()
+	})
+}
+
+// Filter filters given values.
+//
+//	carapace.ActionValues("A", "B", "C").Filter([]string{"B"}) // ["A", "C"]
+func (a Action) Filter(values []string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Filter(values).ToA()
+	})
+}
+
 // Invoke executes the callback of an action if it exists (supports nesting).
 func (a Action) Invoke(c Context) InvokedAction {
 	if c.Args == nil {
@@ -72,6 +98,20 @@ func (a Action) Invoke(c Context) InvokedAction {
 	return InvokedAction{a}
 }
 
+// List wraps the Action in an ActionMultiParts with given divider.
+func (a Action) List(divider string) Action {
+	return ActionMultiParts(divider, func(c Context) Action {
+		return a.Invoke(c).ToA().NoSpace()
+	})
+}
+
+// MultiParts splits values of an Action by given dividers and completes each segment separately.
+func (a Action) MultiParts(dividers ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).ToMultiPartsA(dividers...)
+	})
+}
+
 // NoSpace disables space suffix for given characters (or all if none are given).
 func (a Action) NoSpace(suffixes ...rune) Action {
 	return ActionCallback(func(c Context) Action {
@@ -83,20 +123,21 @@ func (a Action) NoSpace(suffixes ...rune) Action {
 	})
 }
 
-// Usage sets the usage.
-func (a Action) Usage(usage string, args ...interface{}) Action {
-	return a.UsageF(func() string {
-		return fmt.Sprintf(usage, args...)
+// Prefix adds a prefix to values (only the ones inserted, not the display values).
+//
+//	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
+func (a Action) Prefix(prefix string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Prefix(prefix).ToA()
 	})
 }
 
-// Usage sets the usage using a function.
-func (a Action) UsageF(f func() string) Action {
+// Retain retains given values.
+//
+//	carapace.ActionValues("A", "B", "C").Retain([]string{"A", "C"}) // ["A", "C"]
+func (a Action) Retain(values []string) Action {
 	return ActionCallback(func(c Context) Action {
-		if usage := f(); usage != "" {
-			a.meta.Usage = usage
-		}
-		return a
+		return a.Invoke(c).Retain(values).ToA()
 	})
 }
 
@@ -107,6 +148,20 @@ func (a Action) UsageF(f func() string) Action {
 func (a Action) Style(s string) Action {
 	return a.StyleF(func(_ string, _ style.Context) string {
 		return s
+	})
+}
+
+// Style sets the style using a function.
+//
+//	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
+//	ActionValues("true", "false").StyleF(style.ForKeyword)
+func (a Action) StyleF(f func(s string, sc style.Context) string) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, v := range invoked.rawValues {
+			invoked.rawValues[index].Style = f(v.Value, c)
+		}
+		return invoked.ToA()
 	})
 }
 
@@ -123,15 +178,21 @@ func (a Action) StyleR(s *string) Action {
 	})
 }
 
-// Style sets the style using a function.
+// Suffix adds a suffx to values (only the ones inserted, not the display values).
 //
-//	ActionValues("dir/", "test.txt").StyleF(style.ForPathExt)
-//	ActionValues("true", "false").StyleF(style.ForKeyword)
-func (a Action) StyleF(f func(s string, sc style.Context) string) Action {
+//	carapace.ActionValues("apple", "melon", "orange").Suffix("juice")
+func (a Action) Suffix(suffix string) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Suffix(suffix).ToA()
+	})
+}
+
+// Suppress suppresses specific error messages using regular expressions.
+func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
-		for index, v := range invoked.rawValues {
-			invoked.rawValues[index].Style = f(v.Value, c)
+		if err := invoked.meta.Messages.Suppress(expr...); err != nil {
+			return ActionMessage(err.Error())
 		}
 		return invoked.ToA()
 	})
@@ -161,73 +222,6 @@ func (a Action) TagF(f func(s string) string) Action {
 	})
 }
 
-// Chdir changes the current working directory to the named directory for the duration of invocation.
-func (a Action) Chdir(dir string) Action {
-	return ActionCallback(func(c Context) Action {
-		abs, err := c.Abs(dir)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-		if info, err := os.Stat(abs); err != nil {
-			return ActionMessage(err.Error())
-		} else if !info.IsDir() {
-			return ActionMessage("not a directory: %v", abs)
-		}
-		c.Dir = abs
-		return a.Invoke(c).ToA()
-	})
-}
-
-// Suppress suppresses specific error messages using regular expressions.
-func (a Action) Suppress(expr ...string) Action {
-	return ActionCallback(func(c Context) Action {
-		invoked := a.Invoke(c)
-		if err := invoked.meta.Messages.Suppress(expr...); err != nil {
-			return ActionMessage(err.Error())
-		}
-		return invoked.ToA()
-	})
-}
-
-// MultiParts splits values of an Action by given dividers and completes each segment separately.
-func (a Action) MultiParts(dividers ...string) Action {
-	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).ToMultiPartsA(dividers...)
-	})
-}
-
-// List wraps the Action in an ActionMultiParts with given divider.
-func (a Action) List(divider string) Action {
-	return ActionMultiParts(divider, func(c Context) Action {
-		return a.Invoke(c).ToA().NoSpace()
-	})
-}
-
-// UniqueList wraps the Action in an ActionMultiParts with given divider.
-func (a Action) UniqueList(divider string) Action {
-	return ActionMultiParts(divider, func(c Context) Action {
-		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
-	})
-}
-
-// Prefix adds a prefix to values (only the ones inserted, not the display values).
-//
-//	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
-func (a Action) Prefix(prefix string) Action {
-	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).Prefix(prefix).ToA()
-	})
-}
-
-// Suffix adds a suffx to values (only the ones inserted, not the display values).
-//
-//	carapace.ActionValues("apple", "melon", "orange").Suffix("juice")
-func (a Action) Suffix(suffix string) Action {
-	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).Suffix(suffix).ToA()
-	})
-}
-
 // Timeout sets the maximum duration an Action may take to invoke.
 //
 //	carapace.ActionCallback(func(c carapace.Context) carapace.Action {
@@ -250,5 +244,29 @@ func (a Action) Timeout(d time.Duration, alternative Action) Action {
 			return alternative
 		}
 		return result.ToA()
+	})
+}
+
+// UniqueList wraps the Action in an ActionMultiParts with given divider.
+func (a Action) UniqueList(divider string) Action {
+	return ActionMultiParts(divider, func(c Context) Action {
+		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
+	})
+}
+
+// Usage sets the usage.
+func (a Action) Usage(usage string, args ...interface{}) Action {
+	return a.UsageF(func() string {
+		return fmt.Sprintf(usage, args...)
+	})
+}
+
+// Usage sets the usage using a function.
+func (a Action) UsageF(f func() string) Action {
+	return ActionCallback(func(c Context) Action {
+		if usage := f(); usage != "" {
+			a.meta.Usage = usage
+		}
+		return a
 	})
 }

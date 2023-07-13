@@ -125,11 +125,7 @@ func init() {
 			"dir/subdir1/fileB.txt",
 			"dir/subdir2/fileC.txt",
 		).MultiParts("/"),
-		"prefix": carapace.ActionValues(
-			"melon",
-			"drop",
-			"fall",
-		).Prefix("water"),
+		"prefix": carapace.ActionFiles().Prefix("file://"),
 		"retain": carapace.ActionValuesDescribed(
 			"1", "one",
 			"2", "two",

@@ -135,7 +135,7 @@ func init() {
 			"2", "two",
 			"3", "three",
 			"4", "four",
-		).Retain([]string{"2", "4"}),
+		).Retain("2", "4"),
 		"shift": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionMessage("%#v", c.Args)
 		}).Shift(1),

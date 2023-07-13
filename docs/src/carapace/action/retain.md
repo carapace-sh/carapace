@@ -8,7 +8,7 @@ carapace.ActionValuesDescribed(
 	"2", "two",
 	"3", "three",
 	"4", "four",
-).Retain([]string{"2", "4"})
+).Retain("2", "4")
 ```
 
 ![](./retain.cast)

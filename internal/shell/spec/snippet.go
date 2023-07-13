@@ -45,7 +45,7 @@ func command(cmd *cobra.Command) Command {
 	})
 
 	for _, subcmd := range cmd.Commands() {
-		if subcmd.Name() != "_carapace" {
+		if subcmd.Name() != "_carapace" && subcmd.Deprecated == "" {
 			c.Commands = append(c.Commands, command(subcmd))
 		}
 	}

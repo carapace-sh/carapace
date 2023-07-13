@@ -41,6 +41,16 @@ func TestRetain(t *testing.T) {
 	})
 }
 
+func TestShift(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "one", "--shift", "").
+			Expect(carapace.ActionMessage(`[]string{}`).Usage("Shift()"))
+
+		s.Run("modifier", "one", "two", "three", "--shift", "").
+			Expect(carapace.ActionMessage(`[]string{"two", "three"}`).Usage("Shift()"))
+	})
+}
+
 func TestTimeout(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--timeout", "1s:").

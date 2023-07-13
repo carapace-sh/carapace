@@ -16,6 +16,7 @@
     - [NoSpace](./carapace/action/noSpace.md)
     - [Prefix](./carapace/action/prefix.md)
     - [Retain](./carapace/action/retain.md)
+    - [Shift](./carapace/action/shift.md)
     - [Style](./carapace/action/style.md)
     - [StyleF](./carapace/action/styleF.md)
     - [StyleR](./carapace/action/styleR.md)

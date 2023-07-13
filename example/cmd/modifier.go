@@ -32,6 +32,7 @@ func init() {
 	modifierCmd.Flags().String("nospace", "", "NoSpace()")
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
 	modifierCmd.Flags().String("retain", "", "Retain()")
+	modifierCmd.Flags().String("shift", "", "Shift()")
 	modifierCmd.Flags().String("style", "", "Style()")
 	modifierCmd.Flags().String("stylef", "", "StyleF()")
 	modifierCmd.Flags().String("styler", "", "StyleR()")
@@ -135,6 +136,9 @@ func init() {
 			"3", "three",
 			"4", "four",
 		).Retain([]string{"2", "4"}),
+		"shift": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			return carapace.ActionMessage("%#v", c.Args)
+		}).Shift(1),
 		"style": carapace.ActionValues(
 			"one",
 			"two",

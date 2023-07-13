@@ -141,6 +141,21 @@ func (a Action) Retain(values []string) Action {
 	})
 }
 
+// Shift shifts positional arguments left `n` times.
+func (a Action) Shift(n int) Action {
+	return ActionCallback(func(c Context) Action {
+		switch {
+		case n < 0:
+			return ActionMessage("invalid argument [ActionShift]: %v", n)
+		case len(c.Args) < n:
+			c.Args = []string{}
+		default:
+			c.Args = c.Args[n:]
+		}
+		return a.Invoke(c).ToA()
+	})
+}
+
 // Style sets the style.
 //
 //	ActionValues("yes").Style(style.Green)

@@ -3,11 +3,7 @@
 [`Prefix`] adds a prefix to the inserted values.
 
 ```go
-carapace.ActionValues(
-	"melon",
-	"drop",
-	"fall",
-).Prefix("water")
+carapace.ActionFiles().Prefix("file://")
 ```
 
 ![](./prefix.cast)

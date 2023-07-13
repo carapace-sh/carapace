@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/rsteube/carapace/internal/cache"
@@ -128,6 +129,14 @@ func (a Action) NoSpace(suffixes ...rune) Action {
 //	carapace.ActionValues("melon", "drop", "fall").Prefix("water")
 func (a Action) Prefix(prefix string) Action {
 	return ActionCallback(func(c Context) Action {
+		switch {
+		case strings.HasPrefix(c.Value, prefix):
+			c.Value = strings.TrimPrefix(c.Value, prefix)
+		case strings.HasPrefix(prefix, c.Value):
+			c.Value = ""
+		default:
+			return ActionValues()
+		}
 		return a.Invoke(c).Prefix(prefix).ToA()
 	})
 }

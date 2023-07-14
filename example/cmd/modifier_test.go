@@ -61,6 +61,7 @@ func TestTimeout(t *testing.T) {
 
 		s.Run("modifier", "--timeout", "3s:").
 			Expect(carapace.ActionMessage("timeout exceeded").
+				NoSpace(':').
 				Usage("Timeout()"))
 	})
 }

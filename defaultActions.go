@@ -205,7 +205,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 		if len(args) > 0 {
 			msg = fmt.Sprintf(msg, args...)
 		}
-		a := ActionValues().NoSpace()
+		a := ActionValues()
 		a.meta.Messages.Add(stripansi.Strip(msg))
 		return a
 	})

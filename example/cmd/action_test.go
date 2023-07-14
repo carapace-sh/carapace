@@ -22,12 +22,10 @@ func TestAction(t *testing.T) {
 
 		s.Run("action", "--callback", "").
 			Expect(carapace.ActionMessage("values flag is not set").
-				NoSpace().
 				Usage("ActionCallback()"))
 
 		s.Run("action", "--values", "first", "--callback", "").
 			Expect(carapace.ActionMessage("values flag is set to: 'first'").
-				NoSpace().
 				Usage("ActionCallback()"))
 
 		s.Run("action", "--directories", "").
@@ -81,7 +79,6 @@ func TestAction(t *testing.T) {
 
 		s.Run("action", "--message", "").
 			Expect(carapace.ActionMessage("example message").
-				NoSpace().
 				Usage("ActionMessage()"))
 
 		s.Run("action", "--message-multiple", "t").
@@ -91,7 +88,6 @@ func TestAction(t *testing.T) {
 				carapace.ActionMessage("third message"),
 				carapace.ActionValues("one", "two", "three")).
 				ToA().
-				NoSpace().
 				Usage("ActionMessage()"))
 
 		s.Run("action", "--multiparts", "").
@@ -209,7 +205,7 @@ func TestDash(t *testing.T) {
 func TestUnknownFlag(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--unknown", "").
-			Expect(carapace.ActionMessage("unknown flag: --unknown").NoSpace())
+			Expect(carapace.ActionMessage("unknown flag: --unknown"))
 
 		s.Env("CARAPACE_LENIENT", "1")
 		s.Run("action", "--unknown", "").

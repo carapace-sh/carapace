@@ -184,7 +184,7 @@ func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
 	assertEqual(t,
-		ActionMessage(fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))).NoSpace('/').Invoke(Context{}),
+		ActionMessage(fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))).Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{}),
 	)
 
@@ -207,7 +207,7 @@ func TestActionFilesChdir(t *testing.T) {
 }
 
 func TestActionMessage(t *testing.T) {
-	expected := ActionValues().NoSpace()
+	expected := ActionValues()
 	expected.meta.Messages.Add("example message")
 
 	assertEqual(t,
@@ -222,13 +222,13 @@ func TestActionMessageSuppress(t *testing.T) {
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
 		).ToA().Invoke(Context{}),
-		ActionValues("test").NoSpace('*').Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
+		ActionValues("test").Invoke(Context{}), // TODO suppress does not reset nospace (is that even possible?)
 	)
 }
 
 func TestActionExecCommand(t *testing.T) {
 	assertEqual(t,
-		ActionMessage("go unknown: unknown command").NoSpace('/').Invoke(Context{}).Prefix("docs/"),
+		ActionMessage("go unknown: unknown command").Invoke(Context{}).Prefix("docs/"),
 		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{Value: "docs/"}),
 	)
 

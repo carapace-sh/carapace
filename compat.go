@@ -17,7 +17,7 @@ func registerValidArgsFunction(cmd *cobra.Command) {
 }
 
 func registerFlagCompletion(cmd *cobra.Command) {
-	cmd.Flags().VisitAll(func(f *pflag.Flag) {
+	cmd.LocalFlags().VisitAll(func(f *pflag.Flag) {
 		err := cmd.RegisterFlagCompletionFunc(f.Name, func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			a := storage.getFlag(cmd, f.Name)
 			action := a.Invoke(Context{Args: args, Value: toComplete})

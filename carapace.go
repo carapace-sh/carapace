@@ -97,7 +97,7 @@ func (c Carapace) Standalone() {
 			}
 		}
 	})
-	c.cmd.SetHelpCommand(&cobra.Command{Hidden: true, Deprecated: "fake help command to prevent default"})
+	c.cmd.SetHelpCommand(&cobra.Command{Use: "_carapace_help", Hidden: true, Deprecated: "fake help command to prevent default"})
 }
 
 // Snippet creates completion script for given shell.

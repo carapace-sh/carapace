@@ -25,3 +25,7 @@ func Log() bool {
 func Hidden() bool {
 	return os.Getenv("CARAPACE_HIDDEN") != ""
 }
+
+func CoverDir() string {
+	return os.Getenv("CARAPACE_COVERDIR") // custom env for GOCOVERDIR so that it works together with `-coverprofile`
+}

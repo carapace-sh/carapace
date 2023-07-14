@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os/exec"
 	"strings"
 
 	"github.com/rsteube/carapace"
@@ -21,7 +22,8 @@ func init() {
 
 	actionCmd.Flags().String("callback", "", "ActionCallback()")
 	actionCmd.Flags().String("directories", "", "ActionDirectories()")
-	actionCmd.Flags().String("exec-command", "", "ActionExecCommand()")
+	actionCmd.Flags().String("execcommand", "", "ActionExecCommand()")
+	actionCmd.Flags().String("execcommandE", "", "ActionExecCommand()")
 	actionCmd.Flags().String("executables", "", "ActionExecutables()")
 	actionCmd.Flags().String("files", "", "ActionFiles()")
 	actionCmd.Flags().String("files-filtered", "", "ActionFiles(\".md\", \"go.mod\", \"go.sum\")")
@@ -30,6 +32,8 @@ func init() {
 	actionCmd.Flags().String("message-multiple", "", "ActionMessage()")
 	actionCmd.Flags().String("multiparts", "", "ActionMultiParts()")
 	actionCmd.Flags().String("multiparts-nested", "", "ActionMultiParts(...ActionMultiParts...)")
+	actionCmd.Flags().String("styles", "", "ActionStyles()")
+	actionCmd.Flags().String("styleconfig", "", "ActionStyleConfig()")
 	actionCmd.Flags().String("styled-values", "", "ActionStyledValues()")
 	actionCmd.Flags().String("styled-values-described", "", "ActionStyledValuesDescribed()")
 	actionCmd.Flags().String("values", "", "ActionValues()")
@@ -43,9 +47,18 @@ func init() {
 			return carapace.ActionMessage("values flag is not set")
 		}),
 		"directories": carapace.ActionDirectories(),
-		"exec-command": carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
+		"execcommand": carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
 			lines := strings.Split(string(output), "\n")
 			return carapace.ActionValues(lines[:len(lines)-1]...)
+		}),
+		"execcommandE": carapace.ActionExecCommandE("false")(func(output []byte, err error) carapace.Action {
+			if err != nil {
+				if exitErr, ok := err.(*exec.ExitError); ok {
+					return carapace.ActionMessage("failed with %v", exitErr.ExitCode())
+				}
+				return carapace.ActionMessage(err.Error())
+			}
+			return carapace.ActionValues()
 		}),
 		"executables":    carapace.ActionExecutables(),
 		"files":          carapace.ActionFiles(),
@@ -113,6 +126,8 @@ func init() {
 				}
 			})
 		}),
+		"styles":      carapace.ActionStyles(),
+		"styleconfig": carapace.ActionStyleConfig(),
 		"styled-values": carapace.ActionStyledValues(
 			"first", style.Default,
 			"second", style.Blue,

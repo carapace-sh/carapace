@@ -4,11 +4,14 @@
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-	if !strings.HasPrefix(c.Value, "file://") {
-		return carapace.ActionValues("file://").NoSpace()
+	switch {
+	case strings.HasPrefix(c.Value, "file://"):
+		c.Value = strings.TrimPrefix(c.Value, "file://")
+	case strings.HasPrefix("file://", c.Value):
+		c.Value = ""
+	default:
+		return carapace.ActionValues()
 	}
-
-	c.Value = strings.TrimPrefix(c.Value, "file://")
 	return carapace.ActionFiles().Invoke(c).Prefix("file://").ToA()
 })
 ```

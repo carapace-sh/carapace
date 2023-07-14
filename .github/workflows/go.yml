@@ -29,10 +29,14 @@ jobs:
         run: go generate ./...
 
       - name: Test
-        run: go test -v ./... ./example-nonposix/...
+        run: go test -v -coverprofile=profile.cov ./... ./example-nonposix/...
 
       - name: "Check formatting"
         run: '[ "$(gofmt -d -s . | tee -a /dev/stderr)" = "" ]'
+
+      - uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: profile.cov
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2

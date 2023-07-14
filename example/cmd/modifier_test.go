@@ -62,14 +62,7 @@ func TestTimeout(t *testing.T) {
 func TestUsage(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--usage", "").
-			Expect(carapace.ActionValues("explicit", "implicit").
-				Suffix(":").
-				NoSpace(':').
-				Usage("Usage()"))
-
-		s.Run("modifier", "--usage", "explicit:").
 			Expect(carapace.ActionValues().
-				NoSpace(':').
 				Usage("explicit usage"))
 	})
 }

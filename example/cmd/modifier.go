@@ -174,20 +174,7 @@ func init() {
 			}
 		}),
 		"uniquelist": carapace.ActionValues("one", "two", "three").UniqueList(","),
-		"usage": carapace.ActionMultiParts(":", func(c carapace.Context) carapace.Action {
-			switch len(c.Parts) {
-			case 0:
-				return carapace.ActionValues("explicit", "implicit").Suffix(":")
-			case 1:
-				if c.Parts[0] == "explicit" {
-					return carapace.ActionValues().Usage("explicit usage")
-				}
-				return carapace.ActionValues()
-
-			default:
-				return carapace.ActionValues()
-			}
-		}),
+		"usage":      carapace.ActionValues().Usage("explicit usage"),
 	})
 
 	carapace.Gen(modifierCmd).PositionalCompletion(

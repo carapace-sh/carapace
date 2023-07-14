@@ -3,6 +3,7 @@ package carapace
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/uid"
@@ -21,26 +22,50 @@ type entry struct {
 	preinvoke     func(cmd *cobra.Command, flag *pflag.Flag, action Action) Action
 	prerun        func(cmd *cobra.Command, args []string)
 	bridged       bool
+	initialized   bool
 }
 
 type _storage map[*cobra.Command]*entry
 
+var storageMutex sync.Mutex
+
 func (s _storage) get(cmd *cobra.Command) (e *entry) {
 	var ok bool
 	if e, ok = s[cmd]; !ok {
-		e = &entry{}
-		s[cmd] = e
+		storageMutex.Lock()
+		defer storageMutex.Unlock()
+
+		if e, ok = s[cmd]; !ok {
+			e = &entry{}
+			s[cmd] = e
+		}
 	}
 	return
 }
 
+var bridgeMutex sync.Mutex
+
 func (s _storage) bridge(cmd *cobra.Command) {
 	if entry := storage.get(cmd); !entry.bridged {
-		cobra.OnInitialize(func() {
-			registerValidArgsFunction(cmd)
-			registerFlagCompletion(cmd)
-		})
-		entry.bridged = true
+		bridgeMutex.Lock()
+		defer bridgeMutex.Unlock()
+
+		if entry := storage.get(cmd); !entry.bridged {
+			cobra.OnInitialize(func() {
+				if !entry.initialized {
+					bridgeMutex.Lock()
+					defer bridgeMutex.Unlock()
+
+					if !entry.initialized {
+						registerValidArgsFunction(cmd)
+						registerFlagCompletion(cmd)
+						entry.initialized = true
+					}
+
+				}
+			})
+			entry.bridged = true
+		}
 	}
 }
 

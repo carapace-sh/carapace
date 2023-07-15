@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"testing"
+	"time"
 
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/pkg/sandbox"
@@ -18,6 +19,23 @@ func TestBatch(t *testing.T) {
 				"D", "description of D",
 			).
 				Usage("Batch()"))
+	})
+}
+
+func TestCache(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Keep()
+		cached := s.Run("modifier", "--cache", "").Output()
+		time.Sleep(1 * time.Second)
+		s.Run("modifier", "--cache", "").
+			Expect(cached.
+				Usage("Cache()"))
+
+		s.ClearCache()
+		s.Run("modifier", "--cache", "").
+			ExpectNot(cached.
+				Usage("Cache()"))
+
 	})
 }
 

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/cache"
@@ -43,10 +44,17 @@ func Load(file string, timeout time.Duration) (e export.Export, err error) {
 // CacheDir creates a cache folder for current user and returns the path.
 func CacheDir(name string) (dir string, err error) {
 	var userCacheDir string
-	if userCacheDir, err = xdg.UserCacheDir(); err == nil {
-		dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)
-		err = os.MkdirAll(dir, 0700)
+	userCacheDir, err = xdg.UserCacheDir()
+	if err != nil {
+		return
 	}
+
+	if m, sandboxErr := env.Sandbox(); sandboxErr == nil {
+		userCacheDir = m.CacheDir
+	}
+
+	dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)
+	err = os.MkdirAll(dir, 0700)
 	return
 }
 

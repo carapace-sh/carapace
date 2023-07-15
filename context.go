@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/shell/zsh"
 	"github.com/rsteube/carapace/pkg/util"
@@ -47,10 +46,7 @@ func NewContext(args ...string) Context {
 		context.Dir = wd
 	}
 
-	isGoRun := func() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
-	if sandbox := env.Sandbox(); sandbox != "" && isGoRun() {
-		var m common.Mock
-		_ = json.Unmarshal([]byte(sandbox), &m)
+	if m, err := env.Sandbox(); err == nil {
 		context.Dir = m.Dir
 		context.mockedReplies = m.Replies
 	}

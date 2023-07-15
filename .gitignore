@@ -1,5 +1,9 @@
 caraparse/caraparse
+.cover
 docs/book
 example/cmd/_test_files/*.txt
 example/example
+integration.cov
+profile.cov
+unit.cov
 .vscode

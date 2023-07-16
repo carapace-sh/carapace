@@ -62,10 +62,6 @@ RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/m
   && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
   && mv mdbook* /usr/local/bin/
 
-FROM base as gocovmerge
-ARG version=b5bfa59
-RUN go install github.com/wadey/gocovmerge@${version}
-
 FROM base
 RUN apt-get update && apt-get install -y libicu67
 RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.0/powershell_7.3.0-1.deb_amd64.deb\
@@ -91,7 +87,6 @@ RUN git config --system safe.directory '*'
 COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=ble /go/ble.sh /opt/ble.sh
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
-COPY --from=gocovmerge /go/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
 #COPY --from=ion /ion/target/release/ion /usr/local/bin/
 COPY --from=ion-poc /usr/local/bin/ion /usr/local/bin/

@@ -50,7 +50,7 @@ func CacheDir(name string) (dir string, err error) {
 	}
 
 	if m, sandboxErr := env.Sandbox(); sandboxErr == nil {
-		userCacheDir = m.CacheDir
+		userCacheDir = m.CacheDir()
 	}
 
 	dir = fmt.Sprintf("%v/carapace/%v/%v", userCacheDir, uid.Executable(), name)

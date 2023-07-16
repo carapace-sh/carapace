@@ -47,7 +47,7 @@ func NewContext(args ...string) Context {
 	}
 
 	if m, err := env.Sandbox(); err == nil {
-		context.Dir = m.Dir
+		context.Dir = m.WorkDir()
 		context.mockedReplies = m.Replies
 	}
 	return context

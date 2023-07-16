@@ -24,7 +24,6 @@ func TestBatch(t *testing.T) {
 
 func TestCache(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
-		s.Keep()
 		cached := s.Run("modifier", "--cache", "").Output()
 		time.Sleep(1 * time.Second)
 		s.Run("modifier", "--cache", "").

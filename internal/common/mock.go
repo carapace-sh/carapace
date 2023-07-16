@@ -1,6 +1,7 @@
 package common
 
 type Mock struct {
-	Dir     string
-	Replies map[string]string
+	Dir      string
+	CacheDir string
+	Replies  map[string]string
 }

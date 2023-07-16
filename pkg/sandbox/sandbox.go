@@ -217,16 +217,19 @@ func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 
 		carapace.Gen(cmd).PositionalAnyCompletion(
 			carapace.ActionCallback(func(c carapace.Context) carapace.Action {
-				args := []string{"run", "-cover", pkg, "_carapace", "export", ""}
+				args := []string{"run"}
+				if coverdir := env.CoverDir(); coverdir != "" {
+					c.Setenv("GOCOVERDIR", env.CoverDir())
+					args = append(args, "-cover")
+				}
+
+				args = append(args, pkg, "_carapace", "export", "")
 				args = append(args, c.Args...)
 				args = append(args, c.Value)
 
 				var err error
 				if c.Dir, err = os.Getwd(); err != nil { // `go run` needs to run in actual workdir and not the sandbox dir
 					return carapace.ActionMessage(err.Error())
-				}
-				if coverdir := env.CoverDir(); coverdir != "" {
-					c.Setenv("GOCOVERDIR", env.CoverDir())
 				}
 				return carapace.ActionExecCommand("go", args...)(func(output []byte) carapace.Action {
 					return carapace.ActionImport(output)

@@ -48,9 +48,9 @@ func Diff(expected, actual string) string {
 	highlighted := make([]string, 0)
 	for _, line := range strings.Split(diff, "\n") {
 		switch {
-		case strings.HasPrefix(line, "+"):
-			highlighted = append(highlighted, fmt.Sprintf("\033[0;31m%v\033[0m", line))
 		case strings.HasPrefix(line, "-"):
+			highlighted = append(highlighted, fmt.Sprintf("\033[0;31m%v\033[0m", line))
+		case strings.HasPrefix(line, "+"):
 			highlighted = append(highlighted, fmt.Sprintf("\033[0;32m%v\033[0m", line))
 		default:
 			highlighted = append(highlighted, line)

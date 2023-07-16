@@ -208,7 +208,7 @@ func Command(t *testing.T, cmdF func() *cobra.Command) (f func(func(s *Sandbox))
 	}
 }
 
-// Run invokes `go run` on given package.
+// Package invokes `go run` on given package.
 func Package(t *testing.T, pkg string) (f func(func(s *Sandbox))) {
 	return Command(t, func() *cobra.Command {
 		cmd := &cobra.Command{DisableFlagParsing: true}

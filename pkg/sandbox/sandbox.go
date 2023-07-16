@@ -39,9 +39,8 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 		cmdF: f,
 		env:  make(map[string]string),
 		mock: &common.Mock{
-			Dir:      tempDir,
-			CacheDir: tempDir + "_CACHE",
-			Replies:  make(map[string]string),
+			Dir:     tempDir,
+			Replies: make(map[string]string),
 		},
 	}
 }
@@ -56,15 +55,14 @@ func (s *Sandbox) Env(key, value string) {
 }
 
 func (s *Sandbox) remove() {
-	if !s.keep && strings.HasPrefix(s.mock.Dir, os.TempDir()) && strings.HasPrefix(s.mock.CacheDir, os.TempDir()) {
-		os.RemoveAll(s.mock.Dir)
-		os.RemoveAll(s.mock.CacheDir)
+	if dir := s.mock.Dir; !s.keep && strings.HasPrefix(dir, os.TempDir()) {
+		os.RemoveAll(dir)
 	}
 }
 
 func (s *Sandbox) ClearCache() {
-	if strings.HasPrefix(s.mock.CacheDir, os.TempDir()) {
-		os.RemoveAll(s.mock.CacheDir)
+	if dir := s.mock.CacheDir(); strings.HasPrefix(dir, os.TempDir()) {
+		os.RemoveAll(dir)
 	}
 }
 
@@ -79,8 +77,9 @@ func (s *Sandbox) Files(args ...string) {
 		s.t.Errorf("invalid amount of arguments: %v", len(args))
 	}
 
-	if !strings.HasPrefix(s.mock.Dir, os.TempDir()) {
-		s.t.Errorf("sandbox dir not in os.TempDir: %v", s.mock.Dir)
+	wd := s.mock.WorkDir()
+	if !strings.HasPrefix(wd, os.TempDir()) {
+		s.t.Errorf("sandbox dir not in os.TempDir: %v", wd)
 	}
 
 	for i := 0; i < len(args); i += 2 {
@@ -91,7 +90,7 @@ func (s *Sandbox) Files(args ...string) {
 			s.t.Fatalf("invalid filename: %v", file)
 		}
 
-		path := fmt.Sprintf("%v/%v", s.mock.Dir, file)
+		path := fmt.Sprintf("%v/%v", wd, file)
 
 		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil && !os.IsExist(err) {
 			s.t.Fatal(err.Error())
@@ -126,7 +125,7 @@ func (s *Sandbox) NewContext(args ...string) carapace.Context {
 	for key, value := range s.env {
 		context.Setenv(key, value)
 	}
-	context.Dir = s.mock.Dir
+	context.Dir = s.mock.WorkDir()
 	// TODO set mockedreplies in context
 	return context
 }
@@ -137,7 +136,7 @@ func (s *Sandbox) Run(args ...string) run {
 	r := run{
 		t:       s.t,
 		id:      string(m),
-		dir:     s.mock.Dir,
+		dir:     s.mock.WorkDir(),
 		context: s.NewContext(args...),
 	}
 

@@ -31,7 +31,7 @@ jobs:
       - name: Test
         run: mkdir .cover && CARAPACE_COVERDIR="$(pwd)/.cover" go test -v -coverpkg ./... -coverprofile=unit.cov ./... ./example-nonposix/...
 
-      - name: Merge coverage
+      - name: Convert coverage
         run: go tool covdata textfmt -i .cover/ -o integration.cov 
 
       - name: Filter coverage

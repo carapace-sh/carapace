@@ -39,6 +39,8 @@ func init() {
 	rootCmd.Flag("nargs-any").Nargs = -1
 	rootCmd.Flag("nargs-two").Nargs = 2
 
+	rootCmd.Flags().SetInterspersed(false)
+
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
 		"delim-colon": carapace.ActionValues("d1", "d2", "d3"),
 		"delim-slash": carapace.ActionValues("d1", "d2", "d3"),

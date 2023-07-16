@@ -19,6 +19,20 @@ func TestStandalone(t *testing.T) {
 	})
 }
 
+func TestInterspersed(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		s.Run("-delim-colon:d1", "-d").
+			Expect(carapace.ActionValuesDescribed(
+				"-delim-slash", "OptargDelimiter '/'",
+			).NoSpace('.').
+				Style(style.Yellow).
+				Tag("flags"))
+
+		s.Run("-delim-colon:d1", "positional1", "-d").
+			Expect(carapace.ActionValues())
+	})
+}
+
 func TestRoot(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-delim-colon:").

@@ -115,7 +115,7 @@ loop:
 	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
 		LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1]
-	} else if fs.IsShorthandSeries(context.Value) {
+	} else if (fs.IsInterspersed() || len(inPositionals) == 0) && fs.IsShorthandSeries(context.Value) {
 		LOG.Printf("arg %#v is a shorthand flag series", context.Value)
 		localInFlag := &_inFlag{
 			Flag: fs.LookupArg(context.Value),

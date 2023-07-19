@@ -17,10 +17,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	os.Unsetenv("LS_COLORS")
-}
-
 type Sandbox struct {
 	t    *testing.T
 	cmdF func() *cobra.Command

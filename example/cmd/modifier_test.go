@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -128,6 +129,7 @@ func TestMultiParts(t *testing.T) {
 }
 
 func TestPrefix(t *testing.T) {
+	os.Unsetenv("LS_COLORS")
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files("subdir/file1.txt", "")
 

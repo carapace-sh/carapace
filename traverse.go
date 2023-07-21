@@ -82,6 +82,8 @@ loop:
 
 			if inFlag.Flag == nil {
 				LOG.Printf("flag %#v is unknown", arg)
+			} else if splitted := inFlag.Flag.Split(arg); len(splitted) > 1 {
+				inFlag.Args = append(inFlag.Args, splitted[1])
 			}
 			continue
 
@@ -160,9 +162,9 @@ loop:
 
 	// flag
 	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
-		if f := fs.LookupArg(context.Value); f != nil && f.IsOptarg() && strings.Contains(context.Value, string(f.OptargDelimiter())) {
+		if f := fs.LookupArg(context.Value); f != nil && strings.Contains(context.Value, string(f.OptargDelimiter())) {
 			LOG.Printf("completing optional flag argument for arg %#v\n", context.Value)
-			prefix, _ := f.Split(context.Value)
+			prefix := f.Split(context.Value)[0]
 
 			switch f.Value.Type() {
 			case "bool":

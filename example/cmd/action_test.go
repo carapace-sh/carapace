@@ -226,3 +226,49 @@ func TestPersistentFlag(t *testing.T) {
 				Usage("Help message for persistentFlag2"))
 	})
 }
+
+func TestAttached(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files(
+			"dirA/file1.txt", "",
+			"dirA/file2.png", "",
+			"dirB/dirC/file3.go", "",
+			"dirB/file4.md", "",
+			"file5.go", "",
+		)
+
+		s.Run("action", "--values=").
+			Expect(carapace.ActionValues(
+				"first",
+				"second",
+				"third",
+			).Prefix("--values=").
+				Usage("ActionValues()"))
+
+		s.Run("action", "--values=f").
+			Expect(carapace.ActionValues(
+				"first",
+			).Prefix("--values=").
+				Usage("ActionValues()"))
+
+		s.Run("action", "--values=first", "").
+			Expect(carapace.ActionValues(
+				"embeddedP1",
+				"embeddedPositional1",
+			).Usage("action [pos1] [pos2] [--] [dashAny]..."))
+
+		s.Run("action", "--multiparts-nested=VALUE=").
+			Expect(carapace.ActionValues("one", "two", "three").
+				Prefix("--multiparts-nested=VALUE=").
+				NoSpace().
+				Usage("ActionMultiParts(...ActionMultiParts...)"))
+
+		s.Run("action", "--multiparts-nested=VALUE=two,DIRECTORY=").
+			Expect(carapace.ActionValues("dirA/", "dirB/").
+				Tag("directories").
+				StyleF(style.ForPath).
+				Prefix("--multiparts-nested=VALUE=two,DIRECTORY=").
+				NoSpace().
+				Usage("ActionMultiParts(...ActionMultiParts...)"))
+	})
+}

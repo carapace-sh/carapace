@@ -26,18 +26,11 @@ type Sandbox struct {
 }
 
 func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
-	tempDir, err := os.MkdirTemp(os.TempDir(), fmt.Sprintf("carapace-sandbox_%v_", t.Name()))
-	if err != nil {
-		t.Fatal("failed to create sandbox dir: " + err.Error())
-	}
 	return Sandbox{
 		t:    t,
 		cmdF: f,
 		env:  make(map[string]string),
-		mock: &common.Mock{
-			Dir:     tempDir,
-			Replies: make(map[string]string),
-		},
+		mock: common.NewMock(t),
 	}
 }
 
@@ -65,7 +58,7 @@ func (s *Sandbox) ClearCache() {
 // Files creates files within the sandbox directory.
 //
 //	s.Files(
-//		"file1.txt", "content of files1.txt",
+//		"file1.txt", "content of file1.txt",
 //		"dir1/file2.md", "content of file2.md",
 //	)
 func (s *Sandbox) Files(args ...string) {
@@ -82,7 +75,7 @@ func (s *Sandbox) Files(args ...string) {
 		file := args[i]
 		content := args[i+1]
 
-		if strings.HasPrefix(file, "../") {
+		if strings.Contains(file, "..") || strings.HasPrefix(file, "/") {
 			s.t.Fatalf("invalid filename: %v", file)
 		}
 

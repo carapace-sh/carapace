@@ -53,10 +53,9 @@ func (f Flag) IsRepeatable() bool {
 	return false
 }
 
-func (f Flag) Split(arg string) (prefix, optarg string) {
+func (f Flag) Split(arg string) []string {
 	delimiter := string(f.OptargDelimiter())
-	splitted := strings.SplitN(arg, delimiter, 2)
-	return splitted[0] + delimiter, splitted[1]
+	return strings.SplitAfterN(arg, delimiter, 2)
 }
 
 func (f Flag) Matches(arg string, posix bool) bool {

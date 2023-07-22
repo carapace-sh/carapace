@@ -54,7 +54,7 @@ func (a InvokedAction) Prefix(prefix string) InvokedAction {
 //
 //	a := carapace.ActionValues("A", "B", "C").Invoke(c)
 //	b := a.Retain([]string{"A", "C"}) // ["A", "C"]
-func (a InvokedAction) Retain(values []string) InvokedAction {
+func (a InvokedAction) Retain(values ...string) InvokedAction {
 	a.rawValues = a.rawValues.Retain(values...)
 	return a
 }

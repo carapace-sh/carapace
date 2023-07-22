@@ -146,7 +146,7 @@ func (a Action) Prefix(prefix string) Action {
 //	carapace.ActionValues("A", "B", "C").Retain("A", "C") // ["A", "C"]
 func (a Action) Retain(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).Retain(values).ToA()
+		return a.Invoke(c).Retain(values...).ToA()
 	})
 }
 

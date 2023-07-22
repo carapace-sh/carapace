@@ -58,7 +58,7 @@
   - [Export](./carapace/export.md)
   - [Group](./carapace/group.md)
   - [Standalone](./carapace/standalone.md)
-    - [caraparse](./carapace/standalone/caraparse.md)
+    - [carapace-parse](./carapace/standalone/carapace-parse.md)
     - [pflag](./carapace/standalone/pflag.md)
 - [development](./development.md)
   - [Additional Information](./development/additionalInformation.md)

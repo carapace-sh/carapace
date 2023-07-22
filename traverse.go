@@ -162,12 +162,11 @@ loop:
 	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 		if f := fs.LookupArg(context.Value); f != nil && f.IsOptarg() && strings.Contains(context.Value, string(f.OptargDelimiter())) {
 			LOG.Printf("completing optional flag argument for arg %#v\n", context.Value)
-			prefix, optarg := f.Split(context.Value)
-			context.Value = optarg
+			prefix, _ := f.Split(context.Value)
 
 			switch f.Value.Type() {
 			case "bool":
-				return ActionValues("true", "false").StyleF(style.ForKeyword).Prefix(prefix), context
+				return ActionValues("true", "false").StyleF(style.ForKeyword).Usage(f.Usage).Prefix(prefix), context
 			default:
 				return storage.getFlag(c, f.Name).Prefix(prefix), context
 			}

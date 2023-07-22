@@ -136,11 +136,38 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
+	})
+}
+
+func TestOptarg(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("--persistentFlag=").
+			Expect(carapace.ActionValues(
+				"p1",
+				"p2",
+				"p3",
+			).Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
+
+		s.Run("--persistentFlag=p").
+			Expect(carapace.ActionValues(
+				"p1",
+				"p2",
+				"p3",
+			).Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
 
 		s.Run("--toggle=").
 			Expect(carapace.ActionStyledValues(
-				"false", style.Red,
 				"true", style.Green,
-			).Prefix("--toggle="))
+				"false", style.Red,
+			).Prefix("--toggle=").
+				Usage("Help message for toggle"))
+
+		s.Run("--toggle=tru").
+			Expect(carapace.ActionStyledValues(
+				"true", style.Green,
+			).Prefix("--toggle=").
+				Usage("Help message for toggle"))
 	})
 }

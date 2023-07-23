@@ -211,7 +211,7 @@ func ActionMessage(msg string, args ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes parts of c.Value separated by sep.
+// ActionMultiParts completes parts of an argument separated by sep.
 func ActionMultiParts(sep string, callback func(c Context) Action) Action {
 	return ActionMultiPartsN(sep, -1, callback)
 }

@@ -272,3 +272,32 @@ func TestAttached(t *testing.T) {
 				Usage("ActionMultiParts(...ActionMultiParts...)"))
 	})
 }
+
+func TestActionMultipartsN(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--multipartsn", "").
+			Expect(carapace.ActionValues("one", "two").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "o").
+			Expect(carapace.ActionValues("one").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "one=").
+			Expect(carapace.ActionValues("three", "four").
+				Prefix("one=").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "one=three=").
+			Expect(carapace.ActionValues("five", "six").
+				Prefix("one=three=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+	})
+}

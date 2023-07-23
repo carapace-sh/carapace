@@ -211,26 +211,30 @@ func ActionMessage(msg string, args ...interface{}) Action {
 	})
 }
 
-// ActionMultiParts completes multiple parts of words separately where each part is separated by some char (Context.Value is set to the currently completed part during invocation).
-func ActionMultiParts(divider string, callback func(c Context) Action) Action {
+// ActionMultiParts completes parts of c.Value separated by sep.
+func ActionMultiParts(sep string, callback func(c Context) Action) Action {
+	return ActionMultiPartsN(sep, -1, callback)
+}
+
+// ActionMultiPartsN is like ActionMultiParts but limits the number of parts to `n`.
+func ActionMultiPartsN(sep string, n int, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
-		index := strings.LastIndex(c.Value, string(divider))
+		splitted := strings.SplitN(c.Value, sep, n)
 		prefix := ""
-		if len(divider) == 0 {
+		c.Parts = []string{}
+
+		switch {
+		case len(sep) == 0:
 			prefix = c.Value
 			c.Value = ""
-		} else if index != -1 {
-			prefix = c.Value[0 : index+len(divider)]
-			c.Value = c.Value[index+len(divider):] // update Context.Value to only contain the currently completed part
+		case len(splitted) > 1:
+			c.Value = splitted[len(splitted)-1]
+			c.Parts = splitted[:len(splitted)-1]
+			prefix = strings.Join(c.Parts, sep) + sep
 		}
-		parts := strings.Split(prefix, string(divider))
-		if len(parts) > 0 && len(divider) > 0 {
-			parts = parts[0 : len(parts)-1]
-		}
-		c.Parts = parts
 
 		nospace := '*'
-		if runes := []rune(divider); len(runes) > 0 {
+		if runes := []rune(sep); len(runes) > 0 {
 			nospace = runes[len(runes)-1]
 		}
 		return callback(c).Invoke(c).Prefix(prefix).ToA().NoSpace(nospace)

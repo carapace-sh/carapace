@@ -32,6 +32,7 @@ func init() {
 	actionCmd.Flags().String("message-multiple", "", "ActionMessage()")
 	actionCmd.Flags().String("multiparts", "", "ActionMultiParts()")
 	actionCmd.Flags().String("multiparts-nested", "", "ActionMultiParts(...ActionMultiParts...)")
+	actionCmd.Flags().String("multipartsn", "", "ActionMultiPartsN()")
 	actionCmd.Flags().String("styles", "", "ActionStyles()")
 	actionCmd.Flags().String("styleconfig", "", "ActionStyleConfig()")
 	actionCmd.Flags().String("styled-values", "", "ActionStyledValues()")
@@ -125,6 +126,25 @@ func init() {
 					return carapace.ActionValues()
 				}
 			})
+		}),
+		"multipartsn": carapace.ActionMultiPartsN("=", 2, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValues("one", "two").Suffix("=")
+			case 1:
+				return carapace.ActionMultiParts("=", func(c carapace.Context) carapace.Action {
+					switch len(c.Parts) {
+					case 0:
+						return carapace.ActionValues("three", "four").Suffix("=")
+					case 1:
+						return carapace.ActionValues("five", "six")
+					default:
+						return carapace.ActionValues()
+					}
+				})
+			default:
+				return carapace.ActionMessage("should never happen")
+			}
 		}),
 		"styles":      carapace.ActionStyles(),
 		"styleconfig": carapace.ActionStyleConfig(),

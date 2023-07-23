@@ -45,6 +45,7 @@
     - [ActionImport](./carapace/defaultActions/actionImport.md)
     - [ActionMessage](./carapace/defaultActions/actionMessage.md)
     - [ActionMultiParts](./carapace/defaultActions/actionMultiParts.md)
+    - [ActionMultiPartsN](./carapace/defaultActions/actionMultiPartsN.md)
     - [ActionPositional](./carapace/defaultActions/actionPositional.md)
     - [ActionStyles](./carapace/defaultActions/actionStyles.md)
     - [ActionStyleConfig](./carapace/defaultActions/actionStyleConfig.md)

@@ -48,13 +48,18 @@ func (f FlagSet) IsMutuallyExclusive(flag *pflag.Flag) bool {
 
 func (f *FlagSet) VisitAll(fn func(*Flag)) {
 	f.FlagSet.VisitAll(func(flag *pflag.Flag) {
-		fn(&Flag{flag})
+		fn(&Flag{Flag: flag, Args: []string{}})
 	})
 
 }
 
 func (fs FlagSet) LookupArg(arg string) (result *Flag) {
 	isPosix := fs.IsPosix()
+
+	if isPosix && !strings.HasPrefix(arg, "--") {
+		return fs.lookupPosixShorthandArg(arg)
+	}
+
 	fs.VisitAll(func(f *Flag) {
 		if result != nil {
 			return
@@ -65,4 +70,40 @@ func (fs FlagSet) LookupArg(arg string) (result *Flag) {
 		}
 	})
 	return
+}
+
+func (fs FlagSet) ShorthandLookup(name string) *Flag {
+	if f := fs.FlagSet.ShorthandLookup(name); f != nil {
+		return &Flag{
+			Flag: f,
+			Args: []string{},
+		}
+	}
+	return nil
+}
+
+func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
+	if !strings.HasPrefix(arg, "-") || !fs.IsPosix() || len(arg) < 2 {
+		return nil
+	}
+
+	for index, r := range arg[1:] {
+		index += 1
+		flag := fs.ShorthandLookup(string(r))
+
+		switch {
+		case flag == nil || len(arg) == index+1:
+			return flag
+		case arg[index+1] == byte(flag.OptargDelimiter()) && len(arg) > index+2:
+			flag.Args = []string{arg[index+2:]}
+			return flag
+		case arg[index+1] == byte(flag.OptargDelimiter()):
+			flag.Args = []string{""}
+			return flag
+		case !flag.IsOptarg() && len(arg) > index+1:
+			flag.Args = []string{arg[index+1:]}
+			return flag
+		}
+	}
+	return nil
 }

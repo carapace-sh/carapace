@@ -21,6 +21,7 @@ const (
 
 type Flag struct {
 	*pflag.Flag
+	Args []string
 }
 
 func (f Flag) Nargs() int {
@@ -172,4 +173,23 @@ func (f Flag) Definition() string {
 	}
 
 	return definition
+}
+
+func (f Flag) Consumes(arg string) bool {
+	switch {
+	case f.Flag == nil:
+		return false
+	case !f.TakesValue():
+		return false
+	case f.IsOptarg():
+		return false
+	case len(f.Args) == 0:
+		return true
+	case f.Nargs() > 1 && len(f.Args) < f.Nargs():
+		return true
+	case f.Nargs() < 0 && !strings.HasPrefix(arg, "-"):
+		return true
+	default:
+		return false
+	}
 }

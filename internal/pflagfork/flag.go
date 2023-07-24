@@ -21,6 +21,8 @@ const (
 
 type Flag struct {
 	*pflag.Flag
+	Prefix string
+	Args   []string
 }
 
 func (f Flag) Nargs() int {
@@ -51,52 +53,6 @@ func (f Flag) IsRepeatable() bool {
 		return true
 	}
 	return false
-}
-
-func (f Flag) Split(arg string) []string {
-	delimiter := string(f.OptargDelimiter())
-	return strings.SplitAfterN(arg, delimiter, 2)
-}
-
-func (f Flag) Matches(arg string, posix bool) bool {
-	if !strings.HasPrefix(arg, "-") { // not a flag
-		return false
-	}
-
-	switch {
-
-	case strings.HasPrefix(arg, "--"):
-		name := strings.TrimPrefix(arg, "--")
-		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
-
-		switch f.Mode() {
-		case ShorthandOnly, NameAsShorthand:
-			return false
-		default:
-			return name == f.Name
-		}
-
-	case !posix:
-		name := strings.TrimPrefix(arg, "-")
-		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
-
-		if name == "" {
-			return false
-		}
-
-		switch f.Mode() {
-		case ShorthandOnly:
-			return name == f.Shorthand
-		default:
-			return name == f.Name || name == f.Shorthand
-		}
-
-	default:
-		if f.Shorthand != "" {
-			return strings.HasSuffix(arg, f.Shorthand)
-		}
-		return false
-	}
 }
 
 func (f Flag) TakesValue() bool {
@@ -172,4 +128,23 @@ func (f Flag) Definition() string {
 	}
 
 	return definition
+}
+
+func (f Flag) Consumes(arg string) bool {
+	switch {
+	case f.Flag == nil:
+		return false
+	case !f.TakesValue():
+		return false
+	case f.IsOptarg():
+		return false
+	case len(f.Args) == 0:
+		return true
+	case f.Nargs() > 1 && len(f.Args) < f.Nargs():
+		return true
+	case f.Nargs() < 0 && !strings.HasPrefix(arg, "-"):
+		return true
+	default:
+		return false
+	}
 }

@@ -51,7 +51,7 @@ func TestShorthandChain(t *testing.T) {
 				"positional1",
 			))
 
-		s.Run("chain", "-bcco=", "").
+		s.Run("chain", "-bcco=").
 			Expect(carapace.ActionValues(
 				"opt1",
 				"opt2",
@@ -62,6 +62,12 @@ func TestShorthandChain(t *testing.T) {
 				"val1",
 				"val2",
 			))
+
+		s.Run("chain", "-bccv=").
+			Expect(carapace.ActionValues(
+				"val1",
+				"val2",
+			).Prefix("-bccv="))
 
 		s.Run("chain", "-bccv", "val1", "-c").
 			Expect(carapace.ActionStyledValues(

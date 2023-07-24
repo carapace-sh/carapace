@@ -21,11 +21,12 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 			fs.StringP("string", "s", "", "")
 
 			f := fs.lookupPosixShorthandArg(arg)
-			if f.Name != name {
-				t.Error("should be " + name)
+			if f == nil || f.Name != name {
+				t.Fatalf("should be " + name)
 			}
+
 			if !reflect.DeepEqual(f.Args, args) {
-				t.Errorf("args dont match %v: actual: %#v expected: %#v", arg, f.Args, args)
+				t.Fatalf("args dont match %v: actual: %#v expected: %#v", arg, f.Args, args)
 			}
 
 		})
@@ -38,4 +39,6 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 	_test("-ccb=", "bool", "")
 	_test("-ccb=t", "bool", "t")
 	_test("-ccb=true", "bool", "true")
+	_test("-ccbs=val1", "string", "val1")
+	_test("-ccbsval1", "string", "val1")
 }

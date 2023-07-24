@@ -22,16 +22,16 @@ func init() {
 			cmd := &cobra.Command{}
 			carapace.Gen(cmd).Standalone()
 
-			cmd.Flags().CountP("c", "c", "")
-			cmd.Flags().BoolP("b", "b", false, "")
-			cmd.Flags().StringP("v", "v", "", "")
-			cmd.Flags().StringP("o", "o", "", "")
+			cmd.Flags().CountP("count", "c", "")
+			cmd.Flags().BoolP("bool", "b", false, "")
+			cmd.Flags().StringP("value", "v", "", "")
+			cmd.Flags().StringP("optarg", "o", "", "")
 
-			cmd.Flag("o").NoOptDefVal = " "
+			cmd.Flag("optarg").NoOptDefVal = " "
 
 			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
-				"v": carapace.ActionValues("val1", "val2"),
-				"o": carapace.ActionValues("opt1", "opt2"),
+				"value":  carapace.ActionValues("val1", "val2"),
+				"optarg": carapace.ActionValues("opt1", "opt2"),
 			})
 
 			carapace.Gen(cmd).PositionalCompletion(

@@ -131,7 +131,7 @@ loop:
 	// flag
 	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 		if f := fs.LookupArg(context.Value); f != nil && strings.Contains(context.Value, string(f.OptargDelimiter())) {
-			LOG.Printf("completing optional flag argument for arg %#v\n", context.Value)
+			LOG.Printf("completing optional flag argument for arg %#v with prefix %#v\n", context.Value, f.Prefix)
 
 			switch f.Value.Type() {
 			case "bool":

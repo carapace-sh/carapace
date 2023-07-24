@@ -133,7 +133,7 @@ loop:
 
 	// flag
 	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
-		if f := fs.LookupArg(context.Value); f != nil && strings.Contains(context.Value, string(f.OptargDelimiter())) {
+		if f := fs.LookupArg(context.Value); f != nil && len(f.Args) > 0 {
 			LOG.Printf("completing optional flag argument for arg %#v with prefix %#v\n", context.Value, f.Prefix)
 
 			switch f.Value.Type() {
@@ -142,6 +142,9 @@ loop:
 			default:
 				return storage.getFlag(c, f.Name).Prefix(f.Prefix), context
 			}
+		} else if f != nil && fs.IsPosix() && !strings.HasPrefix(context.Value, "--") && !f.IsOptarg() && f.Prefix == context.Value {
+			LOG.Printf("completing attached flag argument for arg %#v with prefix %#v\n", context.Value, f.Prefix)
+			return storage.getFlag(c, f.Name).Prefix(f.Prefix), context
 		}
 		LOG.Printf("completing flags for arg %#v\n", context.Value)
 		return actionFlags(c), context

@@ -1,7 +1,6 @@
 package pflagfork
 
 import (
-	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -95,7 +94,6 @@ func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
 			if len(splitted) > 1 {
 				flag.Args = splitted[1:]
 			}
-			strings.HasPrefix(arg, fmt.Sprintf("--%v%c", f.Name, f.OptargDelimiter()))
 		}
 	})
 	return
@@ -150,7 +148,6 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 			if len(splitted) > 1 {
 				result.Args = splitted[1:]
 			}
-			strings.HasPrefix(arg, fmt.Sprintf("-%v%c", f.Shorthand, f.OptargDelimiter()))
 		}
 	})
 	return

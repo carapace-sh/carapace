@@ -1,6 +1,7 @@
 package pflagfork
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -56,11 +57,14 @@ func (f *FlagSet) VisitAll(fn func(*Flag)) {
 func (fs FlagSet) LookupArg(arg string) (result *Flag) {
 	isPosix := fs.IsPosix()
 
-	if isPosix && !strings.HasPrefix(arg, "--") {
+	switch {
+	case strings.HasPrefix(arg, "--"):
+		return fs.lookupPosixLonghandArg(arg)
+	case isPosix:
 		return fs.lookupPosixShorthandArg(arg)
 	}
 
-	fs.VisitAll(func(f *Flag) {
+	fs.VisitAll(func(f *Flag) { // TODO might need sorting so that longest possible name is tried first
 		if result != nil {
 			return
 		}
@@ -80,6 +84,29 @@ func (fs FlagSet) ShorthandLookup(name string) *Flag {
 		}
 	}
 	return nil
+}
+
+func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
+	if !strings.HasPrefix(arg, "--") {
+		return nil
+	}
+
+	fs.VisitAll(func(f *Flag) { // TODO needs to be sorted to try longest matching first
+		if flag != nil {
+			return
+		}
+
+		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
+		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "--"+f.Name {
+			flag = f
+			flag.Prefix = splitted[0]
+			if len(splitted) > 1 {
+				flag.Args = splitted[1:]
+			}
+			strings.HasPrefix(arg, fmt.Sprintf("--%v%c", f.Name, f.OptargDelimiter()))
+		}
+	})
+	return
 }
 
 func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {

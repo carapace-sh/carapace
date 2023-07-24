@@ -93,14 +93,18 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 
 		switch {
 		case flag == nil || len(arg) == index+1:
+			flag.Prefix = arg
 			return flag
 		case arg[index+1] == byte(flag.OptargDelimiter()) && len(arg) > index+2:
+			flag.Prefix = arg[:index+2]
 			flag.Args = []string{arg[index+2:]}
 			return flag
 		case arg[index+1] == byte(flag.OptargDelimiter()):
+			flag.Prefix = arg[:index+2]
 			flag.Args = []string{""}
 			return flag
 		case !flag.IsOptarg() && len(arg) > index+1:
+			flag.Prefix = arg[:index+1]
 			flag.Args = []string{arg[index+1:]}
 			return flag
 		}

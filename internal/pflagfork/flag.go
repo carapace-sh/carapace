@@ -21,7 +21,8 @@ const (
 
 type Flag struct {
 	*pflag.Flag
-	Args []string
+	Prefix string
+	Args   []string
 }
 
 func (f Flag) Nargs() int {
@@ -52,11 +53,6 @@ func (f Flag) IsRepeatable() bool {
 		return true
 	}
 	return false
-}
-
-func (f Flag) Split(arg string) []string {
-	delimiter := string(f.OptargDelimiter())
-	return strings.SplitAfterN(arg, delimiter, 2)
 }
 
 func (f Flag) Matches(arg string, posix bool) bool {

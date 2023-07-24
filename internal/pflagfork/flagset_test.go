@@ -8,7 +8,7 @@ import (
 )
 
 func TestLookupPosixShorthandArg(t *testing.T) {
-	_test := func(arg, name string, args ...string) {
+	_test := func(arg, name, prefix string, args ...string) {
 		t.Run(arg, func(t *testing.T) {
 			if args == nil {
 				args = []string{}
@@ -25,6 +25,10 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 				t.Fatalf("should be " + name)
 			}
 
+			if f.Prefix != prefix {
+				t.Fatalf("prefix doesnt match actual: %#v, expected: %#v", f.Prefix, prefix)
+			}
+
 			if !reflect.DeepEqual(f.Args, args) {
 				t.Fatalf("args dont match %v: actual: %#v expected: %#v", arg, f.Args, args)
 			}
@@ -32,13 +36,13 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 		})
 	}
 
-	_test("-b=", "bool", "")
-	_test("-b=t", "bool", "t")
-	_test("-b=true", "bool", "true")
-	_test("-ccb", "bool")
-	_test("-ccb=", "bool", "")
-	_test("-ccb=t", "bool", "t")
-	_test("-ccb=true", "bool", "true")
-	_test("-ccbs=val1", "string", "val1")
-	_test("-ccbsval1", "string", "val1")
+	_test("-b=", "bool", "-b=", "")
+	_test("-b=t", "bool", "-b=", "t")
+	_test("-b=true", "bool", "-b=", "true")
+	_test("-ccb", "bool", "-ccb")
+	_test("-ccb=", "bool", "-ccb=", "")
+	_test("-ccb=t", "bool", "-ccb=", "t")
+	_test("-ccb=true", "bool", "-ccb=", "true")
+	_test("-ccbs=val1", "string", "-ccbs=", "val1")
+	_test("-ccbsval1", "string", "-ccbs", "val1")
 }

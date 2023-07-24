@@ -52,7 +52,7 @@ loop:
 			inArgs = append(inArgs, arg)
 			inFlag = fs.LookupArg(arg)
 
-			if inFlag.Flag == nil {
+			if inFlag == nil {
 				LOG.Printf("flag %#v is unknown", arg)
 			}
 			continue

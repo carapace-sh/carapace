@@ -55,47 +55,6 @@ func (f Flag) IsRepeatable() bool {
 	return false
 }
 
-func (f Flag) Matches(arg string, posix bool) bool {
-	if !strings.HasPrefix(arg, "-") { // not a flag
-		return false
-	}
-
-	switch {
-
-	case strings.HasPrefix(arg, "--"):
-		name := strings.TrimPrefix(arg, "--")
-		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
-
-		switch f.Mode() {
-		case ShorthandOnly, NameAsShorthand:
-			return false
-		default:
-			return name == f.Name
-		}
-
-	case !posix:
-		name := strings.TrimPrefix(arg, "-")
-		name = strings.SplitN(name, string(f.OptargDelimiter()), 2)[0]
-
-		if name == "" {
-			return false
-		}
-
-		switch f.Mode() {
-		case ShorthandOnly:
-			return name == f.Shorthand
-		default:
-			return name == f.Name || name == f.Shorthand
-		}
-
-	default:
-		if f.Shorthand != "" {
-			return strings.HasSuffix(arg, f.Shorthand)
-		}
-		return false
-	}
-}
-
 func (f Flag) TakesValue() bool {
 	switch f.Value.Type() {
 	case "bool", "boolSlice", "count":

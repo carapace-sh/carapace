@@ -133,22 +133,22 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 	return nil
 }
 
-func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (flag *Flag) { // TODO pretty much duplicates longhand lookup
+func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TODO pretty much duplicates longhand lookup
 	if !strings.HasPrefix(arg, "-") {
 		return nil
 	}
 
 	fs.VisitAll(func(f *Flag) { // TODO needs to be sorted to try longest matching first
-		if flag != nil {
+		if result != nil {
 			return
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "-"+f.Shorthand {
-			flag = f
-			flag.Prefix = splitted[0]
+			result = f
+			result.Prefix = splitted[0]
 			if len(splitted) > 1 {
-				flag.Args = splitted[1:]
+				result.Args = splitted[1:]
 			}
 			strings.HasPrefix(arg, fmt.Sprintf("-%v%c", f.Shorthand, f.OptargDelimiter()))
 		}

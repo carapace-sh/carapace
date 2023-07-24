@@ -29,7 +29,7 @@ func (f FlagSet) IsPosix() bool {
 }
 
 func (f FlagSet) IsShorthandSeries(arg string) bool {
-	re := regexp.MustCompile("^-(?P<shorthand>[^-=]+)")
+	re := regexp.MustCompile("^-(?P<shorthand>[^-].*)")
 	return re.MatchString(arg) && f.IsPosix()
 }
 

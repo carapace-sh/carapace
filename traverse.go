@@ -87,14 +87,17 @@ loop:
 	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
 		LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1]
-	} else if (fs.IsInterspersed() || len(inPositionals) == 0) && fs.IsShorthandSeries(context.Value) {
-		LOG.Printf("arg %#v is a shorthand flag series", context.Value)
+	} else if (fs.IsInterspersed() || len(inPositionals) == 0) && fs.IsShorthandSeries(context.Value) { // TODO shorthand series isn't correct anymore (can have value attached)
+		LOG.Printf("arg %#v is a shorthand flag series", context.Value) // TODO not aways correct
 		localInFlag := fs.LookupArg(context.Value)
 
-		if localInFlag != nil && len(localInFlag.Args) == 0 && !localInFlag.IsOptarg() && len(context.Value) > 2 {
+		if localInFlag != nil && (len(localInFlag.Args) == 0 || localInFlag.Args[0] == "") && (!localInFlag.IsOptarg() || strings.HasSuffix(localInFlag.Prefix, string(localInFlag.OptargDelimiter()))) { // TODO && len(context.Value) > 2 {
+			// TODO check if empty prefix
 			LOG.Printf("removing shorthand %#v from flag series since it is missing its argument\n", localInFlag.Shorthand)
-			toParse = append(toParse, strings.TrimSuffix(context.Value, localInFlag.Shorthand))
+			LOG.Printf("prefix %#v", localInFlag.Prefix)
+			toParse = append(toParse, strings.TrimSuffix(strings.TrimSuffix(localInFlag.Prefix, string(localInFlag.OptargDelimiter())), localInFlag.Shorthand))
 		} else {
+			LOG.Printf("adding shorthand flag %#v", context.Value)
 			toParse = append(toParse, context.Value)
 		}
 

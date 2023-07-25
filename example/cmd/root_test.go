@@ -72,6 +72,7 @@ func TestRoot(t *testing.T) {
 					"injection", "just trying to break things",
 				).Style(style.Magenta).Tag("test commands"),
 				carapace.ActionValuesDescribed(
+					"chain", "shorthand chain",
 					"completion", "Generate the autocompletion script for the specified shell",
 					"group", "group example",
 					"help", "Help about any command",

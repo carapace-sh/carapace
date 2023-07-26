@@ -1,6 +1,6 @@
 # Split
 
-[`Split`] splits `Context.Value` using a shell lexer.
+[`Split`] splits `Context.Value` using a shell lexer and replaces `Context.Args` with the tokens.
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {

@@ -166,6 +166,35 @@ func (a Action) Shift(n int) Action {
 	})
 }
 
+// Split splits `Context.Value` using a shell lexer and replaces `Context.Args` with the tokens.
+func (a Action) Split() Action {
+	return ActionCallback(func(c Context) Action {
+		tokenset, err := lexer.Split(c.Value)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		c.Args = tokenset.Tokens[:len(tokenset.Tokens)-1]
+		c.Parts = []string{}
+		c.Value = tokenset.Tokens[len(tokenset.Tokens)-1]
+		invoked := a.Invoke(c)
+		for index, value := range invoked.rawValues {
+			if !invoked.meta.Nospace.Matches(value.Value) {
+				switch tokenset.State {
+				case lexer.OPEN_DOUBLE:
+					invoked.rawValues[index].Value = fmt.Sprintf(`"%v" `, strings.Replace(value.Value, `"`, `\"`, -1))
+				case lexer.OPEN_SINGLE:
+					invoked.rawValues[index].Value = fmt.Sprintf(`'%v' `, strings.Replace(value.Value, `'`, `'"'"'`, -1))
+				default:
+					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1) + ` `
+				}
+			}
+		}
+		invoked.Prefix(tokenset.Prefix)
+		return invoked.ToA().NoSpace()
+	})
+}
+
 // Style sets the style.
 //
 //	ActionValues("yes").Style(style.Green)
@@ -293,34 +322,5 @@ func (a Action) UsageF(f func() string) Action {
 			a.meta.Usage = usage
 		}
 		return a
-	})
-}
-
-// Split splits `Context.Value` using a shell lexer.
-func (a Action) Split() Action {
-	return ActionCallback(func(c Context) Action {
-		tokenset, err := lexer.Split(c.Value)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		c.Args = tokenset.Tokens[:len(tokenset.Tokens)-1]
-		c.Parts = []string{}
-		c.Value = tokenset.Tokens[len(tokenset.Tokens)-1]
-		invoked := a.Invoke(c)
-		for index, value := range invoked.rawValues {
-			if !invoked.meta.Nospace.Matches(value.Value) {
-				switch tokenset.State {
-				case lexer.OPEN_DOUBLE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`"%v" `, strings.Replace(value.Value, `"`, `\"`, -1))
-				case lexer.OPEN_SINGLE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`'%v' `, strings.Replace(value.Value, `'`, `'"'"'`, -1))
-				default:
-					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1) + ` `
-				}
-			}
-		}
-		invoked.Prefix(tokenset.Prefix)
-		return invoked.ToA().NoSpace()
 	})
 }

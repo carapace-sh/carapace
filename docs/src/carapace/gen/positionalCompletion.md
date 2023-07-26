@@ -5,18 +5,9 @@
 
 ```go
 carapace.Gen(rootCmd).PositionalCompletion(
-    carapace.ActionValues("a", "b", "c"),
-    // ...
-)
-```
-
-[`PositionalAnyCompletion`] defines completion for any positional argument not already defined.
-
-```go
-carapace.Gen(rootCmd).PositionalAnyCompletion(
-    carapace.ActionFiles(),
+    carapace.ActionValues("pos1", "positional1"),
+    carapace.ActionValues("pos2", "positional2"),
 )
 ```
 
 [`PositionalCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PositionalCompletion
-[`PositionalAnyCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PositionalAnyCompletion

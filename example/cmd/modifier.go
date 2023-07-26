@@ -33,6 +33,7 @@ func init() {
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
 	modifierCmd.Flags().String("retain", "", "Retain()")
 	modifierCmd.Flags().String("shift", "", "Shift()")
+	modifierCmd.Flags().String("split", "", "Split()")
 	modifierCmd.Flags().String("style", "", "Style()")
 	modifierCmd.Flags().String("stylef", "", "StyleF()")
 	modifierCmd.Flags().String("styler", "", "StyleR()")
@@ -123,6 +124,23 @@ func init() {
 		"shift": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionMessage("%#v", c.Args)
 		}).Shift(1),
+		"split": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
+			cmd := &cobra.Command{}
+			carapace.Gen(cmd).Standalone()
+			cmd.Flags().BoolP("bool", "b", false, "bool flag")
+			cmd.Flags().StringP("string", "s", "", "string flag")
+
+			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
+				"string": carapace.ActionValues("one", "two", "three"),
+			})
+
+			carapace.Gen(cmd).PositionalCompletion(
+				carapace.ActionValues("pos1", "positional1"),
+				carapace.ActionFiles(),
+			)
+
+			return carapace.ActionExecute(cmd)
+		}).Split(),
 		"style": carapace.ActionValues(
 			"one",
 			"two",

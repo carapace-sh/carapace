@@ -158,3 +158,84 @@ func TestPrefix(t *testing.T) {
 				Tag("files"))
 	})
 }
+
+func TestSplit(t *testing.T) {
+	os.Unsetenv("LS_COLORS")
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files("subdir/file1.txt", "")
+
+		s.Run("modifier", "--split", "").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Suffix(" ").
+				Usage("Split()"))
+
+		s.Run("modifier", "--split", "pos1 ").
+			Expect(carapace.ActionValues(
+				"subdir/",
+			).StyleF(style.ForPathExt).
+				Prefix("pos1 ").
+				NoSpace('*').
+				Usage("Split()").
+				Tag("files"))
+
+		s.Run("modifier", "--split", "pos1 \"").
+			Expect(carapace.ActionValues(
+				"subdir/",
+			).StyleF(style.ForPathExt).
+				Prefix("pos1 ").
+				Suffix("\"").
+				NoSpace('*').
+				Usage("Split()").
+				Tag("files"))
+
+		s.Run("modifier", "--split", "pos1 '").
+			Expect(carapace.ActionValues(
+				"subdir/",
+			).StyleF(style.ForPathExt).
+				Prefix("pos1 ").
+				Suffix("'").
+				NoSpace('*').
+				Usage("Split()").
+				Tag("files"))
+
+		s.Run("modifier", "--split", "pos1 --").
+			Expect(carapace.ActionStyledValuesDescribed(
+				"--bool", "bool flag", style.Default,
+				"--string", "string flag", style.Blue,
+			).Prefix("pos1 ").
+				Suffix(" ").
+				NoSpace('*').
+				Usage("Split()").
+				Tag("flags"))
+
+		s.Run("modifier", "--split", "pos1 --bool=").
+			Expect(carapace.ActionStyledValues(
+				"true", style.Green,
+				"false", style.Red,
+			).Prefix("pos1 --bool=").
+				Suffix(" ").
+				NoSpace('*').
+				Usage("bool flag"))
+
+		s.Run("modifier", "--split", "pos1 \"--bool=").
+			Expect(carapace.ActionStyledValues(
+				"true", style.Green,
+				"false", style.Red,
+			).Prefix("pos1 \"--bool=").
+				Suffix("\" ").
+				NoSpace('*').
+				Usage("bool flag"))
+
+		s.Run("modifier", "--split", "pos1 '--bool=").
+			Expect(carapace.ActionStyledValues(
+				"true", style.Green,
+				"false", style.Red,
+			).Prefix("pos1 '--bool=").
+				Suffix("' ").
+				NoSpace('*').
+				Usage("bool flag"))
+	})
+}

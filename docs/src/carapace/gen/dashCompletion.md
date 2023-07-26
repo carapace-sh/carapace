@@ -9,25 +9,9 @@ The Context is also updated to only contain the arguments after the dash.
 
 ```go
 carapace.Gen(rootCmd).DashCompletion(
-    carapace.ActionValues("a", "b", "c"),
-    // ...
+    carapace.ActionValues("d1", "dash1"),
+    carapace.ActionValues("d2", "dash2"),
 )
 ```
 
-[`DashAnyCompletion`] defines completion for any positional argument after dash not already defined.
-
-```go
-carapace.Gen(rootCmd).DashAnyCompletion(
-    carapace.ActionFiles(""),
-)
-```
-
-
-## Complete using different command
-
-[`DashAnyCompletion`] can be combined with [`ActionExecute`] or [`ActionImport`] to complete the arguments after dash with a different completer.
-
-[`ActionExecute`]:../defaultActions/actionExecute.md
-[`ActionImport`]:../defaultActions/actionImport.md
 [`DashCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.DashCompletion
-[`DashAnyCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.DashAnyCompletion

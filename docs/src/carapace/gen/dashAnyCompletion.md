@@ -4,7 +4,7 @@
 
 ```go
 carapace.Gen(rootCmd).DashAnyCompletion(
-    carapace.ActionFiles(""),
+    carapace.ActionValues("dAny", "dashAny"),
 )
 ```
 

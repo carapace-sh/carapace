@@ -35,7 +35,6 @@ func init() {
 	rootCmd.AddGroup(
 		&cobra.Group{ID: "main", Title: "Main Commands"},
 		&cobra.Group{ID: "modifier", Title: "Modifier Commands"},
-		&cobra.Group{ID: "test", Title: "Test Commands"},
 		&cobra.Group{ID: "plugin", Title: "Plugin Commands"},
 	)
 

@@ -69,8 +69,8 @@ func TestRoot(t *testing.T) {
 					"modifier", "modifier example",
 				).Style(style.Yellow).Tag("modifier commands"),
 				carapace.ActionValuesDescribed(
-					"injection", "just trying to break things",
-				).Style(style.Magenta).Tag("test commands"),
+					"plugin", "dynamic plugin command",
+				).Style(style.Magenta).Tag("plugin commands"),
 				carapace.ActionValuesDescribed(
 					"chain", "shorthand chain",
 					"completion", "Generate the autocompletion script for the specified shell",
@@ -80,9 +80,6 @@ func TestRoot(t *testing.T) {
 					"multiparts", "multiparts example",
 					"special", "",
 				).Tag("other commands"),
-				carapace.ActionValuesDescribed(
-					"plugin", "dynamic plugin command",
-				).Style(style.Cyan).Tag("plugin commands"),
 			).ToA())
 
 		s.Run("a").

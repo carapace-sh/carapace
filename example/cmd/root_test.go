@@ -80,6 +80,9 @@ func TestRoot(t *testing.T) {
 					"multiparts", "multiparts example",
 					"special", "",
 				).Tag("other commands"),
+				carapace.ActionValuesDescribed(
+					"plugin", "dynamic plugin command",
+				).Style(style.Cyan).Tag("plugin commands"),
 			).ToA())
 
 		s.Run("a").
@@ -95,6 +98,8 @@ func TestRoot(t *testing.T) {
 
 		s.Run("-").
 			Expect(carapace.ActionStyledValuesDescribed(
+				"--chdir", "change work directory", style.Blue,
+				"-C", "change work directory", style.Blue,
 				"--array", "multiflag", style.Blue,
 				"-a", "multiflag", style.Blue,
 				"-h", "help for example", style.Default,
@@ -111,6 +116,7 @@ func TestRoot(t *testing.T) {
 		s.Run("--").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
+				"--chdir", "change work directory", style.Blue,
 				"--help", "help for example", style.Default,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
 				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,

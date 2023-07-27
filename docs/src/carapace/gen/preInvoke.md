@@ -4,7 +4,7 @@
 
 ```go
 carapace.Gen(rootCmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, action carapace.Action) carapace.Action {
-	return action.Chdir(rootCmd.Flag("C").Value.String())
+	return action.Chdir(rootCmd.Flag("chdir").Value.String())
 })
 ```
 

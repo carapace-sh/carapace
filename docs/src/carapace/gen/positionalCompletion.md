@@ -1,6 +1,6 @@
 # PositionalCompletion
 
-[`PositionalCompletion`] defines completion for positional arguments using a list of [actions](../action.md).
+[`PositionalCompletion`] defines completion for positional arguments.
 
 
 ```go

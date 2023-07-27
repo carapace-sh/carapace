@@ -1,6 +1,6 @@
 # DashAnyCompletion
 
-[`DashAnyCompletion`] defines completion for any positional argument after dash not already defined.
+[`DashAnyCompletion`] defines completion for any positional arguments after `--` (dash) not already defined.
 
 ```go
 carapace.Gen(rootCmd).DashAnyCompletion(

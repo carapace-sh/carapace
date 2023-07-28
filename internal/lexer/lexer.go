@@ -44,7 +44,7 @@ func Split(s string) (*Tokenset, error) {
 }
 
 func split(s string) (*Tokenset, error) {
-	splitted, err := shlex.Split(s)
+	splitted, err := shlex.SplitP(s)
 	if strings.HasSuffix(s, " ") {
 		splitted = append(splitted, "")
 	}

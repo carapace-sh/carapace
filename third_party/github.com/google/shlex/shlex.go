@@ -80,6 +80,7 @@ const (
 	nonEscapingQuoteRunes = "'"
 	escapeRunes           = `\`
 	commentRunes          = "#"
+	terminateRunes        = "|&;"
 )
 
 // Classes of rune token
@@ -90,6 +91,7 @@ const (
 	nonEscapingQuoteRuneClass
 	escapeRuneClass
 	commentRuneClass
+	pipelineRuneClass
 	eofRuneClass
 )
 
@@ -99,6 +101,7 @@ const (
 	WordToken
 	SpaceToken
 	CommentToken
+	PipelineToken
 )
 
 // Lexer state machine states
@@ -129,6 +132,7 @@ func newDefaultClassifier() tokenClassifier {
 	t.addRuneClass(nonEscapingQuoteRunes, nonEscapingQuoteRuneClass)
 	t.addRuneClass(escapeRunes, escapeRuneClass)
 	t.addRuneClass(commentRunes, commentRuneClass)
+	t.addRuneClass(terminateRunes, pipelineRuneClass)
 	return t
 }
 
@@ -146,6 +150,12 @@ func NewLexer(r io.Reader) *Lexer {
 	return (*Lexer)(NewTokenizer(r))
 }
 
+type PipelineSeparatorError struct{}
+
+func (m *PipelineSeparatorError) Error() string {
+	return "encountered a pipeline separator like `|`"
+}
+
 // Next returns the next word, or an error. If there are no more words,
 // the error will be io.EOF.
 func (l *Lexer) Next() (string, error) {
@@ -159,6 +169,9 @@ func (l *Lexer) Next() (string, error) {
 			return token.value, nil
 		case CommentToken:
 			// skip comments
+		case PipelineToken:
+			// return token but with pseudo err to mark end of pipeline
+			return token.value, &PipelineSeparatorError{}
 		default:
 			return "", fmt.Errorf("Unknown token type: %v", token.tokenType)
 		}
@@ -231,6 +244,12 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						tokenType = CommentToken
 						state = commentState
+					}
+				case pipelineRuneClass:
+					{
+						tokenType = PipelineToken
+						value = append(value, nextRune)
+						state = inWordState
 					}
 				default:
 					{
@@ -400,6 +419,19 @@ func (t *Tokenizer) Next() (*Token, error) {
 
 // Split partitions a string into a slice of strings.
 func Split(s string) ([]string, error) {
+	return split(s, false)
+}
+
+// Split is like Split but only returns the last pipeline.
+//
+//	`echo example | bat -`
+//	# [bat, -]
+func SplitP(s string) ([]string, error) {
+	return split(s, true)
+}
+
+// Split partitions a string into a slice of strings.
+func split(s string, resetOnPipe bool) ([]string, error) {
 	l := NewLexer(strings.NewReader(s))
 	subStrings := make([]string, 0)
 	for {
@@ -408,7 +440,13 @@ func Split(s string) ([]string, error) {
 			if err == io.EOF {
 				return subStrings, nil
 			}
-			return subStrings, err
+			if _, ok := err.(*PipelineSeparatorError); !ok {
+				return subStrings, err
+			}
+			if resetOnPipe {
+				subStrings = make([]string, 0)
+				continue
+			}
 		}
 		subStrings = append(subStrings, word)
 	}

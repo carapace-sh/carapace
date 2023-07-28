@@ -96,4 +96,29 @@ func TestSplit(t *testing.T) {
 		Tokens: []string{"example", "action", "--", ""},
 		Prefix: `example 'action' -- `,
 	})
+
+	_test(`example 'action' -- | echo `, Tokenset{
+		Tokens: []string{"echo", ""},
+		Prefix: `example 'action' -- | echo `,
+	})
+
+	_test(`example 'action' -- || echo `, Tokenset{
+		Tokens: []string{"echo", ""},
+		Prefix: `example 'action' -- || echo `,
+	})
+
+	_test(`example 'action' -- && echo `, Tokenset{
+		Tokens: []string{"echo", ""},
+		Prefix: `example 'action' -- && echo `,
+	})
+
+	_test(`example 'action' -- ; echo `, Tokenset{
+		Tokens: []string{"echo", ""},
+		Prefix: `example 'action' -- ; echo `,
+	})
+
+	_test(`example 'action' -- & echo `, Tokenset{
+		Tokens: []string{"echo", ""},
+		Prefix: `example 'action' -- & echo `,
+	})
 }

@@ -10,7 +10,7 @@ import (
 func TestSplit(t *testing.T) {
 	_test := func(s string, expected Tokenset) {
 		t.Run(s, func(t *testing.T) {
-			tokenset, err := Split(s)
+			tokenset, err := Split(s, true)
 			if err != nil {
 				t.Error(err.Error())
 			}

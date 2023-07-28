@@ -1,6 +1,6 @@
-# Split
+# SplitP
 
-[`Split`] splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
+[`SplitP`] is like [Split] but supports pipelines.
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {
@@ -19,9 +19,10 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 	)
 
 	return carapace.ActionExecute(cmd)
-}).Split()
+}).SplitP()
 ```
 
-![](./split.cast)
+![](./splitP.cast)
 
-[`Split`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Split
+[Split]:./split.md
+[`SplitP`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.SplitP

@@ -28,6 +28,7 @@
     - [Retain](./carapace/action/retain.md)
     - [Shift](./carapace/action/shift.md)
     - [Split](./carapace/action/split.md)
+    - [SplitP](./carapace/action/splitP.md)
     - [Style](./carapace/action/style.md)
     - [StyleF](./carapace/action/styleF.md)
     - [StyleR](./carapace/action/styleR.md)

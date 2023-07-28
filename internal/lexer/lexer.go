@@ -20,10 +20,10 @@ type Tokenset struct {
 	State  State
 }
 
-func Split(s string) (*Tokenset, error) {
-	tokenset, err := split(s)
+func Split(s string, pipelines bool) (*Tokenset, error) {
+	tokenset, err := split(s, pipelines)
 	if err != nil && err.Error() == "EOF found when expecting closing quote" {
-		tokenset, err = split(s + `_"`)
+		tokenset, err = split(s+`_"`, pipelines)
 		if err == nil {
 			last := tokenset.Tokens[len(tokenset.Tokens)-1]
 			tokenset.Tokens[len(tokenset.Tokens)-1] = last[:len(last)-1]
@@ -32,7 +32,7 @@ func Split(s string) (*Tokenset, error) {
 		}
 	}
 	if err != nil && err.Error() == "EOF found when expecting closing quote" {
-		tokenset, err = split(s + `_'`)
+		tokenset, err = split(s+`_'`, pipelines)
 		if err == nil {
 			last := tokenset.Tokens[len(tokenset.Tokens)-1]
 			tokenset.Tokens[len(tokenset.Tokens)-1] = last[:len(last)-1]
@@ -43,8 +43,12 @@ func Split(s string) (*Tokenset, error) {
 	return tokenset, err
 }
 
-func split(s string) (*Tokenset, error) {
-	splitted, err := shlex.SplitP(s)
+func split(s string, pipelines bool) (*Tokenset, error) {
+	f := shlex.Split
+	if pipelines {
+		f = shlex.SplitP
+	}
+	splitted, err := f(s)
 	if strings.HasSuffix(s, " ") {
 		splitted = append(splitted, "")
 	}

@@ -431,7 +431,7 @@ func SplitP(s string) ([]string, error) {
 }
 
 // Split partitions a string into a slice of strings.
-func split(s string, resetOnPipe bool) ([]string, error) {
+func split(s string, pipelines bool) ([]string, error) {
 	l := NewLexer(strings.NewReader(s))
 	subStrings := make([]string, 0)
 	for {
@@ -443,7 +443,7 @@ func split(s string, resetOnPipe bool) ([]string, error) {
 			if _, ok := err.(*PipelineSeparatorError); !ok {
 				return subStrings, err
 			}
-			if resetOnPipe {
+			if pipelines {
 				subStrings = make([]string, 0)
 				continue
 			}

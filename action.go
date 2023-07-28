@@ -166,10 +166,19 @@ func (a Action) Shift(n int) Action {
 	})
 }
 
-// Split splits `Context.Value` using a shell lexer and replaces `Context.Args` with the tokens.
+// Split splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
 func (a Action) Split() Action {
+	return a.split(false)
+}
+
+// SplitP is like Split but supports pipelines.
+func (a Action) SplitP() Action {
+	return a.split(true)
+}
+
+func (a Action) split(pipelines bool) Action {
 	return ActionCallback(func(c Context) Action {
-		tokenset, err := lexer.Split(c.Value)
+		tokenset, err := lexer.Split(c.Value, pipelines)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}

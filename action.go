@@ -188,15 +188,18 @@ func (a Action) split(pipelines bool) Action {
 		c.Value = tokenset.Tokens[len(tokenset.Tokens)-1]
 		invoked := a.Invoke(c)
 		for index, value := range invoked.rawValues {
-			if !invoked.meta.Nospace.Matches(value.Value) {
+			if !invoked.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
 				switch tokenset.State {
 				case lexer.OPEN_DOUBLE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`"%v" `, strings.Replace(value.Value, `"`, `\"`, -1))
+					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.Replace(value.Value, `"`, `\"`, -1))
 				case lexer.OPEN_SINGLE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`'%v' `, strings.Replace(value.Value, `'`, `'"'"'`, -1))
+					invoked.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.Replace(value.Value, `'`, `'"'"'`, -1))
 				default:
-					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1) + ` `
+					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1)
 				}
+			}
+			if !invoked.meta.Nospace.Matches(value.Value) {
+				invoked.rawValues[index].Value += " "
 			}
 		}
 		invoked.Prefix(tokenset.Prefix)

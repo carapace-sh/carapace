@@ -132,7 +132,7 @@ func init() {
 			cmd.Flags().StringP("string", "s", "", "string flag")
 
 			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
-				"string": carapace.ActionValues("one", "two", "three"),
+				"string": carapace.ActionValues("one", "two", "three with space"),
 			})
 
 			carapace.Gen(cmd).PositionalCompletion(
@@ -149,7 +149,7 @@ func init() {
 			cmd.Flags().StringP("string", "s", "", "string flag")
 
 			carapace.Gen(cmd).FlagCompletion(carapace.ActionMap{
-				"string": carapace.ActionValues("one", "two", "three"),
+				"string": carapace.ActionValues("one", "two", "three with space"),
 			})
 
 			carapace.Gen(cmd).PositionalCompletion(

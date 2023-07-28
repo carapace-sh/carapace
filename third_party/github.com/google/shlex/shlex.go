@@ -58,6 +58,7 @@ type lexerState int
 type Token struct {
 	tokenType TokenType
 	value     string
+	index     int
 }
 
 // Equal reports whether tokens a, and b, are equal.
@@ -70,7 +71,7 @@ func (a *Token) Equal(b *Token) bool {
 	if a.tokenType != b.tokenType {
 		return false
 	}
-	return a.value == b.value
+	return a.value == b.value && a.index == b.index
 }
 
 // Named classes of UTF-8 runes
@@ -80,7 +81,7 @@ const (
 	nonEscapingQuoteRunes = "'"
 	escapeRunes           = `\`
 	commentRunes          = "#"
-	terminateRunes        = "|&;"
+	pipelineRunes         = "|&;"
 )
 
 // Classes of rune token
@@ -132,7 +133,7 @@ func newDefaultClassifier() tokenClassifier {
 	t.addRuneClass(nonEscapingQuoteRunes, nonEscapingQuoteRuneClass)
 	t.addRuneClass(escapeRunes, escapeRuneClass)
 	t.addRuneClass(commentRunes, commentRuneClass)
-	t.addRuneClass(terminateRunes, pipelineRuneClass)
+	t.addRuneClass(pipelineRunes, pipelineRuneClass)
 	return t
 }
 
@@ -158,22 +159,22 @@ func (m *PipelineSeparatorError) Error() string {
 
 // Next returns the next word, or an error. If there are no more words,
 // the error will be io.EOF.
-func (l *Lexer) Next() (string, error) {
+func (l *Lexer) Next() (string, int, error) {
 	for {
 		token, err := (*Tokenizer)(l).Next()
 		if err != nil {
-			return "", err
+			return "", -1, err
 		}
 		switch token.tokenType {
 		case WordToken:
-			return token.value, nil
+			return token.value, token.index, nil
 		case CommentToken:
 			// skip comments
 		case PipelineToken:
 			// return token but with pseudo err to mark end of pipeline
-			return token.value, &PipelineSeparatorError{}
+			return token.value, token.index, &PipelineSeparatorError{}
 		default:
-			return "", fmt.Errorf("Unknown token type: %v", token.tokenType)
+			return "", token.index, fmt.Errorf("Unknown token type: %v", token.tokenType)
 		}
 	}
 }
@@ -182,6 +183,7 @@ func (l *Lexer) Next() (string, error) {
 type Tokenizer struct {
 	input      bufio.Reader
 	classifier tokenClassifier
+	index      int
 }
 
 // NewTokenizer creates a new tokenizer from an input stream.
@@ -197,6 +199,7 @@ func NewTokenizer(r io.Reader) *Tokenizer {
 // It will panic if it encounters a rune which it does not know how to handle.
 func (t *Tokenizer) scanStream() (*Token, error) {
 	state := startState
+	tokenIndex := 0
 	var tokenType TokenType
 	var value []rune
 	var nextRune rune
@@ -205,6 +208,7 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 
 	for {
 		nextRune, _, err = t.input.ReadRune()
+		t.index += 1
 		nextRuneType = t.classifier.ClassifyRune(nextRune)
 
 		if err == io.EOF {
@@ -217,6 +221,9 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 		switch state {
 		case startState: // no runes read yet
 			{
+				if nextRuneType != spaceRuneClass {
+					tokenIndex = t.index - 1 // TODO verify
+				}
 				switch nextRuneType {
 				case eofRuneClass:
 					{
@@ -266,14 +273,16 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				case spaceRuneClass:
 					{
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				case escapingQuoteRuneClass:
@@ -302,7 +311,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 						err = fmt.Errorf("EOF found after escape character")
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				default:
@@ -320,7 +330,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 						err = fmt.Errorf("EOF found after escape character")
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				default:
@@ -338,7 +349,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 						err = fmt.Errorf("EOF found when expecting closing quote")
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				case escapingQuoteRuneClass:
@@ -363,7 +375,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 						err = fmt.Errorf("EOF found when expecting closing quote")
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				case nonEscapingQuoteRuneClass:
@@ -383,7 +396,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						token := &Token{
 							tokenType: tokenType,
-							value:     string(value)}
+							value:     string(value),
+							index:     tokenIndex}
 						return token, err
 					}
 				case spaceRuneClass:
@@ -392,7 +406,8 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 							state = startState
 							token := &Token{
 								tokenType: tokenType,
-								value:     string(value)}
+								value:     string(value),
+								index:     tokenIndex}
 							return token, err
 						} else {
 							value = append(value, nextRune)
@@ -419,35 +434,31 @@ func (t *Tokenizer) Next() (*Token, error) {
 
 // Split partitions a string into a slice of strings.
 func Split(s string) ([]string, error) {
-	return split(s, false)
+	substrings, _, err := SplitP(s, false)
+	return substrings, err
 }
 
-// Split is like Split but only returns the last pipeline.
-//
-//	`echo example | bat -`
-//	# [bat, -]
-func SplitP(s string) ([]string, error) {
-	return split(s, true)
-}
-
-// Split partitions a string into a slice of strings.
-func split(s string, pipelines bool) ([]string, error) {
+// SplitP is like Split but supports pipelines and returns the prefix.
+func SplitP(s string, pipelines bool) ([]string, string, error) {
 	l := NewLexer(strings.NewReader(s))
 	subStrings := make([]string, 0)
+	lastIndex := 0
 	for {
-		word, err := l.Next()
+		word, index, err := l.Next()
 		if err != nil {
 			if err == io.EOF {
-				return subStrings, nil
+				return subStrings, string([]rune(s)[:lastIndex]), nil
 			}
 			if _, ok := err.(*PipelineSeparatorError); !ok {
-				return subStrings, err
+				return subStrings, "", err
 			}
 			if pipelines {
 				subStrings = make([]string, 0)
+				lastIndex = index
 				continue
 			}
 		}
 		subStrings = append(subStrings, word)
+		lastIndex = index
 	}
 }

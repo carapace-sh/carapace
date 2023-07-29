@@ -8,7 +8,7 @@ carapace.ActionStyledValuesDescribed(
 	"styles/<style>", "details", style.Default,
 	"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 	"styles", "list", style.Yellow,
-).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string, c carapace.Context) carapace.Action {
+).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string) carapace.Action {
 	switch segment {
 	case "<style>":
 		return carapace.ActionStyles()

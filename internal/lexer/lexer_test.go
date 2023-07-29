@@ -150,7 +150,6 @@ func TestSplit(t *testing.T) {
 		State:  OPEN_DOUBLE,
 	})
 
-	t.Skip("skipping test that don't work yet") // TODO these need to work
 	_test(`example "`, Tokenset{
 		Tokens: []string{"example", ""},
 		Prefix: `example `,

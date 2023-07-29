@@ -23,15 +23,19 @@ type Tokenset struct {
 func Split(s string, pipelines bool) (*Tokenset, error) {
 	tokenset, err := split(s, pipelines)
 	if err != nil && err.Error() == "EOF found when expecting closing quote" {
-		tokenset, err = split(s+`"`, pipelines)
+		tokenset, err = split(s+`_"`, pipelines)
 		if err == nil {
 			tokenset.State = OPEN_DOUBLE
+			last := tokenset.Tokens[len(tokenset.Tokens)-1]
+			tokenset.Tokens[len(tokenset.Tokens)-1] = last[:len(last)-1]
 		}
 	}
 	if err != nil && err.Error() == "EOF found when expecting closing quote" {
-		tokenset, err = split(s+`'`, pipelines)
+		tokenset, err = split(s+`_'`, pipelines)
 		if err == nil {
 			tokenset.State = OPEN_SINGLE
+			last := tokenset.Tokens[len(tokenset.Tokens)-1]
+			tokenset.Tokens[len(tokenset.Tokens)-1] = last[:len(last)-1]
 		}
 	}
 	return tokenset, err

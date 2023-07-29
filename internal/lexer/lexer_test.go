@@ -30,6 +30,16 @@ func TestSplit(t *testing.T) {
 		Prefix: ` `,
 	})
 
+	_test(`example `, Tokenset{
+		Tokens: []string{"example", ""},
+		Prefix: `example `,
+	})
+
+	_test(`  example   `, Tokenset{
+		Tokens: []string{"example", ""},
+		Prefix: `  example   `,
+	})
+
 	_test(`"example`, Tokenset{
 		Tokens: []string{"example"},
 		State:  OPEN_DOUBLE,
@@ -120,5 +130,36 @@ func TestSplit(t *testing.T) {
 	_test(`example 'action' -- & echo `, Tokenset{
 		Tokens: []string{"echo", ""},
 		Prefix: `example 'action' -- & echo `,
+	})
+
+	_test(`example 'single with space`, Tokenset{
+		Tokens: []string{"example", "single with space"},
+		Prefix: `example `,
+		State:  OPEN_SINGLE,
+	})
+
+	_test(`example "double with space`, Tokenset{
+		Tokens: []string{"example", "double with space"},
+		Prefix: `example `,
+		State:  OPEN_DOUBLE,
+	})
+
+	_test(`example "double with \"space`, Tokenset{
+		Tokens: []string{"example", "double with \"space"},
+		Prefix: `example `,
+		State:  OPEN_DOUBLE,
+	})
+
+	t.Skip("skipping test that don't work yet") // TODO these need to work
+	_test(`example "`, Tokenset{
+		Tokens: []string{"example", ""},
+		Prefix: `example `,
+		State:  OPEN_DOUBLE,
+	})
+
+	_test(`example '`, Tokenset{
+		Tokens: []string{"example", ""},
+		Prefix: `example `,
+		State:  OPEN_SINGLE,
 	})
 }

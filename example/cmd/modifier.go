@@ -117,8 +117,8 @@ func init() {
 			"dir/subdir2/fileC.txt",
 		).MultiParts("/"),
 		"multipartsp": carapace.ActionStyledValuesDescribed(
-			"keys/<key>/<value>", "key/value example", style.Cyan,
-			"styles/<style>", "details", style.Magenta,
+			"keys/<key>/<value>", "key/value example", style.Default,
+			"styles/<style>", "details", style.Default,
 			"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 			"styles", "list", style.Yellow,
 		).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string, c carapace.Context) carapace.Action {

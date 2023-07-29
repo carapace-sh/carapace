@@ -3,6 +3,7 @@ package carapace
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -111,6 +112,76 @@ func (a Action) List(divider string) Action {
 func (a Action) MultiParts(dividers ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Invoke(c).ToMultiPartsA(dividers...)
+	})
+}
+
+// MultiPartsP is like MultiParts but with placeholder completion.
+func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(segment string, matches map[string]string, c Context) Action) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+
+		return ActionMultiParts(delimiter, func(c Context) Action {
+			placeholder := regexp.MustCompile(placeholderPattern)
+			matchedData := make(map[string]string)
+			matchedSegments := make(map[string]common.RawValue)
+			staticMatches := make(map[int]bool)
+
+		path:
+			for index, value := range invoked.rawValues {
+				segments := strings.Split(value.Value, delimiter)
+			segment:
+				for index, segment := range segments {
+					if index > len(c.Parts)-1 {
+						break segment
+					} else {
+						if segment != c.Parts[index] {
+							if !placeholder.MatchString(segment) {
+								continue path // skip this path as it doesn't match and is not a placeholder
+							} else {
+								matchedData[segment] = c.Parts[index] // store entered data for placeholder (overwrite if duplicate)
+							}
+						} else {
+							staticMatches[index] = true // static segment matches so placeholders should be ignored for this index
+						}
+					}
+				}
+
+				if len(segments) < len(c.Parts)+1 {
+					continue path // skip path as it is shorter than what was entered (must be after staticMatches being set)
+				}
+
+				for key := range staticMatches {
+					if segments[key] != c.Parts[key] {
+						continue path // skip this path as it has a placeholder where a static segment was matched
+					}
+				}
+
+				// store segment as path matched so far and this is currently being completed
+				if len(segments) == (len(c.Parts) + 1) {
+					matchedSegments[segments[len(c.Parts)]] = invoked.rawValues[index]
+				} else {
+					if segment := segments[len(c.Parts)]; placeholder.MatchString(segment) {
+						matchedSegments[segment] = common.RawValue{}
+					} else {
+						matchedSegments[segment+delimiter] = common.RawValue{}
+					}
+				}
+			}
+
+			actions := make([]Action, 0, len(matchedSegments))
+			for key, value := range matchedSegments {
+				if placeholder.MatchString(key) {
+					actions = append(actions, f(key, matchedData, c))
+				} else {
+					actions = append(actions, ActionStyledValuesDescribed(key, value.Description, value.Style)) // TODO tag,..
+				}
+			}
+
+			// TODO verify
+			a := Batch(actions...).ToA().NoSpace()
+			a.meta.Merge(invoked.meta)
+			return a
+		})
 	})
 }
 

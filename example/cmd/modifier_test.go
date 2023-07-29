@@ -159,6 +159,56 @@ func TestPrefix(t *testing.T) {
 	})
 }
 
+func TestMultiPartsP(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--multipartsp", "").
+			Expect(carapace.ActionStyledValuesDescribed(
+				"keys/", "", style.Default,
+				"styles", "list", style.Yellow,
+				"styles/", "", style.Default,
+			).NoSpace().
+				Usage("MultiPartsP()"))
+
+		s.Run("modifier", "--multipartsp", "keys/").
+			Expect(carapace.ActionValues(
+				"key1",
+				"key2",
+			).Prefix("keys/").
+				NoSpace().
+				Usage("MultiPartsP()"))
+
+		s.Run("modifier", "--multipartsp", "keys/key1/").
+			Expect(carapace.ActionValues(
+				"val1",
+				"val2",
+			).Prefix("keys/key1/").
+				NoSpace().
+				Usage("MultiPartsP()"))
+
+		s.Run("modifier", "--multipartsp", "keys/key2/").
+			Expect(carapace.ActionValues(
+				"val3",
+				"val4",
+			).Prefix("keys/key2/").
+				NoSpace().
+				Usage("MultiPartsP()"))
+
+		s.Run("modifier", "--multipartsp", "styles/c").
+			Expect(carapace.Batch(
+				carapace.ActionStyledValues(
+					"color", style.Default,
+					"cyan", style.Cyan,
+				).Tag("styles"),
+				carapace.ActionStyledValuesDescribed(
+					"custom", "custom style", style.Of(style.Blue, style.Blink),
+				),
+			).ToA().
+				Prefix("styles/").
+				NoSpace().
+				Usage("MultiPartsP()"))
+	})
+}
+
 func TestSplit(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {

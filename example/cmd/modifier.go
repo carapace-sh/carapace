@@ -29,6 +29,7 @@ func init() {
 	modifierCmd.Flags().String("invoke", "", "Invoke()")
 	modifierCmd.Flags().String("list", "", "List()")
 	modifierCmd.Flags().String("multiparts", "", "MultiParts()")
+	modifierCmd.Flags().String("multipartsp", "", "MultiPartsP()")
 	modifierCmd.Flags().String("nospace", "", "NoSpace()")
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
 	modifierCmd.Flags().String("retain", "", "Retain()")
@@ -115,6 +116,30 @@ func init() {
 			"dir/subdir1/fileB.txt",
 			"dir/subdir2/fileC.txt",
 		).MultiParts("/"),
+		"multipartsp": carapace.ActionStyledValuesDescribed(
+			"keys/<key>/<value>", "key/value example", style.Cyan,
+			"styles/<style>", "details", style.Magenta,
+			"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
+			"styles", "list", style.Yellow,
+		).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string, c carapace.Context) carapace.Action {
+			switch segment {
+			case "<style>":
+				return carapace.ActionStyles()
+			case "<key>":
+				return carapace.ActionValues("key1", "key2")
+			case "<value>":
+				switch matches["<key>"] {
+				case "key1":
+					return carapace.ActionValues("val1", "val2")
+				case "key2":
+					return carapace.ActionValues("val3", "val4")
+				default:
+					return carapace.ActionValues()
+				}
+			default:
+				return carapace.ActionValues()
+			}
+		}),
 		"prefix": carapace.ActionFiles().Prefix("file://"),
 		"retain": carapace.ActionValuesDescribed(
 			"1", "one",

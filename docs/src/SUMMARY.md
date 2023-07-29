@@ -23,6 +23,7 @@
     - [Invoke](./carapace/action/invoke.md)
     - [List](./carapace/action/list.md)
     - [MultiParts](./carapace/action/multiParts.md)
+    - [MultiPartsP](./carapace/action/multiPartsP.md)
     - [NoSpace](./carapace/action/noSpace.md)
     - [Prefix](./carapace/action/prefix.md)
     - [Retain](./carapace/action/retain.md)

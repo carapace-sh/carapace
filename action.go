@@ -116,7 +116,7 @@ func (a Action) MultiParts(dividers ...string) Action {
 }
 
 // MultiPartsP is like MultiParts but with placeholder completion.
-func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(segment string, matches map[string]string, c Context) Action) Action {
+func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(segment string, matches map[string]string) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 
@@ -171,7 +171,7 @@ func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(
 			actions := make([]Action, 0, len(matchedSegments))
 			for key, value := range matchedSegments {
 				if placeholder.MatchString(key) {
-					actions = append(actions, f(key, matchedData, c))
+					actions = append(actions, f(key, matchedData))
 				} else {
 					actions = append(actions, ActionStyledValuesDescribed(key, value.Description, value.Style)) // TODO tag,..
 				}

@@ -5,15 +5,15 @@
 ```go
 carapace.ActionStyledValuesDescribed(
 	"keys/<key>/<value>", "key/value example", style.Default,
-	"styles/<style>", "details", style.Default,
 	"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 	"styles", "list", style.Yellow,
+	"styles/<style>", "details", style.Default,
 ).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string) carapace.Action {
 	switch segment {
-	case "<style>":
-		return carapace.ActionStyles()
 	case "<key>":
 		return carapace.ActionValues("key1", "key2")
+	case "<style>":
+		return carapace.ActionStyles()
 	case "<value>":
 		switch matches["<key>"] {
 		case "key1":

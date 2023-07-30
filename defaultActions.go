@@ -219,18 +219,40 @@ func ActionMultiParts(sep string, callback func(c Context) Action) Action {
 // ActionMultiPartsN is like ActionMultiParts but limits the number of parts to `n`.
 func ActionMultiPartsN(sep string, n int, callback func(c Context) Action) Action {
 	return ActionCallback(func(c Context) Action {
+		switch n {
+		case 0:
+			return ActionMessage("invalid value for n [ActionValuesDescribed]: %v", n)
+		case 1:
+			return callback(c).Invoke(c).ToA()
+		}
+
 		splitted := strings.SplitN(c.Value, sep, n)
 		prefix := ""
 		c.Parts = []string{}
 
 		switch {
 		case len(sep) == 0:
-			prefix = c.Value
-			c.Value = ""
-		case len(splitted) > 1:
-			c.Value = splitted[len(splitted)-1]
-			c.Parts = splitted[:len(splitted)-1]
-			prefix = strings.Join(c.Parts, sep) + sep
+			switch {
+			case n < 0:
+				prefix = c.Value
+				c.Value = ""
+				c.Parts = splitted
+			default:
+				prefix = c.Value
+				if n-1 < len(prefix) {
+					prefix = c.Value[:n-1]
+					c.Value = c.Value[n-1:]
+				} else {
+					c.Value = ""
+				}
+				c.Parts = strings.Split(prefix, "")
+			}
+		default:
+			if len(splitted) > 1 {
+				c.Value = splitted[len(splitted)-1]
+				c.Parts = splitted[:len(splitted)-1]
+				prefix = strings.Join(c.Parts, sep) + sep
+			}
 		}
 
 		nospace := '*'

@@ -33,6 +33,7 @@ func init() {
 	actionCmd.Flags().String("multiparts", "", "ActionMultiParts()")
 	actionCmd.Flags().String("multiparts-nested", "", "ActionMultiParts(...ActionMultiParts...)")
 	actionCmd.Flags().String("multipartsn", "", "ActionMultiPartsN()")
+	actionCmd.Flags().String("multipartsn-empty", "", "ActionMultiPartsN()")
 	actionCmd.Flags().String("styles", "", "ActionStyles()")
 	actionCmd.Flags().String("styleconfig", "", "ActionStyleConfig()")
 	actionCmd.Flags().String("styled-values", "", "ActionStyledValues()")
@@ -142,6 +143,16 @@ func init() {
 						return carapace.ActionValues()
 					}
 				})
+			default:
+				return carapace.ActionMessage("should never happen")
+			}
+		}),
+		"multipartsn-empty": carapace.ActionMultiPartsN("", 2, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValues("a", "b")
+			case 1:
+				return carapace.ActionValues("c", "d", "e").UniqueList("")
 			default:
 				return carapace.ActionMessage("should never happen")
 			}

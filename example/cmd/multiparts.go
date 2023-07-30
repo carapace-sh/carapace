@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/rsteube/carapace"
+	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +22,10 @@ func init() {
 	multipartsCmd.Flags().String("dotdotdot", "", "multiparts with ... as divider")
 	multipartsCmd.Flags().String("equals", "", "multiparts with = as divider")
 	multipartsCmd.Flags().String("none", "", "multiparts without divider")
+	multipartsCmd.Flags().String("none-zero", "", "multiparts without divider limited to 0")
+	multipartsCmd.Flags().String("none-one", "", "multiparts without divider limited to 1")
+	multipartsCmd.Flags().String("none-two", "", "multiparts without divider limited to 2")
+	multipartsCmd.Flags().String("none-three", "", "multiparts without divider limited to 3")
 	multipartsCmd.Flags().String("slash", "", "multiparts with / as divider")
 
 	rootCmd.AddCommand(multipartsCmd)
@@ -34,6 +39,51 @@ func init() {
 		"equals":    actionMultipartsTest("="),
 		"none": carapace.ActionMultiParts("", func(c carapace.Context) carapace.Action {
 			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(c.Parts).ToA()
+		}),
+		"none-zero": carapace.ActionMultiPartsN("", 0, func(c carapace.Context) carapace.Action {
+			return carapace.ActionMessage("unreachable")
+		}),
+		"none-one": carapace.ActionMultiPartsN("", 1, func(c carapace.Context) carapace.Action {
+			return carapace.ActionValues("a", "b")
+		}),
+		"none-two": carapace.ActionMultiPartsN("", 2, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValuesDescribed(
+					"a", "zero",
+					"b", "zero",
+				).Style(style.Blue)
+			default:
+				return carapace.ActionValuesDescribed(
+					"a", "default",
+					"b", "default",
+					"c", "default",
+				).Style(style.Red).
+					UniqueList("")
+			}
+		}),
+		"none-three": carapace.ActionMultiPartsN("", 3, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValuesDescribed(
+					"a", "zero",
+					"b", "zero",
+				).Style(style.Blue)
+			case 1:
+				return carapace.ActionValuesDescribed(
+					"a", "one",
+					"b", "one",
+					"c", "one",
+				).Style(style.Red)
+			default:
+				return carapace.ActionValuesDescribed(
+					"a", "default",
+					"b", "default",
+					"c", "default",
+					"d", "default",
+				).Style(style.Green).
+					UniqueList("")
+			}
 		}),
 		"slash": actionMultipartsTest("/"),
 	})

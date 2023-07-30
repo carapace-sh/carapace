@@ -9,6 +9,7 @@ import (
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/pkg/cache"
 	"github.com/rsteube/carapace/pkg/style"
+	"github.com/rsteube/carapace/pkg/traverse"
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +26,7 @@ func init() {
 	modifierCmd.Flags().String("cache", "", "Cache()")
 	modifierCmd.Flags().String("cache-key", "", "Cache()")
 	modifierCmd.Flags().String("chdir", "", "Chdir()")
+	modifierCmd.Flags().String("chdirf", "", "ChdirF()")
 	modifierCmd.Flags().String("filter", "", "Filter()")
 	modifierCmd.Flags().String("invoke", "", "Invoke()")
 	modifierCmd.Flags().String("list", "", "List()")
@@ -83,7 +85,8 @@ func init() {
 				return carapace.ActionValues()
 			}
 		}),
-		"chdir": carapace.ActionFiles().Chdir(os.TempDir()),
+		"chdir":  carapace.ActionFiles().Chdir(os.TempDir()),
+		"chdirf": carapace.ActionFiles().ChdirF(traverse.GitWorkTree),
 		"filter": carapace.ActionValuesDescribed(
 			"1", "one",
 			"2", "two",

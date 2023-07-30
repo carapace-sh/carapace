@@ -19,6 +19,7 @@
   - [Action](./carapace/action.md)
     - [Cache](./carapace/action/cache.md)
     - [Chdir](./carapace/action/chdir.md)
+    - [ChdirF](./carapace/action/chdirF.md)
     - [Filter](./carapace/action/filter.md)
     - [Invoke](./carapace/action/invoke.md)
     - [List](./carapace/action/list.md)

@@ -13,6 +13,7 @@ import (
 	"github.com/rsteube/carapace/internal/lexer"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
 	"github.com/rsteube/carapace/pkg/style"
+	pkgtraverse "github.com/rsteube/carapace/pkg/traverse"
 )
 
 // Action indicates how to complete a flag or positional argument.
@@ -69,6 +70,17 @@ func (a Action) Chdir(dir string) Action {
 		}
 		c.Dir = abs
 		return a.Invoke(c).ToA()
+	})
+}
+
+// ChdirF is like Chdir but uses a function.
+func (a Action) ChdirF(f func(tc pkgtraverse.Context) (string, error)) Action {
+	return ActionCallback(func(c Context) Action {
+		newDir, err := f(c)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+		return a.Chdir(newDir)
 	})
 }
 

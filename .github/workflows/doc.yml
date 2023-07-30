@@ -12,6 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/cache@v3
+        with:
+          path: docs/book/linkcheck/
+
       - name: "build docs"
         run: |
             mdbook build docs

@@ -9,7 +9,7 @@ carapace.ActionStyledValuesDescribed(
 	"styles", "list", style.Yellow,
 	"styles/<style>", "details", style.Default,
 ).MultiPartsP("/", "<.*>", func(placeholder string, matches map[string]string) carapace.Action {
-	switch segment {
+	switch placeholder {
 	case "<key>":
 		return carapace.ActionValues("key1", "key2")
 	case "<style>":

@@ -115,13 +115,14 @@ func (a Action) MultiParts(dividers ...string) Action {
 	})
 }
 
-// MultiPartsP is like MultiParts but with placeholder completion.
-func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(segment string, matches map[string]string) Action) Action {
+// MultiPartsP is like MultiParts but with placeholders
+func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder string, matches map[string]string) Action) Action {
+	// TODO add delimiter as suffix for proper nospace handling (some values/placeholders might appear with and without suffix)
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 
 		return ActionMultiParts(delimiter, func(c Context) Action {
-			placeholder := regexp.MustCompile(placeholderPattern)
+			rPlaceholder := regexp.MustCompile(pattern)
 			matchedData := make(map[string]string)
 			matchedSegments := make(map[string]common.RawValue)
 			staticMatches := make(map[int]bool)
@@ -135,7 +136,7 @@ func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(
 						break segment
 					} else {
 						if segment != c.Parts[index] {
-							if !placeholder.MatchString(segment) {
+							if !rPlaceholder.MatchString(segment) {
 								continue path // skip this path as it doesn't match and is not a placeholder
 							} else {
 								matchedData[segment] = c.Parts[index] // store entered data for placeholder (overwrite if duplicate)
@@ -160,7 +161,7 @@ func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(
 				if len(segments) == (len(c.Parts) + 1) {
 					matchedSegments[segments[len(c.Parts)]] = invoked.rawValues[index]
 				} else {
-					if segment := segments[len(c.Parts)]; placeholder.MatchString(segment) {
+					if segment := segments[len(c.Parts)]; rPlaceholder.MatchString(segment) {
 						matchedSegments[segment] = common.RawValue{}
 					} else {
 						matchedSegments[segment+delimiter] = common.RawValue{}
@@ -170,7 +171,7 @@ func (a Action) MultiPartsP(delimiter string, placeholderPattern string, f func(
 
 			actions := make([]Action, 0, len(matchedSegments))
 			for key, value := range matchedSegments {
-				if placeholder.MatchString(key) {
+				if rPlaceholder.MatchString(key) {
 					actions = append(actions, f(key, matchedData))
 				} else {
 					actions = append(actions, ActionStyledValuesDescribed(key, value.Description, value.Style)) // TODO tag,..

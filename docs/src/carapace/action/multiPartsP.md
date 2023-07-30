@@ -1,6 +1,6 @@
 # MultiPartsP
 
-[`MultiPartsP`] is like [MultiParts] but with placeholder completion.
+[`MultiPartsP`] is like [MultiParts] but with placeholders.
 
 ```go
 carapace.ActionStyledValuesDescribed(
@@ -8,7 +8,7 @@ carapace.ActionStyledValuesDescribed(
 	"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 	"styles", "list", style.Yellow,
 	"styles/<style>", "details", style.Default,
-).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string) carapace.Action {
+).MultiPartsP("/", "<.*>", func(placeholder string, matches map[string]string) carapace.Action {
 	switch segment {
 	case "<key>":
 		return carapace.ActionValues("key1", "key2")

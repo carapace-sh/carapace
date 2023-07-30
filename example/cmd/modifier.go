@@ -121,8 +121,8 @@ func init() {
 			"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 			"styles", "list", style.Yellow,
 			"styles/<style>", "details", style.Default,
-		).MultiPartsP("/", "<.*>", func(segment string, matches map[string]string) carapace.Action {
-			switch segment {
+		).MultiPartsP("/", "<.*>", func(placeholder string, matches map[string]string) carapace.Action {
+			switch placeholder {
 			case "<key>":
 				return carapace.ActionValues("key1", "key2")
 			case "<style>":

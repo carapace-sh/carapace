@@ -15,7 +15,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           key: linkcheck
-          path: docs/book/linkcheck/
+          path: docs/book/linkcheck
 
       - name: "build docs"
         run: |

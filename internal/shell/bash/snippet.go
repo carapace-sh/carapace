@@ -16,14 +16,20 @@ _%v_completion() {
 
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'
-  mapfile -t COMPREPLY < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v _carapace bash)
-  [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
 
-  compopt -o nospace
+  if echo ${compline}"''" | xargs echo 2>/dev/null > /dev/null; then
+  	mapfile -t COMPREPLY < <(echo ${compline}""''" | xargs %v _carapace bash )
+  elif echo ${compline} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
+  	mapfile -t COMPREPLY < <(echo ${compline} | sed "s/\$/'/" | xargs %v _carapace bash)
+  else
+  	mapfile -t COMPREPLY < <(echo ${compline} | sed 's/$/"/' | xargs %v _carapace bash)
+  fi
+		
+  [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
 }
 
-complete -F _%v_completion %v
-`, cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name())
+complete -o nospace -o noquote -F _%v_completion %v
+`, cmd.Name(), uid.Executable(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name())
 
 	return result
 }

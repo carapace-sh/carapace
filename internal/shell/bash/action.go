@@ -98,14 +98,9 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if len(values) == 1 {
-			// vals[index] = quoter.Replace(sanitizer.Replace(val.Value)) // TODO
-
-			if strings.Contains(val.Value, " ") {
-				val.Value = fmt.Sprintf(`"%v"`, val.Value) // correctly assigned below
-			}
-
+			vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 			if !meta.Nospace.Matches(val.Value) {
-				vals[index] = val.Value + " "
+				vals[index] = vals[index] + " "
 			}
 
 		} else {

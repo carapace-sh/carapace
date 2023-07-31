@@ -18,7 +18,7 @@ _%v_completion() {
   local IFS=$'\n'
 
   if echo ${compline}"''" | xargs echo 2>/dev/null > /dev/null; then
-  	mapfile -t COMPREPLY < <(echo ${compline}""''" | xargs %v _carapace bash )
+  	mapfile -t COMPREPLY < <(echo ${compline}"''" | xargs %v _carapace bash )
   elif echo ${compline} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
   	mapfile -t COMPREPLY < <(echo ${compline} | sed "s/\$/'/" | xargs %v _carapace bash)
   else

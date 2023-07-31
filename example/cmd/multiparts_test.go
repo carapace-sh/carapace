@@ -8,6 +8,7 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
+// TODO rename
 func TestMultiparts(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
@@ -75,5 +76,100 @@ func TestMultiparts(t *testing.T) {
 				StyleF(style.ForPath).
 				Prefix("VALUE=one,FILE=").
 				NoSpace(',', '/', '='))
+
+		s.Run("multiparts", "--none-zero", "").
+			Expect(carapace.ActionMessage("invalid value for n [ActionValuesDescribed]: 0").
+				Usage("multiparts without divider limited to 0"))
+
+		s.Run("multiparts", "--none-one", "").
+			Expect(carapace.ActionValues("a", "b").
+				Usage("multiparts without divider limited to 1"))
+
+		s.Run("multiparts", "--none-one", "a").
+			Expect(carapace.ActionValues("a").
+				Usage("multiparts without divider limited to 1"))
+
+		s.Run("multiparts", "--none-two", "").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "zero",
+				"b", "zero",
+			).
+				NoSpace().
+				Style(style.Blue).
+				Usage("multiparts without divider limited to 2"))
+
+		s.Run("multiparts", "--none-two", "a").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+				"b", "default",
+				"c", "default",
+			).
+				Prefix("a").
+				NoSpace().
+				Style(style.Red).
+				Usage("multiparts without divider limited to 2"))
+
+		s.Run("multiparts", "--none-two", "ab").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+				"c", "default",
+			).
+				Prefix("ab").
+				NoSpace().
+				Style(style.Red).
+				Usage("multiparts without divider limited to 2"))
+
+		s.Run("multiparts", "--none-two", "abc").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+			).
+				Prefix("abc").
+				NoSpace().
+				Style(style.Red).
+				Usage("multiparts without divider limited to 2"))
+
+		s.Run("multiparts", "--none-three", "a").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "one",
+				"b", "one",
+				"c", "one",
+			).
+				Prefix("a").
+				NoSpace().
+				Style(style.Red).
+				Usage("multiparts without divider limited to 3"))
+
+		s.Run("multiparts", "--none-three", "ab").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+				"b", "default",
+				"c", "default",
+				"d", "default",
+			).
+				Prefix("ab").
+				NoSpace().
+				Style(style.Green).
+				Usage("multiparts without divider limited to 3"))
+
+		s.Run("multiparts", "--none-three", "abc").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+				"b", "default",
+				"d", "default",
+			).
+				Prefix("abc").
+				NoSpace().
+				Style(style.Green).
+				Usage("multiparts without divider limited to 3"))
+
+		s.Run("multiparts", "--none-three", "abcd").
+			Expect(carapace.ActionValuesDescribed(
+				"a", "default",
+				"b", "default",
+			).
+				Prefix("abcd").
+				NoSpace().
+				Style(style.Green).
+				Usage("multiparts without divider limited to 3"))
 	})
 }

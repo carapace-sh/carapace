@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/shell/nushell"
 	"github.com/rsteube/carapace/pkg/ps"
 	"github.com/spf13/cobra"
 )
@@ -14,6 +15,10 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		return Gen(cmd).Snippet(args[0])
 	default:
 		initHelpCompletion(cmd)
+
+		if shell := ps.DetermineShell(); shell == "nushell" {
+			args = nushell.Patch(args)
+		}
 		action, context := traverse(cmd, args[2:])
 		if err := config.Load(); err != nil {
 			action = ActionMessage("failed to load config: " + err.Error())

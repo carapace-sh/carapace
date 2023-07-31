@@ -36,7 +36,7 @@ func sanitize(values []common.RawValue) []common.RawValue {
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
 	vals := make([]record, len(values))
 	for index, val := range sanitize(values) {
-		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {
+		if strings.ContainsAny(val.Value, ` {}()[]<>$&"'|;#\`+"`") {
 			switch {
 			case strings.HasPrefix(val.Value, "~"):
 				val.Value = fmt.Sprintf(`~"%v"`, escaper.Replace(val.Value[1:]))

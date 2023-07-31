@@ -18,6 +18,11 @@ var sanitizer = strings.NewReplacer(
 	"\r", ``,
 )
 
+var escaper = strings.NewReplacer(
+	`\`, `\\`,
+	`"`, `\"`,
+)
+
 func sanitize(values []common.RawValue) []common.RawValue {
 	for index, v := range values {
 		(&values[index]).Value = sanitizer.Replace(v.Value)
@@ -32,7 +37,12 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	vals := make([]record, len(values))
 	for index, val := range sanitize(values) {
 		if strings.ContainsAny(val.Value, ` {}()[]<>$&"|;#\`+"`") {
-			val.Value = fmt.Sprintf("'%v'", val.Value)
+			switch {
+			case strings.HasPrefix(val.Value, "~"):
+				val.Value = fmt.Sprintf(`~"%v"`, escaper.Replace(val.Value[1:]))
+			default:
+				val.Value = fmt.Sprintf(`"%v"`, escaper.Replace(val.Value))
+			}
 		}
 
 		if !meta.Nospace.Matches(val.Value) {

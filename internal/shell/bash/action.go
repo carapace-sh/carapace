@@ -96,17 +96,17 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		meta.Nospace.Add('*')
 	}
 
+	nospace := true
 	vals := make([]string, len(values))
 	for index, val := range values {
 		if len(values) == 1 {
 			// vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 			vals[index] = sanitizer.Replace(val.Value)
-			// if strings.Contains(vals[index], " ") {
-			vals[index] = fmt.Sprintf(`"%v"`, vals[index])
-			// }
+			if strings.Contains(vals[index], " ") {
+				vals[index] = fmt.Sprintf(`"%v"`, vals[index])
+			}
 			if !meta.Nospace.Matches(val.Value) {
-				// TODO use compopt nospace in snippet as bash appends quote otherwise
-				// vals[index] = vals[index] + " "
+				nospace = false
 			}
 
 		} else {
@@ -117,5 +117,5 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			}
 		}
 	}
-	return strings.Join(vals, "\n")
+	return fmt.Sprintf("%v\001%v", nospace, strings.Join(vals, "\n"))
 }

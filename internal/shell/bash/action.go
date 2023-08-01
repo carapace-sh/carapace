@@ -30,6 +30,7 @@ var quoter = strings.NewReplacer(
 	`?`, `\?`,
 	`(`, `\(`,
 	`)`, `\)`,
+	// `:`, `\:`,
 	`;`, `\;`,
 	` `, `\ `,
 	`[`, `\[`,
@@ -100,9 +101,9 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		if len(values) == 1 {
 			// vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 			vals[index] = sanitizer.Replace(val.Value)
-			if strings.Contains(vals[index], " ") {
-				vals[index] = fmt.Sprintf(`"%v"`, vals[index])
-			}
+			// if strings.Contains(vals[index], " ") {
+			vals[index] = fmt.Sprintf(`"%v"`, vals[index])
+			// }
 			if !meta.Nospace.Matches(val.Value) {
 				// TODO use compopt nospace in snippet as bash appends quote otherwise
 				// vals[index] = vals[index] + " "

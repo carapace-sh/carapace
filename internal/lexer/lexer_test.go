@@ -166,4 +166,10 @@ func TestSplit(t *testing.T) {
 		Tokens: []string{"example", ""},
 		Prefix: `example `,
 	})
+
+	_test(`example with:colon`, Tokenset{
+		Tokens:          []string{"example", "with:colon"},
+		Prefix:          `example `,
+		WordBreakPrefix: "with:",
+	})
 }

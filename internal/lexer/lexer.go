@@ -15,9 +15,10 @@ const (
 )
 
 type Tokenset struct {
-	Tokens []string
-	Prefix string
-	State  State
+	Tokens          []string
+	Prefix          string
+	State           State
+	WordBreakPrefix string
 }
 
 func Split(s string, pipelines bool) (*Tokenset, error) {
@@ -45,7 +46,7 @@ func Split(s string, pipelines bool) (*Tokenset, error) {
 }
 
 func split(s string, pipelines bool) (*Tokenset, error) {
-	splitted, prefix, err := shlex.SplitP(s, pipelines)
+	splitted, prefix, wordBreakPrefix, err := shlex.SplitP(s, pipelines)
 	if strings.HasSuffix(s, " ") {
 		splitted = append(splitted, "")
 	}
@@ -62,8 +63,9 @@ func split(s string, pipelines bool) (*Tokenset, error) {
 	}
 
 	t := &Tokenset{
-		Tokens: splitted,
-		Prefix: prefix,
+		Tokens:          splitted,
+		Prefix:          prefix,
+		WordBreakPrefix: wordBreakPrefix,
 	}
 	return t, nil
 }

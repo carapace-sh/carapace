@@ -42,6 +42,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -56,9 +57,10 @@ type lexerState int
 
 // Token is a (type, value) pair representing a lexographical token.
 type Token struct {
-	tokenType TokenType
-	value     string
-	index     int
+	tokenType     TokenType
+	value         string
+	index         int
+	bashWordBreak int
 }
 
 // Equal reports whether tokens a, and b, are equal.
@@ -94,6 +96,7 @@ const (
 	commentRuneClass
 	pipelineRuneClass
 	eofRuneClass
+	bashWordBreakRuneClass
 )
 
 // Classes of lexographic token
@@ -134,6 +137,14 @@ func newDefaultClassifier() tokenClassifier {
 	t.addRuneClass(escapeRunes, escapeRuneClass)
 	t.addRuneClass(commentRunes, commentRuneClass)
 	t.addRuneClass(pipelineRunes, pipelineRuneClass)
+
+	return t
+}
+
+func newBashWordBreaksClassifier() tokenClassifier {
+	t := tokenClassifier{}
+	t.addRuneClass(os.Getenv("COMP_WORDBREAKS"), bashWordBreakRuneClass)
+
 	return t
 }
 
@@ -159,40 +170,44 @@ func (m *PipelineSeparatorError) Error() string {
 
 // Next returns the next word, or an error. If there are no more words,
 // the error will be io.EOF.
-func (l *Lexer) Next() (string, int, error) {
+func (l *Lexer) Next() (string, int, int, error) {
 	for {
 		token, err := (*Tokenizer)(l).Next()
 		if err != nil {
-			return "", -1, err
+			return "", -1, -1, err
 		}
 		switch token.tokenType {
 		case WordToken:
-			return token.value, token.index, nil
+			return token.value, token.index, token.bashWordBreak, nil
 		case CommentToken:
 			// skip comments
 		case PipelineToken:
 			// return token but with pseudo err to mark end of pipeline
-			return token.value, token.index, &PipelineSeparatorError{}
+			return token.value, token.index, token.bashWordBreak, &PipelineSeparatorError{}
 		default:
-			return "", token.index, fmt.Errorf("Unknown token type: %v", token.tokenType)
+			return "", token.index, token.bashWordBreak, fmt.Errorf("Unknown token type: %v", token.tokenType)
 		}
 	}
 }
 
 // Tokenizer turns an input stream into a sequence of typed tokens
 type Tokenizer struct {
-	input      bufio.Reader
-	classifier tokenClassifier
-	index      int
+	input                    bufio.Reader
+	classifier               tokenClassifier
+	bashWordBreaksClassifier tokenClassifier
+	index                    int
 }
 
 // NewTokenizer creates a new tokenizer from an input stream.
 func NewTokenizer(r io.Reader) *Tokenizer {
 	input := bufio.NewReader(r)
 	classifier := newDefaultClassifier()
+	bashWordBreaksClassifier := newBashWordBreaksClassifier()
 	return &Tokenizer{
-		input:      *input,
-		classifier: classifier}
+		input:                    *input,
+		classifier:               classifier,
+		bashWordBreaksClassifier: bashWordBreaksClassifier,
+	}
 }
 
 // scanStream scans the stream for the next token using the internal state machine.
@@ -205,11 +220,13 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 	var nextRune rune
 	var nextRuneType runeTokenClass
 	var err error
+	var bashWordBreakIndex int
 
 	for {
 		nextRune, _, err = t.input.ReadRune()
 		t.index += 1
 		nextRuneType = t.classifier.ClassifyRune(nextRune)
+		bashWordBreakIndex = 0
 
 		if err == io.EOF {
 			nextRuneType = eofRuneClass
@@ -272,17 +289,19 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 				case eofRuneClass:
 					{
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				case spaceRuneClass:
 					{
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				case escapingQuoteRuneClass:
@@ -299,6 +318,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					}
 				default:
 					{
+						switch t.bashWordBreaksClassifier.ClassifyRune(nextRune) {
+						case bashWordBreakRuneClass:
+							bashWordBreakIndex = len(value)
+						}
 						value = append(value, nextRune)
 					}
 				}
@@ -310,9 +333,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						err = fmt.Errorf("EOF found after escape character")
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				default:
@@ -329,9 +353,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						err = fmt.Errorf("EOF found after escape character")
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				default:
@@ -348,9 +373,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						err = fmt.Errorf("EOF found when expecting closing quote")
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				case escapingQuoteRuneClass:
@@ -374,9 +400,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 					{
 						err = fmt.Errorf("EOF found when expecting closing quote")
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				case nonEscapingQuoteRuneClass:
@@ -395,9 +422,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 				case eofRuneClass:
 					{
 						token := &Token{
-							tokenType: tokenType,
-							value:     string(value),
-							index:     tokenIndex}
+							tokenType:     tokenType,
+							value:         string(value),
+							index:         tokenIndex,
+							bashWordBreak: bashWordBreakIndex}
 						return token, err
 					}
 				case spaceRuneClass:
@@ -405,9 +433,10 @@ func (t *Tokenizer) scanStream() (*Token, error) {
 						if nextRune == '\n' {
 							state = startState
 							token := &Token{
-								tokenType: tokenType,
-								value:     string(value),
-								index:     tokenIndex}
+								tokenType:     tokenType,
+								value:         string(value),
+								index:         tokenIndex,
+								bashWordBreak: bashWordBreakIndex}
 							return token, err
 						} else {
 							value = append(value, nextRune)
@@ -434,23 +463,24 @@ func (t *Tokenizer) Next() (*Token, error) {
 
 // Split partitions a string into a slice of strings.
 func Split(s string) ([]string, error) {
-	substrings, _, err := SplitP(s, false)
+	substrings, _, _, err := SplitP(s, false)
 	return substrings, err
 }
 
 // SplitP is like Split but supports pipelines and returns the prefix.
-func SplitP(s string, pipelines bool) ([]string, string, error) {
+func SplitP(s string, pipelines bool) ([]string, string, string, error) {
 	l := NewLexer(strings.NewReader(s))
 	subStrings := make([]string, 0)
 	lastIndex := 0
+	lastWordBreakPrefix := ""
 	for {
-		word, index, err := l.Next()
+		word, index, wordBreakIndex, err := l.Next()
 		if err != nil {
 			if err == io.EOF {
-				return subStrings, string([]rune(s)[:lastIndex]), nil
+				return subStrings, string([]rune(s)[:lastIndex]), lastWordBreakPrefix, nil
 			}
 			if _, ok := err.(*PipelineSeparatorError); !ok {
-				return subStrings, "", err
+				return subStrings, "", "", err
 			}
 			if pipelines {
 				subStrings = make([]string, 0)
@@ -460,5 +490,8 @@ func SplitP(s string, pipelines bool) ([]string, string, error) {
 		}
 		subStrings = append(subStrings, word)
 		lastIndex = index
+		if wordBreakIndex > -1 {
+			lastWordBreakPrefix = string([]rune(subStrings[len(subStrings)-1])[:wordBreakIndex])
+		}
 	}
 }

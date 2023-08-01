@@ -2,6 +2,7 @@ package testfiles
 
 //go:generate touch -- -_minus_prefix.txt
 //go:generate touch -- ampersand_&.txt
+//go:generate touch -- angle-brackets_<.txt
 //go:generate touch -- angle-brackets_<>.txt
 //go:generate touch -- backslash2_\n.txt
 //go:generate touch -- backslash3_\t.txt

@@ -12,11 +12,14 @@ import (
 func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_completion() {
+  #export COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
   export COMP_WORDBREAKS
+  echo "${COMP_WORDS[*]}" >> /tmp/compline
+  echo "$COMP_LINE" >> /tmp/compline
+  echo "$COMP_WORDBREAKS" >> /tmp/compline
 
-  local compline="${COMP_LINE:0:${COMP_POINT}}"
+  local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
 
-  local nospace data
   if echo ${compline}"''" | xargs echo 2>/dev/null > /dev/null; then
   	data=$(echo ${compline}"''" | xargs %v _carapace bash)
   elif echo ${compline} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then

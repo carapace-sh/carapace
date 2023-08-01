@@ -22,6 +22,9 @@ type Tokenset struct {
 
 func Split(s string, pipelines bool) (*Tokenset, error) {
 	tokenset, err := split(s, pipelines)
+	if err != nil && err.Error() == "EOF found after escape character" {
+		return Split(s[:len(s)-1], pipelines) // TODO mark this in tokenset
+	}
 	if err != nil && err.Error() == "EOF found when expecting closing quote" {
 		tokenset, err = split(s+`_"`, pipelines)
 		if err == nil {

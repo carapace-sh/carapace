@@ -161,4 +161,9 @@ func TestSplit(t *testing.T) {
 		Prefix: `example `,
 		State:  OPEN_SINGLE,
 	})
+
+	_test(`example \`, Tokenset{
+		Tokens: []string{"example", ""},
+		Prefix: `example `,
+	})
 }

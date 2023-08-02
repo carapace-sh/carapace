@@ -1,6 +1,6 @@
 # Split
 
-[`Split`] splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
+[`Split`] splits `Context.Value` [lexicographically] and replaces `Context.Args` with the tokens.
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {
@@ -24,4 +24,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ![](./split.cast)
 
+[lexicographically]:https://github.com/rsteube/carapace-shlex
 [`Split`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Split

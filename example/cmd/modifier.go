@@ -28,6 +28,8 @@ func init() {
 	modifierCmd.Flags().String("chdir", "", "Chdir()")
 	modifierCmd.Flags().String("chdirf", "", "ChdirF()")
 	modifierCmd.Flags().String("filter", "", "Filter()")
+	modifierCmd.Flags().String("filterargs", "", "FilterArgs()")
+	modifierCmd.Flags().String("filterparts", "", "FilterParts()")
 	modifierCmd.Flags().String("invoke", "", "Invoke()")
 	modifierCmd.Flags().String("list", "", "List()")
 	modifierCmd.Flags().String("multiparts", "", "MultiParts()")
@@ -92,7 +94,19 @@ func init() {
 			"2", "two",
 			"3", "three",
 			"4", "four",
-		).Filter([]string{"2", "4"}),
+		).Filter("2", "4"),
+		"filterargs": carapace.ActionValues(
+			"one",
+			"two",
+			"three",
+		).FilterArgs(),
+		"filterparts": carapace.ActionMultiParts(",", func(c carapace.Context) carapace.Action {
+			return carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).FilterParts().Suffix(",")
+		}),
 		"list": carapace.ActionValues("one", "two", "three").List(","),
 		"invoke": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			switch {

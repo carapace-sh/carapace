@@ -293,7 +293,7 @@ func ActionStyleConfig() Action {
 			})
 		case 1:
 			return ActionMultiParts(",", func(c Context) Action {
-				return ActionStyles(c.Parts...).Invoke(c).Filter(c.Parts).ToA().NoSpace()
+				return ActionStyles(c.Parts...).Invoke(c).Filter(c.Parts...).ToA().NoSpace()
 			})
 		default:
 			return ActionValues()

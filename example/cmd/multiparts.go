@@ -37,9 +37,7 @@ func init() {
 		"dot":       actionMultipartsTest("."),
 		"dotdotdot": actionMultipartsTest("..."),
 		"equals":    actionMultipartsTest("="),
-		"none": carapace.ActionMultiParts("", func(c carapace.Context) carapace.Action {
-			return carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").Invoke(c).Filter(c.Parts).ToA()
-		}),
+		"none":      carapace.ActionValuesDescribed("a", "first", "b", "second", "c", "third", "d", "fourth").UniqueList(""),
 		"none-zero": carapace.ActionMultiPartsN("", 0, func(c carapace.Context) carapace.Action {
 			return carapace.ActionMessage("unreachable")
 		}),
@@ -97,7 +95,7 @@ func init() {
 					for index, entry := range cEntries.Parts {
 						keys[index] = strings.Split(entry, "=")[0]
 					}
-					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys).Suffix("=").ToA()
+					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Filter(keys...).Suffix("=")
 				case 1:
 					switch c.Parts[0] {
 					case "FILE":
@@ -122,11 +120,11 @@ func actionMultipartsTest(divider string) carapace.Action {
 	return carapace.ActionMultiParts(divider, func(c carapace.Context) carapace.Action {
 		switch len(c.Parts) {
 		case 0:
-			return actionTestValues().Invoke(c).Suffix(divider).ToA()
+			return actionTestValues().Suffix(divider)
 		case 1:
-			return actionTestValues().Invoke(c).Filter(c.Parts).Suffix(divider).ToA()
+			return actionTestValues().FilterParts().Suffix(divider)
 		case 2:
-			return actionTestValues().Invoke(c).Filter(c.Parts).ToA()
+			return actionTestValues().FilterParts()
 		default:
 			return carapace.ActionValues()
 		}

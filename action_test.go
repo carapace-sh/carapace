@@ -81,7 +81,7 @@ func TestSkipCache(t *testing.T) {
 			ActionCallback(func(c Context) Action {
 				return ActionMessage("skipcache")
 			}).Invoke(c)).
-			Filter([]string{""}).
+			Filter("").
 			Prefix("").
 			Suffix("").
 			ToA()
@@ -100,7 +100,7 @@ func TestNoSpace(t *testing.T) {
 			ActionMultiParts("", func(c Context) Action {
 				return ActionMessage("nospace")
 			}).Invoke(c)).
-			Filter([]string{""}).
+			Filter("").
 			Prefix("").
 			Suffix("").
 			ToA()
@@ -123,7 +123,7 @@ func TestActionDirectories(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}),
-		ActionDirectories().Invoke(Context{Value: ""}).Filter([]string{"vendor/"}),
+		ActionDirectories().Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
 	assertEqual(t,
@@ -135,7 +135,7 @@ func TestActionDirectories(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("./"),
-		ActionDirectories().Invoke(Context{Value: "./"}).Filter([]string{"./vendor/"}),
+		ActionDirectories().Invoke(Context{Value: "./"}).Filter("./vendor/"),
 	)
 
 	assertEqual(t,
@@ -165,7 +165,7 @@ func TestActionFiles(t *testing.T) {
 			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
 		).NoSpace('/').Tag("files").Invoke(Context{}),
-		ActionFiles(".md").Invoke(Context{Value: ""}).Filter([]string{"vendor/"}),
+		ActionFiles(".md").Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
 	assertEqual(t,
@@ -176,7 +176,7 @@ func TestActionFiles(t *testing.T) {
 			"main.go", style.Of("fg-default", "bg-default"),
 			"main_test.go", style.Of("fg-default", "bg-default"),
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/"),
-		ActionFiles().Invoke(Context{Value: "example/"}).Filter([]string{"example/example"}),
+		ActionFiles().Invoke(Context{Value: "example/"}).Filter("example/example"),
 	)
 }
 

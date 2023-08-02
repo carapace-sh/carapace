@@ -21,7 +21,7 @@ func (a InvokedAction) export() export.Export {
 //
 //	a := carapace.ActionValues("A", "B", "C").Invoke(c)
 //	b := a.Filter([]string{"B"}) // ["A", "C"]
-func (a InvokedAction) Filter(values []string) InvokedAction {
+func (a InvokedAction) Filter(values ...string) InvokedAction {
 	a.rawValues = a.rawValues.Filter(values...)
 	return a
 }

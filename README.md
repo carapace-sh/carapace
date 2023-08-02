@@ -47,6 +47,7 @@ See [carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
 - [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
 - [carapace-bridge](https://github.com/rsteube/carapace-bridge) completion bridge
 - [carapace-pflag](https://github.com/rsteube/carapace-pflag) Drop-in replacement for spf13/pflag with support for non-posix variants
+- [carapace-shlex](https://github.com/rsteube/carapace-shlex) simple shell lexer
 - [carapace-spec](https://github.com/rsteube/carapace-spec) define simple completions using a spec file
 - [carapace-spec-clap](https://github.com/rsteube/carapace-spec-clap) spec generation for clap-rs/clap
 - [carapace-spec-kingpin](https://github.com/rsteube/carapace-spec-kingpin) spec generation for alecthomas/kingpin

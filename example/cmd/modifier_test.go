@@ -159,6 +159,59 @@ func TestPrefix(t *testing.T) {
 	})
 }
 
+func TestFilterArgs(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--filterargs", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).Usage("FilterArgs()"))
+
+		s.Run("modifier", "one", "--filterargs", "").
+			Expect(carapace.ActionValues(
+				"two",
+				"three",
+			).Usage("FilterArgs()"))
+
+		s.Run("modifier", "one", "three", "--filterargs", "").
+			Expect(carapace.ActionValues(
+				"two",
+			).Usage("FilterArgs()"))
+	})
+}
+
+func TestFilterParts(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--filterparts", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).Suffix(",").
+				NoSpace(',').
+				Usage("FilterParts()"))
+
+		s.Run("modifier", "--filterparts", "one,").
+			Expect(carapace.ActionValues(
+				"two",
+				"three",
+			).Suffix(",").
+				NoSpace(',').
+				Prefix("one,").
+				Usage("FilterParts()"))
+
+		s.Run("modifier", "--filterparts", "one,three,").
+			Expect(carapace.ActionValues(
+				"two",
+			).Suffix(",").
+				NoSpace(',').
+				Prefix("one,three,").
+				Usage("FilterParts()"))
+
+	})
+}
+
 func TestMultiPartsP(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--multipartsp", "").

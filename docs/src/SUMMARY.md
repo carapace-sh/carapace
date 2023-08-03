@@ -21,6 +21,8 @@
     - [Chdir](./carapace/action/chdir.md)
     - [ChdirF](./carapace/action/chdirF.md)
     - [Filter](./carapace/action/filter.md)
+    - [FilterArgs](./carapace/action/filterArgs.md)
+    - [FilterParts](./carapace/action/filterParts.md)
     - [Invoke](./carapace/action/invoke.md)
     - [List](./carapace/action/list.md)
     - [MultiParts](./carapace/action/multiParts.md)

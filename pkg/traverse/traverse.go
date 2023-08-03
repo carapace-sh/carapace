@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/pflag"
 )
 
 type Context interface {
@@ -14,6 +16,7 @@ type Context interface {
 	LookupEnv(key string) (string, bool)
 }
 
+// Parent returns the first parent directory containing any of the given names/directories.
 func Parent(names ...string) func(tc Context) (string, error) {
 	return func(tc Context) (string, error) {
 		wd, err := tc.Abs("")
@@ -48,4 +51,14 @@ func traverse(path string, name string) (target string, err error) {
 		}
 	}
 	return
+}
+
+// Flag returns the value of given flag.
+func Flag(f *pflag.Flag) func(tc Context) (string, error) {
+	return func(tc Context) (string, error) {
+		if f == nil {
+			return "", errors.New("invalid argument [traverse.Flag]")
+		}
+		return f.Value.String(), nil
+	}
 }

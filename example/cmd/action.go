@@ -110,7 +110,7 @@ func init() {
 					for index, entry := range cEntries.Parts {
 						keys[index] = strings.Split(entry, "=")[0]
 					}
-					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys).Suffix("=").ToA()
+					return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys...).Suffix("=").ToA()
 				case 1:
 					switch c.Parts[0] {
 					case "FILE":

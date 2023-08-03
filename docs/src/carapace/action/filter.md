@@ -8,7 +8,7 @@ carapace.ActionValuesDescribed(
 	"2", "two",
 	"3", "three",
 	"4", "four",
-).Filter([]string{"2", "4"})
+).Filter("2", "4")
 ```
 
 ![](./filter.cast)

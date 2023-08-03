@@ -86,10 +86,24 @@ func (a Action) ChdirF(f func(tc pkgtraverse.Context) (string, error)) Action {
 
 // Filter filters given values.
 //
-//	carapace.ActionValues("A", "B", "C").Filter([]string{"B"}) // ["A", "C"]
-func (a Action) Filter(values []string) Action {
+//	carapace.ActionValues("A", "B", "C").Filter("B") // ["A", "C"]
+func (a Action) Filter(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).Filter(values).ToA()
+		return a.Invoke(c).Filter(values...).ToA()
+	})
+}
+
+// FilterArgs filters Context.Args
+func (a Action) FilterArgs() Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Filter(c.Args...)
+	})
+}
+
+// FilterArgs filters Context.Parts
+func (a Action) FilterParts() Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Filter(c.Parts...)
 	})
 }
 
@@ -400,7 +414,7 @@ func (a Action) Timeout(d time.Duration, alternative Action) Action {
 // UniqueList wraps the Action in an ActionMultiParts with given divider.
 func (a Action) UniqueList(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {
-		return a.Invoke(c).Filter(c.Parts).ToA().NoSpace()
+		return a.FilterParts().NoSpace()
 	})
 }
 

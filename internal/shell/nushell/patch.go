@@ -20,7 +20,7 @@ func Patch(args []string) []string {
 		switch arg[0] {
 		case '"', "'"[0]:
 			if tokens, err := shlex.Split(arg); err == nil {
-				args[index] = (*tokens)[0].Value
+				args[index] = tokens[0].Value
 			}
 		case '`':
 			args[index] = strings.Trim(arg, "`")

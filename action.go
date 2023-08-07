@@ -295,7 +295,7 @@ func (a Action) split(pipelines bool) Action {
 		invoked := a.Invoke(c)
 		for index, value := range invoked.rawValues {
 			if !invoked.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
-				switch tokens.CurrentToken().State {
+				switch current.State {
 				case shlex.QUOTING_ESCAPING_STATE:
 					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.Replace(value.Value, `"`, `\"`, -1))
 				case shlex.QUOTING_STATE:

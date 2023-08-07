@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	shlex "github.com/rsteube/carapace-shlex"
 	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/lexer"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
 	"github.com/rsteube/carapace/pkg/style"
 	pkgtraverse "github.com/rsteube/carapace/pkg/traverse"
@@ -276,21 +276,29 @@ func (a Action) SplitP() Action {
 
 func (a Action) split(pipelines bool) Action {
 	return ActionCallback(func(c Context) Action {
-		tokenset, err := lexer.Split(c.Value, pipelines)
+		tokens, err := shlex.Split(c.Value)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
-		c.Args = tokenset.Tokens[:len(tokenset.Tokens)-1]
+		if pipelines {
+			tokens = tokens.CurrentPipeline()
+		}
+
+		context := NewContext(tokens.Strings()...)
+		current := tokens.CurrentToken()
+		prefix := c.Value[:current.Index]
+		c.Args = context.Args
 		c.Parts = []string{}
-		c.Value = tokenset.Tokens[len(tokenset.Tokens)-1]
+		c.Value = context.Value
+
 		invoked := a.Invoke(c)
 		for index, value := range invoked.rawValues {
 			if !invoked.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
-				switch tokenset.State {
-				case lexer.OPEN_DOUBLE:
+				switch tokens.CurrentToken().State {
+				case shlex.QUOTING_ESCAPING_STATE:
 					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.Replace(value.Value, `"`, `\"`, -1))
-				case lexer.OPEN_SINGLE:
+				case shlex.QUOTING_STATE:
 					invoked.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.Replace(value.Value, `'`, `'"'"'`, -1))
 				default:
 					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1)
@@ -300,8 +308,7 @@ func (a Action) split(pipelines bool) Action {
 				invoked.rawValues[index].Value += " "
 			}
 		}
-		invoked.Prefix(tokenset.Prefix)
-		return invoked.ToA().NoSpace()
+		return invoked.Prefix(prefix).ToA().NoSpace()
 	})
 }
 

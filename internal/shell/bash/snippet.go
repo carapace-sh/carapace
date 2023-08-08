@@ -13,6 +13,7 @@ func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/bash
 _%v_completion() {
   export COMP_WORDBREAKS
+  export COMP_LINE
 
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'

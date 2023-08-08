@@ -14,6 +14,82 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// ActionCommands returns the completed subcommands of a given cobra command.
+func ActionCommands(cmd *cobra.Command) Action {
+	return ActionCallback(func(c Context) Action {
+		batch := Batch()
+		for _, subcommand := range cmd.Commands() {
+			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
+				group := common.Group{Cmd: subcommand}
+				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
+				for _, alias := range subcommand.Aliases {
+					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
+				}
+			}
+		}
+		return batch.ToA()
+	})
+}
+
+// ActionFlags returns the completed flags of a given cobra command.
+func ActionFlags(cmd *cobra.Command) Action {
+	return ActionCallback(func(c Context) Action {
+		cmd.InitDefaultHelpFlag()
+		cmd.InitDefaultVersionFlag()
+
+		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
+		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
+
+		nospace := make([]rune, 0)
+		vals := make([]string, 0)
+		flagSet.VisitAll(func(f *pflagfork.Flag) {
+			switch {
+			case f.Hidden && !env.Hidden():
+				return // skip hidden flags
+			case f.Deprecated != "":
+				return // skip deprecated flags
+			case f.Changed && !f.IsRepeatable():
+				return // don't repeat flag
+			case flagSet.IsMutuallyExclusive(f.Flag):
+				return // skip flag of group already set
+			}
+
+			if isShorthandSeries {
+				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+					for _, shorthand := range c.Value[1:] {
+						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
+							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
+						}
+					}
+					vals = append(vals, f.Shorthand, f.Usage, f.Style())
+					if f.IsOptarg() {
+						nospace = append(nospace, []rune(f.Shorthand)[0])
+					}
+				}
+			} else {
+				switch f.Mode() {
+				case pflagfork.NameAsShorthand:
+					vals = append(vals, "-"+f.Name, f.Usage, f.Style())
+				case pflagfork.Default:
+					vals = append(vals, "--"+f.Name, f.Usage, f.Style())
+				}
+
+				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
+					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
+				}
+			}
+		})
+
+		if isShorthandSeries {
+			if len(nospace) > 0 {
+				return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace(nospace...)
+			}
+			return ActionStyledValuesDescribed(vals...).Prefix(c.Value)
+		}
+		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
+	}).Tag("flags")
+}
+
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
@@ -75,80 +151,6 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	})
 }
 
-func actionFlags(cmd *cobra.Command) Action {
-	return ActionCallback(func(c Context) Action {
-		cmd.InitDefaultHelpFlag()
-		cmd.InitDefaultVersionFlag()
-
-		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
-		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
-
-		nospace := make([]rune, 0)
-		vals := make([]string, 0)
-		flagSet.VisitAll(func(f *pflagfork.Flag) {
-			switch {
-			case f.Hidden && !env.Hidden():
-				return // skip hidden flags
-			case f.Deprecated != "":
-				return // skip deprecated flags
-			case f.Changed && !f.IsRepeatable():
-				return // don't repeat flag
-			case flagSet.IsMutuallyExclusive(f.Flag):
-				return // skip flag of group already set
-			}
-
-			if isShorthandSeries {
-				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					for _, shorthand := range c.Value[1:] {
-						if shorthandFlag := cmd.Flags().ShorthandLookup(string(shorthand)); shorthandFlag != nil && shorthandFlag.Value.Type() != "bool" && shorthandFlag.Value.Type() != "count" && shorthandFlag.NoOptDefVal == "" {
-							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
-						}
-					}
-					vals = append(vals, f.Shorthand, f.Usage, f.Style())
-					if f.IsOptarg() {
-						nospace = append(nospace, []rune(f.Shorthand)[0])
-					}
-				}
-			} else {
-				switch f.Mode() {
-				case pflagfork.NameAsShorthand:
-					vals = append(vals, "-"+f.Name, f.Usage, f.Style())
-				case pflagfork.Default:
-					vals = append(vals, "--"+f.Name, f.Usage, f.Style())
-				}
-
-				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
-				}
-			}
-		})
-
-		if isShorthandSeries {
-			if len(nospace) > 0 {
-				return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace(nospace...)
-			}
-			return ActionStyledValuesDescribed(vals...).Prefix(c.Value)
-		}
-		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
-	}).Tag("flags")
-}
-
-func actionSubcommands(cmd *cobra.Command) Action {
-	return ActionCallback(func(c Context) Action {
-		batch := Batch()
-		for _, subcommand := range cmd.Commands() {
-			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
-				group := common.Group{Cmd: subcommand}
-				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
-				for _, alias := range subcommand.Aliases {
-					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
-				}
-			}
-		}
-		return batch.ToA()
-	})
-}
-
 func initHelpCompletion(cmd *cobra.Command) {
 	helpCmd, _, err := cmd.Find([]string{"help"})
 	if err != nil {
@@ -167,7 +169,7 @@ func initHelpCompletion(cmd *cobra.Command) {
 			if err != nil {
 				return ActionMessage(err.Error())
 			}
-			return actionSubcommands(lastCmd)
+			return ActionCommands(lastCmd)
 		}),
 	)
 }

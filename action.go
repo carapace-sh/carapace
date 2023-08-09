@@ -285,17 +285,26 @@ func (a Action) split(pipelines bool) Action {
 			tokens = tokens.CurrentPipeline()
 		}
 
-		context := NewContext(tokens.Strings()...)
-		current := tokens.CurrentToken()
-		prefix := c.Value[:current.Index]
+		originalValue := c.Value
+		context := NewContext(tokens.FilterRedirects().Words().Strings()...)
+		prefix := originalValue[:tokens.Words().CurrentToken().Index]
 		c.Args = context.Args
 		c.Parts = []string{}
 		c.Value = context.Value
 
+		if pipelines { // support redirects
+			if len(tokens) > 1 && tokens[len(tokens)-2].WordbreakType.IsRedirect() {
+				LOG.Printf("completing files for redirect arg %#v", tokens.Words().CurrentToken().Value)
+				prefix = originalValue[:tokens.CurrentToken().Index]
+				c.Value = tokens.CurrentToken().Value
+				a = ActionFiles()
+			}
+		}
+
 		invoked := a.Invoke(c)
 		for index, value := range invoked.rawValues {
 			if !invoked.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
-				switch current.State {
+				switch tokens.CurrentToken().State {
 				case shlex.QUOTING_ESCAPING_STATE:
 					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.Replace(value.Value, `"`, `\"`, -1))
 				case shlex.QUOTING_STATE:

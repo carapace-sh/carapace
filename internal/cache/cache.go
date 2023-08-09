@@ -30,7 +30,7 @@ func Write(file string, e export.Export) (err error) {
 // Load loads values from file unless modification date exceeds timeout.
 func Load(file string, timeout time.Duration) (e export.Export, err error) {
 	var stat os.FileInfo
-	if stat, err = os.Stat(file); os.IsNotExist(err) || (timeout > 0 && stat.ModTime().Add(timeout).Before(time.Now())) {
+	if stat, err = os.Stat(file); os.IsNotExist(err) || (timeout >= 0 && stat.ModTime().Add(timeout).Before(time.Now())) {
 		err = errors.New("not exists or timeout exceeded")
 	} else {
 		var content []byte

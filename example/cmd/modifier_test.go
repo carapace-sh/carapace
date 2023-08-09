@@ -343,3 +343,92 @@ func TestSplit(t *testing.T) {
 				Tag("files"))
 	})
 }
+
+func TestSplitP(t *testing.T) {
+	os.Unsetenv("LS_COLORS")
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files("subdir/file1.txt", "")
+
+		s.Run("modifier", "--splitp", "pos1>").
+			Expect(carapace.ActionValues(
+				"subdir/",
+			).NoSpace('*').
+				StyleF(style.ForPath).
+				Prefix("pos1>").
+				Tag("files").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1>subdir/").
+			Expect(carapace.ActionValues(
+				"file1.txt",
+			).NoSpace('*').
+				StyleF(style.ForPath).
+				Prefix("pos1>subdir/").
+				Suffix(" ").
+				Tag("files").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1>subdir/file1.txt --b").
+			Expect(carapace.ActionValuesDescribed(
+				"--bool", "bool flag",
+			).NoSpace('*').
+				Prefix("pos1>subdir/file1.txt ").
+				Suffix(" ").
+				Tag("flags").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1 1>").
+			Expect(carapace.ActionValues(
+				"subdir/",
+			).NoSpace('*').
+				StyleF(style.ForPath).
+				Prefix("pos1 1>").
+				Tag("files").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "<> subdir/file1.txt ").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Prefix("<> subdir/file1.txt ").
+				Suffix(" ").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1|").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Prefix("pos1|").
+				Suffix(" ").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1|&").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Prefix("pos1|&").
+				Suffix(" ").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1 ;").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Prefix("pos1 ;").
+				Suffix(" ").
+				Usage("SplitP()"))
+
+		s.Run("modifier", "--splitp", "pos1 | ").
+			Expect(carapace.ActionValues(
+				"pos1",
+				"positional1",
+			).NoSpace('*').
+				Prefix("pos1 | ").
+				Suffix(" ").
+				Usage("SplitP()"))
+	})
+}

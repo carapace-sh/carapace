@@ -1,6 +1,7 @@
 #!/bin/bash
 _example_completion() {
   export COMP_WORDBREAKS
+  export COMP_LINE
 
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'

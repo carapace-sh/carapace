@@ -47,7 +47,7 @@ func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak
 	args = append(args[:1], tokens.CurrentPipeline().FilterRedirects().Words().Strings()...)
 
 	// TODO find a better solution to pass the wordbreakprefix to bash/action.go
-	wordbreakPrefix = getWordbreakPrefix(tokens.CurrentPipeline())
+	wordbreakPrefix = tokens.CurrentPipeline().WordbreakPrefix()
 	unsetBashCompEnv()
 
 	return args, nil
@@ -66,25 +66,4 @@ func unsetBashCompEnv() {
 	} {
 		os.Unsetenv(key)
 	}
-}
-
-// TODO move to carapace-shlex
-func getWordbreakPrefix(tokens shlex.TokenSlice) string {
-	found := false
-	prefix := ""
-	for i := len(tokens) - 2; i >= 0; i-- {
-		token := tokens[i]
-		if token.Index+len(token.RawValue) != tokens[i+1].Index { // TODO use adjoins
-			break
-		}
-
-		if token.Type == shlex.WORDBREAK_TOKEN {
-			found = true
-		}
-
-		if found {
-			prefix = token.Value + prefix
-		}
-	}
-	return prefix
 }

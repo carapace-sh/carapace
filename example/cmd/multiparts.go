@@ -27,6 +27,7 @@ func init() {
 	multipartsCmd.Flags().String("none-two", "", "multiparts without divider limited to 2")
 	multipartsCmd.Flags().String("none-three", "", "multiparts without divider limited to 3")
 	multipartsCmd.Flags().String("slash", "", "multiparts with / as divider")
+	multipartsCmd.Flags().String("space", "", "multiparts with space as divider")
 
 	rootCmd.AddCommand(multipartsCmd)
 
@@ -84,6 +85,12 @@ func init() {
 			}
 		}),
 		"slash": actionMultipartsTest("/"),
+		"space": carapace.ActionValues(
+			"one",
+			"two",
+			"three",
+			"four",
+		).UniqueList(" "),
 	})
 
 	carapace.Gen(multipartsCmd).PositionalCompletion(

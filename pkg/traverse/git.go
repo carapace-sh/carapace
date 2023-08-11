@@ -18,11 +18,6 @@ func GitWorkTree(tc Context) (string, error) {
 		return filepath.ToSlash(dir), nil
 	}
 
-	if _, ok := tc.LookupEnv("GIT_DIR"); ok {
-		wd, _ := tc.Abs("") // TODO provide better access to Context.Dir
-		return wd, nil
-	}
-
-	gitdir, err := GitDir(tc)
-	return filepath.Dir(gitdir), err
+	gitDir, err := GitDir(tc)
+	return filepath.Dir(gitDir), err
 }

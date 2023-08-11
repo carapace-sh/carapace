@@ -281,12 +281,15 @@ func (a Action) split(pipelines bool) Action {
 			return ActionMessage(err.Error())
 		}
 
+		var context Context
 		if pipelines {
 			tokens = tokens.CurrentPipeline()
+			context = NewContext(tokens.FilterRedirects().Words().Strings()...)
+		} else {
+			context = NewContext(tokens.Words().Strings()...)
 		}
 
 		originalValue := c.Value
-		context := NewContext(tokens.FilterRedirects().Words().Strings()...)
 		prefix := originalValue[:tokens.Words().CurrentToken().Index]
 		c.Args = context.Args
 		c.Parts = []string{}
@@ -306,9 +309,9 @@ func (a Action) split(pipelines bool) Action {
 			if !invoked.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
 				switch tokens.CurrentToken().State {
 				case shlex.QUOTING_ESCAPING_STATE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.Replace(value.Value, `"`, `\"`, -1))
+					invoked.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.ReplaceAll(value.Value, `"`, `\"`))
 				case shlex.QUOTING_STATE:
-					invoked.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.Replace(value.Value, `'`, `'"'"'`, -1))
+					invoked.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.ReplaceAll(value.Value, `'`, `'"'"'`))
 				default:
 					invoked.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1)
 				}

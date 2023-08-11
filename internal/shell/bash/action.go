@@ -57,20 +57,11 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 
 // ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
-	lastSegment := currentWord // last segment of currentWord split by COMP_WORDBREAKS
+	for index, value := range values {
+		values[index].Value = strings.TrimPrefix(value.Value, wordbreakPrefix)
+	}
 
-	// TODO handle wordbreaks correctly with carapace-shlex
-	// for valueIndex, value := range values {
-	// TODO optimize
-	// if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
-	// 	wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
-	// 	if index := strings.LastIndexAny(currentWord, wordbreaks); index != -1 {
-	// 		values[valueIndex].Value = strings.TrimPrefix(value.Value, currentWord[:index+1])
-	// 		lastSegment = currentWord[index+1:]
-	// 	}
-	// }
-	// }
-
+	lastSegment := strings.TrimPrefix(currentWord, wordbreakPrefix) // last segment of currentWord split by COMP_WORDBREAKS
 	if len(values) > 1 && commonDisplayPrefix(values...) != "" {
 		// When all display values have the same prefix bash will insert is as partial completion (which skips prefixes/formatting).
 		if valuePrefix := commonValuePrefix(values...); lastSegment != valuePrefix {

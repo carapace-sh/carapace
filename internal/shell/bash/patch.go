@@ -13,6 +13,10 @@ func (r RedirectError) Error() string {
 	return "current position is a redirect like `echo test >[TAB]`"
 }
 
+// TODO yuck! - set by Patch which also unsets bash comp environment variables so that they don't affect further completion
+// introduces state and hides what is happening but works for now
+var wordbreakPrefix string = ""
+
 // Patch patches args if `COMP_LINE` environment variable is set.
 //
 // Bash passes redirects to the completion function so these need to be filtered out.
@@ -24,10 +28,6 @@ func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak
 	compline, ok := os.LookupEnv("COMP_LINE")
 	if !ok {
 		return args, nil
-	}
-
-	if err := os.Unsetenv("COMP_LINE"); err != nil { // prevent it being passes along to embedded completions
-		return nil, err
 	}
 
 	if compline == "" {
@@ -45,5 +45,46 @@ func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak
 		}
 	}
 	args = append(args[:1], tokens.CurrentPipeline().FilterRedirects().Words().Strings()...)
+
+	// TODO find a better solution to pass the wordbreakprefix to bash/action.go
+	wordbreakPrefix = getWordbreakPrefix(tokens.CurrentPipeline())
+	unsetBashCompEnv()
+
 	return args, nil
+}
+
+func unsetBashCompEnv() {
+	for _, key := range []string{
+		// https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html
+		"COMP_CWORD",
+		"COMP_LINE",
+		"COMP_POINT",
+		"COMP_TYPE",
+		"COMP_KEY",
+		"COMP_WORDBREAKS",
+		"COMP_WORDS",
+	} {
+		os.Unsetenv(key)
+	}
+}
+
+// TODO move to carapace-shlex
+func getWordbreakPrefix(tokens shlex.TokenSlice) string {
+	found := false
+	prefix := ""
+	for i := len(tokens) - 2; i >= 0; i-- {
+		token := tokens[i]
+		if token.Index+len(token.RawValue) != tokens[i+1].Index { // TODO use adjoins
+			break
+		}
+
+		if token.Type == shlex.WORDBREAK_TOKEN {
+			found = true
+		}
+
+		if found {
+			prefix = token.Value + prefix
+		}
+	}
+	return prefix
 }

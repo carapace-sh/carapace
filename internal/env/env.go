@@ -44,3 +44,7 @@ func CoverDir() string {
 }
 
 func isGoRun() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-build") }
+
+func Match() string { // see match.Match
+	return os.Getenv("CASE_INSENSITIVE")
+}

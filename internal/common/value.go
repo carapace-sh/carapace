@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/rsteube/carapace/pkg/match"
 	"github.com/rsteube/carapace/pkg/style"
 )
 
@@ -111,7 +112,7 @@ func (r RawValues) Decolor() RawValues {
 func (r RawValues) FilterPrefix(prefix string) RawValues {
 	filtered := make(RawValues, 0)
 	for _, r := range r {
-		if strings.HasPrefix(r.Value, prefix) {
+		if match.HasPrefix(r.Value, prefix) {
 			filtered = append(filtered, r)
 		}
 	}

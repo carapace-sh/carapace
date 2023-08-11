@@ -6,6 +6,7 @@ import (
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/export"
 	_shell "github.com/rsteube/carapace/internal/shell"
+	"github.com/rsteube/carapace/pkg/match"
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked.
@@ -100,7 +101,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 
 		uniqueVals := make(map[string]common.RawValue)
 		for _, val := range a.rawValues {
-			if strings.HasPrefix(val.Value, c.Value) {
+			if match.HasPrefix(val.Value, c.Value) {
 				if splitted := tokenize(val.Value, dividers...); len(splitted) >= len(splittedCV) {
 					v := strings.Join(splitted[:len(splittedCV)], "")
 					d := splitted[len(splittedCV)-1]

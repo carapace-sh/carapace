@@ -25,10 +25,13 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			var err error
 			args, err = bash.Patch(args) // handle redirects
 			LOG.Printf("patching args to %#v", args)
-			if _, ok := err.(bash.RedirectError); ok {
-				LOG.Printf("completing redirect target for %#v", args)
+			if err != nil {
 				context := NewContext(args...)
-				return ActionFiles().Invoke(context).value(args[0], args[len(args)-1]), nil
+				if _, ok := err.(bash.RedirectError); ok {
+					LOG.Printf("completing redirect target for %#v", args)
+					return ActionFiles().Invoke(context).value(args[0], args[len(args)-1]), nil
+				}
+				return ActionMessage(err.Error()).Invoke(context).value(args[0], args[len(args)-1]), nil
 			}
 		}
 

@@ -101,6 +101,46 @@ func TestChdir(t *testing.T) {
 	})
 }
 
+func TestChdirF(t *testing.T) {
+	os.Unsetenv("LS_COLORS")
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files(
+			".git/config", "",
+			"file1.txt", "",
+			"subdirA/file2.txt", "",
+			"subdirB/file3.txt", "",
+		)
+
+		s.Run("modifier", "--chdirf", "").Expect(
+			carapace.ActionValues(
+				"subdirA/",
+				"subdirB/",
+				"file1.txt",
+			).StyleF(style.ForPath).
+				NoSpace('/').
+				Tag("files").
+				Usage("ChdirF()"))
+
+		s.Env("GIT_DIR", "subdirA/") // TODO should also work for subdirA
+		s.Run("modifier", "--chdirf", "").Expect(
+			carapace.ActionValues(
+				"file2.txt",
+			).StyleF(style.ForPath).
+				NoSpace('/').
+				Tag("files").
+				Usage("ChdirF()"))
+
+		s.Env("GIT_WORK_TREE", "subdirB/") // TODO should also work for subdirB
+		s.Run("modifier", "--chdirf", "").Expect(
+			carapace.ActionValues(
+				"file3.txt",
+			).StyleF(style.ForPath).
+				NoSpace('/').
+				Tag("files").
+				Usage("ChdirF()"))
+	})
+}
+
 func TestMultiParts(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--multiparts", "").

@@ -13,6 +13,7 @@ import (
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/man"
+	"github.com/rsteube/carapace/pkg/match"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/third_party/github.com/acarl005/stripansi"
 	"github.com/spf13/cobra"
@@ -441,7 +442,7 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 		if files, err := os.ReadDir(dir); err == nil {
 			vals := make([]string, 0)
 			for _, f := range files {
-				if strings.HasPrefix(f.Name(), prefix) {
+				if match.HasPrefix(f.Name(), prefix) {
 					if info, err := f.Info(); err == nil && !f.IsDir() && isExecAny(info.Mode()) {
 						vals = append(vals, f.Name(), manDescriptions[f.Name()], style.ForPath(dir+"/"+f.Name(), c))
 					}

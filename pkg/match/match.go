@@ -44,3 +44,10 @@ func Equal(s, t string) bool {
 func HasPrefix(s, prefix string) bool {
 	return match.HasPrefix(s, prefix)
 }
+
+func TrimPrefix(s, prefix string) string {
+	if HasPrefix(s, prefix) {
+		return s[len(prefix):]
+	}
+	return s
+}

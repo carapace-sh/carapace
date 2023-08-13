@@ -28,6 +28,13 @@ func (m Match) HasPrefix(s, prefix string) bool {
 	return strings.HasPrefix(s, prefix)
 }
 
+func (m Match) TrimPrefix(s, prefix string) string {
+	if m.HasPrefix(s, prefix) {
+		return s[len(prefix):]
+	}
+	return s
+}
+
 var match = CASE_SENSITIVE
 
 func init() {
@@ -46,8 +53,5 @@ func HasPrefix(s, prefix string) bool {
 }
 
 func TrimPrefix(s, prefix string) string {
-	if HasPrefix(s, prefix) {
-		return s[len(prefix):]
-	}
-	return s
+	return match.TrimPrefix(s, prefix)
 }

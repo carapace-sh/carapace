@@ -12,6 +12,7 @@ import (
 	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
 	pkgcache "github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/match"
 	"github.com/rsteube/carapace/pkg/style"
 	pkgtraverse "github.com/rsteube/carapace/pkg/traverse"
 )
@@ -229,9 +230,9 @@ func (a Action) NoSpace(suffixes ...rune) Action {
 func (a Action) Prefix(prefix string) Action {
 	return ActionCallback(func(c Context) Action {
 		switch {
-		case strings.HasPrefix(c.Value, prefix):
-			c.Value = strings.TrimPrefix(c.Value, prefix)
-		case strings.HasPrefix(prefix, c.Value):
+		case match.HasPrefix(c.Value, prefix):
+			c.Value = match.TrimPrefix(c.Value, prefix)
+		case match.HasPrefix(prefix, c.Value):
 			c.Value = ""
 		default:
 			return ActionValues()

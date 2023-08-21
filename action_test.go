@@ -227,9 +227,11 @@ func TestActionMessageSuppress(t *testing.T) {
 }
 
 func TestActionExecCommand(t *testing.T) {
+	context := NewContext()
+	context.Value = "docs/"
 	assertEqual(t,
-		ActionMessage("go unknown: unknown command").Invoke(Context{}).Prefix("docs/"),
-		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(Context{Value: "docs/"}),
+		ActionMessage("go unknown: unknown command").Invoke(NewContext()).Prefix("docs/"),
+		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(context),
 	)
 
 	assertEqual(t,

@@ -144,7 +144,6 @@ func (a Action) MultiParts(dividers ...string) Action {
 
 // MultiPartsP is like MultiParts but with placeholders
 func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder string, matches map[string]string) Action) Action {
-	// TODO add delimiter as suffix for proper nospace handling (some values/placeholders might appear with and without suffix)
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)
 
@@ -211,7 +210,6 @@ func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder
 				}
 			}
 
-			// TODO verify
 			a := Batch(actions...).ToA()
 			a.meta.Merge(invoked.meta)
 			return a

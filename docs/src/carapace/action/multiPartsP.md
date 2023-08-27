@@ -4,6 +4,7 @@
 
 ```go
 carapace.ActionStyledValuesDescribed(
+	"keys/<key>", "key example", style.Default,
 	"keys/<key>/<value>", "key/value example", style.Default,
 	"styles/custom", "custom style", style.Of(style.Blue, style.Blink),
 	"styles", "list", style.Yellow,

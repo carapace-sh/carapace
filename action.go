@@ -188,25 +188,31 @@ func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder
 				if len(segments) == (len(c.Parts) + 1) {
 					matchedSegments[segments[len(c.Parts)]] = invoked.rawValues[index]
 				} else {
-					if segment := segments[len(c.Parts)]; rPlaceholder.MatchString(segment) {
-						matchedSegments[segment] = common.RawValue{}
-					} else {
-						matchedSegments[segment+delimiter] = common.RawValue{}
-					}
+					matchedSegments[segments[len(c.Parts)]+delimiter] = common.RawValue{}
 				}
 			}
 
 			actions := make([]Action, 0, len(matchedSegments))
 			for key, value := range matchedSegments {
-				if rPlaceholder.MatchString(key) {
-					actions = append(actions, f(key, matchedData))
+				if trimmedKey := strings.TrimSuffix(key, delimiter); rPlaceholder.MatchString(trimmedKey) {
+					suffix := ""
+					if strings.HasSuffix(key, delimiter) {
+						suffix = delimiter
+					}
+					actions = append(actions, ActionCallback(func(c Context) Action {
+						invoked := f(trimmedKey, matchedData).Invoke(c).Suffix(suffix)
+						for index := range invoked.rawValues {
+							invoked.rawValues[index].Display += suffix
+						}
+						return invoked.ToA()
+					}))
 				} else {
 					actions = append(actions, ActionStyledValuesDescribed(key, value.Description, value.Style)) // TODO tag,..
 				}
 			}
 
 			// TODO verify
-			a := Batch(actions...).ToA().NoSpace()
+			a := Batch(actions...).ToA()
 			a.meta.Merge(invoked.meta)
 			return a
 		})

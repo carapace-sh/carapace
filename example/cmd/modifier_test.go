@@ -259,15 +259,17 @@ func TestMultiPartsP(t *testing.T) {
 				"keys/", "", style.Default,
 				"styles", "list", style.Yellow,
 				"styles/", "", style.Default,
-			).NoSpace().
+			).NoSpace('/').
 				Usage("MultiPartsP()"))
 
 		s.Run("modifier", "--multipartsp", "keys/").
 			Expect(carapace.ActionValues(
 				"key1",
+				"key1/",
 				"key2",
+				"key2/",
 			).Prefix("keys/").
-				NoSpace().
+				NoSpace('/').
 				Usage("MultiPartsP()"))
 
 		s.Run("modifier", "--multipartsp", "keys/key1/").
@@ -275,7 +277,7 @@ func TestMultiPartsP(t *testing.T) {
 				"val1",
 				"val2",
 			).Prefix("keys/key1/").
-				NoSpace().
+				NoSpace('/').
 				Usage("MultiPartsP()"))
 
 		s.Run("modifier", "--multipartsp", "keys/key2/").
@@ -283,7 +285,7 @@ func TestMultiPartsP(t *testing.T) {
 				"val3",
 				"val4",
 			).Prefix("keys/key2/").
-				NoSpace().
+				NoSpace('/').
 				Usage("MultiPartsP()"))
 
 		s.Run("modifier", "--multipartsp", "styles/c").
@@ -297,7 +299,7 @@ func TestMultiPartsP(t *testing.T) {
 				),
 			).ToA().
 				Prefix("styles/").
-				NoSpace().
+				NoSpace('/', 'r').
 				Usage("MultiPartsP()"))
 	})
 }

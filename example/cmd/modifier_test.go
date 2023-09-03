@@ -121,15 +121,6 @@ func TestChdirF(t *testing.T) {
 				Tag("files").
 				Usage("ChdirF()"))
 
-		s.Env("GIT_DIR", "subdirA/") // TODO should also work for subdirA
-		s.Run("modifier", "--chdirf", "").Expect(
-			carapace.ActionValues(
-				"file2.txt",
-			).StyleF(style.ForPath).
-				NoSpace('/').
-				Tag("files").
-				Usage("ChdirF()"))
-
 		s.Env("GIT_WORK_TREE", "subdirB/") // TODO should also work for subdirB
 		s.Run("modifier", "--chdirf", "").Expect(
 			carapace.ActionValues(

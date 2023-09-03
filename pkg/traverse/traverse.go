@@ -26,7 +26,7 @@ func Parent(names ...string) func(tc Context) (string, error) {
 
 		for _, name := range names {
 			if dir, err := traverse(wd, name); err == nil {
-				return dir, nil
+				return filepath.Dir(dir), nil
 			}
 		}
 		formattedNames := fmt.Sprintf("%#v", names)

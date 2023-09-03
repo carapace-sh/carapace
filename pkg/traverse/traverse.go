@@ -40,7 +40,7 @@ func Parent(names ...string) func(tc Context) (string, error) {
 func traverse(path string, name string) (target string, err error) {
 	var absPath string
 	if absPath, err = filepath.Abs(path); err == nil {
-		target = filepath.ToSlash(absPath + "/" + name)
+		target = filepath.ToSlash(absPath + "/" + strings.TrimSuffix(name, "/"))
 		if _, err = os.Stat(target); err != nil {
 			parent := filepath.Dir(absPath)
 			if parent != path {

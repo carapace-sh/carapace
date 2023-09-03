@@ -9,7 +9,11 @@ func GitDir(tc Context) (string, error) {
 	if dir, ok := tc.LookupEnv("GIT_DIR"); ok {
 		return filepath.ToSlash(dir), nil
 	}
-	return Parent(".git")(tc)
+	dir, err := GitWorkTree(tc)
+	if err == nil {
+		dir += "/.git"
+	}
+	return dir, err
 }
 
 // GitWorkTree returns the location of the root of the working directory for a non-bare repository.
@@ -17,6 +21,5 @@ func GitWorkTree(tc Context) (string, error) {
 	if dir, ok := tc.LookupEnv("GIT_WORK_TREE"); ok {
 		return filepath.ToSlash(dir), nil
 	}
-
-	return GitDir(tc)
+	return Parent(".git")(tc)
 }

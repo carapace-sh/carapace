@@ -18,6 +18,5 @@ func GitWorkTree(tc Context) (string, error) {
 		return filepath.ToSlash(dir), nil
 	}
 
-	gitDir, err := GitDir(tc)
-	return filepath.Dir(gitDir), err
+	return GitDir(tc)
 }

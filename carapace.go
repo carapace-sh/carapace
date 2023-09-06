@@ -72,7 +72,11 @@ func (c Carapace) DashAnyCompletion(action Action) {
 
 // FlagCompletion defines completion for flags using a map consisting of name and Action.
 func (c Carapace) FlagCompletion(actions ActionMap) {
-	if e := storage.get(c.cmd); e.flag == nil {
+	e := storage.get(c.cmd)
+	e.flagMutex.Lock()
+	defer e.flagMutex.Unlock()
+
+	if e.flag == nil {
 		e.flag = actions
 	} else {
 		for name, action := range actions {

@@ -15,6 +15,7 @@ import (
 
 type entry struct {
 	flag          ActionMap
+	flagMutex     sync.RWMutex
 	positional    []Action
 	positionalAny Action
 	dash          []Action
@@ -27,20 +28,22 @@ type entry struct {
 
 type _storage map[*cobra.Command]*entry
 
-var storageMutex sync.Mutex
+var storageMutex sync.RWMutex
 
-func (s _storage) get(cmd *cobra.Command) (e *entry) {
-	var ok bool
-	if e, ok = s[cmd]; !ok {
+func (s _storage) get(cmd *cobra.Command) *entry {
+	storageMutex.RLock()
+	e, ok := s[cmd]
+	storageMutex.RUnlock()
+
+	if !ok {
 		storageMutex.Lock()
 		defer storageMutex.Unlock()
-
 		if e, ok = s[cmd]; !ok {
 			e = &entry{}
 			s[cmd] = e
 		}
 	}
-	return
+	return e
 }
 
 var bridgeMutex sync.Mutex

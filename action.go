@@ -442,6 +442,16 @@ func (a Action) UniqueList(divider string) Action {
 	})
 }
 
+// UniqueListF is like UniqueList but uses a function to transform values before filtering.
+func (a Action) UniqueListF(divider string, f func(s string) string) Action {
+	return ActionMultiParts(divider, func(c Context) Action {
+		for i := range c.Parts {
+			c.Parts[i] = f(c.Parts[i])
+		}
+		return a.Filter(c.Parts...).NoSpace()
+	})
+}
+
 // Usage sets the usage.
 func (a Action) Usage(usage string, args ...interface{}) Action {
 	return a.UsageF(func() string {

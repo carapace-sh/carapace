@@ -49,6 +49,7 @@ func init() {
 	modifierCmd.Flags().String("tagf", "", "TagF()")
 	modifierCmd.Flags().String("timeout", "", "Timeout()")
 	modifierCmd.Flags().String("uniquelist", "", "UniqueList()")
+	modifierCmd.Flags().String("uniquelistf", "", "UniqueListF()")
 	modifierCmd.Flags().String("usage", "", "Usage()")
 
 	rootCmd.AddCommand(modifierCmd)
@@ -253,7 +254,17 @@ func init() {
 			}
 		}),
 		"uniquelist": carapace.ActionValues("one", "two", "three").UniqueList(","),
-		"usage":      carapace.ActionValues().Usage("explicit usage"),
+		"uniquelistf": carapace.ActionMultiPartsN(":", 2, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValues("one", "two", "three")
+			default:
+				return carapace.ActionValues("1", "2", "3")
+			}
+		}).UniqueListF(",", func(s string) string {
+			return strings.SplitN(s, ":", 2)[0]
+		}),
+		"usage": carapace.ActionValues().Usage("explicit usage"),
 	})
 
 	carapace.Gen(modifierCmd).PositionalCompletion(

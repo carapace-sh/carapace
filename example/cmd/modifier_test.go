@@ -465,3 +465,60 @@ func TestSplitP(t *testing.T) {
 				Usage("SplitP()"))
 	})
 }
+
+func TestUniqueList(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--uniquelist", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).NoSpace().
+				Usage("UniqueList()"))
+
+		s.Run("modifier", "--uniquelist", "two,").
+			Expect(carapace.ActionValues(
+				"one",
+				"three",
+			).Prefix("two,").
+				NoSpace().
+				Usage("UniqueList()"))
+	})
+}
+
+func TestUniqueListF(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--uniquelistf", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).NoSpace().
+				Usage("UniqueListF()"))
+
+		s.Run("modifier", "--uniquelistf", "two,").
+			Expect(carapace.ActionValues(
+				"one",
+				"three",
+			).Prefix("two,").
+				NoSpace().
+				Usage("UniqueListF()"))
+
+		s.Run("modifier", "--uniquelistf", "two:").
+			Expect(carapace.ActionValues(
+				"1",
+				"2",
+				"3",
+			).Prefix("two:").
+				NoSpace().
+				Usage("UniqueListF()"))
+
+		s.Run("modifier", "--uniquelistf", "two:1,").
+			Expect(carapace.ActionValues(
+				"one",
+				"three",
+			).Prefix("two:1,").
+				NoSpace().
+				Usage("UniqueListF()"))
+	})
+}

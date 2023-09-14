@@ -42,6 +42,7 @@
     - [TagF](./carapace/action/tagF.md)
     - [Timeout](./carapace/action/timeout.md)
     - [UniqueList](./carapace/action/uniqueList.md)
+    - [UniqueListF](./carapace/action/uniqueListF.md)
     - [Usage](./carapace/action/usage.md)
     - [UsageF](./carapace/action/usageF.md)
   - [InvokedAction](./carapace/invokedAction.md)

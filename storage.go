@@ -140,13 +140,16 @@ func (s _storage) getPositional(cmd *cobra.Command, index int) Action {
 func (s _storage) check() []string {
 	errors := make([]string, 0)
 	for cmd, entry := range s {
-		entry.flagMutex.RLock()
-		for name := range entry.flag {
-			if flag := cmd.LocalFlags().Lookup(name); flag == nil {
-				errors = append(errors, fmt.Sprintf("unknown flag for %s: %s\n", uid.Command(cmd), name))
+		func() {
+			entry.flagMutex.RLock()
+			defer entry.flagMutex.RUnlock()
+
+			for name := range entry.flag {
+				if flag := cmd.LocalFlags().Lookup(name); flag == nil {
+					errors = append(errors, fmt.Sprintf("unknown flag for %s: %s\n", uid.Command(cmd), name))
+				}
 			}
-		}
-		entry.flagMutex.RUnlock()
+		}()
 	}
 	return errors
 }

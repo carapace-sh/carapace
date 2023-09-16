@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye as base
+FROM golang:bookworm as base
 LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 
@@ -19,7 +19,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=1.19.2
+ARG version=1.20.0
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
@@ -33,12 +33,12 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make update-shells prefix=/usr
 
 FROM base as nushell
-ARG version=0.82.0
+ARG version=0.84.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
 FROM base as oil
-ARG version=0.16.0
+ARG version=0.18.0
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && cd oil-*/ \
@@ -47,7 +47,7 @@ RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && ./install
 
 FROM base as starship
-ARG version=1.15.0
+ARG version=1.16.0
 RUN wget -qO- "https://github.com/starship/starship/releases/download/v${version}/starship-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz starship \
  && mv starship /usr/local/bin/
 
@@ -57,28 +57,25 @@ RUN wget -qO- "https://github.com/sharkdp/vivid/releases/download/v${version}/vi
  && mv vivid-v${version}-x86_64-unknown-linux-gnu/vivid /usr/local/bin/
 
 FROM base as mdbook
-ARG version=0.4.31
+ARG version=0.4.34
 RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
   && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
   && mv mdbook* /usr/local/bin/
 
 FROM base
-RUN apt-get update && apt-get install -y libicu67
-RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.0/powershell_7.3.0-1.deb_amd64.deb\
-  && dpkg -i powershell_7.3.0-1.deb_amd64.deb \
-  && rm powershell_7.3.0-1.deb_amd64.deb
+RUN apt-get update && apt-get install -y libicu72
+RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/powershell_7.3.6-1.deb_amd64.deb\
+  && dpkg -i powershell_7.3.6-1.deb_amd64.deb \
+  && rm powershell_7.3.6-1.deb_amd64.deb
 
 RUN apt-get update \
   && apt-get install -y fish \
   elvish \
-  python3-pip \
+  expect \
   shellcheck \
   tcsh \
-  zsh \
-  expect
-
-RUN pip3 install --no-cache-dir --disable-pip-version-check xonsh prompt_toolkit \
-  && ln -s $(which xonsh) /usr/bin/xonsh
+  xonsh \
+  zsh
 
 RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 

@@ -76,7 +76,10 @@ func (s _storage) getFlag(cmd *cobra.Command, name string) Action {
 	if flag := cmd.LocalFlags().Lookup(name); flag == nil && cmd.HasParent() {
 		return s.getFlag(cmd.Parent(), name)
 	} else {
-		a := s.preinvoke(cmd, flag, s.get(cmd).flag[name])
+		entry := s.get(cmd)
+		entry.flagMutex.RLock()
+		defer entry.flagMutex.RUnlock()
+		a := s.preinvoke(cmd, flag, entry.flag[name])
 
 		return ActionCallback(func(c Context) Action { // TODO verify order of execution is correct
 			invoked := a.Invoke(c)
@@ -137,11 +140,13 @@ func (s _storage) getPositional(cmd *cobra.Command, index int) Action {
 func (s _storage) check() []string {
 	errors := make([]string, 0)
 	for cmd, entry := range s {
+		entry.flagMutex.RLock()
 		for name := range entry.flag {
 			if flag := cmd.LocalFlags().Lookup(name); flag == nil {
 				errors = append(errors, fmt.Sprintf("unknown flag for %s: %s\n", uid.Command(cmd), name))
 			}
 		}
+		entry.flagMutex.RUnlock()
 	}
 	return errors
 }

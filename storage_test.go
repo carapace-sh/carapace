@@ -91,6 +91,11 @@ func BenchmarkStorage(b *testing.B) {
 				"flag2": ActionValues("a", "b"),
 			})
 			Gen(cmd2).PositionalCompletion(ActionValues("a", "b"))
+
+			storage.getFlag(cmd, "flag1")
+			storage.getPositional(cmd, 0)
+			storage.getFlag(cmd2, "flag2")
+			storage.getPositional(cmd2, 0)
 		}
 	})
 

@@ -26,6 +26,7 @@ func traverse(cmd *cobra.Command, args []string) (Action, Context) {
 	fs := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 
 	context := NewContext(args...)
+	context.cmd = cmd
 loop:
 	for i, arg := range context.Args {
 		switch {

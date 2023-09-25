@@ -57,7 +57,7 @@ func (c Carapace) PositionalCompletion(action ...Action) {
 
 // PositionalAnyCompletion defines completion for any positional arguments not already defined.
 func (c Carapace) PositionalAnyCompletion(action Action) {
-	storage.get(c.cmd).positionalAny = action
+	storage.get(c.cmd).positionalAny = &action
 }
 
 // DashCompletion defines completion for positional arguments after dash (`--`) using a list of Actions.
@@ -67,7 +67,7 @@ func (c Carapace) DashCompletion(action ...Action) {
 
 // DashAnyCompletion defines completion for any positional arguments after dash (`--`) not already defined.
 func (c Carapace) DashAnyCompletion(action Action) {
-	storage.get(c.cmd).dashAny = action
+	storage.get(c.cmd).dashAny = &action
 }
 
 // FlagCompletion defines completion for flags using a map consisting of name and Action.

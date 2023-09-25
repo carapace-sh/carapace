@@ -21,6 +21,7 @@ func init() {
 	rootCmd.AddCommand(actionCmd)
 
 	actionCmd.Flags().String("callback", "", "ActionCallback()")
+	actionCmd.Flags().String("cobra", "", "ActionCobra()")
 	actionCmd.Flags().String("commands", "", "ActionCommands()")
 	actionCmd.Flags().String("directories", "", "ActionDirectories()")
 	actionCmd.Flags().String("execcommand", "", "ActionExecCommand()")
@@ -48,6 +49,9 @@ func init() {
 				return carapace.ActionMessage("values flag is set to: '%v'", flag.Value.String())
 			}
 			return carapace.ActionMessage("values flag is not set")
+		}),
+		"cobra": carapace.ActionCobra(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return []string{"one", "two"}, cobra.ShellCompDirectiveNoSpace
 		}),
 		"commands":    carapace.ActionCommands(rootCmd).Split(),
 		"directories": carapace.ActionDirectories(),

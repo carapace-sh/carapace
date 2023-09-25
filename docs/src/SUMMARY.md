@@ -55,6 +55,7 @@
     - [ToMultiPartsA](./carapace/invokedAction/toMultiPartsA.md)
   - [DefaultActions](./carapace/defaultActions.md)
     - [ActionCallback](./carapace/defaultActions/actionCallback.md)
+    - [ActionCobra](./carapace/defaultActions/actionCobra.md)
     - [ActionCommands](./carapace/defaultActions/actionCommands.md)
     - [ActionDirectories](./carapace/defaultActions/actionDirectories.md)
     - [ActionExecCommand](./carapace/defaultActions/actionExecCommand.md)

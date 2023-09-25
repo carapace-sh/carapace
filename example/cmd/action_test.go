@@ -24,6 +24,13 @@ func TestAction(t *testing.T) {
 			Expect(carapace.ActionMessage("values flag is not set").
 				Usage("ActionCallback()"))
 
+		s.Run("action", "--cobra", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+			).NoSpace().
+				Usage("ActionCobra()"))
+
 		s.Run("action", "--commands", "s").
 			Expect(carapace.ActionValuesDescribed(
 				"special", "",

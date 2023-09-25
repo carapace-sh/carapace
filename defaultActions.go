@@ -474,7 +474,11 @@ func ActionPositional(cmd *cobra.Command) Action {
 		c.Args = cmd.Flags().Args()
 		entry := storage.get(cmd)
 
-		a := entry.positionalAny
+		var a Action
+		if entry.positionalAny != nil {
+			a = *entry.positionalAny
+		}
+
 		if index := len(c.Args); index < len(entry.positional) {
 			a = entry.positional[len(c.Args)]
 		}
@@ -512,5 +516,20 @@ func ActionCommands(cmd *cobra.Command) Action {
 			}
 		}
 		return batch.ToA()
+	})
+}
+
+// ActionCora bridges given cobra completion function.
+func ActionCobra(f func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective)) Action {
+	return ActionCallback(func(c Context) Action {
+		switch {
+		case f == nil:
+			return ActionValues()
+		case c.cmd == nil: // ensure cmd is never nil even if context does not contain one
+			LOG.Print("cmd is nil [ActionCobra]")
+			c.cmd = &cobra.Command{Use: "_carapace_actioncobra", Hidden: true, Deprecated: "dummy command for ActionCobra"}
+		}
+		values, directive := f(c.cmd, c.cmd.Flags().Args(), c.Value)
+		return compDirective(directive).ToA(values...)
 	})
 }

@@ -110,6 +110,9 @@ loop:
 				Type:        "subcommand",
 				Value:       arg,
 			})
+			m, _ := yaml.Marshal(inArgsX) // TODO pass on to next traverse invocation
+			LOG.Println(string(m))
+
 			return traverse(subCmd, args[i+1:])
 
 		// positional

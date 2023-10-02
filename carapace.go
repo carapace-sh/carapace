@@ -85,11 +85,18 @@ func (c Carapace) FlagCompletion(actions ActionMap) {
 	}
 }
 
+const annotation_standalone = "carapace_standalone"
+
 // Standalone prevents cobra defaults interfering with standalone mode (e.g. implicit help command).
 func (c Carapace) Standalone() {
 	c.cmd.CompletionOptions = cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	}
+
+	if c.cmd.Annotations == nil {
+		c.cmd.Annotations = make(map[string]string)
+	}
+	c.cmd.Annotations[annotation_standalone] = "true"
 
 	c.PreRun(func(cmd *cobra.Command, args []string) {
 		if f := cmd.Flag("help"); f == nil {

@@ -8,7 +8,17 @@ import (
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
+
+type inArgsX []inArgX
+type inArgX struct {
+	Value       string  `yaml:",omitempty"`
+	Name        string  `yaml:",omitempty"`
+	Description string  `yaml:",omitempty"`
+	Type        string  `yaml:",omitempty"`
+	OptArg      *inArgX `yaml:",omitempty"`
+}
 
 func traverse(c *cobra.Command, args []string) (Action, Context) {
 	LOG.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
@@ -19,6 +29,7 @@ func traverse(c *cobra.Command, args []string) (Action, Context) {
 		c.FParseErrWhitelist.UnknownFlags = true
 	}
 
+	inArgsX := make(inArgsX, 0)
 	inArgs := []string{}        // args consumed by current command
 	inPositionals := []string{} // positionals consumed by current command
 	var inFlag *pflagfork.Flag  // last encountered flag that still expects arguments
@@ -32,6 +43,10 @@ loop:
 		// flag argument
 		case inFlag != nil && inFlag.Consumes(arg):
 			LOG.Printf("arg %#v is a flag argument\n", arg)
+			inArgsX = append(inArgsX, inArgX{
+				Value: arg,
+				Type:  "flag argument",
+			})
 			inArgs = append(inArgs, arg)
 			inFlag.Args = append(inFlag.Args, arg)
 
@@ -43,6 +58,10 @@ loop:
 		// dash
 		case arg == "--":
 			LOG.Printf("arg %#v is dash\n", arg)
+			inArgsX = append(inArgsX, inArgX{
+				Type:  "dash",
+				Value: arg,
+			})
 			inArgs = append(inArgs, context.Args[i:]...)
 			break loop
 
@@ -54,6 +73,17 @@ loop:
 
 			if inFlag == nil {
 				LOG.Printf("flag %#v is unknown", arg)
+				inArgsX = append(inArgsX, inArgX{
+					Type:  "unknown flag",
+					Value: arg,
+				})
+			} else {
+				inArgsX = append(inArgsX, inArgX{
+					Name:        inFlag.Name,
+					Description: inFlag.Usage,
+					Type:        "flag", // TODO flagtype
+					Value:       arg,
+				})
 			}
 			continue
 
@@ -73,15 +103,32 @@ loop:
 				context.Args = c.Flags().Args()
 			}
 
-			return traverse(subcommand(c, arg), args[i+1:])
+			subCmd := subcommand(c, arg)
+			inArgsX = append(inArgsX, inArgX{
+				Name:        subCmd.Name(),
+				Description: subCmd.Short,
+				Type:        "subcommand",
+				Value:       arg,
+			})
+			m, _ := yaml.Marshal(inArgsX) // TODO pass on to next traverse invocation
+			LOG.Println(string(m))
+
+			return traverse(subCmd, args[i+1:])
 
 		// positional
 		default:
 			LOG.Printf("arg %#v is a positional\n", arg)
+			inArgsX = append(inArgsX, inArgX{
+				Type:  "positional argument",
+				Value: arg,
+			})
 			inArgs = append(inArgs, arg)
 			inPositionals = append(inPositionals, arg)
 		}
 	}
+
+	m, _ := yaml.Marshal(inArgsX)
+	LOG.Println(string(m))
 
 	toParse := inArgs
 	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {

@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/uid"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
@@ -67,15 +66,9 @@ func addCompletionCommand(cmd *cobra.Command) {
 	)
 	Carapace{carapaceCmd}.PositionalAnyCompletion(
 		ActionCallback(func(c Context) Action {
-			args := []string{"_carapace", "export", ""}
-			args = append(args, c.Args[2:]...)
-			args = append(args, c.Value)
-			return ActionExecCommand(uid.Executable(), args...)(func(output []byte) Action {
-				if string(output) == "" {
-					return ActionValues()
-				}
-				return ActionImport(output)
-			})
+			cmd.RemoveCommand(carapaceCmd)
+			action, _ := traverse(cmd, append(c.Args[2:], c.Value))
+			return action
 		}),
 	)
 

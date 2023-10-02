@@ -32,10 +32,16 @@ func addCompletionCommand(cmd *cobra.Command) {
 				panic("missing parent command") // this should never happen
 			}
 
-			if s, err := complete(cmd.Parent(), args); err != nil {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStderr(), LOG.Writer()), err.Error())
+			parentCmd := cmd.Parent()
+			if parentCmd.Annotations[annotation_standalone] == "true" {
+				// TODO how to handle an explicit `_carapace` command?
+				parentCmd.RemoveCommand(cmd) // don't complete local `_carapace` in standalone mode
+			}
+
+			if s, err := complete(parentCmd, args); err != nil {
+				fmt.Fprintln(io.MultiWriter(parentCmd.OutOrStderr(), LOG.Writer()), err.Error())
 			} else {
-				fmt.Fprintln(io.MultiWriter(cmd.OutOrStdout(), LOG.Writer()), s)
+				fmt.Fprintln(io.MultiWriter(parentCmd.OutOrStdout(), LOG.Writer()), s)
 			}
 		},
 		FParseErrWhitelist: cobra.FParseErrWhitelist{

@@ -8,7 +8,7 @@
 
 ```go
 carapace.Gen(helpCmd).PositionalAnyCompletion(
-	carapace.ActionCommands(cmd),
+	carapace.ActionCommands(rootCmd),
 )
 ```
 

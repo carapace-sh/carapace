@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/pflagfork"
 	"github.com/rsteube/carapace/pkg/style"
@@ -133,22 +132,6 @@ func actionFlags(cmd *cobra.Command) Action {
 	}).Tag("flags")
 }
 
-func actionSubcommands(cmd *cobra.Command) Action {
-	return ActionCallback(func(c Context) Action {
-		batch := Batch()
-		for _, subcommand := range cmd.Commands() {
-			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
-				group := common.Group{Cmd: subcommand}
-				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
-				for _, alias := range subcommand.Aliases {
-					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
-				}
-			}
-		}
-		return batch.ToA()
-	})
-}
-
 func initHelpCompletion(cmd *cobra.Command) {
 	helpCmd, _, err := cmd.Find([]string{"help"})
 	if err != nil {
@@ -162,12 +145,6 @@ func initHelpCompletion(cmd *cobra.Command) {
 	}
 
 	Gen(helpCmd).PositionalAnyCompletion(
-		ActionCallback(func(c Context) Action {
-			lastCmd, _, err := cmd.Find(c.Args)
-			if err != nil {
-				return ActionMessage(err.Error())
-			}
-			return actionSubcommands(lastCmd)
-		}),
+		ActionCommands(cmd),
 	)
 }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/internal/config"
+	"github.com/rsteube/carapace/internal/env"
 	"github.com/rsteube/carapace/internal/export"
 	"github.com/rsteube/carapace/internal/man"
 	"github.com/rsteube/carapace/pkg/match"
@@ -478,5 +479,38 @@ func ActionPositional(cmd *cobra.Command) Action {
 			a = entry.positional[len(c.Args)]
 		}
 		return a.Invoke(c).ToA()
+	})
+}
+
+// ActionCommands completes (sub)commands of given command.
+// `Context.Args` is used to traverse the command tree further down. Use `Action.Shift` to avoid this.
+//
+//	carapace.Gen(helpCmd).PositionalAnyCompletion(
+//		carapace.ActionCommands(rootCmd),
+//	)
+func ActionCommands(cmd *cobra.Command) Action {
+	return ActionCallback(func(c Context) Action {
+		if len(c.Args) > 0 {
+			for _, subCommand := range cmd.Commands() {
+				for _, name := range append(subCommand.Aliases, subCommand.Name()) {
+					if name == c.Args[0] { // cmd.Find is too lenient
+						return ActionCommands(subCommand).Shift(1)
+					}
+				}
+			}
+			return ActionMessage("unknown subcommand %#v for %#v", c.Args[0], cmd.Name())
+		}
+
+		batch := Batch()
+		for _, subcommand := range cmd.Commands() {
+			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
+				group := common.Group{Cmd: subcommand}
+				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
+				for _, alias := range subcommand.Aliases {
+					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
+				}
+			}
+		}
+		return batch.ToA()
 	})
 }

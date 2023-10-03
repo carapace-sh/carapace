@@ -79,6 +79,7 @@ func TestRoot(t *testing.T) {
 					"interspersed", "interspersed example",
 					"multiparts", "multiparts example",
 					"special", "",
+					"subcommand", "subcommand example",
 				).Tag("other commands"),
 			).ToA())
 

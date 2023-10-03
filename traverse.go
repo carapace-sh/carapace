@@ -154,7 +154,7 @@ loop:
 		LOG.Printf("completing positionals and subcommands for arg %#v\n", context.Value)
 		batch := Batch(storage.getPositional(cmd, len(context.Args)))
 		if cmd.HasAvailableSubCommands() && len(context.Args) == 0 {
-			batch = append(batch, actionSubcommands(cmd))
+			batch = append(batch, ActionCommands(cmd))
 		}
 		return batch.ToA(), context
 	}

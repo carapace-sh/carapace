@@ -21,6 +21,7 @@ func init() {
 	rootCmd.AddCommand(actionCmd)
 
 	actionCmd.Flags().String("callback", "", "ActionCallback()")
+	actionCmd.Flags().String("commands", "", "ActionCommands()")
 	actionCmd.Flags().String("directories", "", "ActionDirectories()")
 	actionCmd.Flags().String("execcommand", "", "ActionExecCommand()")
 	actionCmd.Flags().String("execcommandE", "", "ActionExecCommand()")
@@ -48,6 +49,7 @@ func init() {
 			}
 			return carapace.ActionMessage("values flag is not set")
 		}),
+		"commands":    carapace.ActionCommands(rootCmd).Split(),
 		"directories": carapace.ActionDirectories(),
 		"execcommand": carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
 			lines := strings.Split(string(output), "\n")

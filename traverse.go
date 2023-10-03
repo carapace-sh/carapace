@@ -147,14 +147,14 @@ loop:
 			return storage.getFlag(c, f.Name).Prefix(f.Prefix), context
 		}
 		LOG.Printf("completing flags for arg %#v\n", context.Value)
-		return actionFlags(c), context
+		return ActionFlags(c), context
 
 	// positional or subcommand
 	default:
 		LOG.Printf("completing positionals and subcommands for arg %#v\n", context.Value)
 		batch := Batch(storage.getPositional(c, len(context.Args)))
 		if c.HasAvailableSubCommands() && len(context.Args) == 0 {
-			batch = append(batch, actionSubcommands(c))
+			batch = append(batch, ActionCommands(c))
 		}
 		return batch.ToA(), context
 	}

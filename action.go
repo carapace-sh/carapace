@@ -57,6 +57,47 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 	return a
 }
 
+// CacheF requires a function to determine if we should use the cached data (if any and if it's
+// still within timeout), and if asked to refresh it, to cache the proceeds of the invoked action.
+func (a Action) CacheF(timeout time.Duration, refresh func() bool, keys ...pkgcache.Key) Action {
+	if a.callback == nil {
+		return a
+	}
+
+	_, file, line, _ := runtime.Caller(1)
+	cachedCallback := a.callback
+
+	return ActionCallback(func(c Context) Action {
+		// Know when the last cached values were written (if any)
+		cacheFile, err := cache.File(file, line, keys...)
+		if err != nil {
+			return a
+		}
+
+		stat, err := os.Stat(cacheFile)
+
+		// No cached results, just ask to cache after call.
+		cacheIsOutdated := (timeout > 0 && stat.ModTime().Add(timeout).Before(time.Now()))
+		if os.IsNotExist(err) || cacheIsOutdated {
+			return a.Cache(timeout, keys...)
+		}
+
+		// If we are asked to refresh the cache with new results anyway, do it.
+		if refresh() {
+			invokedAction := (Action{callback: cachedCallback}).Invoke(c)
+			if invokedAction.meta.Messages.IsEmpty() {
+				if cacheFile, err := cache.File(file, line, keys...); err == nil {
+					_ = cache.Write(cacheFile, invokedAction.export())
+				}
+			}
+			return invokedAction.ToA()
+		}
+
+		// Else, once again let's the cache do it's work.
+		return a.Cache(timeout, keys...)
+	})
+}
+
 // Chdir changes the current working directory to the named directory for the duration of invocation.
 func (a Action) Chdir(dir string) Action {
 	return ActionCallback(func(c Context) Action {
@@ -94,14 +135,14 @@ func (a Action) Filter(values ...string) Action {
 	})
 }
 
-// FilterArgs filters Context.Args
+// FilterArgs filters Context.Args.
 func (a Action) FilterArgs() Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Filter(c.Args...)
 	})
 }
 
-// FilterArgs filters Context.Parts
+// FilterArgs filters Context.Parts.
 func (a Action) FilterParts() Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Filter(c.Parts...)
@@ -142,7 +183,7 @@ func (a Action) MultiParts(dividers ...string) Action {
 	})
 }
 
-// MultiPartsP is like MultiParts but with placeholders
+// MultiPartsP is like MultiParts but with placeholders.
 func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder string, matches map[string]string) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)

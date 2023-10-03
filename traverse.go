@@ -10,20 +10,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func traverse(c *cobra.Command, args []string) (Action, Context) {
-	LOG.Printf("traverse called for %#v with args %#v\n", c.Name(), args)
-	storage.preRun(c, args)
+func traverse(cmd *cobra.Command, args []string) (Action, Context) {
+	LOG.Printf("traverse called for %#v with args %#v\n", cmd.Name(), args)
+	storage.preRun(cmd, args)
 
 	if env.Lenient() {
 		LOG.Printf("allowing unknown flags")
-		c.FParseErrWhitelist.UnknownFlags = true
+		cmd.FParseErrWhitelist.UnknownFlags = true
 	}
 
 	inArgs := []string{}        // args consumed by current command
 	inPositionals := []string{} // positionals consumed by current command
 	var inFlag *pflagfork.Flag  // last encountered flag that still expects arguments
-	c.LocalFlags()              // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
-	fs := pflagfork.FlagSet{FlagSet: c.Flags()}
+	cmd.LocalFlags()            // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
+	fs := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 
 	context := NewContext(args...)
 loop:
@@ -47,7 +47,7 @@ loop:
 			break loop
 
 		// flag
-		case !c.DisableFlagParsing && strings.HasPrefix(arg, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
+		case !cmd.DisableFlagParsing && strings.HasPrefix(arg, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 			LOG.Printf("arg %#v is a flag\n", arg)
 			inArgs = append(inArgs, arg)
 			inFlag = fs.LookupArg(arg)
@@ -58,22 +58,22 @@ loop:
 			continue
 
 		// subcommand
-		case subcommand(c, arg) != nil:
+		case subcommand(cmd, arg) != nil:
 			LOG.Printf("arg %#v is a subcommand\n", arg)
 
 			switch {
-			case c.DisableFlagParsing:
-				LOG.Printf("flag parsing disabled for %#v\n", c.Name())
+			case cmd.DisableFlagParsing:
+				LOG.Printf("flag parsing disabled for %#v\n", cmd.Name())
 
 			default:
-				LOG.Printf("parsing flags for %#v with args %#v\n", c.Name(), inArgs)
-				if err := c.ParseFlags(inArgs); err != nil {
+				LOG.Printf("parsing flags for %#v with args %#v\n", cmd.Name(), inArgs)
+				if err := cmd.ParseFlags(inArgs); err != nil {
 					return ActionMessage(err.Error()), context
 				}
-				context.Args = c.Flags().Args()
+				context.Args = cmd.Flags().Args()
 			}
 
-			return traverse(subcommand(c, arg), args[i+1:])
+			return traverse(subcommand(cmd, arg), args[i+1:])
 
 		// positional
 		default:
@@ -105,34 +105,34 @@ loop:
 
 	// TODO duplicated code
 	switch {
-	case c.DisableFlagParsing:
-		LOG.Printf("flag parsing is disabled for %#v\n", c.Name())
+	case cmd.DisableFlagParsing:
+		LOG.Printf("flag parsing is disabled for %#v\n", cmd.Name())
 
 	default:
-		LOG.Printf("parsing flags for %#v with args %#v\n", c.Name(), toParse)
-		if err := c.ParseFlags(toParse); err != nil {
+		LOG.Printf("parsing flags for %#v with args %#v\n", cmd.Name(), toParse)
+		if err := cmd.ParseFlags(toParse); err != nil {
 			return ActionMessage(err.Error()), context
 		}
-		context.Args = c.Flags().Args()
+		context.Args = cmd.Flags().Args()
 	}
 
 	switch {
 	// dash argument
-	case common.IsDash(c):
+	case common.IsDash(cmd):
 		LOG.Printf("completing dash for arg %#v\n", context.Value)
-		context.Args = c.Flags().Args()[c.ArgsLenAtDash():]
+		context.Args = cmd.Flags().Args()[cmd.ArgsLenAtDash():]
 		LOG.Printf("context: %#v\n", context.Args)
 
-		return storage.getPositional(c, len(context.Args)), context
+		return storage.getPositional(cmd, len(context.Args)), context
 
 	// flag argument
 	case inFlag != nil && inFlag.Consumes(context.Value):
 		LOG.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.Value)
 		context.Parts = inFlag.Args
-		return storage.getFlag(c, inFlag.Name), context
+		return storage.getFlag(cmd, inFlag.Name), context
 
 	// flag
-	case !c.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
+	case !cmd.DisableFlagParsing && strings.HasPrefix(context.Value, "-") && (fs.IsInterspersed() || len(inPositionals) == 0):
 		if f := fs.LookupArg(context.Value); f != nil && len(f.Args) > 0 {
 			LOG.Printf("completing optional flag argument for arg %#v with prefix %#v\n", context.Value, f.Prefix)
 
@@ -140,21 +140,21 @@ loop:
 			case "bool":
 				return ActionValues("true", "false").StyleF(style.ForKeyword).Usage(f.Usage).Prefix(f.Prefix), context
 			default:
-				return storage.getFlag(c, f.Name).Prefix(f.Prefix), context
+				return storage.getFlag(cmd, f.Name).Prefix(f.Prefix), context
 			}
 		} else if f != nil && fs.IsPosix() && !strings.HasPrefix(context.Value, "--") && !f.IsOptarg() && f.Prefix == context.Value {
 			LOG.Printf("completing attached flag argument for arg %#v with prefix %#v\n", context.Value, f.Prefix)
-			return storage.getFlag(c, f.Name).Prefix(f.Prefix), context
+			return storage.getFlag(cmd, f.Name).Prefix(f.Prefix), context
 		}
 		LOG.Printf("completing flags for arg %#v\n", context.Value)
-		return actionFlags(c), context
+		return actionFlags(cmd), context
 
 	// positional or subcommand
 	default:
 		LOG.Printf("completing positionals and subcommands for arg %#v\n", context.Value)
-		batch := Batch(storage.getPositional(c, len(context.Args)))
-		if c.HasAvailableSubCommands() && len(context.Args) == 0 {
-			batch = append(batch, actionSubcommands(c))
+		batch := Batch(storage.getPositional(cmd, len(context.Args)))
+		if cmd.HasAvailableSubCommands() && len(context.Args) == 0 {
+			batch = append(batch, actionSubcommands(cmd))
 		}
 		return batch.ToA(), context
 	}

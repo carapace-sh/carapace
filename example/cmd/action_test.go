@@ -24,6 +24,44 @@ func TestAction(t *testing.T) {
 			Expect(carapace.ActionMessage("values flag is not set").
 				Usage("ActionCallback()"))
 
+		s.Run("action", "--commands", "s").
+			Expect(carapace.ActionValuesDescribed(
+				"special", "",
+				"subcommand", "subcommand example",
+			).Suffix(" ").
+				NoSpace().
+				Tag("other commands").
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand ").
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed(
+					"a1", "subcommand with alias",
+					"a2", "subcommand with alias",
+					"alias", "subcommand with alias",
+				).Tag("other commands"),
+				carapace.ActionValuesDescribed(
+					"group", "subcommand with group",
+				).Style(style.Blue).Tag("group commands"),
+			).ToA().
+				Prefix("subcommand ").
+				Suffix(" ").
+				NoSpace().
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand unknown ").
+			Expect(carapace.ActionMessage(`unknown subcommand "unknown" for "subcommand"`).NoSpace().
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand hidden ").
+			Expect(carapace.ActionValuesDescribed(
+				"visible", "visible subcommand of a hidden command",
+			).Prefix("subcommand hidden ").
+				Suffix(" ").
+				NoSpace().
+				Tag("commands").
+				Usage("ActionCommands()"))
+
 		s.Run("action", "--values", "first", "--callback", "").
 			Expect(carapace.ActionMessage("values flag is set to: 'first'").
 				Usage("ActionCallback()"))

@@ -63,7 +63,7 @@ RUN apt-get update && apt-get install -y unzip \
   && wget -q "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.7/mdbook-linkcheck.x86_64-unknown-linux-gnu.zip" \
   && unzip mdbook-linkcheck.x86_64-unknown-linux-gnu.zip mdbook-linkcheck \
   && chmod +x mdbook-linkcheck \
-  && mv mdbook-linkcheck /usr/local/bin/
+  && mv mdbook mdbook-linkcheck /usr/local/bin/
 
 FROM base
 RUN apt-get update && apt-get install -y libicu72

@@ -57,10 +57,13 @@ RUN wget -qO- "https://github.com/sharkdp/vivid/releases/download/v${version}/vi
  && mv vivid-v${version}-x86_64-unknown-linux-gnu/vivid /usr/local/bin/
 
 FROM base as mdbook
-ARG version=0.4.34
-RUN curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
-  && curl -L "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.0/mdbook-linkcheck-v0.7.0-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook-linkcheck \
-  && mv mdbook* /usr/local/bin/
+ARG version=0.4.35
+RUN apt-get update && apt-get install -y unzip \
+  && curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
+  && wget -q "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.7/mdbook-linkcheck.x86_64-unknown-linux-gnu.zip" \
+  && unzip mdbook-linkcheck.x86_64-unknown-linux-gnu.zip mdbook-linkcheck \
+  && chmod +x mdbook-linkcheck \
+  && mv mdbook-linkcheck /usr/local/bin/
 
 FROM base
 RUN apt-get update && apt-get install -y libicu72

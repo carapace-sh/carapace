@@ -3,7 +3,7 @@ LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
 USER root
 
 FROM base as bat
-ARG version=0.23.0
+ARG version=0.24.0
 RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-x86_64-unknown-linux-gnu.tar.gz \
   | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v${version}-x86_64-unknown-linux-gnu/bat \
   && chmod +x /usr/local/bin/bat
@@ -19,7 +19,7 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=1.20.0
+ARG version=1.21.2
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
@@ -33,7 +33,7 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make update-shells prefix=/usr
 
 FROM base as nushell
-ARG version=0.84.0
+ARG version=0.85.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
@@ -67,9 +67,9 @@ RUN apt-get update && apt-get install -y unzip \
 
 FROM base
 RUN apt-get update && apt-get install -y libicu72
-RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/powershell_7.3.6-1.deb_amd64.deb\
-  && dpkg -i powershell_7.3.6-1.deb_amd64.deb \
-  && rm powershell_7.3.6-1.deb_amd64.deb
+RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.8/powershell_7.3.8-1.deb_amd64.deb\
+  && dpkg -i powershell_7.3.8-1.deb_amd64.deb \
+  && rm powershell_7.3.8-1.deb_amd64.deb
 
 RUN apt-get update \
   && apt-get install -y fish \

@@ -73,6 +73,7 @@ func TestRoot(t *testing.T) {
 				).Style(style.Magenta).Tag("plugin commands"),
 				carapace.ActionValuesDescribed(
 					"chain", "shorthand chain",
+					"compat", "",
 					"completion", "Generate the autocompletion script for the specified shell",
 					"group", "group example",
 					"help", "Help about any command",

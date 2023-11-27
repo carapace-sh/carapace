@@ -12,6 +12,7 @@ import (
 	"github.com/rsteube/carapace/pkg/util"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
+	"github.com/spf13/cobra"
 )
 
 // Context provides information during completion.
@@ -28,6 +29,7 @@ type Context struct {
 	Dir string
 
 	mockedReplies map[string]string
+	cmd           *cobra.Command // needed for ActionCobra
 }
 
 // NewContext creates a new context for given arguments.

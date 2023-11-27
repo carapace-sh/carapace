@@ -94,6 +94,20 @@ func (a Action) Filter(values ...string) Action {
 	})
 }
 
+func (a Action) FilterF(f func(s ...string) bool) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		filtered := make(common.RawValues, 0)
+		for _, v := range invoked.rawValues {
+			if f(v.Value) {
+				filtered = append(filtered, v)
+			}
+		}
+		invoked.rawValues = filtered
+		return invoked.ToA()
+	})
+}
+
 // FilterArgs filters Context.Args
 func (a Action) FilterArgs() Action {
 	return ActionCallback(func(c Context) Action {

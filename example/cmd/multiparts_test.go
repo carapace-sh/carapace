@@ -8,7 +8,7 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
-// TODO rename
+// TODO rename.
 func TestMultiparts(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(

@@ -35,7 +35,6 @@ func TestCache(t *testing.T) {
 		s.Run("modifier", "--cache", "").
 			ExpectNot(cached.
 				Usage("Cache()"))
-
 	})
 }
 
@@ -239,7 +238,6 @@ func TestFilterParts(t *testing.T) {
 				NoSpace(',').
 				Prefix("one,three,").
 				Usage("FilterParts()"))
-
 	})
 }
 

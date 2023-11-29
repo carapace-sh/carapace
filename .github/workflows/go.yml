@@ -11,11 +11,11 @@ jobs:
     container: ghcr.io/rsteube/carapace
     steps:
       - name: shallow clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         if: "!startsWith(github.ref, 'refs/tags/')"
 
       - name: deep clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         if: startsWith(github.ref, 'refs/tags/')
         with:
           fetch-depth: 0
@@ -29,13 +29,22 @@ jobs:
         run: go generate ./...
 
       - name: Test
-        run: go test -v ./...
+        run: mkdir .cover && CARAPACE_COVERDIR="$(pwd)/.cover" go test -v -coverpkg ./... -coverprofile=unit.cov ./... ./example-nonposix/...
+
+      - name: Bench
+        run: go test -bench ./...
+
+      - name: Convert coverage
+        run: go tool covdata textfmt -i .cover/ -o integration.cov 
+
+      - name: Filter coverage
+        run: sed -i '/^github.com\/rsteube\/carapace\/third_party/d' unit.cov integration.cov
 
       - name: "Check formatting"
         run: '[ "$(gofmt -d -s . | tee -a /dev/stderr)" = "" ]'
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v5
         if: startsWith(github.ref, 'refs/tags/')
         with:
           version: latest

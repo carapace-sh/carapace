@@ -76,7 +76,7 @@ func TestCheck(t *testing.T) {
 	}
 }
 
-// BenchmarkStorage tests for concurrent map read/write.
+// BenchmarkStorage tests for concurrent map read/write
 func BenchmarkStorage(b *testing.B) {
 	cmd := &cobra.Command{}
 	cmd2 := &cobra.Command{}

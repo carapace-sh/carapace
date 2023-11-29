@@ -2,3 +2,9 @@
 example/example
 caraparse/caraparse
 docs/book
+example/cmd/_test_files/*.txt
+example/example
+example-nonposix/example-nonposix
+integration.cov
+unit.cov
+.vscode

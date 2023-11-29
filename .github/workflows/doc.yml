@@ -10,7 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/rsteube/carapace
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v3
+        with:
+          key: linkcheck
+          path: docs/book/linkcheck
 
       - name: "build docs"
         run: |

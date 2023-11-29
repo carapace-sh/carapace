@@ -7,7 +7,6 @@ import (
 	"github.com/rsteube/carapace/internal/shell/library"
 	"github.com/rsteube/carapace/internal/shell/nushell"
 	"github.com/rsteube/carapace/pkg/ps"
-	"github.com/rsteube/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 
@@ -71,39 +70,4 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		}
 		return action.Invoke(context).value(args[0], args[len(args)-1]), nil
 	}
-}
-
-func internalValues(action InvokedAction, current string, onFinalize func()) (common.RawValues, common.Meta) {
-	unsorted := action.rawValues
-	sorted := make(common.RawValues, 0)
-
-	// Ensure values are sorted.
-	unsorted.EachTag(func(_ string, values common.RawValues) {
-		vals := make(common.RawValues, len(values))
-		for index, val := range values {
-			if !action.meta.Nospace.Matches(val.Value) {
-				val.Value += " "
-			}
-			if val.Style != "" {
-				val.Style = style.SGR(val.Style)
-			}
-
-			vals[index] = val
-		}
-		sorted = append(sorted, vals...)
-	})
-
-	// Merge/filter completions and meta stuff.
-	filtered := sorted.FilterPrefix(current)
-	filtered = action.meta.Messages.Integrate(filtered, current)
-
-	// Reset the storage (empty all commands) and run the finalize function, which is
-	// generally in charge of binding new command instances, with blank flags.
-	if onFinalize != nil {
-		storage = make(_storage)
-
-		onFinalize()
-	}
-
-	return filtered, action.meta
 }

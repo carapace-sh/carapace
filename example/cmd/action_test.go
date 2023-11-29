@@ -22,12 +22,55 @@ func TestAction(t *testing.T) {
 
 		s.Run("action", "--callback", "").
 			Expect(carapace.ActionMessage("values flag is not set").
-				NoSpace().
 				Usage("ActionCallback()"))
+
+		s.Run("action", "--cobra", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+			).NoSpace().
+				Usage("ActionCobra()"))
+
+		s.Run("action", "--commands", "s").
+			Expect(carapace.ActionValuesDescribed(
+				"special", "",
+				"subcommand", "subcommand example",
+			).Suffix(" ").
+				NoSpace().
+				Tag("other commands").
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand ").
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed(
+					"a1", "subcommand with alias",
+					"a2", "subcommand with alias",
+					"alias", "subcommand with alias",
+				).Tag("other commands"),
+				carapace.ActionValuesDescribed(
+					"group", "subcommand with group",
+				).Style(style.Blue).Tag("group commands"),
+			).ToA().
+				Prefix("subcommand ").
+				Suffix(" ").
+				NoSpace().
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand unknown ").
+			Expect(carapace.ActionMessage(`unknown subcommand "unknown" for "subcommand"`).NoSpace().
+				Usage("ActionCommands()"))
+
+		s.Run("action", "--commands", "subcommand hidden ").
+			Expect(carapace.ActionValuesDescribed(
+				"visible", "visible subcommand of a hidden command",
+			).Prefix("subcommand hidden ").
+				Suffix(" ").
+				NoSpace().
+				Tag("commands").
+				Usage("ActionCommands()"))
 
 		s.Run("action", "--values", "first", "--callback", "").
 			Expect(carapace.ActionMessage("values flag is set to: 'first'").
-				NoSpace().
 				Usage("ActionCallback()"))
 
 		s.Run("action", "--directories", "").
@@ -45,7 +88,7 @@ func TestAction(t *testing.T) {
 				NoSpace('/').
 				Usage("ActionDirectories()"))
 
-		s.Run("action", "--exec-command", "").
+		s.Run("action", "--execcommand", "").
 			Expect(carapace.ActionValues("origin", "fork").
 				Usage("ActionExecCommand()"))
 
@@ -81,7 +124,6 @@ func TestAction(t *testing.T) {
 
 		s.Run("action", "--message", "").
 			Expect(carapace.ActionMessage("example message").
-				NoSpace().
 				Usage("ActionMessage()"))
 
 		s.Run("action", "--message-multiple", "t").
@@ -91,7 +133,6 @@ func TestAction(t *testing.T) {
 				carapace.ActionMessage("third message"),
 				carapace.ActionValues("one", "two", "three")).
 				ToA().
-				NoSpace().
 				Usage("ActionMessage()"))
 
 		s.Run("action", "--multiparts", "").
@@ -209,7 +250,7 @@ func TestDash(t *testing.T) {
 func TestUnknownFlag(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--unknown", "").
-			Expect(carapace.ActionMessage("unknown flag: --unknown").NoSpace())
+			Expect(carapace.ActionMessage("unknown flag: --unknown"))
 
 		s.Env("CARAPACE_LENIENT", "1")
 		s.Run("action", "--unknown", "").
@@ -228,5 +269,80 @@ func TestPersistentFlag(t *testing.T) {
 		s.Run("action", "--persistentFlag2", "").
 			Expect(carapace.ActionValues("p4", "p5", "p6").
 				Usage("Help message for persistentFlag2"))
+	})
+}
+
+func TestAttached(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files(
+			"dirA/file1.txt", "",
+			"dirA/file2.png", "",
+			"dirB/dirC/file3.go", "",
+			"dirB/file4.md", "",
+			"file5.go", "",
+		)
+
+		s.Run("action", "--values=").
+			Expect(carapace.ActionValues(
+				"first",
+				"second",
+				"third",
+			).Prefix("--values=").
+				Usage("ActionValues()"))
+
+		s.Run("action", "--values=f").
+			Expect(carapace.ActionValues(
+				"first",
+			).Prefix("--values=").
+				Usage("ActionValues()"))
+
+		s.Run("action", "--values=first", "").
+			Expect(carapace.ActionValues(
+				"embeddedP1",
+				"embeddedPositional1",
+			).Usage("action [pos1] [pos2] [--] [dashAny]..."))
+
+		s.Run("action", "--multiparts-nested=VALUE=").
+			Expect(carapace.ActionValues("one", "two", "three").
+				Prefix("--multiparts-nested=VALUE=").
+				NoSpace().
+				Usage("ActionMultiParts(...ActionMultiParts...)"))
+
+		s.Run("action", "--multiparts-nested=VALUE=two,DIRECTORY=").
+			Expect(carapace.ActionValues("dirA/", "dirB/").
+				Tag("directories").
+				StyleF(style.ForPath).
+				Prefix("--multiparts-nested=VALUE=two,DIRECTORY=").
+				NoSpace().
+				Usage("ActionMultiParts(...ActionMultiParts...)"))
+	})
+}
+
+func TestActionMultipartsN(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("action", "--multipartsn", "").
+			Expect(carapace.ActionValues("one", "two").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "o").
+			Expect(carapace.ActionValues("one").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "one=").
+			Expect(carapace.ActionValues("three", "four").
+				Prefix("one=").
+				Suffix("=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
+
+		s.Run("action", "--multipartsn", "one=three=").
+			Expect(carapace.ActionValues("five", "six").
+				Prefix("one=three=").
+				NoSpace('=').
+				Usage("ActionMultiPartsN()"))
 	})
 }

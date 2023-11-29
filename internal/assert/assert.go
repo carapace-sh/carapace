@@ -3,10 +3,13 @@ package assert
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
+
+	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff"
+	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/myers"
+	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
 type T interface {
@@ -33,20 +36,25 @@ type T interface {
 // Equal calls t.Error if given strings are not equal.
 func Equal(t T, expected string, actual string) {
 	if expected != actual {
-		// TODO handle err
-		tempDir := t.TempDir()
-		expctdFile := fmt.Sprintf("%v/expctd", tempDir)
-		actualFile := fmt.Sprintf("%v/actual", tempDir)
-
-		if err := os.WriteFile(expctdFile, []byte(expected), os.ModePerm); err != nil {
-			t.Fatal(err.Error())
-		}
-
-		if err := os.WriteFile(actualFile, []byte(actual), os.ModePerm); err != nil {
-			t.Fatal(err.Error())
-		}
-		output, _ := exec.Command("diff", "--color=always", "--context=5", expctdFile, actualFile).Output()
 		_, file, line, _ := runtime.Caller(2)
-		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, string(output))
+		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, Diff(expected, actual))
 	}
+}
+
+func Diff(expected, actual string) string {
+	edits := myers.ComputeEdits(span.URIFromPath(""), expected, actual)
+	diff := fmt.Sprint(gotextdiff.ToUnified("expected", "actual", expected, edits))
+
+	highlighted := make([]string, 0)
+	for _, line := range strings.Split(diff, "\n") {
+		switch {
+		case strings.HasPrefix(line, "-"):
+			highlighted = append(highlighted, fmt.Sprintf("\033[0;31m%v\033[0m", line))
+		case strings.HasPrefix(line, "+"):
+			highlighted = append(highlighted, fmt.Sprintf("\033[0;32m%v\033[0m", line))
+		default:
+			highlighted = append(highlighted, line)
+		}
+	}
+	return strings.Join(highlighted, "\n")
 }

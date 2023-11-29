@@ -69,13 +69,18 @@ func TestRoot(t *testing.T) {
 					"modifier", "modifier example",
 				).Style(style.Yellow).Tag("modifier commands"),
 				carapace.ActionValuesDescribed(
-					"injection", "just trying to break things",
-				).Style(style.Magenta).Tag("test commands"),
+					"plugin", "dynamic plugin command",
+				).Style(style.Magenta).Tag("plugin commands"),
 				carapace.ActionValuesDescribed(
+					"chain", "shorthand chain",
+					"compat", "",
 					"completion", "Generate the autocompletion script for the specified shell",
+					"group", "group example",
 					"help", "Help about any command",
+					"interspersed", "interspersed example",
 					"multiparts", "multiparts example",
 					"special", "",
+					"subcommand", "subcommand example",
 				).Tag("other commands"),
 			).ToA())
 
@@ -92,6 +97,8 @@ func TestRoot(t *testing.T) {
 
 		s.Run("-").
 			Expect(carapace.ActionStyledValuesDescribed(
+				"--chdir", "change work directory", style.Blue,
+				"-C", "change work directory", style.Blue,
 				"--array", "multiflag", style.Blue,
 				"-a", "multiflag", style.Blue,
 				"-h", "help for example", style.Default,
@@ -108,6 +115,7 @@ func TestRoot(t *testing.T) {
 		s.Run("--").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
+				"--chdir", "change work directory", style.Blue,
 				"--help", "help for example", style.Default,
 				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
 				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
@@ -134,11 +142,38 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
 			).NoSpace('.').Tag("flags"))
+	})
+}
+
+func TestOptarg(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("--persistentFlag=").
+			Expect(carapace.ActionValues(
+				"p1",
+				"p2",
+				"p3",
+			).Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
+
+		s.Run("--persistentFlag=p").
+			Expect(carapace.ActionValues(
+				"p1",
+				"p2",
+				"p3",
+			).Prefix("--persistentFlag=").
+				Usage("Help message for persistentFlag"))
 
 		s.Run("--toggle=").
 			Expect(carapace.ActionStyledValues(
-				"false", style.Red,
 				"true", style.Green,
-			).Prefix("--toggle="))
+				"false", style.Red,
+			).Prefix("--toggle=").
+				Usage("Help message for toggle"))
+
+		s.Run("--toggle=tru").
+			Expect(carapace.ActionStyledValues(
+				"true", style.Green,
+			).Prefix("--toggle=").
+				Usage("Help message for toggle"))
 	})
 }

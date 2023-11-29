@@ -30,7 +30,7 @@ func init() {
 	})
 
 	carapace.Gen(specialCmd).PositionalCompletion(
-		carapace.ActionValues("positional1", "p1", "positional1 with space"),
-		carapace.ActionValues("positional2", "p2", "positional2 with space"),
+		carapace.ActionValues(`p1 & < > ' " { } $ # | ? ( ) ;  [ ] * \ `+"`", "positional1"),
 	)
+
 }

@@ -5,6 +5,6 @@ E.g. completing a unique list of values in an [ActionMultiParts](../defaultActio
 
 ```go
 carapace.ActionMultiParts(",", func(c carapace.Context) carapace.Action {
- 	return carapace.ActionValues("one", "two", "three").Invoke(c).Filter(c.Parts).ToA()
+ 	return carapace.ActionValues("one", "two", "three").Invoke(c).Filter(c.Parts...).ToA()
 }
 ```

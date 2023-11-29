@@ -1,11 +1,10 @@
 # FlagCompletion
 
-[`FlagCompletion`] defines completion for flags using a map consisting of name and [action](../action.md).
+[`FlagCompletion`] defines completion for flags.
 
 ```go
 carapace.Gen(myCmd).FlagCompletion(carapace.ActionMap{
     "flagName": carapace.ActionValues("a", "b", "c"),
-    // ...
 })
 ```
 

@@ -39,7 +39,7 @@ carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
 			for index, entry := range cEntries.Parts {
 				keys[index] = strings.Split(entry, "=")[0]
 			}
-			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Invoke(c).Filter(keys).Suffix("=").ToA()
+			return carapace.ActionValues("FILE", "DIRECTORY", "VALUE").Filter(keys...).Suffix("=")
 		case 1:
 			switch c.Parts[0] {
 			case "FILE":

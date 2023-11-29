@@ -75,3 +75,27 @@ func TestCheck(t *testing.T) {
 		t.Error("check should fail")
 	}
 }
+
+// BenchmarkStorage tests for concurrent map read/write.
+func BenchmarkStorage(b *testing.B) {
+	cmd := &cobra.Command{}
+	cmd2 := &cobra.Command{}
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			Gen(cmd).FlagCompletion(ActionMap{
+				"flag1": ActionValues("a", "b"),
+			})
+			Gen(cmd).PositionalCompletion(ActionValues("a", "b"))
+
+			Gen(cmd2).FlagCompletion(ActionMap{
+				"flag2": ActionValues("a", "b"),
+			})
+			Gen(cmd2).PositionalCompletion(ActionValues("a", "b"))
+
+			storage.getFlag(cmd, "flag1")
+			storage.getPositional(cmd, 0)
+			storage.getFlag(cmd2, "flag2")
+			storage.getPositional(cmd2, 0)
+		}
+	})
+}

@@ -8,6 +8,31 @@ import (
 	"github.com/rsteube/carapace/pkg/style"
 )
 
+func TestStandalone(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		s.Run("--h").
+			Expect(carapace.ActionValues().
+				NoSpace('.'))
+
+		s.Run("hel").
+			Expect(carapace.ActionValues())
+	})
+}
+
+func TestInterspersed(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		s.Run("-delim-colon:d1", "-d").
+			Expect(carapace.ActionValuesDescribed(
+				"-delim-slash", "OptargDelimiter '/'",
+			).NoSpace('.').
+				Style(style.Yellow).
+				Tag("flags"))
+
+		s.Run("-delim-colon:d1", "positional1", "-d").
+			Expect(carapace.ActionValues())
+	})
+}
+
 func TestRoot(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-delim-colon:").
@@ -70,7 +95,8 @@ func TestNargs(t *testing.T) {
 
 		s.Run("--nargs-two", "nt1", "nt4", "--nargs-").
 			Expect(carapace.ActionValuesDescribed(
-				"--nargs-any", "Nargs").
+				"--nargs-any", "Nargs",
+				"--nargs-two", "Nargs").
 				Style(style.Magenta).
 				NoSpace('.').
 				Tag("flags"))

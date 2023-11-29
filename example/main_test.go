@@ -240,7 +240,7 @@ import (
 // 	}
 // }
 
-// func TestPowershell(t *testing.T) {
+//func TestPowershell(t *testing.T) {
 //	if err := exec.Command("pwsh", "--version").Run(); err != nil {
 //		t.Skip("skipping powershell")
 //	}

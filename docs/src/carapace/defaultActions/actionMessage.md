@@ -6,6 +6,9 @@
 carapace.ActionMessage("example message")
 ```
 
-> To display the message [ActionValuesDescribed](./actionValuesDescribed.md) is used with values `_`, `ERR` and the message as description.
+> In shells other than [Elvish] and [Zsh] the message is integrated in the values as `ERR{n}`.
 
 ![](./actionMessage.cast)
+
+[Elvish]:https://elv.sh/
+[Zsh]:https://www.zsh.org/

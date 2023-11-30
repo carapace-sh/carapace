@@ -19,7 +19,7 @@ func TestCompat(t *testing.T) {
 		)
 
 		s.Run("compat", "--error", "").
-			Expect(carapace.ActionMessage("an error occured").
+			Expect(carapace.ActionMessage("an error occurred").
 				Usage("ShellCompDirectiveError"))
 
 		s.Run("compat", "--nospace", "").

@@ -41,5 +41,4 @@ func init() {
 			return carapace.ActionExecute(cmd)
 		}),
 	)
-
 }

@@ -73,7 +73,7 @@ func (d compDirective) ToA(values ...string) Action {
 	var action Action
 	switch {
 	case d.matches(cobra.ShellCompDirectiveError):
-		return ActionMessage("an error occured")
+		return ActionMessage("an error occurred")
 	case d.matches(cobra.ShellCompDirectiveFilterDirs):
 		switch len(values) {
 		case 0:

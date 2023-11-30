@@ -94,14 +94,14 @@ func (a Action) Filter(values ...string) Action {
 	})
 }
 
-// FilterArgs filters Context.Args
+// FilterArgs filters Context.Args.
 func (a Action) FilterArgs() Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Filter(c.Args...)
 	})
 }
 
-// FilterArgs filters Context.Parts
+// FilterArgs filters Context.Parts.
 func (a Action) FilterParts() Action {
 	return ActionCallback(func(c Context) Action {
 		return a.Filter(c.Parts...)
@@ -142,7 +142,7 @@ func (a Action) MultiParts(dividers ...string) Action {
 	})
 }
 
-// MultiPartsP is like MultiParts but with placeholders
+// MultiPartsP is like MultiParts but with placeholders.
 func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder string, matches map[string]string) Action) Action {
 	return ActionCallback(func(c Context) Action {
 		invoked := a.Invoke(c)

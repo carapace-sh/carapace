@@ -2,6 +2,7 @@ package bash
 
 import (
 	"os"
+	"strconv"
 
 	shlex "github.com/rsteube/carapace-shlex"
 )
@@ -17,6 +18,25 @@ func (r RedirectError) Error() string {
 // introduces state and hides what is happening but works for now
 var wordbreakPrefix string = ""
 
+func CompLine() (string, bool) {
+	line, ok := os.LookupEnv("COMP_LINE")
+	if !ok {
+		return "", false
+	}
+
+	point, ok := os.LookupEnv("COMP_POINT")
+	if !ok {
+		return "", false
+	}
+
+	pointI, err := strconv.Atoi(point)
+	if err != nil || len(line) < pointI {
+		return "", false
+	}
+
+	return line[:pointI], true
+}
+
 // Patch patches args if `COMP_LINE` environment variable is set.
 //
 // Bash passes redirects to the completion function so these need to be filtered out.
@@ -25,7 +45,7 @@ var wordbreakPrefix string = ""
 //	["example", "action", ">", "/tmp/stdout.txt", "--values", "2", ">", "/tmp/stderr.txt", "fi"]
 //	["example", "action", "--values", "fi"]
 func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak splitting (e.g. `:`)
-	compline, ok := os.LookupEnv("COMP_LINE")
+	compline, ok := CompLine()
 	if !ok {
 		return args, nil
 	}

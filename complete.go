@@ -1,6 +1,8 @@
 package carapace
 
 import (
+	"os"
+
 	"github.com/rsteube/carapace/internal/config"
 	"github.com/rsteube/carapace/internal/shell/bash"
 	"github.com/rsteube/carapace/internal/shell/nushell"
@@ -22,6 +24,8 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 			args = nushell.Patch(args) // handle open quotes
 			LOG.Printf("patching args to %#v", args)
 		case "bash": // TODO what about oil and such?
+			LOG.Printf("COMP_LINE is %#v", os.Getenv("COMP_LINE"))
+			LOG.Printf("COMP_POINT is %#v", os.Getenv("COMP_POINT"))
 			var err error
 			args, err = bash.Patch(args) // handle redirects
 			LOG.Printf("patching args to %#v", args)

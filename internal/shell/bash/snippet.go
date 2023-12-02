@@ -14,6 +14,7 @@ func Snippet(cmd *cobra.Command) string {
 _%v_completion() {
   export COMP_WORDBREAKS
   export COMP_LINE
+  export COMP_POINT
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
 

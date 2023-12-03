@@ -36,3 +36,4 @@ package testfiles
 //go:generate touch -- "star_*.txt"
 //go:generate touch -- "star_*_match.txt"
 //go:generate touch -- ~_tilde_prefix.txt
+//go:generate touch -- ~_tilde_prefix_pipe_|.txt

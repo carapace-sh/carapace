@@ -87,7 +87,12 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 				vals[index] = valueReplacer.Replace(vals[index])
 				switch {
 				case strings.HasPrefix(vals[index], "~"): // assume homedir expansion
-					vals[index] = fmt.Sprintf(`~"%v"`, strings.TrimPrefix(vals[index], "~"))
+					if splitted := strings.SplitAfterN(vals[index], "/", 2); len(splitted) == 2 {
+						vals[index] = fmt.Sprintf(`%v"%v"`, splitted[0], splitted[1])
+					} else {
+						// TODO homedir expansion won't work this way, but shouldn't reach this point anyway.
+						vals[index] = fmt.Sprintf(`~"%v"`, strings.TrimPrefix(vals[index], "~"))
+					}
 				default:
 					vals[index] = fmt.Sprintf(`"%v"`, vals[index])
 				}

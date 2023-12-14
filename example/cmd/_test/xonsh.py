@@ -14,7 +14,7 @@ def _example_completer(context):
 
         output, _ = Popen(['example', '_carapace', 'xonsh', *[a.value for a in context.args], fix_prefix(context.prefix)], stdout=PIPE, stderr=PIPE).communicate()
         try:
-            result = {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=len(context.raw_prefix), append_closing_quote=False) for c in loads(output)}
+            result = {RichCompletion(c["Value"], display=c["Display"], description=c["Description"], prefix_len=len(context.raw_prefix), append_closing_quote=False, style=c["Style"]) for c in loads(output)}
         except:
             result = {}
         if len(result) == 0:

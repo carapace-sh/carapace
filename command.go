@@ -47,8 +47,8 @@ func addCompletionCommand(cmd *cobra.Command) {
 		FParseErrWhitelist: cobra.FParseErrWhitelist{
 			UnknownFlags: true,
 		},
-		DisableFlagParsing: true,
 	}
+	carapaceCmd.Flags().SetInterspersed(false)
 
 	cmd.AddCommand(carapaceCmd)
 

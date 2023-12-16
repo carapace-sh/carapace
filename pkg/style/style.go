@@ -64,9 +64,9 @@ func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }
 func TrueColor(r, g, b uint8) string { return ui.TrueColor(r, g, b).String() }
 
 // SGR returns the SGR sequence for given style.
-func SGR(s string) string { return parseStyle(s).SGR() }
+func SGR(s string) string { return Parse(s).SGR() }
 
-func parseStyle(s string) ui.Style {
+func Parse(s string) ui.Style {
 	stylings := make([]ui.Styling, 0)
 	for _, word := range strings.Split(s, " ") {
 		if styling := ui.ParseStyling(word); styling != nil {

@@ -10,18 +10,18 @@ func convertStyle(s string) string {
 	xonshStyle := make([]string, 0)
 
 	style := style.Parse("fg-default bg-default " + s)
-	switch style.Foreground {
-	case nil:
-		xonshStyle = append(xonshStyle, "fg:default")
-	default:
-		xonshStyle = append(xonshStyle, "fg:"+convertColor(style.Foreground.String()))
-	}
-
 	switch style.Background {
 	case nil:
 		xonshStyle = append(xonshStyle, "bg:default")
 	default:
 		xonshStyle = append(xonshStyle, "bg:"+convertColor(style.Background.String()))
+	}
+
+	switch style.Foreground {
+	case nil:
+		xonshStyle = append(xonshStyle, "fg:default")
+	default:
+		xonshStyle = append(xonshStyle, "fg:"+convertColor(style.Foreground.String()))
 	}
 
 	if style.Bold {

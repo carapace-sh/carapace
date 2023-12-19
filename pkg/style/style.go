@@ -55,7 +55,7 @@ var (
 )
 
 // Of combines different styles.
-func Of(s ...string) string { return strings.Join(s, " ") }
+func Of(s ...string) string { return strings.TrimSpace(strings.Join(s, " ")) }
 
 // XTerm256Color returns a color from the xterm 256-color palette.
 func XTerm256Color(i uint8) string { return ui.XTerm256Color(i).String() }

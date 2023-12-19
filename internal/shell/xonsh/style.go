@@ -29,7 +29,7 @@ func convertStyle(s string) string {
 	}
 	if style.Dim { // TODO dim not supported
 		if style.Foreground == nil || style.Foreground.String() == "white" {
-			xonshStyle[0] = "fg:#808080" // TODO workaround
+			xonshStyle[1] = "fg:#808080" // TODO workaround
 		}
 	}
 	if style.Italic {

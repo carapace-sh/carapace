@@ -15,7 +15,8 @@ import (
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		panic(c.Value)
+		c.Value = filepath.ToSlash(c.Value)
+
 		if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
 			// TODO should be fixed in Abs or wherever this is happening
 			return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`

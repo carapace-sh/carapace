@@ -27,6 +27,8 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			return ActionMessage(err.Error())
 		}
 
+		panic(abs)
+
 		displayFolder := filepath.ToSlash(filepath.Dir(c.Value))
 		if displayFolder == "." {
 			displayFolder = ""

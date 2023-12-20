@@ -78,7 +78,8 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			style.Carapace.Usage = style.Italic
 			values = values.Decolor()
 		}
-		filtered := values.FilterPrefix(value)
+		// filtered := values.FilterPrefix(value)
+		filtered := values // TODO
 		switch shell {
 		case "elvish", "export", "zsh": // shells with support for showing messages
 		default:

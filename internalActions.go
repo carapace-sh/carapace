@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -26,8 +27,6 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
-
-		panic(abs)
 
 		displayFolder := filepath.ToSlash(filepath.Dir(c.Value))
 		if displayFolder == "." {
@@ -71,6 +70,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 				}
 			}
 		}
+		panic(fmt.Sprintf("%#v", vals))
 		if strings.HasPrefix(c.Value, "./") {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}

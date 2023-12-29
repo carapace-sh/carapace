@@ -9,8 +9,9 @@ import (
 )
 
 type record struct {
-	Value       string `json:"value"`
-	Description string `json:"description,omitempty"`
+	Value       string        `json:"value"`
+	Description string        `json:"description,omitempty"`
+	Style       *nushellStyle `json:"style,omitempty"`
 }
 
 var sanitizer = strings.NewReplacer(
@@ -50,7 +51,11 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			val.Value = val.Value + " "
 		}
 
-		vals[index] = record{Value: val.Value, Description: val.TrimmedDescription()}
+		vals[index] = record{
+			Value:       val.Value,
+			Description: val.TrimmedDescription(),
+			Style:       convertStyle(val.Style),
+		}
 	}
 	m, _ := json.Marshal(vals)
 	return string(m)

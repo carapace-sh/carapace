@@ -10,6 +10,7 @@ import (
 
 type record struct {
 	Value       string        `json:"value"`
+	Display     string        `json:"display"`
 	Description string        `json:"description,omitempty"`
 	Style       *nushellStyle `json:"style,omitempty"`
 }
@@ -53,6 +54,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 
 		vals[index] = record{
 			Value:       val.Value,
+			Display:     val.Display,
 			Description: val.TrimmedDescription(),
 			Style:       convertStyle(val.Style),
 		}

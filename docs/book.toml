@@ -4,6 +4,7 @@ language = "en"
 multilingual = false
 src = "src"
 title = "carapace"
+description = "A multi-shell completion library. Supports Bash, Elvish, Fish, Nushell, Oil, Powershell, Xonsh and Zsh."
 
 [output.html]
 default-theme = "Latte"

@@ -112,6 +112,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Display:     d,
 							Description: val.Description,
 							Style:       val.Style,
+							Tag:         val.Tag,
 						}
 					} else {
 						uniqueVals[v] = common.RawValue{
@@ -119,6 +120,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Display:     d,
 							Description: "",
 							Style:       "",
+							Tag:         "",
 						}
 					}
 				}

@@ -463,6 +463,34 @@ func TestSplitP(t *testing.T) {
 				Usage("SplitP()"))
 	})
 }
+func TestUnless(t *testing.T) {
+	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--unless", "").
+			Expect(carapace.ActionValues(
+				"./local",
+				"~/home",
+				"/abs",
+				"one",
+				"two",
+				"three",
+			).Usage("Unless()"))
+
+		s.Run("modifier", "--unless", "t").
+			Expect(carapace.ActionValues(
+				"two",
+				"three",
+			).Usage("Unless()"))
+
+		s.Run("modifier", "--unless", ".").
+			Expect(carapace.ActionValues().Usage("Unless()"))
+
+		s.Run("modifier", "--unless", "~").
+			Expect(carapace.ActionValues().Usage("Unless()"))
+
+		s.Run("modifier", "--unless", "/").
+			Expect(carapace.ActionValues().Usage("Unless()"))
+	})
+}
 
 func TestUniqueList(t *testing.T) {
 	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {

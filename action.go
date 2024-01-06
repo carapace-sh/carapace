@@ -452,6 +452,16 @@ func (a Action) UniqueListF(divider string, f func(s string) string) Action {
 	})
 }
 
+// Unless skips invokation if given condition succeeds.
+func (a Action) Unless(condition func(c Context) bool) Action {
+	return ActionCallback(func(c Context) Action {
+		if condition(c) {
+			return ActionValues()
+		}
+		return a
+	})
+}
+
 // Usage sets the usage.
 func (a Action) Usage(usage string, args ...interface{}) Action {
 	return a.UsageF(func() string {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/rsteube/carapace"
 	"github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/condition"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/pkg/traverse"
 	"github.com/spf13/cobra"
@@ -50,6 +51,7 @@ func init() {
 	modifierCmd.Flags().String("timeout", "", "Timeout()")
 	modifierCmd.Flags().String("uniquelist", "", "UniqueList()")
 	modifierCmd.Flags().String("uniquelistf", "", "UniqueListF()")
+	modifierCmd.Flags().String("unless", "", "Unless()")
 	modifierCmd.Flags().String("usage", "", "Usage()")
 
 	rootCmd.AddCommand(modifierCmd)
@@ -264,6 +266,14 @@ func init() {
 		}).UniqueListF(",", func(s string) string {
 			return strings.SplitN(s, ":", 2)[0]
 		}),
+		"unless": carapace.ActionValues(
+			"./local",
+			"~/home",
+			"/abs",
+			"one",
+			"two",
+			"three",
+		).Unless(condition.CompletingPath),
 		"usage": carapace.ActionValues().Usage("explicit usage"),
 	})
 

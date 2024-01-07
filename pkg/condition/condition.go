@@ -57,19 +57,12 @@ func File(s string) func(c carapace.Context) bool {
 	}
 }
 
-// CompletingPath returns true when Context.Value is assumed a path.
-// Either
-// - it has a path prefix
-// - it contains a filepath delimiter and the first segment is a valid directory
-// - it is a valid file or directory
+// CompletingPath returns true when `Context.Value` has a path prefix.
 func CompletingPath(c carapace.Context) bool {
-	if util.HasPathPrefix(c.Value) {
-		return true
-	}
-	if s := c.Value; strings.ContainsAny(s, "/\\") {
-		s = strings.SplitN(s, "/", 2)[0]
-		s = strings.SplitN(s, "\\", 2)[0]
-		return File(s)(c)
-	}
-	return File(c.Value)(c)
+	return util.HasPathPrefix(c.Value)
+}
+
+// CompletingPathS is like CompletingPathS but also checks for path separator `/`
+func CompletingPathS(c carapace.Context) bool {
+	return CompletingPath(c) || strings.Contains(c.Value, "/") // TODO support windows backslash at some point?
 }

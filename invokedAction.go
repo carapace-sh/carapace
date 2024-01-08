@@ -120,7 +120,7 @@ func (a InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Display:     d,
 							Description: "",
 							Style:       "",
-							Tag:         "",
+							Tag:         val.Tag,
 						}
 					}
 				}

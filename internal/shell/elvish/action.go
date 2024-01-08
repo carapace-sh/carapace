@@ -36,6 +36,7 @@ type complexCandidate struct {
 	Description string
 	CodeSuffix  string
 	Style       string
+	Tag         string
 }
 
 // ActionRawValues formats values for elvish.
@@ -60,7 +61,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		if val.Style == "" || ui.ParseStyling(val.Style) == nil {
 			val.Style = valueStyle
 		}
-		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style}
+		vals[index] = complexCandidate{Value: val.Value, Display: val.Display, Description: val.Description, CodeSuffix: suffix, Style: val.Style, Tag: val.Tag}
 	}
 
 	if len(values) > 0 {

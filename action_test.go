@@ -18,24 +18,24 @@ func init() {
 }
 
 func assertEqual(t *testing.T, expected, actual InvokedAction) {
-	sort.Sort(common.ByValue(expected.rawValues))
-	sort.Sort(common.ByValue(actual.rawValues))
+	sort.Sort(common.ByValue(expected.action.rawValues))
+	sort.Sort(common.ByValue(actual.action.rawValues))
 
-	e, _ := json.MarshalIndent(expected.rawValues, "", "  ")
-	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
+	e, _ := json.MarshalIndent(expected.action.rawValues, "", "  ")
+	a, _ := json.MarshalIndent(actual.action.rawValues, "", "  ")
 	assert.Equal(t, string(e), string(a))
 
-	eMeta, _ := json.MarshalIndent(expected.meta, "", "  ")
-	aMeta, _ := json.MarshalIndent(actual.meta, "", "  ")
+	eMeta, _ := json.MarshalIndent(expected.action.meta, "", "  ")
+	aMeta, _ := json.MarshalIndent(actual.action.meta, "", "  ")
 	assert.Equal(t, string(eMeta), string(aMeta))
 }
 
 func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
-	sort.Sort(common.ByValue(expected.rawValues))
-	sort.Sort(common.ByValue(actual.rawValues))
+	sort.Sort(common.ByValue(expected.action.rawValues))
+	sort.Sort(common.ByValue(actual.action.rawValues))
 
-	e, _ := json.MarshalIndent(expected.rawValues, "", "  ")
-	a, _ := json.MarshalIndent(actual.rawValues, "", "  ")
+	e, _ := json.MarshalIndent(expected.action.rawValues, "", "  ")
+	a, _ := json.MarshalIndent(actual.action.rawValues, "", "  ")
 
 	if string(e) == string(a) {
 		t.Errorf("should differ:\n%v", a)
@@ -89,7 +89,7 @@ func TestSkipCache(t *testing.T) {
 	if !a.meta.Messages.IsEmpty() {
 		t.Fatal("uninvoked action should not contain messages")
 	}
-	if a.Invoke(Context{}).meta.Messages.IsEmpty() {
+	if a.Invoke(Context{}).action.meta.Messages.IsEmpty() {
 		t.Fatal("invoked action should contain messages")
 	}
 }
@@ -108,7 +108,7 @@ func TestNoSpace(t *testing.T) {
 	if a.meta.Nospace.Matches("x") {
 		t.Fatal("uninvoked nospace should not match")
 	}
-	if !a.Invoke(Context{}).meta.Nospace.Matches("x") {
+	if !a.Invoke(Context{}).action.meta.Nospace.Matches("x") {
 		t.Fatal("invoked nospace should match")
 	}
 }

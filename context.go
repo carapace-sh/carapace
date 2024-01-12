@@ -12,6 +12,7 @@ import (
 	"github.com/rsteube/carapace/pkg/execlog"
 	"github.com/rsteube/carapace/pkg/util"
 	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
+	"github.com/rsteube/carapace/third_party/golang.org/lookpath"
 	"github.com/spf13/cobra"
 )
 
@@ -151,4 +152,8 @@ func (c Context) Abs(path string) (string, error) {
 		result += "/."
 	}
 	return result, nil
+}
+
+func (c Context) LookPath(file string) (string, error) {
+	return lookpath.LookPath(c, file)
 }

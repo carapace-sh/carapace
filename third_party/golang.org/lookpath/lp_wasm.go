@@ -4,7 +4,7 @@
 
 //go:build wasm
 
-package exec
+package lookpath
 
 import (
 	"errors"

@@ -4,11 +4,10 @@
 
 //go:build unix
 
-package exec
+package lookpath
 
 import (
 	"errors"
-	"internal/syscall/unix"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -28,13 +27,13 @@ func findExecutable(file string) error {
 	if m.IsDir() {
 		return syscall.EISDIR
 	}
-	err = unix.Eaccess(file, unix.X_OK)
-	// ENOSYS means Eaccess is not available or not implemented.
-	// EPERM can be returned by Linux containers employing seccomp.
-	// In both cases, fall back to checking the permission bits.
-	if err == nil || (err != syscall.ENOSYS && err != syscall.EPERM) {
-		return err
-	}
+	// err = unix.Eaccess(file, unix.X_OK)
+	// // ENOSYS means Eaccess is not available or not implemented.
+	// // EPERM can be returned by Linux containers employing seccomp.
+	// // In both cases, fall back to checking the permission bits.
+	// if err == nil || (err != syscall.ENOSYS && err != syscall.EPERM) {
+	// 	return err
+	// }
 	if m&0111 != 0 {
 		return nil
 	}
@@ -70,10 +69,11 @@ func LookPath(file string) (string, error) {
 		path := filepath.Join(dir, file)
 		if err := findExecutable(path); err == nil {
 			if !filepath.IsAbs(path) {
-				if execerrdot.Value() != "0" {
-					return path, &Error{file, ErrDot}
-				}
-				execerrdot.IncNonDefault()
+				// TODO
+				// if execerrdot.Value() != "0" {
+				// 	return path, &Error{file, ErrDot}
+				// }
+				// execerrdot.IncNonDefault()
 			}
 			return path, nil
 		}

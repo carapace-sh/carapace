@@ -1,8 +1,8 @@
 package execlog
 
 import (
+	shlex "github.com/rsteube/carapace-shlex"
 	"github.com/rsteube/carapace/internal/log"
-	"github.com/rsteube/carapace/pkg/util"
 	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
 )
 
@@ -19,12 +19,12 @@ func Command(name string, arg ...string) *Cmd {
 }
 
 func (c *Cmd) Run() error {
-	log.LOG.Printf("executing %#v", util.FormatCmd(c.Args...))
+	log.LOG.Printf("executing %#v", shlex.Join(c.Args))
 	return c.Cmd.Run()
 }
 
 func (c *Cmd) Start() error {
-	log.LOG.Printf("executing %#v", util.FormatCmd(c.Args...))
+	log.LOG.Printf("executing %#v", shlex.Join(c.Args))
 	return c.Cmd.Start()
 }
 

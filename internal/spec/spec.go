@@ -8,10 +8,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Snippet generates the spec file.
+// Spec generates the spec file.
 func Spec(cmd *cobra.Command) string {
 	m, _ := yaml.Marshal(command(cmd))
-	return string(m)
+	return "# yaml-language-server: $schema=https://carapace.sh/schemas/command.json\n" + string(m)
 }
 
 func command(cmd *cobra.Command) Command {

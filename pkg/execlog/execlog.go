@@ -18,6 +18,16 @@ func Command(name string, arg ...string) *Cmd {
 	return cmd
 }
 
+func (c *Cmd) CombinedOutput() ([]byte, error) {
+	log.LOG.Printf("executing %#v", shlex.Join(c.Args))
+	return c.Cmd.CombinedOutput()
+}
+
+func (c *Cmd) Output() ([]byte, error) {
+	log.LOG.Printf("executing %#v", shlex.Join(c.Args))
+	return c.Cmd.Output()
+}
+
 func (c *Cmd) Run() error {
 	log.LOG.Printf("executing %#v", shlex.Join(c.Args))
 	return c.Cmd.Run()

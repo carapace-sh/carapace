@@ -30,7 +30,7 @@ func ForPathExt(path string, sc Context) string {
 
 func fromSGR(sgr string) string {
 	s := ui.StyleFromSGR(sgr)
-	result := []string{"fg-default", "bg-default"}
+	result := []string{}
 	if s.Foreground != nil {
 		result = append(result, s.Foreground.String())
 	}

@@ -116,39 +116,39 @@ func TestNoSpace(t *testing.T) {
 func TestActionDirectories(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
-			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"example/", style.Of(style.Blue, style.Bold),
+			"example-nonposix/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}),
 		ActionDirectories().Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"example/", style.Of(style.Blue, style.Bold),
+			"example-nonposix/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("./"),
 		ActionDirectories().Invoke(Context{Value: "./"}).Filter("./vendor/"),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"_test/", style.Of(style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{Value: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
 		ActionDirectories().Invoke(Context{Value: "example/cm"}),
 	)
@@ -157,24 +157,24 @@ func TestActionDirectories(t *testing.T) {
 func TestActionFiles(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
-			"README.md", style.Of("fg-default", "bg-default"),
-			"example/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"example-nonposix/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"docs/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"internal/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"pkg/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"third_party/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
+			"README.md", style.Default,
+			"example/", style.Of(style.Blue, style.Bold),
+			"example-nonposix/", style.Of(style.Blue, style.Bold),
+			"docs/", style.Of(style.Blue, style.Bold),
+			"internal/", style.Of(style.Blue, style.Bold),
+			"pkg/", style.Of(style.Blue, style.Bold),
+			"third_party/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("files").Invoke(Context{}),
 		ActionFiles(".md").Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
-			"README.md", style.Of("fg-default", "bg-default"),
-			"_test/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"cmd/", style.Of("fg-default", "bg-default", style.Blue, style.Bold),
-			"main.go", style.Of("fg-default", "bg-default"),
-			"main_test.go", style.Of("fg-default", "bg-default"),
+			"README.md", style.Default,
+			"_test/", style.Of(style.Blue, style.Bold),
+			"cmd/", style.Of(style.Blue, style.Bold),
+			"main.go", style.Default,
+			"main_test.go", style.Default,
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/"),
 		ActionFiles().Invoke(Context{Value: "example/"}).Filter("example/example"),
 	)
@@ -195,8 +195,8 @@ func TestActionFilesChdir(t *testing.T) {
 
 	assertEqual(t,
 		ActionStyledValues(
-			"action.go", style.Of("fg-default", "bg-default"),
-			"snippet.go", style.Of("fg-default", "bg-default"),
+			"action.go", style.Default,
+			"snippet.go", style.Default,
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("elvish/"),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{Value: "elvish/"}),
 	)

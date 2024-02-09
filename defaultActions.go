@@ -149,7 +149,9 @@ func ActionValues(values ...string) Action {
 	return ActionCallback(func(c Context) Action {
 		vals := make([]common.RawValue, 0, len(values))
 		for _, val := range values {
-			vals = append(vals, common.RawValue{Value: val, Display: val})
+			if val != "" {
+				vals = append(vals, common.RawValue{Value: val, Display: val})
+			}
 		}
 		return Action{rawValues: vals}
 	})

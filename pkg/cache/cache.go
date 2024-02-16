@@ -1,46 +1,30 @@
-// Package cache provides cache keys
 package cache
 
 import (
-	"crypto/sha1"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
+	"runtime"
+	"time"
+
+	"github.com/rsteube/carapace/internal/cache"
+	"github.com/rsteube/carapace/pkg/cache/key"
 )
 
-// Key provides a cache key.
-type Key func() (string, error)
-
-// String creates a CacheKey for given strings.
-func String(s ...string) Key {
-	return func() (string, error) {
-		return strings.Join(s, "\n"), nil
-	}
-}
-
-// FileChecksum creates a CacheKey for given file.
-func FileChecksum(file string) Key {
-	return func() (checksum string, err error) {
-		var content []byte
-		if content, err = os.ReadFile(file); err == nil {
-			checksum = fmt.Sprintf("%x", sha1.Sum(content))
+// Cache caches a function for given duration and keys.
+func Cache(timeout time.Duration, keys ...key.Key) func(f func() ([]byte, error)) ([]byte, error) {
+	return func(f func() ([]byte, error)) ([]byte, error) {
+		_, file, line, _ := runtime.Caller(1)
+		cacheFile, err := cache.File(file, line, keys...)
+		if err != nil {
+			return nil, err
 		}
-		return
-	}
-}
 
-// FileStats creates a CacheKey for given file.
-func FileStats(file string) Key {
-	return func() (checksum string, err error) {
-		var path string
-		if path, err = filepath.Abs(file); err == nil {
-			var info os.FileInfo
-			if info, err = os.Stat(file); err == nil {
-				return String(path, strconv.FormatInt(info.Size(), 10), info.ModTime().String())()
+		content, err := cache.Load(cacheFile, timeout)
+		if err != nil {
+			content, err = f()
+			if err != nil {
+				return nil, err
 			}
+			return content, cache.Write(cacheFile, content)
 		}
-		return
+		return content, nil
 	}
 }

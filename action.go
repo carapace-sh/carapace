@@ -11,7 +11,7 @@ import (
 	shlex "github.com/rsteube/carapace-shlex"
 	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
-	pkgcache "github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/cache/key"
 	"github.com/rsteube/carapace/pkg/match"
 	"github.com/rsteube/carapace/pkg/style"
 	pkgtraverse "github.com/rsteube/carapace/pkg/traverse"
@@ -31,7 +31,7 @@ type ActionMap map[string]Action
 type CompletionCallback func(c Context) Action
 
 // Cache cashes values of a CompletionCallback for given duration and keys.
-func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
+func (a Action) Cache(timeout time.Duration, keys ...key.Key) Action {
 	if a.callback != nil { // only relevant for callback actions
 		cachedCallback := a.callback
 		_, file, line, _ := runtime.Caller(1) // generate uid from wherever Cache() was called
@@ -41,14 +41,14 @@ func (a Action) Cache(timeout time.Duration, keys ...pkgcache.Key) Action {
 				return cachedCallback(c)
 			}
 
-			if cached, err := cache.Load(cacheFile, timeout); err == nil {
+			if cached, err := cache.LoadE(cacheFile, timeout); err == nil {
 				return Action{meta: cached.Meta, rawValues: cached.Values}
 			}
 
 			invokedAction := (Action{callback: cachedCallback}).Invoke(c)
 			if invokedAction.action.meta.Messages.IsEmpty() {
 				if cacheFile, err := cache.File(file, line, keys...); err == nil { // regenerate as cache keys might have changed due to invocation
-					_ = cache.Write(cacheFile, invokedAction.export())
+					_ = cache.WriteE(cacheFile, invokedAction.export())
 				}
 			}
 			return invokedAction.ToA()

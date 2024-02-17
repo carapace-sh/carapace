@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/cache"
+	"github.com/rsteube/carapace/pkg/cache/key"
 	"github.com/rsteube/carapace/pkg/condition"
 	"github.com/rsteube/carapace/pkg/style"
 	"github.com/rsteube/carapace/pkg/traverse"
@@ -85,7 +85,7 @@ func init() {
 					return carapace.ActionValues(
 						time.Now().Format("15:04:05"),
 					)
-				}).Cache(10*time.Second, cache.String(c.Parts[0]))
+				}).Cache(10*time.Second, key.String(c.Parts[0]))
 			default:
 				return carapace.ActionValues()
 			}

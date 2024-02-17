@@ -17,7 +17,7 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ## Key
 
-Additional keys like [`cache.String`] can be passed as well.
+Additional keys like [`key.String`] can be passed as well.
 
 ```go
 carapace.ActionMultiParts("/", func(c carapace.Context) carapace.Action {
@@ -29,7 +29,7 @@ carapace.ActionMultiParts("/", func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues(
 				time.Now().Format("15:04:05"),
 			)
-		}).Cache(10*time.Second, cache.String(c.Parts[0]))
+		}).Cache(10*time.Second, key.String(c.Parts[0]))
 	default:
 		return carapace.ActionValues()
 	}
@@ -56,7 +56,7 @@ Cache is written as `json` to [`os.UserCacheDir`] using the [Export] format.
 
 [Action]:../action.md
 [`Cache`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Cache
-[`cache.String`]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/cache#String
+[`key.String`]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/key#String
 [`CacheKeys`]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/cache#CacheKey
 [callback actions]:./defaultActions/actionCallback.md
 [Export]:../export.md

@@ -78,11 +78,9 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			if err != nil {
 				return nil, err
 			}
-			host, path, _ := strings.Cut(abs[1:], "/")
 			return &url.URL{
 				Scheme: "file",
-				Host:   host,
-				Path:   path,
+				Path:   abs,
 			}, nil
 		})
 	})

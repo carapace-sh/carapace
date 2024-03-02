@@ -438,7 +438,7 @@ func ActionExecutables() Action {
 			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
 		}
 		return batch.ToA()
-	}).Tag("executables")
+	}).Tag("executables").Uid("cmd", "")
 }
 
 func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[string]string) Action {

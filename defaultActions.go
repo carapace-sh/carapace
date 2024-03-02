@@ -523,6 +523,11 @@ func ActionCommands(cmd *cobra.Command) Action {
 			if err != nil {
 				return nil, err
 			}
+
+			if subCommand, _, err := cmd.Find([]string{s}); err == nil {
+				s = subCommand.Name() // alias -> actual name
+			}
+
 			switch uid.Path {
 			case "":
 				uid.Path = s

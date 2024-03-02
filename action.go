@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"regexp"
 	"runtime"
@@ -459,6 +460,57 @@ func (a Action) Unless(condition func(c Context) bool) Action {
 			return ActionValues()
 		}
 		return a
+	})
+}
+
+// Uid TODO
+//
+
+//	cmd://git/checkout?pos=1
+//	cmd://git/checkout?dash=3
+//	cmd://git/checkout?flag=--detach&arg=nothing
+// file://somefilepath.txt
+// http://somefilepath.txt
+
+// ps://signal/KILL
+// ps://process/1234
+func (a Action) Uid(scheme, host string, opts ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		if length := len(opts); length%2 != 0 {
+			return ActionMessage("invalid amount of arguments [Uid]: %v", length)
+		}
+
+		invoked := a.Invoke(c)
+		for index, v := range invoked.action.rawValues {
+			uid := url.URL{
+				Scheme: scheme,
+				Host:   host,
+				Path:   v.Value,
+			}
+			if len(opts) > 0 {
+				values := uid.Query()
+				for i := 0; i <= len(opts); i += 2 {
+					values.Set(opts[i], opts[i+1])
+				}
+			}
+			// TODO ?key=value...
+			invoked.action.rawValues[index].Uid = uid.String()
+		}
+		return invoked.ToA()
+	})
+}
+
+func (a Action) UidF(f func(s string) (*url.URL, error)) Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		for index, v := range invoked.action.rawValues {
+			url, err := f(v.Value)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
+			invoked.action.rawValues[index].Uid = url.String() // TODO nil check
+		}
+		return invoked.ToA()
 	})
 }
 

@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
 	"github.com/rsteube/carapace/internal/common"
@@ -516,8 +518,33 @@ func ActionCommands(cmd *cobra.Command) Action {
 				}
 			}
 		}
-		return batch.ToA()
+		return batch.ToA().UidF(func(s string) (*url.URL, error) {
+			uid, err := uidCommand(cmd)
+			if err != nil {
+				return nil, err
+			}
+			switch uid.Path {
+			case "":
+				uid.Path = s
+			default:
+				uid.Path = uid.Path + "/" + s
+			}
+			return uid, nil
+		})
 	})
+}
+
+func uidCommand(cmd *cobra.Command) (*url.URL, error) {
+	path := []string{cmd.Name()}
+	for parent := cmd.Parent(); parent != nil; parent = parent.Parent() {
+		path = append(path, parent.Name())
+	}
+	slices.Reverse(path)
+	return &url.URL{
+		Scheme: "cmd",
+		Host:   path[0],
+		Path:   strings.Join(path[1:], "/"),
+	}, nil
 }
 
 // ActionCora bridges given cobra completion function.

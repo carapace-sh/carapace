@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,62 +16,75 @@ import (
 
 func actionPath(fileSuffixes []string, dirOnly bool) Action {
 	return ActionCallback(func(c Context) Action {
-		if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
-			// TODO should be fixed in Abs or wherever this is happening
-			return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`
-		}
-
-		abs, err := c.Abs(c.Value)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		displayFolder := filepath.ToSlash(filepath.Dir(c.Value))
-		if displayFolder == "." {
-			displayFolder = ""
-		} else if !strings.HasSuffix(displayFolder, "/") {
-			displayFolder = displayFolder + "/"
-		}
-
-		actualFolder := filepath.ToSlash(filepath.Dir(abs))
-		files, err := ioutil.ReadDir(actualFolder)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
-		showHidden := !strings.HasSuffix(abs, "/") && strings.HasPrefix(filepath.Base(abs), ".")
-
-		vals := make([]string, 0, len(files)*2)
-		for _, file := range files {
-			if !showHidden && strings.HasPrefix(file.Name(), ".") {
-				continue
+		return ActionCallback(func(c Context) Action {
+			if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
+				// TODO should be fixed in Abs or wherever this is happening
+				return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`
 			}
 
-			resolvedFile := file
-			if resolved, err := filepath.EvalSymlinks(actualFolder + file.Name()); err == nil {
-				if stat, err := os.Stat(resolved); err == nil {
-					resolvedFile = stat
-				}
+			abs, err := c.Abs(c.Value)
+			if err != nil {
+				return ActionMessage(err.Error())
 			}
 
-			if resolvedFile.IsDir() {
-				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
-			} else if !dirOnly {
-				if len(fileSuffixes) == 0 {
-					fileSuffixes = []string{""}
+			displayFolder := filepath.ToSlash(filepath.Dir(c.Value))
+			if displayFolder == "." {
+				displayFolder = ""
+			} else if !strings.HasSuffix(displayFolder, "/") {
+				displayFolder = displayFolder + "/"
+			}
+
+			actualFolder := filepath.ToSlash(filepath.Dir(abs))
+			files, err := ioutil.ReadDir(actualFolder)
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
+
+			showHidden := !strings.HasSuffix(abs, "/") && strings.HasPrefix(filepath.Base(abs), ".")
+
+			vals := make([]string, 0, len(files)*2)
+			for _, file := range files {
+				if !showHidden && strings.HasPrefix(file.Name(), ".") {
+					continue
 				}
-				for _, suffix := range fileSuffixes {
-					if strings.HasSuffix(file.Name(), suffix) {
-						vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
-						break
+
+				resolvedFile := file
+				if resolved, err := filepath.EvalSymlinks(actualFolder + file.Name()); err == nil {
+					if stat, err := os.Stat(resolved); err == nil {
+						resolvedFile = stat
+					}
+				}
+
+				if resolvedFile.IsDir() {
+					vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
+				} else if !dirOnly {
+					if len(fileSuffixes) == 0 {
+						fileSuffixes = []string{""}
+					}
+					for _, suffix := range fileSuffixes {
+						if strings.HasSuffix(file.Name(), suffix) {
+							vals = append(vals, displayFolder+file.Name(), style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c))
+							break
+						}
 					}
 				}
 			}
-		}
-		if strings.HasPrefix(c.Value, "./") {
-			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
-		}
-		return ActionStyledValues(vals...)
+			if strings.HasPrefix(c.Value, "./") {
+				return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
+			}
+			return ActionStyledValues(vals...)
+		}).UidF(func(s string) (*url.URL, error) {
+			abs, err := c.Abs(s)
+			if err != nil {
+				return nil, err
+			}
+			host, path, _ := strings.Cut(abs[1:], "/")
+			return &url.URL{
+				Scheme: "file",
+				Host:   host,
+				Path:   path,
+			}, nil
+		})
 	})
 }
 
@@ -129,7 +143,16 @@ func actionFlags(cmd *cobra.Command) Action {
 			return ActionStyledValuesDescribed(vals...).Prefix(c.Value)
 		}
 		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
-	}).Tag("flags")
+	}).Tag("flags").UidF(func(s string) (*url.URL, error) {
+		uid, err := uidCommand(cmd)
+		if err != nil {
+			return nil, err
+		}
+		values := uid.Query()
+		values.Set("flag", s)
+		uid.RawQuery = values.Encode()
+		return uid, nil
+	})
 }
 
 func initHelpCompletion(cmd *cobra.Command) {

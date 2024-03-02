@@ -113,6 +113,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Description: val.Description,
 							Style:       val.Style,
 							Tag:         val.Tag,
+							Uid:         val.Uid,
 						}
 					} else {
 						uniqueVals[v] = common.RawValue{
@@ -121,6 +122,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Description: "",
 							Style:       "",
 							Tag:         val.Tag,
+							Uid:         val.Uid,
 						}
 					}
 				}

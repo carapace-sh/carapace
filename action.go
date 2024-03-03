@@ -489,9 +489,10 @@ func (a Action) Uid(scheme, host string, opts ...string) Action {
 			}
 			if len(opts) > 0 {
 				values := uid.Query()
-				for i := 0; i <= len(opts); i += 2 {
+				for i := 0; i < len(opts); i += 2 {
 					values.Set(opts[i], opts[i+1])
 				}
+				uid.RawQuery = values.Encode()
 			}
 			// TODO ?key=value...
 			invoked.action.rawValues[index].Uid = uid.String()

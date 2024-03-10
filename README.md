@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> In the process of moving to [github.com/carapace-sh](https://github.com/carapace-sh)
+
 # carapace
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/rsteube/carapace)](https://pkg.go.dev/github.com/rsteube/carapace)

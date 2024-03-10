@@ -14,12 +14,12 @@ RUN git clone --recursive https://github.com/akinomyoga/ble.sh.git \
  && make -C ble.sh
 
 FROM base as elvish
-ARG version=0.19.2
+ARG version=0.20.1
 RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish-* /usr/local/bin/elvish
 
 FROM base as goreleaser
-ARG version=1.21.2
+ARG version=1.24.0
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
@@ -33,12 +33,12 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make update-shells prefix=/usr
 
 FROM base as nushell
-ARG version=0.85.0
+ARG version=0.91.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
 FROM base as oil
-ARG version=0.18.0
+ARG version=0.20.0
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && cd oil-*/ \
@@ -47,7 +47,7 @@ RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && ./install
 
 FROM base as starship
-ARG version=1.16.0
+ARG version=1.17.1
 RUN wget -qO- "https://github.com/starship/starship/releases/download/v${version}/starship-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz starship \
  && mv starship /usr/local/bin/
 
@@ -57,7 +57,7 @@ RUN wget -qO- "https://github.com/sharkdp/vivid/releases/download/v${version}/vi
  && mv vivid-v${version}-x86_64-unknown-linux-gnu/vivid /usr/local/bin/
 
 FROM base as mdbook
-ARG version=0.4.35
+ARG version=0.4.37
 RUN apt-get update && apt-get install -y unzip \
   && curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
   && wget -q "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v0.7.7/mdbook-linkcheck.x86_64-unknown-linux-gnu.zip" \
@@ -67,9 +67,9 @@ RUN apt-get update && apt-get install -y unzip \
 
 FROM base
 RUN apt-get update && apt-get install -y libicu72
-RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.3.8/powershell_7.3.8-1.deb_amd64.deb\
-  && dpkg -i powershell_7.3.8-1.deb_amd64.deb \
-  && rm powershell_7.3.8-1.deb_amd64.deb
+RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/powershell_7.4.1-1.deb_amd64.deb\
+  && dpkg -i powershell_7.4.1-1.deb_amd64.deb \
+  && rm powershell_7.4.1-1.deb_amd64.deb
 
 RUN apt-get update \
   && apt-get install -y fish \

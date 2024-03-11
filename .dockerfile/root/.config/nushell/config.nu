@@ -134,7 +134,9 @@ let light_theme = {
 
 # External completer example
 let carapace_completer = {|spans|
-    ^$env.TARGET _carapace nushell $spans | from json
+    if "TARGET" in $env {
+        ^$env.TARGET _carapace nushell $spans | from json
+    }
 }
 
 # The default config record. This is where much of your global configuration is setup.

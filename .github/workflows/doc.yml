@@ -8,7 +8,7 @@ on:
 jobs:
   doc:
     runs-on: ubuntu-latest
-    container: ghcr.io/rsteube/carapace
+    container: ghcr.io/carapace-sh/carapace
     steps:
       - uses: actions/checkout@v4
 

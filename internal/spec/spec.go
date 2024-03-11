@@ -3,6 +3,7 @@ package spec
 
 import (
 	"github.com/rsteube/carapace/internal/pflagfork"
+	"github.com/rsteube/carapace/internal/spec/command"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
@@ -10,12 +11,12 @@ import (
 
 // Spec generates the spec file.
 func Spec(cmd *cobra.Command) string {
-	m, _ := yaml.Marshal(command(cmd))
+	m, _ := yaml.Marshal(genCommand(cmd))
 	return "# yaml-language-server: $schema=https://carapace.sh/schemas/command.json\n" + string(m)
 }
 
-func command(cmd *cobra.Command) Command {
-	c := Command{
+func genCommand(cmd *cobra.Command) command.Command {
+	c := command.Command{
 		Name:            cmd.Use,
 		Description:     cmd.Short,
 		Aliases:         cmd.Aliases,
@@ -23,7 +24,7 @@ func command(cmd *cobra.Command) Command {
 		Hidden:          cmd.Hidden,
 		Flags:           make(map[string]string),
 		PersistentFlags: make(map[string]string),
-		Commands:        make([]Command, 0),
+		Commands:        make([]command.Command, 0),
 	}
 
 	// TODO mutually exclusive flags
@@ -46,9 +47,11 @@ func command(cmd *cobra.Command) Command {
 
 	for _, subcmd := range cmd.Commands() {
 		if subcmd.Name() != "_carapace" && subcmd.Deprecated == "" {
-			c.Commands = append(c.Commands, command(subcmd))
+			c.Commands = append(c.Commands, genCommand(subcmd))
 		}
 	}
+
+	c.Documentation.Command = cmd.Long
 
 	return c
 }

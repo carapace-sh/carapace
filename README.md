@@ -43,19 +43,19 @@ An example implementation can be found in the [example](./example/) folder.
 ## Standalone Mode
 
 Carapace can also be used to provide completion for arbitrary commands.
-See [carapace-bin](https://github.com/rsteube/carapace-bin) for examples.
+See [carapace-bin](https://github.com/carapace-sh/carapace-bin) for examples.
 
 ## Related Projects
 
-- [carapace-bin](https://github.com/rsteube/carapace-bin) multi-shell multi-command argument completer
-- [carapace-bridge](https://github.com/rsteube/carapace-bridge) completion bridge
+- [carapace-bin](https://github.com/carapace-sh/carapace-bin) multi-shell multi-command argument completer
+- [carapace-bridge](https://github.com/carapace-sh/carapace-bridge) completion bridge
 - [carapace-pflag](https://github.com/carapace-sh/carapace-pflag) Drop-in replacement for spf13/pflag with support for non-posix variants
 - [carapace-shlex](https://github.com/carapace-sh/carapace-shlex) simple shell lexer
-- [carapace-spec](https://github.com/rsteube/carapace-spec) define simple completions using a spec file
-- [carapace-spec-clap](https://github.com/rsteube/carapace-spec-clap) spec generation for clap-rs/clap
-- [carapace-spec-kingpin](https://github.com/rsteube/carapace-spec-kingpin) spec generation for alecthomas/kingpin
-- [carapace-spec-kong](https://github.com/rsteube/carapace-spec-kong) spec generation for alecthomas/kong
-- [carapace-spec-man](https://github.com/rsteube/carapace-spec-man) spec generation for manpages
-- [carapace-spec-urfavecli](https://github.com/rsteube/carapace-spec-urfavecli) spec generation for urfave/cli
+- [carapace-spec](https://github.com/carapace-sh/carapace-spec) define simple completions using a spec file
+- [carapace-spec-clap](https://github.com/carapace-sh/carapace-spec-clap) spec generation for clap-rs/clap
+- [carapace-spec-kingpin](https://github.com/carapace-sh/carapace-spec-kingpin) spec generation for alecthomas/kingpin
+- [carapace-spec-kong](https://github.com/carapace-sh/carapace-spec-kong) spec generation for alecthomas/kong
+- [carapace-spec-man](https://github.com/carapace-sh/carapace-spec-man) spec generation for manpages
+- [carapace-spec-urfavecli](https://github.com/carapace-sh/carapace-spec-urfavecli) spec generation for urfave/cli
 
 [cobra]:https://github.com/spf13/cobra

@@ -76,6 +76,7 @@ RUN apt-get update \
   elvish \
   expect \
   shellcheck \
+  sudo \
   tcsh \
   xonsh \
   zsh
@@ -96,8 +97,15 @@ COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=starship /usr/local/bin/* /usr/local/bin/
 COPY --from=vivid /usr/local/bin/* /usr/local/bin/
 
-ADD .dockerfile/root /root
-ADD .dockerfile/usr/local/bin/* /usr/local/bin/
+RUN groupadd --gid 1000 carapace \
+ && useradd --uid 1000 --gid 1000 --create-home carapace \
+ && mkdir /.cache \
+ && chmod -R a+rwx /.cache /go /opt \
+ && echo " carapace      ALL = NOPASSWD: ALL" >> /etc/sudoers
+
+COPY .dockerfile/home /root/
+COPY --chown=1000:1000 .dockerfile/home /home/carapace/
+COPY .dockerfile/usr/local/bin/* /usr/local/bin/
 
 ENV TERM xterm
 ENTRYPOINT [ "entrypoint.sh" ]

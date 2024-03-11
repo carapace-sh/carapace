@@ -10,4 +10,4 @@ require (
 
 replace github.com/carapace-sh/carapace => ../
 
-replace github.com/spf13/pflag => github.com/carapace-sh/carapace-pflag v0.2.0
+replace github.com/spf13/pflag => github.com/carapace-sh/carapace-pflag v1.0.0

@@ -12,4 +12,4 @@ carapace.Gen(cmd).DashAnyCompletion(
 
 ![](./actionPositional.cast)
 
-[`ActionPositional`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionPositional
+[`ActionPositional`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionPositional

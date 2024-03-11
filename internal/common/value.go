@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rsteube/carapace/pkg/match"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/match"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 // FromInvokedAction provides access to RawValues within an InvokedAction.

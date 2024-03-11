@@ -2,7 +2,7 @@
 package spec
 
 import (
-	"github.com/rsteube/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"

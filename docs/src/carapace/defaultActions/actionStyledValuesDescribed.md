@@ -1,6 +1,6 @@
 # ActionStyledValuesDescribed
 
-[`ActionStyledValuesDescribed`] is like [ActionValuesDescribed](./actionValuesDescribed.md) but accepts an additional [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style).
+[`ActionStyledValuesDescribed`] is like [ActionValuesDescribed](./actionValuesDescribed.md) but accepts an additional [style](https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/style).
 
 ```go
 carapace.ActionStyledValuesDescribed(
@@ -12,4 +12,4 @@ carapace.ActionStyledValuesDescribed(
 
 ![](./actionStyledValuesDescribed.cast)
 
-[`ActionStyledValuesDescribed`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionStyledValuesDescribed
+[`ActionStyledValuesDescribed`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionStyledValuesDescribed

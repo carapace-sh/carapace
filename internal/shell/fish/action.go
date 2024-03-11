@@ -2,7 +2,7 @@ package fish
 
 import (
 	"fmt"
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/common"
 	"strings"
 )
 

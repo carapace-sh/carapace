@@ -3,13 +3,13 @@ package cmd
 import (
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/sandbox"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestAction(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"dirA/file1.txt", "",
 			"dirA/file2.png", "",
@@ -206,7 +206,7 @@ func TestAction(t *testing.T) {
 }
 
 func TestDash(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--", "").
 			Expect(carapace.ActionValues("embeddedP1", "embeddedPositional1").
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
@@ -248,7 +248,7 @@ func TestDash(t *testing.T) {
 }
 
 func TestUnknownFlag(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--unknown", "").
 			Expect(carapace.ActionMessage("unknown flag: --unknown"))
 
@@ -260,7 +260,7 @@ func TestUnknownFlag(t *testing.T) {
 }
 
 func TestPersistentFlag(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--persistentFlag=").
 			Expect(carapace.ActionValues("p1", "p2", "p3").
 				Prefix("--persistentFlag=").
@@ -273,7 +273,7 @@ func TestPersistentFlag(t *testing.T) {
 }
 
 func TestAttached(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"dirA/file1.txt", "",
 			"dirA/file2.png", "",
@@ -319,7 +319,7 @@ func TestAttached(t *testing.T) {
 }
 
 func TestActionMultipartsN(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("action", "--multipartsn", "").
 			Expect(carapace.ActionValues("one", "two").
 				Suffix("=").

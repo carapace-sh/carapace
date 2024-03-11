@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rsteube/carapace/third_party/golang.org/x/sys/execabs"
+	"github.com/carapace-sh/carapace/third_party/golang.org/x/sys/execabs"
 )
 
 // Descriptions returns manpage descriptions for commands matching given prefix.

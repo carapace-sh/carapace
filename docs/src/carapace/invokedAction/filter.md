@@ -1,6 +1,6 @@
 # Filter
 
-[`Filter`](https://pkg.go.dev/github.com/rsteube/carapace#InvokedAction.Filter) filters values within an [InvokedAction](../invokedAction.md).
+[`Filter`](https://pkg.go.dev/github.com/carapace-sh/carapace#InvokedAction.Filter) filters values within an [InvokedAction](../invokedAction.md).
 E.g. completing a unique list of values in an [ActionMultiParts](../defaultActions/actionMultiParts.md):
 
 ```go

@@ -11,4 +11,4 @@ carapace.ActionValues(
 
 ![](./tag.cast)
 
-[`Tag`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Tag
+[`Tag`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Tag

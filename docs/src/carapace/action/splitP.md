@@ -25,4 +25,4 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 ![](./splitP.cast)
 
 [Split]:./split.md
-[`SplitP`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.SplitP
+[`SplitP`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.SplitP

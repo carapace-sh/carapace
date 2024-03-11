@@ -4,7 +4,7 @@ package export
 import (
 	"encoding/json"
 
-	"github.com/rsteube/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

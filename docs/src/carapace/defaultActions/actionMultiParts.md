@@ -61,5 +61,5 @@ carapace.ActionMultiParts(",", func(cEntries carapace.Context) carapace.Action {
 
 ![](./actionMultiParts-nested.cast)
 
-[`ActionMultiParts`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionMultiParts
+[`ActionMultiParts`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionMultiParts
 [`NoSpace`]:../action/noSpace.md

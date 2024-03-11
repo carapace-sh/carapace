@@ -9,4 +9,4 @@ carapace.ActionFiles().ChdirF(traverse.GitWorkTree)
 ![](./chdirF.cast)
 
 [Chdir]:./chdir.md
-[`ChdirF`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.ChdirF
+[`ChdirF`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.ChdirF

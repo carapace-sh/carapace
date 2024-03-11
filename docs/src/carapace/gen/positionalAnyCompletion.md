@@ -8,4 +8,4 @@ carapace.Gen(rootCmd).PositionalAnyCompletion(
 )
 ```
 
-[`PositionalAnyCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PositionalAnyCompletion
+[`PositionalAnyCompletion`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.PositionalAnyCompletion

@@ -5,4 +5,4 @@
 ![](./actionStyles.cast)
 
 
-[`ActionStyles`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionStyles
+[`ActionStyles`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionStyles

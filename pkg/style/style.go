@@ -4,7 +4,7 @@ package style
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
+	"github.com/carapace-sh/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 var (

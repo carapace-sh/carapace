@@ -3,7 +3,7 @@ package xonsh
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func convertStyle(s string) string {

@@ -11,4 +11,4 @@ carapace.Gen(rootCmd).PreInvoke(func(cmd *cobra.Command, flag *pflag.Flag, actio
 ![](./preInvoke.cast)
 
 [Action]:../action.md
-[`PreInvoke`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PreInvoke
+[`PreInvoke`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.PreInvoke

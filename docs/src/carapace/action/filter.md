@@ -13,4 +13,4 @@ carapace.ActionValuesDescribed(
 
 ![](./filter.cast)
 
-[`Filter`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Filter
+[`Filter`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Filter

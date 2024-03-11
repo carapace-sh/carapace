@@ -22,5 +22,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 ![](./actionCallback.cast)
 
 
-[`ActionCallback`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionCallback
+[`ActionCallback`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionCallback
 [DefaultActions]:../defaultActions.md

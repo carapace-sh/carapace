@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 	"sort"
 
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/common"
 )
 
 type Export struct {
@@ -30,7 +30,7 @@ func (e Export) MarshalJSON() ([]byte, error) {
 func version() string {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		for _, dep := range info.Deps {
-			if dep.Path == "github.com/rsteube/carapace" {
+			if dep.Path == "github.com/carapace-sh/carapace" {
 				return dep.Version
 			}
 		}

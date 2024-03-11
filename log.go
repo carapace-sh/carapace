@@ -1,5 +1,5 @@
 package carapace
 
-import "github.com/rsteube/carapace/internal/log"
+import "github.com/carapace-sh/carapace/internal/log"
 
 var LOG = log.LOG

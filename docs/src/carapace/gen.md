@@ -1,16 +1,16 @@
 # Gen
 
-Calling [`Gen`](https://pkg.go.dev/github.com/rsteube/carapace#Gen) on the root command is sufficient to enable completion script generation using the [Hidden Subcommand](#hidden-subcommand).
+Calling [`Gen`](https://pkg.go.dev/github.com/carapace-sh/carapace#Gen) on the root command is sufficient to enable completion script generation using the [Hidden Subcommand](#hidden-subcommand).
 
 ```go
 import (
-    "github.com/rsteube/carapace"
+    "github.com/carapace-sh/carapace"
 )
 
 carapace.Gen(rootCmd)
 ```
 
-Additionally invoke [`carapace.Test`](https://pkg.go.dev/github.com/rsteube/carapace#Test) in a [test](https://golang.org/doc/tutorial/add-a-test) to verify configuration during build time.
+Additionally invoke [`carapace.Test`](https://pkg.go.dev/github.com/carapace-sh/carapace#Test) in a [test](https://golang.org/doc/tutorial/add-a-test) to verify configuration during build time.
 ```go
 func TestCarapace(t *testing.T) {
     carapace.Test(t)
@@ -19,7 +19,7 @@ func TestCarapace(t *testing.T) {
 
 ## Hidden Subcommand
 
-When [`Gen`](https://pkg.go.dev/github.com/rsteube/carapace#Gen) is invoked a hidden subcommand (`_carapace`) is added. This handles completion script generation and [callbacks](./defaultActions/actionCallback.md).
+When [`Gen`](https://pkg.go.dev/github.com/carapace-sh/carapace#Gen) is invoked a hidden subcommand (`_carapace`) is added. This handles completion script generation and [callbacks](./defaultActions/actionCallback.md).
 
 
 ### Completion

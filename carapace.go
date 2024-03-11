@@ -4,7 +4,7 @@ package carapace
 import (
 	"os"
 
-	"github.com/rsteube/carapace/internal/shell"
+	"github.com/carapace-sh/carapace/internal/shell"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

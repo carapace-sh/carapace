@@ -10,4 +10,4 @@ carapace.Gen(rootCmd).PositionalCompletion(
 )
 ```
 
-[`PositionalCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PositionalCompletion
+[`PositionalCompletion`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.PositionalCompletion

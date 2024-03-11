@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/uid"
-	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/pkg/ps"
 )
 
 var LOG = log.New(ioutil.Discard, "", log.Flags())

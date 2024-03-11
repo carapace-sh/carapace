@@ -55,9 +55,9 @@ Cache is written as `json` to [`os.UserCacheDir`] using the [Export] format.
 | cacheChecksum  | sh1sum of given [`CacheKeys`]    | `041858daaaa8b084122d4604a3223315c39edc3e` |
 
 [Action]:../action.md
-[`Cache`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Cache
-[`key.String`]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/key#String
-[`CacheKeys`]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/cache#CacheKey
+[`Cache`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Cache
+[`key.String`]:https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/key#String
+[`CacheKeys`]:https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/cache#CacheKey
 [callback actions]:./defaultActions/actionCallback.md
 [Export]:../export.md
 [`os.UserCacheDir`]:https://pkg.go.dev/os#UserCacheDir

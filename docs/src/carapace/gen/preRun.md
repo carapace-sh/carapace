@@ -21,4 +21,4 @@ carapace.Gen(rootCmd).PreRun(func(cmd *cobra.Command, args []string) {
 
 ![](./preRun.cast)
 
-[`PreRun`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.PreRun
+[`PreRun`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.PreRun

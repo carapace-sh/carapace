@@ -1,6 +1,6 @@
 # StyleR
 
-[`StyleR`] sets the [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style) for all values using a reference.
+[`StyleR`] sets the [style](https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/style) for all values using a reference.
 
 ```go
 carapace.ActionValues(
@@ -16,4 +16,4 @@ carapace.ActionValues(
 
 [Action]:../action.md
 [ActionCallback]:../defaultActions/actionCallback.md
-[`StyleR`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.StyleR
+[`StyleR`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.StyleR

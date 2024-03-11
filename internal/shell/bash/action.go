@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/common"
 )
 
 var sanitizer = strings.NewReplacer(

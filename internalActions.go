@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/pflagfork"
-	"github.com/rsteube/carapace/pkg/style"
-	"github.com/rsteube/carapace/pkg/util"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/util"
 	"github.com/spf13/cobra"
 )
 

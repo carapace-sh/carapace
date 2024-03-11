@@ -8,8 +8,8 @@ package myers
 import (
 	"strings"
 
-	diff "github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff"
-	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/span"
+	diff "github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff"
+	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
 // Sources:

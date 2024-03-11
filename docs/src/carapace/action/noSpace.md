@@ -12,4 +12,4 @@ carapace.ActionValues(
 
 ![](./nospace.cast)
 
-[`NoSpace`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.NoSpace
+[`NoSpace`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.NoSpace

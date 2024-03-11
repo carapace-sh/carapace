@@ -12,4 +12,4 @@ carapace.ActionValues(
 
 ![](./uniquelist.cast)
 
-[`UniqueList`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.UniqueList
+[`UniqueList`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.UniqueList

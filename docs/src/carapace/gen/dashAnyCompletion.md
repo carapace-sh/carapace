@@ -8,4 +8,4 @@ carapace.Gen(rootCmd).DashAnyCompletion(
 )
 ```
 
-[`DashAnyCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.DashAnyCompletion
+[`DashAnyCompletion`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.DashAnyCompletion

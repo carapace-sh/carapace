@@ -15,5 +15,5 @@ carapace.ActionValues(
 
 ![](./unless.cast)
 
-[`Unless`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Unless
-[condition]:https://pkg.go.dev/github.com/rsteube/carapace/pkg/condition
+[`Unless`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Unless
+[condition]:https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/condition

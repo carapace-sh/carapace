@@ -19,5 +19,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 ![](./invoke.cast)
 
 [callback]:../defaultActions/actionCallback.md
-[`Invoke`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Invoke
+[`Invoke`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Invoke
 [Action]:../action.md

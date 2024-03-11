@@ -14,4 +14,4 @@ carapace.Gen(helpCmd).PositionalAnyCompletion(
 
 ![](./actionCommands.cast)
 
-[`ActionCommands`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionCommands
+[`ActionCommands`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionCommands

@@ -5,7 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst/parse"
+	"github.com/carapace-sh/carapace/third_party/github.com/drone/envsubst/parse"
 )
 
 // state represents the state of template execution. It is not part of the

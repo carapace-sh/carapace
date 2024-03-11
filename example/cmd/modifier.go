@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/cache/key"
-	"github.com/rsteube/carapace/pkg/condition"
-	"github.com/rsteube/carapace/pkg/style"
-	"github.com/rsteube/carapace/pkg/traverse"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/cache/key"
+	"github.com/carapace-sh/carapace/pkg/condition"
+	"github.com/carapace-sh/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/traverse"
 	"github.com/spf13/cobra"
 )
 

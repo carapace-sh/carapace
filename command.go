@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/spec"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/internal/spec"
+	"github.com/carapace-sh/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 

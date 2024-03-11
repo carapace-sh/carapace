@@ -16,5 +16,5 @@ To mark a flag argument as optional (`--name=value`) the [`NoOptDefVal`] needs t
 rootCmd.Flag("optarg").NoOptDefVal = " "
 ```
 
-[`FlagCompletion`]:https://pkg.go.dev/github.com/rsteube/carapace#Carapace.FlagCompletion
+[`FlagCompletion`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Carapace.FlagCompletion
 [`NoOptDefVal`]:https://pkg.go.dev/github.com/spf13/pflag#Flag

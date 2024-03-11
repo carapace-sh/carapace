@@ -1,8 +1,8 @@
 package style
 
 import (
-	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/cli/lscolors"
-	"github.com/rsteube/carapace/third_party/github.com/elves/elvish/pkg/ui"
+	"github.com/carapace-sh/carapace/third_party/github.com/elves/elvish/pkg/cli/lscolors"
+	"github.com/carapace-sh/carapace/third_party/github.com/elves/elvish/pkg/ui"
 )
 
 type Context interface {

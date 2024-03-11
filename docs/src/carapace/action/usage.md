@@ -10,6 +10,6 @@ carapace.ActionValues().Usage("explicit usage")
 
 > It is implicitly set by default to [`Flag.Usage`] for flag and [`Command.Use`] for positional arguments.
 
-[`Usage`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Usage
+[`Usage`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Usage
 [`Command.Use`]:https://pkg.go.dev/github.com/spf13/cobra#Command
 [`Flag.Usage`]:https://pkg.go.dev/github.com/spf13/pflag#Flag

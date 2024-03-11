@@ -65,5 +65,5 @@ command pos1 part1,part2,p<TAB>
 
 [ActionMultiParts]:./defaultActions/actionMultiParts.md
 [`Command.DisableFlagParsing`]:https://pkg.go.dev/github.com/spf13/cobra#Command
-[`Context`]:https://pkg.go.dev/github.com/rsteube/carapace#Context
+[`Context`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Context
 [`SetInterspersed`]:https://pkg.go.dev/github.com/spf13/pflag#SetInterspersed

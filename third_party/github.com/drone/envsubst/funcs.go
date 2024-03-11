@@ -6,7 +6,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst/path"
+	"github.com/carapace-sh/carapace/third_party/github.com/drone/envsubst/path"
 )
 
 // defines a parameter substitution function.

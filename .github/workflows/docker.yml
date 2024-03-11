@@ -24,5 +24,5 @@ jobs:
         run: |
          tag=latest
          [[ "$GITHUB_REF" =~ ^refs/tags/ ]] && tag="${GITHUB_REF/refs\/tags\//}"
-         docker build . --tag "ghcr.io/rsteube/carapace:${tag}"
-         docker push "ghcr.io/rsteube/carapace:${tag}"
+         docker build . --tag "ghcr.io/carapace-sh/carapace:${tag}"
+         docker push "ghcr.io/carapace-sh/carapace:${tag}"

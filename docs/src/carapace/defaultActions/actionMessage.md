@@ -1,6 +1,6 @@
 # ActionMessage
 
-[`ActionMessage`](https://pkg.go.dev/github.com/rsteube/carapace#ActionMessage) shows an error message.
+[`ActionMessage`](https://pkg.go.dev/github.com/carapace-sh/carapace#ActionMessage) shows an error message.
 
 ```go
 carapace.ActionMessage("example message")

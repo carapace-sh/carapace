@@ -3,9 +3,9 @@ package carapace
 import (
 	"encoding/json"
 
-	"github.com/rsteube/carapace/internal/config"
-	"github.com/rsteube/carapace/internal/export"
-	"github.com/rsteube/carapace/pkg/x"
+	"github.com/carapace-sh/carapace/internal/config"
+	"github.com/carapace-sh/carapace/internal/export"
+	"github.com/carapace-sh/carapace/pkg/x"
 	"github.com/spf13/cobra"
 )
 

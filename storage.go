@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

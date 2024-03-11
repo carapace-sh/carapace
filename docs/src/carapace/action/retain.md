@@ -13,4 +13,4 @@ carapace.ActionValuesDescribed(
 
 ![](./retain.cast)
 
-[`Retain`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Retain
+[`Retain`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Retain

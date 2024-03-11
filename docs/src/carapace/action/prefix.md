@@ -8,4 +8,4 @@ carapace.ActionFiles().Prefix("file://")
 
 ![](./prefix.cast)
 
-[`Prefix`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Prefix
+[`Prefix`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Prefix

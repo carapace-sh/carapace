@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rsteube/carapace/example/cmd"
+	"github.com/carapace-sh/carapace/example/cmd"
 )
 
 func main() {

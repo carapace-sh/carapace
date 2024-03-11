@@ -1,6 +1,6 @@
 # StyleF
 
-[`StyleF`] sets the [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style) for all values using a function.
+[`StyleF`] sets the [style](https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/style) for all values using a function.
 
 ```go
 carapace.ActionValues(
@@ -21,4 +21,4 @@ carapace.ActionValues(
 
 ![](./styleF.cast)
 
-[`StyleF`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.StyleF
+[`StyleF`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.StyleF

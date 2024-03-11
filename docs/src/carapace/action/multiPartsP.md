@@ -33,4 +33,4 @@ carapace.ActionStyledValuesDescribed(
 ![](./multiPartsP.cast)
 
 [MultiParts]:./multiParts.md
-[`MultiPartsP`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.MultiPartsP
+[`MultiPartsP`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.MultiPartsP

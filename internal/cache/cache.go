@@ -11,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/export"
-	"github.com/rsteube/carapace/internal/uid"
-	"github.com/rsteube/carapace/pkg/cache/key"
-	"github.com/rsteube/carapace/pkg/xdg"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/export"
+	"github.com/carapace-sh/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/pkg/cache/key"
+	"github.com/carapace-sh/carapace/pkg/xdg"
 )
 
 func WriteE(file string, e export.Export) (err error) {

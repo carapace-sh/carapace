@@ -3,7 +3,7 @@ package zsh
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/env"
 )
 
 type namedDirectories map[string]string

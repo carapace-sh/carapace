@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/rsteube/carapace"
+	"github.com/carapace-sh/carapace"
 )
 
 // func doComplete(t *testing.T, shell string, cmdline string, contained ...string) {

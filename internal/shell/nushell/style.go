@@ -3,7 +3,7 @@ package nushell
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 type nushellStyle struct {

@@ -14,4 +14,4 @@ carapace.ActionMultiParts(",", func(c carapace.Context) carapace.Action {
 
 ![](./filterParts.cast)
 
-[`FilterParts`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.FilterParts
+[`FilterParts`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.FilterParts

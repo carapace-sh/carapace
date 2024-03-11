@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/shell/zsh"
-	"github.com/rsteube/carapace/pkg/execlog"
-	"github.com/rsteube/carapace/pkg/util"
-	"github.com/rsteube/carapace/third_party/github.com/drone/envsubst"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/shell/zsh"
+	"github.com/carapace-sh/carapace/pkg/execlog"
+	"github.com/carapace-sh/carapace/pkg/util"
+	"github.com/carapace-sh/carapace/third_party/github.com/drone/envsubst"
 	"github.com/spf13/cobra"
 )
 

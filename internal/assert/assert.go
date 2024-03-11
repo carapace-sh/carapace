@@ -7,9 +7,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff"
-	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/myers"
-	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/span"
+	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff"
+	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/myers"
+	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
 type T interface {

@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/internal/assert"
-	"github.com/rsteube/carapace/pkg/sandbox"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func testScript(t *testing.T, shell string, file string) {
@@ -57,7 +57,7 @@ func TestZsh(t *testing.T) {
 }
 
 func TestRoot(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("").
 			Expect(carapace.Batch(
 				carapace.ActionValuesDescribed(
@@ -146,7 +146,7 @@ func TestRoot(t *testing.T) {
 }
 
 func TestOptarg(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("--persistentFlag=").
 			Expect(carapace.ActionValues(
 				"p1",

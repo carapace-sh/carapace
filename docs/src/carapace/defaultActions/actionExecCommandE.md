@@ -17,4 +17,4 @@ carapace.ActionExecCommandE("false")(func(output []byte, err error) carapace.Act
 ![](./actionExecCommandE.cast)
 
 [ActionExecCommand]:./actionExecCommand.md
-[`ActionExecCommandE`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionExecCommandE
+[`ActionExecCommandE`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionExecCommandE

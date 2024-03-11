@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/rsteube/carapace/internal/cache"
-	"github.com/rsteube/carapace/pkg/cache/key"
+	"github.com/carapace-sh/carapace/internal/cache"
+	"github.com/carapace-sh/carapace/pkg/cache/key"
 )
 
 // Cache caches a function for given duration and keys.

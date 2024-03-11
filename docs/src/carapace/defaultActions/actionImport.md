@@ -30,5 +30,5 @@ carapace.ActionImport([]byte(`
 ![](./actionImport.cast)
 
 [Action]:../action.md
-[`ActionImport`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionImport
+[`ActionImport`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionImport
 [Export]:../export.md

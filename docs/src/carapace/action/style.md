@@ -1,6 +1,6 @@
 # Style
 
-[`Style`] sets the [style](https://pkg.go.dev/github.com/rsteube/carapace/pkg/style) for all values.
+[`Style`] sets the [style](https://pkg.go.dev/github.com/carapace-sh/carapace/pkg/style) for all values.
 
 ```go
 carapace.ActionValues(
@@ -11,4 +11,4 @@ carapace.ActionValues(
 
 ![](./style.cast)
 
-[`Style`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Style
+[`Style`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Style

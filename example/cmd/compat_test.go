@@ -3,13 +3,13 @@ package cmd
 import (
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/sandbox"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestCompat(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			"subdir/file1.txt", "",
 			"subdir/subdir2/file2.txt", "",

@@ -1,8 +1,8 @@
 package carapace
 
 import (
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 // Diff compares values of two actions.

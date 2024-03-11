@@ -38,7 +38,7 @@ jobs:
         run: go tool covdata textfmt -i .cover/ -o integration.cov 
 
       - name: Filter coverage
-        run: sed -i '/^github.com\/rsteube\/carapace\/third_party/d' unit.cov integration.cov
+        run: sed -i '/^github.com\/carapace-sh\/carapace\/third_party/d' unit.cov integration.cov
 
       - name: "Check formatting"
         run: '[ "$(gofmt -d -s . | tee -a /dev/stderr)" = "" ]'

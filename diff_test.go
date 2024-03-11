@@ -3,7 +3,7 @@ package carapace
 import (
 	"testing"
 
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestDiff(t *testing.T) {

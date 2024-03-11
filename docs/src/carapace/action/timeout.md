@@ -13,4 +13,4 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 [Action]:../action.md
 [invoke]:./invoke.md
-[`Timeout`]:https://pkg.go.dev/github.com/rsteube/carapace#Action.Timeout
+[`Timeout`]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Timeout

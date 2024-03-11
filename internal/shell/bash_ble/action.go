@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/common"
 )
 
 // ActionRawValues formats values for bash_ble.

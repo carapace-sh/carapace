@@ -6,4 +6,4 @@
 ActionValues().Invoke(c).ToA()
 ```
 
-[`ToA`]:https://pkg.go.dev/github.com/rsteube/carapace#InvokedAction.ToA
+[`ToA`]:https://pkg.go.dev/github.com/carapace-sh/carapace#InvokedAction.ToA

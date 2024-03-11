@@ -68,5 +68,5 @@ example _carapace export example m<TAB>
 
 [ActionImport]:./defaultActions/actionImport.md
 [Cache]:./action/cache.md
-[`Export`]:https://pkg.go.dev/github.com/rsteube/carapace/internal/export#Export
+[`Export`]:https://pkg.go.dev/github.com/carapace-sh/carapace/internal/export#Export
 [InvokedAction]:./invokedAction.md

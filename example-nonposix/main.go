@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rsteube/carapace/example-nonposix/cmd"
+	"github.com/carapace-sh/carapace/example-nonposix/cmd"
 )
 
 func main() {

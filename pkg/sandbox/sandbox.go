@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/internal/assert"
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/export"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/export"
 	"github.com/spf13/cobra"
 )
 

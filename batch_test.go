@@ -3,7 +3,7 @@ package carapace
 import (
 	"testing"
 
-	"github.com/rsteube/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/common"
 )
 
 func TestBatch(t *testing.T) {

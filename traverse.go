@@ -3,10 +3,10 @@ package carapace
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/env"
-	"github.com/rsteube/carapace/internal/pflagfork"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/pkg/style"
 	"github.com/spf13/cobra"
 )
 

@@ -20,4 +20,4 @@ func ActionZipFileContents(file string) carapace.Action {
 }
 ```
 
-[`ToMultiPartsA`]:https://pkg.go.dev/github.com/rsteube/carapace#InvokedAction.ToMultiPartsA
+[`ToMultiPartsA`]:https://pkg.go.dev/github.com/carapace-sh/carapace#InvokedAction.ToMultiPartsA

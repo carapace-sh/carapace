@@ -1,4 +1,4 @@
-module github.com/rsteube/carapace
+module github.com/carapace-sh/carapace
 
 go 1.15
 

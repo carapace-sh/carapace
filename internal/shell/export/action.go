@@ -3,8 +3,8 @@ package export
 import (
 	"encoding/json"
 
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/export"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/export"
 )
 
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {

@@ -12,4 +12,4 @@ carapace.ActionValuesDescribed(
 
 ![](./actionValuesDescribed.cast)
 
-[`ActionValuesDescribed`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionValuesDescribed
+[`ActionValuesDescribed`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionValuesDescribed

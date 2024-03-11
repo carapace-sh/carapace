@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rsteube/carapace/internal/assert"
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func init() {
@@ -235,7 +235,7 @@ func TestActionExecCommand(t *testing.T) {
 	)
 
 	assertEqual(t,
-		ActionValues("module github.com/rsteube/carapace\n").Invoke(Context{}),
+		ActionValues("module github.com/carapace-sh/carapace\n").Invoke(Context{}),
 		ActionExecCommand("head", "-n1", "go.mod")(func(output []byte) Action { return ActionValues(string(output)) }).Invoke(Context{}),
 	)
 }

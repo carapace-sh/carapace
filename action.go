@@ -9,12 +9,12 @@ import (
 	"time"
 
 	shlex "github.com/carapace-sh/carapace-shlex"
-	"github.com/rsteube/carapace/internal/cache"
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/pkg/cache/key"
-	"github.com/rsteube/carapace/pkg/match"
-	"github.com/rsteube/carapace/pkg/style"
-	pkgtraverse "github.com/rsteube/carapace/pkg/traverse"
+	"github.com/carapace-sh/carapace/internal/cache"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/pkg/cache/key"
+	"github.com/carapace-sh/carapace/pkg/match"
+	"github.com/carapace-sh/carapace/pkg/style"
+	pkgtraverse "github.com/carapace-sh/carapace/pkg/traverse"
 )
 
 // Action indicates how to complete a flag or positional argument.

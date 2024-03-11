@@ -3,13 +3,13 @@ package cmd
 import (
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/sandbox"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestStandalone(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("--h").
 			Expect(carapace.ActionValues().
 				NoSpace('.'))
@@ -20,7 +20,7 @@ func TestStandalone(t *testing.T) {
 }
 
 func TestInterspersed(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-delim-colon:d1", "-d").
 			Expect(carapace.ActionValuesDescribed(
 				"-delim-slash", "OptargDelimiter '/'",
@@ -34,7 +34,7 @@ func TestInterspersed(t *testing.T) {
 }
 
 func TestRoot(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-delim-colon:").
 			Expect(carapace.ActionValues("d1", "d2", "d3").
 				Prefix("-delim-colon:").
@@ -58,7 +58,7 @@ func TestRoot(t *testing.T) {
 }
 
 func TestNargs(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("--nargs-any", "").
 			Expect(carapace.ActionValues("na1", "na2", "na3").
 				Usage("Nargs"))

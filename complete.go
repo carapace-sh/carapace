@@ -3,10 +3,10 @@ package carapace
 import (
 	"os"
 
-	"github.com/rsteube/carapace/internal/config"
-	"github.com/rsteube/carapace/internal/shell/bash"
-	"github.com/rsteube/carapace/internal/shell/nushell"
-	"github.com/rsteube/carapace/pkg/ps"
+	"github.com/carapace-sh/carapace/internal/config"
+	"github.com/carapace-sh/carapace/internal/shell/bash"
+	"github.com/carapace-sh/carapace/internal/shell/nushell"
+	"github.com/carapace-sh/carapace/pkg/ps"
 	"github.com/spf13/cobra"
 )
 

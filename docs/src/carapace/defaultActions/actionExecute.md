@@ -27,5 +27,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ![](./actionExecute.cast)
 
-[`ActionExecute`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionExecute
+[`ActionExecute`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionExecute
 [`Command`]:https://pkg.go.dev/github.com/spf13/cobra#Command

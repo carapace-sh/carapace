@@ -12,4 +12,4 @@ carapace.ActionValues(
 
 ![](./suffix.cast)
 
-[`Suffix`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Suffix
+[`Suffix`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Suffix

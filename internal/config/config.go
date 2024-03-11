@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/rsteube/carapace/pkg/xdg"
+	"github.com/carapace-sh/carapace/pkg/xdg"
 )
 
 type configMap map[string]interface{}

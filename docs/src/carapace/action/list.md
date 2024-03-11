@@ -12,4 +12,4 @@ carapace.ActionValues(
 
 ![](./list.cast)
 
-[`List`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.List
+[`List`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.List

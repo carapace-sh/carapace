@@ -9,4 +9,4 @@ carapace.ActionFiles(".md", "go.mod", "go.sum"),
 ![](./actionFiles.cast)
 
 
-[`ActionFiles`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionFiles
+[`ActionFiles`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionFiles

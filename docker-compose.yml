@@ -3,7 +3,7 @@ version: '3'
 services:
   build: &base
     build: .
-    image: ghcr.io/rsteube/carapace
+    image: ghcr.io/carapace-sh/carapace
     command: sh -c 'cd /carapace/example && go build -buildvcs=false .'
     user: 1000:1000
     environment:

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 type Messages struct {

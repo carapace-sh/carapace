@@ -28,5 +28,5 @@ carapace.ActionMultiPartsN("=", 2, func(c carapace.Context) carapace.Action {
 ![](./actionMultiPartsN.cast)
 
 [ActionMultiParts]:./actionMultiParts.md
-[`ActionMultiPartsN`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.MultipartsN
+[`ActionMultiPartsN`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.MultipartsN
 

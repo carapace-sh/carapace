@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rsteube/carapace/third_party/github.com/hexops/gotextdiff/span"
+	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
 // TextEdit represents a change to a section of a document.

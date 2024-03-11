@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rsteube/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/internal/assert"
 	"github.com/spf13/cobra"
 )
 

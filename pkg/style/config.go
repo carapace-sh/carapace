@@ -1,7 +1,7 @@
 package style
 
 import (
-	"github.com/rsteube/carapace/internal/config"
+	"github.com/carapace-sh/carapace/internal/config"
 )
 
 // Register a style configuration

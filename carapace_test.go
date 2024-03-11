@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rsteube/carapace/internal/assert"
-	"github.com/rsteube/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
 

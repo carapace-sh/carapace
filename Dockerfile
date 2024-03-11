@@ -1,5 +1,5 @@
 FROM golang:bookworm as base
-LABEL org.opencontainers.image.source https://github.com/rsteube/carapace
+LABEL org.opencontainers.image.source https://github.com/carapace-sh/carapace
 USER root
 
 FROM base as bat

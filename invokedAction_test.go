@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestToMultiParts(t *testing.T) {

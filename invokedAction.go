@@ -3,10 +3,10 @@ package carapace
 import (
 	"strings"
 
-	"github.com/rsteube/carapace/internal/common"
-	"github.com/rsteube/carapace/internal/export"
-	_shell "github.com/rsteube/carapace/internal/shell"
-	"github.com/rsteube/carapace/pkg/match"
+	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/export"
+	_shell "github.com/carapace-sh/carapace/internal/shell"
+	"github.com/carapace-sh/carapace/pkg/match"
 )
 
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked.

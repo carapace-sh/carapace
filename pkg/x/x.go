@@ -2,7 +2,7 @@
 package x
 
 import (
-	"github.com/rsteube/carapace/internal/export"
+	"github.com/carapace-sh/carapace/internal/export"
 	"github.com/spf13/cobra"
 )
 

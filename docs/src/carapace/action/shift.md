@@ -10,4 +10,4 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ![](./shift.cast)
 
-[`Shift`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Shift
+[`Shift`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Shift

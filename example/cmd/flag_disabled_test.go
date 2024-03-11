@@ -3,12 +3,12 @@ package cmd
 import (
 	"testing"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
 )
 
 func TestFlagDisabled(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("flag", "disabled", "").
 			Expect(carapace.ActionValues(
 				"-p1",

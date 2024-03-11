@@ -12,4 +12,4 @@ carapace.ActionValues(
 
 ![](./multiparts.cast)
 
-[`MultiParts`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Multiparts
+[`MultiParts`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Multiparts

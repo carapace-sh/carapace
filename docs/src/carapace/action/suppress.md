@@ -11,4 +11,4 @@ carapace.Batch(
 
 ![](./suppress.cast)
 
-[`Suppress`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Suppress
+[`Suppress`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Suppress

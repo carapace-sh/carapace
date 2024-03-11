@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rsteube/carapace"
-	"github.com/rsteube/carapace/pkg/sandbox"
-	"github.com/rsteube/carapace/pkg/style"
+	"github.com/carapace-sh/carapace"
+	"github.com/carapace-sh/carapace/pkg/sandbox"
+	"github.com/carapace-sh/carapace/pkg/style"
 )
 
 func TestBatch(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--batch", "").
 			Expect(carapace.ActionValuesDescribed(
 				"A", "description of A",
@@ -24,7 +24,7 @@ func TestBatch(t *testing.T) {
 }
 
 func TestCache(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		cached := s.Run("modifier", "--cache", "").Output()
 		time.Sleep(1 * time.Second)
 		s.Run("modifier", "--cache", "").
@@ -39,7 +39,7 @@ func TestCache(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--filter", "").
 			Expect(carapace.ActionValuesDescribed(
 				"1", "one",
@@ -49,7 +49,7 @@ func TestFilter(t *testing.T) {
 }
 
 func TestRetain(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--retain", "").
 			Expect(carapace.ActionValuesDescribed(
 				"2", "two",
@@ -59,7 +59,7 @@ func TestRetain(t *testing.T) {
 }
 
 func TestShift(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "one", "--shift", "").
 			Expect(carapace.ActionMessage(`[]string{}`).Usage("Shift()"))
 
@@ -69,7 +69,7 @@ func TestShift(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--timeout", "").
 			Expect(carapace.ActionMessage("timeout exceeded").
 				Usage("Timeout()"))
@@ -77,7 +77,7 @@ func TestTimeout(t *testing.T) {
 }
 
 func TestUsage(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--usage", "").
 			Expect(carapace.ActionValues().
 				Usage("explicit usage"))
@@ -102,7 +102,7 @@ func TestChdir(t *testing.T) {
 
 func TestChdirF(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files(
 			".git/config", "",
 			"file1.txt", "",
@@ -132,7 +132,7 @@ func TestChdirF(t *testing.T) {
 }
 
 func TestMultiParts(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--multiparts", "").
 			Expect(carapace.ActionValues("dir/").
 				NoSpace('/').
@@ -160,7 +160,7 @@ func TestMultiParts(t *testing.T) {
 
 func TestPrefix(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files("subdir/file1.txt", "")
 
 		s.Run("modifier", "--prefix", "").
@@ -190,7 +190,7 @@ func TestPrefix(t *testing.T) {
 }
 
 func TestFilterArgs(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--filterargs", "").
 			Expect(carapace.ActionValues(
 				"one",
@@ -212,7 +212,7 @@ func TestFilterArgs(t *testing.T) {
 }
 
 func TestFilterParts(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--filterparts", "").
 			Expect(carapace.ActionValues(
 				"one",
@@ -242,7 +242,7 @@ func TestFilterParts(t *testing.T) {
 }
 
 func TestMultiPartsP(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--multipartsp", "").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"keys/", "", style.Default,
@@ -295,7 +295,7 @@ func TestMultiPartsP(t *testing.T) {
 
 func TestSplit(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files("subdir/file1.txt", "")
 
 		s.Run("modifier", "--split", "").
@@ -377,7 +377,7 @@ func TestSplit(t *testing.T) {
 
 func TestSplitP(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Files("subdir/file1.txt", "")
 
 		s.Run("modifier", "--splitp", "pos1>").
@@ -464,7 +464,7 @@ func TestSplitP(t *testing.T) {
 	})
 }
 func TestUnless(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--unless", "").
 			Expect(carapace.ActionValues(
 				"./local",
@@ -493,7 +493,7 @@ func TestUnless(t *testing.T) {
 }
 
 func TestUniqueList(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--uniquelist", "").
 			Expect(carapace.ActionValues(
 				"one",
@@ -513,7 +513,7 @@ func TestUniqueList(t *testing.T) {
 }
 
 func TestUniqueListF(t *testing.T) {
-	sandbox.Package(t, "github.com/rsteube/carapace/example")(func(s *sandbox.Sandbox) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--uniquelistf", "").
 			Expect(carapace.ActionValues(
 				"one",

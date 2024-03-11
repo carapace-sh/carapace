@@ -10,4 +10,4 @@ carapace.ActionCobra(func(cmd *cobra.Command, args []string, toComplete string) 
 
 ![](./actionCobra.cast)
 
-[`ActionCobra`]:https://pkg.go.dev/github.com/rsteube/carapace#ActionCobra
+[`ActionCobra`]:https://pkg.go.dev/github.com/carapace-sh/carapace#ActionCobra

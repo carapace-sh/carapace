@@ -18,4 +18,4 @@ carapace.ActionMultiPartsN(":", 2, func(c carapace.Context) carapace.Action {
 ![](./uniquelistF.cast)
 
 [UniqueList]:./uniqueList.md
-[`UniqueListF`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.UniqueListF
+[`UniqueListF`]: https://pkg.go.dev/github.com/carapace-sh/carapace#Action.UniqueListF

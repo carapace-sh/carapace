@@ -5,6 +5,7 @@ services:
     build: .
     image: ghcr.io/rsteube/carapace
     command: sh -c 'cd /carapace/example && go build -buildvcs=false .'
+    user: 1000:1000
     environment:
       TARGET: /carapace/example/example
     volumes:

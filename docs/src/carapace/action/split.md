@@ -24,5 +24,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ![](./split.cast)
 
-[lexicographically]:https://github.com/rsteube/carapace-shlex
+[lexicographically]:https://github.com/carapace-sh/carapace-shlex
 [`Split`]: https://pkg.go.dev/github.com/rsteube/carapace#Action.Split

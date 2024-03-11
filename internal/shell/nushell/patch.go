@@ -3,7 +3,7 @@ package nushell
 import (
 	"strings"
 
-	shlex "github.com/rsteube/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex"
 )
 
 // Patch uses the lexer to parse and patch given arguments which

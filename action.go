@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	shlex "github.com/rsteube/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex"
 	"github.com/rsteube/carapace/internal/cache"
 	"github.com/rsteube/carapace/internal/common"
 	"github.com/rsteube/carapace/pkg/cache/key"

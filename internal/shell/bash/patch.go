@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	shlex "github.com/rsteube/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex"
 )
 
 // RedirectError current position is a redirect like `echo test >[TAB]`.

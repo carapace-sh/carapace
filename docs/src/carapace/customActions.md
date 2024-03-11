@@ -1,6 +1,6 @@
 # CustomActions
 
-Custom Actions can be created by using a function that returns `carapace.Action`. A range of these can be found at [carapace-bin](https://pkg.go.dev/github.com/rsteube/carapace-bin/pkg/actions).
+Custom Actions can be created by using a function that returns `carapace.Action`. A range of these can be found at [carapace-bin](https://pkg.go.dev/github.com/carapace-sh/carapace-bin/pkg/actions).
 
 ```go
 type ExampleOpts struct {

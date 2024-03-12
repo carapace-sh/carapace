@@ -2,13 +2,13 @@
   "name": "carapace",
   "image": "ghcr.io/carapace-sh/carapace",
   "settings": {
-    "terminal.integrated.shell.linux": "/bin/elvish"
+    "terminal.integrated.shell.linux": "/usr/local/bin/elvish"
   },
   "extensions": [
     "golang.Go"
   ],
   "containerEnv": {
-    "TARGET": "/home/circleci/go/bin/example"
+    "TARGET": "example"
   },
   "onCreateCommand": [
     "sh",

@@ -8,7 +8,7 @@
     "golang.Go"
   ],
   "containerEnv": {
-    "TARGET": "example"
+    "TARGET": "/go/bin/example"
   },
   "onCreateCommand": [
     "sh",

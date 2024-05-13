@@ -12,6 +12,7 @@ import (
 var sanitizer = strings.NewReplacer(
 	"\n", ``,
 	"\r", ``,
+	"\t", ``,
 )
 
 func sanitize(values []common.RawValue) []common.RawValue {

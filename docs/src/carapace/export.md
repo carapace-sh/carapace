@@ -5,33 +5,33 @@ It is used to exchange completions between commands with [ActionImport] as well 
 
 ```go	
 type Export struct {
-	Version  string   `json:"version"`
-	Messages []string `json:"messages"`
-	Nospace  string   `json:"nospace"`
-	Usage    string   `json:"usage"`
-	Values   []struct {
-		Value       string `json:"value"`
-		Display     string `json:"display"`
-		Description string `json:"description,omitempty"`
-		Style       string `json:"style,omitempty"`
-		Tag         string `json:"tag,omitempty"`
+	version  string   `json:"version"`
+	messages []string `json:"messages"`
+	nospace  string   `json:"nospace"`
+	usage    string   `json:"usage"`
+	values   []struct {
+		value       string `json:"value"`
+		display     string `json:"display"`
+		description string `json:"description,omitempty"`
+		style       string `json:"style,omitempty"`
+		tag         string `json:"tag,omitempty"`
 	} `json:"values"`
 }
 ```
 
 | Key            | Description                                                    |
 |----------------|----------------------------------------------------------------|
-| Version        | version of `carapace` being used                               | 
-| Messages       | list of error messages                                         | 
-| Nospace        | character suffixes that prevent space suffix (`*` matches all) | 
-| Usage          | usage message                                                  | 
-| Values         | list of completion values                                      | 
+| version        | version of `carapace` being used                               | 
+| messages       | list of error messages                                         | 
+| nospace        | character suffixes that prevent space suffix (`*` matches all) | 
+| usage          | usage message                                                  | 
+| values         | list of completion values                                      | 
 | -              |                                                                | 
-|	Value          | value to insert                                                |
-|	Display        | value to display during completion                             |
-|	Description    | description of the value                                       |
-|	Style          | style of the value                                             |
-|	Tag            | tag of the value                                               |
+|	value          | value to insert                                                |
+|	display        | value to display during completion                             |
+|	description    | description of the value                                       |
+|	style          | style of the value                                             |
+|	tag            | tag of the value                                               |
 
 ## Example
 

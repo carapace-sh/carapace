@@ -1,11 +1,6 @@
 # Summary
 
 - [carapace](./carapace.md)
-  - [Introduction](./carapace/introduction.md)
-    - [Integration](./carapace/introduction/integration.md)
-    - [Structure](./carapace/introduction/structure.md)
-    - [Action](./carapace/introduction/action.md)
-    - [Exchange](./carapace/introduction/exchange.md)
   - [Gen](./carapace/gen.md)
     - [DashAnyCompletion](./carapace/gen/dashAnyCompletion.md)
     - [DashCompletion](./carapace/gen/dashCompletion.md)

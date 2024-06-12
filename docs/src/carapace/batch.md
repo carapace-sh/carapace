@@ -1,6 +1,6 @@
 # Batch
 
-[`Batch`](https://pkg.go.dev/github.com/carapace-sh/carapace#Batch) bundles [callback actions](./defaultActions/actionCallback.md) so they can be [invoked](https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Invoke) in parallel using goroutines.
+[`Batch`](https://pkg.go.dev/github.com/carapace-sh/carapace#Batch) bundles [callback actions](./defaultActions/actionCallback.md) so they can be [invoked] concurrently using goroutines.
 
 ```go
 carapace.ActionCallback(func(c carapace.Context) carapace.Action {
@@ -11,3 +11,5 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 	).Invoke(c).Merge().ToA()
 })
 ```
+
+[invoked]:https://pkg.go.dev/github.com/carapace-sh/carapace#Action.Invoke

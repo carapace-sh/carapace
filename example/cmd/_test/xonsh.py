@@ -18,7 +18,7 @@ def _example_completer(context):
         if not output:
             return
 
-        for c in json.loads(output):
+        for c in loads(output):
             yield RichCompletion(
                 c["Value"],
                 display=c["Display"],

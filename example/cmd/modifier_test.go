@@ -323,7 +323,7 @@ func TestSplit(t *testing.T) {
 				Suffix(" ").
 				NoSpace('*').
 				Usage("Split()").
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("modifier", "--split", "pos1 --bool=").
 			Expect(carapace.ActionStyledValues(
@@ -405,7 +405,7 @@ func TestSplitP(t *testing.T) {
 			).NoSpace('*').
 				Prefix("pos1>subdir/file1.txt ").
 				Suffix(" ").
-				Tag("flags").
+				Tag("longhand flags").
 				Usage("SplitP()"))
 
 		s.Run("modifier", "--splitp", "pos1 1>").

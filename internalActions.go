@@ -83,7 +83,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 
 		nospace := make([]rune, 0)
-		vals := make([]string, 0)
+		batch := Batch()
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
 			switch {
 			case f.Hidden && !env.Hidden():
@@ -103,7 +103,7 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					vals = append(vals, f.Shorthand, f.Usage, f.Style())
+					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags"))
 					if f.IsOptarg() {
 						nospace = append(nospace, []rune(f.Shorthand)[0])
 					}
@@ -111,25 +111,25 @@ func actionFlags(cmd *cobra.Command) Action {
 			} else {
 				switch f.Mode() {
 				case pflagfork.NameAsShorthand:
-					vals = append(vals, "-"+f.Name, f.Usage, f.Style())
+					batch = append(batch, ActionStyledValuesDescribed("-"+f.Name, f.Usage, f.Style()).Tag("longhand flags"))
 				case pflagfork.Default:
-					vals = append(vals, "--"+f.Name, f.Usage, f.Style())
+					batch = append(batch, ActionStyledValuesDescribed("--"+f.Name, f.Usage, f.Style()).Tag("longhand flags"))
 				}
 
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					vals = append(vals, "-"+f.Shorthand, f.Usage, f.Style())
+					batch = append(batch, ActionStyledValuesDescribed("-"+f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags"))
 				}
 			}
 		})
 
 		if isShorthandSeries {
 			if len(nospace) > 0 {
-				return ActionStyledValuesDescribed(vals...).Prefix(c.Value).NoSpace(nospace...)
+				return batch.ToA().Prefix(c.Value).NoSpace(nospace...)
 			}
-			return ActionStyledValuesDescribed(vals...).Prefix(c.Value)
+			return batch.ToA().Prefix(c.Value)
 		}
-		return ActionStyledValuesDescribed(vals...).MultiParts(".") // multiparts completion for flags grouped with `.`
-	}).Tag("flags")
+		return batch.ToA().MultiParts(".") // multiparts completion for flags grouped with `.`
+	})
 }
 
 func initHelpCompletion(cmd *cobra.Command) {

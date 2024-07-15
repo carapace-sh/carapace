@@ -16,7 +16,7 @@ func TestInterspersed(t *testing.T) {
 			).
 				StyleR(&style.Carapace.FlagArg).
 				NoSpace('.').
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("interspersed", "--bool", "--s").
 			Expect(carapace.ActionValuesDescribed(
@@ -24,7 +24,7 @@ func TestInterspersed(t *testing.T) {
 			).
 				StyleR(&style.Carapace.FlagArg).
 				NoSpace('.').
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("interspersed", "--bool", "").
 			Expect(carapace.ActionValues(

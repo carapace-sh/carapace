@@ -26,7 +26,7 @@ func TestInterspersed(t *testing.T) {
 				"-delim-slash", "OptargDelimiter '/'",
 			).NoSpace('.').
 				Style(style.Yellow).
-				Tag("flags"))
+				Tag("shorthand flags"))
 
 		s.Run("-delim-colon:d1", "positional1", "-d").
 			Expect(carapace.ActionValues())
@@ -49,11 +49,15 @@ func TestRoot(t *testing.T) {
 				Usage("OptargDelimiter '/'"))
 
 		s.Run("-c").
-			Expect(carapace.ActionValuesDescribed(
-				"-c", "CountN",
-				"-count", "CountN").
-				NoSpace('.').
-				Tag("flags"))
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed(
+					"-c", "CountN",
+				).Tag("shorthand flags"),
+				carapace.ActionValuesDescribed(
+					"-count", "CountN",
+				).Tag("longhand flags"),
+			).ToA().
+				NoSpace('.'))
 	})
 }
 
@@ -68,11 +72,15 @@ func TestNargs(t *testing.T) {
 				Usage("Nargs"))
 
 		s.Run("--nargs-any", "na2", "-c").
-			Expect(carapace.ActionValuesDescribed(
-				"-c", "CountN",
-				"-count", "CountN").
-				NoSpace('.').
-				Tag("flags"))
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed(
+					"-c", "CountN",
+				).Tag("shorthand flags"),
+				carapace.ActionValuesDescribed(
+					"-count", "CountN",
+				).Tag("longhand flags"),
+			).ToA().
+				NoSpace('.'))
 
 		s.Run("--nargs-any", "na1", "na2", "").
 			Expect(carapace.ActionValues("na3").
@@ -99,6 +107,6 @@ func TestNargs(t *testing.T) {
 				"--nargs-two", "Nargs").
 				Style(style.Magenta).
 				NoSpace('.').
-				Tag("flags"))
+				Tag("longhand flags"))
 	})
 }

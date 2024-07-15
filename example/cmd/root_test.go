@@ -96,21 +96,25 @@ func TestRoot(t *testing.T) {
 			).Tag("main commands"))
 
 		s.Run("-").
-			Expect(carapace.ActionStyledValuesDescribed(
-				"--chdir", "change work directory", style.Blue,
-				"-C", "change work directory", style.Blue,
-				"--array", "multiflag", style.Blue,
-				"-a", "multiflag", style.Blue,
-				"-h", "help for example", style.Default,
-				"--help", "help for example", style.Default,
-				"--persistentFlag", "Help message for persistentFlag", style.Yellow,
-				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
-				"-p", "Help message for persistentFlag", style.Yellow,
-				"--toggle", "Help message for toggle", style.Default,
-				"-t", "Help message for toggle", style.Default,
-				"-v", "version for example", style.Default,
-				"--version", "version for example", style.Default,
-			).NoSpace('.').Tag("flags"))
+			Expect(carapace.Batch(
+				carapace.ActionStyledValuesDescribed(
+					"-C", "change work directory", style.Blue,
+					"-a", "multiflag", style.Blue,
+					"-h", "help for example", style.Default,
+					"-p", "Help message for persistentFlag", style.Yellow,
+					"-t", "Help message for toggle", style.Default,
+					"-v", "version for example", style.Default,
+				).Tag("shorthand flags"),
+				carapace.ActionStyledValuesDescribed(
+					"--chdir", "change work directory", style.Blue,
+					"--array", "multiflag", style.Blue,
+					"--help", "help for example", style.Default,
+					"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+					"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
+					"--toggle", "Help message for toggle", style.Default,
+					"--version", "version for example", style.Default,
+				).Tag("longhand flags"),
+			).ToA().NoSpace('.'))
 
 		s.Run("--").
 			Expect(carapace.ActionStyledValuesDescribed(
@@ -121,27 +125,27 @@ func TestRoot(t *testing.T) {
 				"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
 				"--toggle", "Help message for toggle", style.Default,
 				"--version", "version for example", style.Default,
-			).NoSpace('.').Tag("flags"))
+			).NoSpace('.').Tag("longhand flags"))
 
 		s.Run("--a").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
-			).NoSpace('.').Tag("flags"))
+			).NoSpace('.').Tag("longhand flags"))
 
 		s.Run("--array").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
-			).NoSpace('.').Tag("flags"))
+			).NoSpace('.').Tag("longhand flags"))
 
 		s.Run("--array", "", "--a").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
-			).NoSpace('.').Tag("flags"))
+			).NoSpace('.').Tag("longhand flags"))
 
 		s.Run("-a", "", "--a").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--array", "multiflag", style.Blue,
-			).NoSpace('.').Tag("flags"))
+			).NoSpace('.').Tag("longhand flags"))
 	})
 }
 

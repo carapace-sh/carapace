@@ -17,7 +17,7 @@ func TestShorthandChain(t *testing.T) {
 				"v", style.Blue,
 			).Prefix("-b").
 				NoSpace('c', 'o').
-				Tag("flags"))
+				Tag("shorthand flags"))
 
 		s.Run("chain", "-bc").
 			Expect(carapace.ActionStyledValues(
@@ -26,7 +26,7 @@ func TestShorthandChain(t *testing.T) {
 				"v", style.Blue,
 			).Prefix("-bc").
 				NoSpace('c', 'o').
-				Tag("flags"))
+				Tag("shorthand flags"))
 
 		s.Run("chain", "-bcc").
 			Expect(carapace.ActionStyledValues(
@@ -35,7 +35,7 @@ func TestShorthandChain(t *testing.T) {
 				"v", style.Blue,
 			).Prefix("-bcc").
 				NoSpace('c', 'o').
-				Tag("flags"))
+				Tag("shorthand flags"))
 
 		s.Run("chain", "-bcco").
 			Expect(carapace.ActionStyledValues(
@@ -43,7 +43,7 @@ func TestShorthandChain(t *testing.T) {
 				"v", style.Blue,
 			).Prefix("-bcco").
 				NoSpace('c').
-				Tag("flags"))
+				Tag("shorthand flags"))
 
 		s.Run("chain", "-bcco", "").
 			Expect(carapace.ActionValues(
@@ -75,6 +75,6 @@ func TestShorthandChain(t *testing.T) {
 				"o", style.Yellow,
 			).Prefix("-c").
 				NoSpace('c', 'o').
-				Tag("flags"))
+				Tag("shorthand flags"))
 	})
 }

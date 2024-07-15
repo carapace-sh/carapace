@@ -83,14 +83,14 @@ func TestPreRun(t *testing.T) {
 			Expect(carapace.ActionValuesDescribed(
 				"--root", "root flag").
 				NoSpace('.').
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("--root", "sub", "--").
 			Expect(carapace.ActionStyledValuesDescribed(
 				"--help", "help for sub", style.Default,
 				"--sub", "sub flag", style.Blue).
 				NoSpace('.').
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("--root", "sub", "--sub", "").
 			Expect(carapace.ActionValues("true").

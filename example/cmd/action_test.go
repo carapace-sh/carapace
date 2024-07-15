@@ -212,15 +212,19 @@ func TestDash(t *testing.T) {
 				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 
 		s.Run("action", "--", "-").
-			Expect(carapace.ActionStyledValuesDescribed(
-				"--embedded-bool", "embedded bool flag", style.Default,
-				"--embedded-optarg", "embedded optarg flag", style.Yellow,
-				"--embedded-string", "embedded string flag", style.Blue,
-				"-h", "help for embedded", style.Default,
-				"--help", "help for embedded", style.Default).
+			Expect(carapace.Batch(
+				carapace.ActionStyledValuesDescribed(
+					"-h", "help for embedded", style.Default,
+				).Tag("shorthand flags"),
+				carapace.ActionStyledValuesDescribed(
+					"--embedded-bool", "embedded bool flag", style.Default,
+					"--embedded-optarg", "embedded optarg flag", style.Yellow,
+					"--embedded-string", "embedded string flag", style.Blue,
+					"--help", "help for embedded", style.Default,
+				).Tag("longhand flags"),
+			).ToA().
 				NoSpace('.').
-				Usage("action [pos1] [pos2] [--] [dashAny]...").
-				Tag("flags"))
+				Usage("action [pos1] [pos2] [--] [dashAny]..."))
 
 		s.Run("action", "--", "--").
 			Expect(carapace.ActionStyledValuesDescribed(
@@ -230,7 +234,7 @@ func TestDash(t *testing.T) {
 				"--help", "help for embedded", style.Default).
 				NoSpace('.').
 				Usage("action [pos1] [pos2] [--] [dashAny]...").
-				Tag("flags"))
+				Tag("longhand flags"))
 
 		s.Run("action", "--", "embeddedP1", "--embedded-optarg=").
 			Expect(carapace.ActionValues("eo1", "eo2", "eo3").

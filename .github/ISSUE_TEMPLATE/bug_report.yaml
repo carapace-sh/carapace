@@ -1,7 +1,7 @@
 name: Bug
 description: File a bug/issue
 title: "<title>"
-labels: [bug]
+labels: [bug, fund]
 body:
 - type: textarea
   attributes:
@@ -39,6 +39,7 @@ body:
     options:
     - label: Linux
     - label: OSX
+    - label: Termux
     - label: Windows
 - type: checkboxes
   attributes:

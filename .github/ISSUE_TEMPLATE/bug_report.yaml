@@ -37,23 +37,23 @@ body:
     label: OS
     description: Operating System where this occured.
     options:
-    - label: Linux
-    - label: OSX
-    - label: Termux
-    - label: Windows
+    - label: linux
+    - label: darwin
+    - label: termux
+    - label: windows
 - type: checkboxes
   attributes:
     label: Shell
     description: Shell where this occured.
     options:
-    - label: Bash
-    - label: Elvish
-    - label: Fish
-    - label: Nushell
-    - label: Oil
-    - label: Powershell
-    - label: Xonsh
-    - label: Zsh
+    - label: bash
+    - label: elvish
+    - label: fish
+    - label: nushell
+    - label: oil
+    - label: powershell
+    - label: xonsh
+    - label: zsh
 - type: textarea
   attributes:
     label: Anything else?

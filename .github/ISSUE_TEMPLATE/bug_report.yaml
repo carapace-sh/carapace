@@ -33,6 +33,7 @@ body:
   validations:
     required: false
 - type: checkboxes
+  id: os
   attributes:
     label: OS
     description: Operating System where this occured.
@@ -42,6 +43,7 @@ body:
     - label: termux
     - label: windows
 - type: checkboxes
+  id: shell
   attributes:
     label: Shell
     description: Shell where this occured.

@@ -38,24 +38,24 @@ body:
     label: OS
     description: Operating System where this occured.
     options:
-    - label: linux
-    - label: darwin
-    - label: termux
-    - label: windows
+    - label: Linux
+    - label: Darwin
+    - label: Termux
+    - label: Windows
 - type: checkboxes
   id: shell
   attributes:
     label: Shell
     description: Shell where this occured.
     options:
-    - label: bash
-    - label: elvish
-    - label: fish
-    - label: nushell
-    - label: oil
-    - label: powershell
-    - label: xonsh
-    - label: zsh
+    - label: Bash
+    - label: Elvish
+    - label: Fish
+    - label: Nushell
+    - label: Oil
+    - label: Powershell
+    - label: Xonsh
+    - label: Zsh
 - type: textarea
   attributes:
     label: Anything else?

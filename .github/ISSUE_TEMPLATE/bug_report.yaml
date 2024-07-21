@@ -38,8 +38,8 @@ body:
     label: OS
     description: Operating System where this occured.
     options:
-    - label: Linux
     - label: Darwin
+    - label: Linux
     - label: Termux
     - label: Windows
 - type: checkboxes

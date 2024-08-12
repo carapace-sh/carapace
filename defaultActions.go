@@ -132,16 +132,18 @@ func ActionExecute(cmd *cobra.Command) Action {
 
 // ActionDirectories completes directories.
 func ActionDirectories() Action {
-	return ActionCallback(func(c Context) Action {
-		return actionPath([]string{""}, true).Invoke(c).ToMultiPartsA("/").StyleF(style.ForPath)
-	}).Tag("directories")
+	return actionPath([]string{""}, true).
+		MultiParts("/").
+		StyleF(style.ForPath).
+		Tag("directories")
 }
 
 // ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
-	return ActionCallback(func(c Context) Action {
-		return actionPath(suffix, false).Invoke(c).ToMultiPartsA("/").StyleF(style.ForPath)
-	}).Tag("files")
+	return actionPath(suffix, false).
+		MultiParts("/").
+		StyleF(style.ForPath).
+		Tag("files")
 }
 
 // ActionValues completes arbitrary keywords (values).

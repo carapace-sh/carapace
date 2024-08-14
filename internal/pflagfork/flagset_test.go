@@ -22,7 +22,7 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 
 			f := fs.lookupPosixShorthandArg(arg)
 			if f == nil || f.Name != name {
-				t.Fatalf("should be " + name)
+				t.Fatal("should be " + name)
 			}
 
 			if f.Prefix != prefix {

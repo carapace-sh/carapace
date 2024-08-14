@@ -139,6 +139,7 @@ loop:
 
 			switch f.Value.Type() {
 			case "bool":
+				//nolint:govet
 				return ActionValues("true", "false").StyleF(style.ForKeyword).Usage(f.Usage).Prefix(f.Prefix), context
 			default:
 				return storage.getFlag(cmd, f.Name).Prefix(f.Prefix), context

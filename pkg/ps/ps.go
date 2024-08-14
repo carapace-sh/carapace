@@ -58,10 +58,13 @@ func DetermineShell() string {
 
 func isBLE() bool {
 	bleEnvs := []string{
+		"_bleopt_connect_tty",
+		"_ble_util_fdlist_cloexec",
 		"_ble_util_fd_null",
 		"_ble_util_fd_stderr",
 		"_ble_util_fd_stdin",
 		"_ble_util_fd_stdout",
+		"_ble_util_fdvars_export",
 		"_ble_util_fd_zero",
 	}
 	for _, e := range bleEnvs {

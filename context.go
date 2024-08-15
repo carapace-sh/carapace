@@ -114,7 +114,12 @@ func expandHome(s string) (string, error) {
 			return "", err
 		}
 		home = filepath.ToSlash(home)
-		s = strings.Replace(s, "~/", home+"/", 1)
+		switch s {
+		case "~":
+			s = home
+		default:
+			s = strings.Replace(s, "~/", home+"/", 1)
+		}
 	}
 	return s, nil
 }

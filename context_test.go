@@ -31,33 +31,39 @@ func parent(s string) string {
 }
 
 func TestContextAbs(t *testing.T) {
-	tests := append([]string{},
-		"/", "file", "/file",
-		"", "file", wd("file"),
-		"", "../", parent(""),
-		"", "../file", parent("file"),
-		"", "~/file", home("file"),
-		"/", "~/file", home("file"),
-		"/", "file", "/file",
-		"/dir", "file", "/dir/file",
-		"/dir", "./.file", "/dir/.file",
-		"", "/dir/", "/dir/",
-		"/dir/", "", "/dir/",
-		"~/", "file", home("file"),
-		"", "/", "/",
-		"", ".hidden", wd(".hidden"),
-		"", "./", wd("")+"/",
-		"", "", wd("")+"/",
-		"", ".", wd("")+"/"+".",
-	)
+	testCases := []struct {
+		Dir      string
+		Path     string
+		Expected string
+	}{
+		{"/", "file", "/file"},
+		{"", "file", wd("file")},
+		{"", "../", parent("")},
+		{"", "../file", parent("file")},
+		{"", "~/file", home("file")},
+		{"/", "~/file", home("file")},
+		{"/", "file", "/file"},
+		{"/dir", "file", "/dir/file"},
+		{"/dir", "./.file", "/dir/.file"},
+		{"", "/dir/", "/dir/"},
+		{"/dir/", "", "/dir/"},
+		{"~/", "file", home("file")},
+		{"", "/", "/"},
+		{"", ".hidden", wd(".hidden")},
+		{"", "./", wd("") + "/"},
+		{"", "", wd("") + "/"},
+		{"", ".", wd("") + "/" + "."},
+		{"", "~", home("")},
+		{"", "~/file", home("file")},
+	}
 
-	for index := 0; index < len(tests); index += 3 {
-		actual, err := Context{Dir: tests[index]}.Abs(tests[index+1])
+	for _, tc := range testCases {
+		actual, err := Context{Dir: tc.Dir}.Abs(tc.Path)
 		if err != nil {
 			t.Error(err.Error())
 		}
-		if expected := tests[index+2]; expected != actual {
-			t.Errorf("context: '%v' arg: '%v' expected: '%v' was: '%v'", tests[index], tests[index+1], expected, actual)
+		if tc.Expected != actual {
+			t.Errorf("context: '%v' arg: '%v' expected: '%v' was: '%v'", tc.Dir, tc.Path, tc.Expected, actual)
 		}
 	}
 }

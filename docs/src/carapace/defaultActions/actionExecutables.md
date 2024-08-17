@@ -1,9 +1,10 @@
 # ActionExecutables
 
-[`ActionExecutables`] completes [PATH] executables.
+[`ActionExecutables`] completes executables either from [PATH] or given directories.
 
 ```go
 carapace.ActionExecutables()
+carapace.ActionExecutables("~/.local/bin")
 ```
 
 ![](./actionExecutables.cast)

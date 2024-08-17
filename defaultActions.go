@@ -424,16 +424,17 @@ func ActionStyles(styles ...string) Action {
 	}).Tag("styles")
 }
 
-// ActionExecutables completes PATH executables
+// ActionExecutables completes executables either from PATH or given directories
 //
 //	nvim
 //	chmod
-func ActionExecutables() Action {
+func ActionExecutables(dirs ...string) Action {
 	return ActionCallback(func(c Context) Action {
-		// TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
+		if len(dirs) == 0 {
+			dirs = strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
+		}
+		manDescriptions := man.Descriptions(c.Value) // TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
 		batch := Batch()
-		manDescriptions := man.Descriptions(c.Value)
-		dirs := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
 		for i := len(dirs) - 1; i >= 0; i-- {
 			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
 		}
@@ -443,12 +444,17 @@ func ActionExecutables() Action {
 
 func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[string]string) Action {
 	return ActionCallback(func(c Context) Action {
-		if files, err := os.ReadDir(dir); err == nil {
+		abs, err := c.Abs(dir)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		if files, err := os.ReadDir(abs); err == nil {
 			vals := make([]string, 0)
 			for _, f := range files {
 				if match.HasPrefix(f.Name(), prefix) {
 					if info, err := f.Info(); err == nil && !f.IsDir() && isExecAny(info.Mode()) {
-						vals = append(vals, f.Name(), manDescriptions[f.Name()], style.ForPath(dir+"/"+f.Name(), c))
+						vals = append(vals, f.Name(), manDescriptions[f.Name()], style.ForPath(abs+"/"+f.Name(), c))
 					}
 				}
 			}

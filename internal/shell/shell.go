@@ -2,6 +2,7 @@ package shell
 
 import (
 	"fmt"
+	"os/exec"
 	"sort"
 	"strings"
 
@@ -90,6 +91,14 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		}
 
 		sort.Sort(common.ByDisplay(filtered))
+		if env.Experimental() {
+			if _, err := exec.LookPath("tabdance"); err == nil {
+				return f(value, meta, filtered)
+			}
+		}
+		for index := range filtered {
+			filtered[index].Uid = ""
+		}
 		return f(value, meta, filtered)
 	}
 	return ""

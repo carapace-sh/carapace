@@ -11,6 +11,7 @@ import (
 
 const (
 	CARAPACE_COVERDIR      = "CARAPACE_COVERDIR"      // coverage directory for sandbox tests
+	CARAPACE_EXPERIMENTAL  = "CARAPACE_EXPERIMENTAL"  // enable experimental features
 	CARAPACE_HIDDEN        = "CARAPACE_HIDDEN"        // show hidden commands/flags
 	CARAPACE_LENIENT       = "CARAPACE_LENIENT"       // allow unknown flags
 	CARAPACE_LOG           = "CARAPACE_LOG"           // enable logging
@@ -23,6 +24,10 @@ const (
 
 func ColorDisabled() bool {
 	return os.Getenv(NO_COLOR) != "" || os.Getenv(CLICOLOR) == "0"
+}
+
+func Experimental() bool {
+	return os.Getenv(CARAPACE_EXPERIMENTAL) != ""
 }
 
 func Lenient() bool {

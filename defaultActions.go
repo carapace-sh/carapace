@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
 	"github.com/carapace-sh/carapace/internal/man"
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/match"
 	"github.com/carapace-sh/carapace/pkg/style"
 	"github.com/carapace-sh/carapace/third_party/github.com/acarl005/stripansi"
@@ -132,18 +134,34 @@ func ActionExecute(cmd *cobra.Command) Action {
 
 // ActionDirectories completes directories.
 func ActionDirectories() Action {
-	return actionPath([]string{""}, true).
-		MultiParts("/").
-		StyleF(style.ForPath).
-		Tag("directories")
+	return ActionCallback(func(c Context) Action {
+		return actionPath([]string{""}, true).
+			MultiParts("/").
+			StyleF(style.ForPath).
+			UidF(func(s string) (*url.URL, error) { // TODO duplicated from ActionFiles
+				abs, err := c.Abs(s)
+				if err != nil {
+					return nil, err
+				}
+				return url.Parse("file://" + abs)
+			})
+	}).Tag("directories")
 }
 
 // ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
-	return actionPath(suffix, false).
-		MultiParts("/").
-		StyleF(style.ForPath).
-		Tag("files")
+	return ActionCallback(func(c Context) Action {
+		return actionPath(suffix, false).
+			MultiParts("/").
+			StyleF(style.ForPath).
+			UidF(func(s string) (*url.URL, error) {
+				abs, err := c.Abs(s)
+				if err != nil {
+					return nil, err
+				}
+				return url.Parse("file://" + abs)
+			})
+	}).Tag("files")
 }
 
 // ActionValues completes arbitrary keywords (values).
@@ -438,7 +456,10 @@ func ActionExecutables(dirs ...string) Action {
 		for i := len(dirs) - 1; i >= 0; i-- {
 			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
 		}
-		return batch.ToA()
+		return batch.ToA().
+			UidF(func(s string) (*url.URL, error) {
+				return &url.URL{Scheme: "cmd", Host: s}, nil
+			})
 	}).Tag("executables")
 }
 
@@ -458,7 +479,9 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 					}
 				}
 			}
-			return ActionStyledValuesDescribed(vals...)
+			return ActionStyledValuesDescribed(vals...).UidF(func(s string) (*url.URL, error) {
+				return url.Parse(fmt.Sprintf("file://%v/%v", dir, s)) // TODO trim slash suffix from dir | backslash path possible? (windows)
+			})
 		}
 		return ActionValues()
 	})
@@ -524,7 +547,20 @@ func ActionCommands(cmd *cobra.Command) Action {
 				}
 			}
 		}
-		return batch.ToA()
+		return batch.ToA().UidF(func(s string) (*url.URL, error) {
+			uid := uid.Command(cmd)
+			if subCommand, _, err := cmd.Find([]string{s}); err == nil {
+				s = subCommand.Name() // alias -> actual name
+			}
+
+			switch uid.Path {
+			case "":
+				uid.Path = s
+			default:
+				uid.Path = uid.Path + "/" + s
+			}
+			return uid, nil
+		})
 	})
 }
 

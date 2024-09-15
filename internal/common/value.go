@@ -20,6 +20,7 @@ type RawValue struct {
 	Description string `json:"description,omitempty"`
 	Style       string `json:"style,omitempty"`
 	Tag         string `json:"tag,omitempty"`
+	Uid         string `json:"uid,omitempty"`
 }
 
 // TrimmedDescription returns the trimmed description.

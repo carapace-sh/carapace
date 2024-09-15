@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/spf13/cobra"
 )
 
@@ -33,13 +34,27 @@ func TestActionImport(t *testing.T) {
 }
 
 func TestActionFlags(t *testing.T) {
-	cmd := &cobra.Command{}
+	cmd := &cobra.Command{Use: "actionFlags"}
 	cmd.Flags().BoolP("alpha", "a", false, "")
 	cmd.Flags().BoolP("beta", "b", false, "")
 
 	cmd.Flag("alpha").Changed = true
 	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
-	assertEqual(t, ActionValuesDescribed("b", "", "h", "help for this command").Tag("shorthand flags").NoSpace('b', 'h').Invoke(Context{}).Prefix("-a"), a)
+	assertEqual(
+		t,
+		ActionValuesDescribed(
+			"b", "",
+			"h", "help for actionFlags",
+		).Tag("shorthand flags").
+			NoSpace('b', 'h').
+			Invoke(Context{}).
+			Prefix("-a").
+			UidF(uid.Map(
+				"-ab", "cmd://actionFlags?flag=beta",
+				"-ah", "cmd://actionFlags?flag=help",
+			)),
+		a,
+	)
 }
 
 func TestActionExecCommandEnv(t *testing.T) {

@@ -22,9 +22,9 @@ func TestUidCommand(t *testing.T) {
 	root.AddCommand(sub1)
 	sub1.AddCommand(sub2)
 
-	assert.Equal(t, "_root", Command(root))
-	assert.Equal(t, "_root__sub1", Command(sub1))
-	assert.Equal(t, "_root__sub1__sub2", Command(sub2))
+	assert.Equal(t, "cmd://root", Command(root).String())
+	assert.Equal(t, "cmd://root/sub1", Command(sub1).String())
+	assert.Equal(t, "cmd://root/sub1/sub2", Command(sub2).String())
 }
 
 func TestExecutable(t *testing.T) {

@@ -1,13 +1,14 @@
 package carapace
 
 import (
-	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/style"
 	"github.com/carapace-sh/carapace/pkg/util"
 	"github.com/spf13/cobra"
@@ -33,7 +34,7 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		}
 
 		actualFolder := filepath.ToSlash(filepath.Dir(abs))
-		files, err := ioutil.ReadDir(actualFolder)
+		files, err := os.ReadDir(actualFolder)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
@@ -46,7 +47,10 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 				continue
 			}
 
-			resolvedFile := file
+			resolvedFile, err := file.Info()
+			if err != nil {
+				return ActionMessage(err.Error())
+			}
 			if resolved, err := filepath.EvalSymlinks(actualFolder + file.Name()); err == nil {
 				if stat, err := os.Stat(resolved); err == nil {
 					resolvedFile = stat
@@ -103,7 +107,8 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags"))
+					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
+						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 					if f.IsOptarg() {
 						nospace = append(nospace, []rune(f.Shorthand)[0])
 					}
@@ -111,13 +116,16 @@ func actionFlags(cmd *cobra.Command) Action {
 			} else {
 				switch f.Mode() {
 				case pflagfork.NameAsShorthand:
-					batch = append(batch, ActionStyledValuesDescribed("-"+f.Name, f.Usage, f.Style()).Tag("longhand flags"))
+					batch = append(batch, ActionStyledValuesDescribed("-"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
+						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				case pflagfork.Default:
-					batch = append(batch, ActionStyledValuesDescribed("--"+f.Name, f.Usage, f.Style()).Tag("longhand flags"))
+					batch = append(batch, ActionStyledValuesDescribed("--"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
+						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				}
 
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
-					batch = append(batch, ActionStyledValuesDescribed("-"+f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags"))
+					batch = append(batch, ActionStyledValuesDescribed("-"+f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
+						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				}
 			}
 		})

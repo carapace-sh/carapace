@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"net/url"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/common"
@@ -70,6 +71,18 @@ func (ia InvokedAction) Suffix(suffix string) InvokedAction {
 	return ia
 }
 
+// UidF TODO experimental
+func (ia InvokedAction) UidF(f func(s string) (*url.URL, error)) InvokedAction {
+	for index, v := range ia.action.rawValues {
+		url, err := f(v.Value)
+		if err != nil {
+			return ActionMessage(err.Error()).Invoke(Context{})
+		}
+		ia.action.rawValues[index].Uid = url.String()
+	}
+	return ia
+}
+
 // ToA casts an InvokedAction to Action.
 func (ia InvokedAction) ToA() Action {
 	return ia.action
@@ -113,6 +126,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Description: val.Description,
 							Style:       val.Style,
 							Tag:         val.Tag,
+							Uid:         val.Uid,
 						}
 					} else {
 						uniqueVals[v] = common.RawValue{
@@ -121,6 +135,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Description: "",
 							Style:       "",
 							Tag:         val.Tag,
+							Uid:         val.Uid,
 						}
 					}
 				}

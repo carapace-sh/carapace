@@ -10,6 +10,7 @@ import (
 
 	"github.com/carapace-sh/carapace/internal/assert"
 	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/style"
 )
 
@@ -122,7 +123,14 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of(style.Blue, style.Bold),
 			"pkg/", style.Of(style.Blue, style.Bold),
 			"third_party/", style.Of(style.Blue, style.Bold),
-		).NoSpace('/').Tag("directories").Invoke(Context{}),
+		).NoSpace('/').Tag("directories").Invoke(Context{}).UidF(uid.Map(
+			"example/", "file://"+wd("")+"/example/",
+			"example-nonposix/", "file://"+wd("")+"/example-nonposix/",
+			"docs/", "file://"+wd("")+"/docs/",
+			"internal/", "file://"+wd("")+"/internal/",
+			"pkg/", "file://"+wd("")+"/pkg/",
+			"third_party/", "file://"+wd("")+"/third_party/",
+		)),
 		ActionDirectories().Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
@@ -134,7 +142,14 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", style.Of(style.Blue, style.Bold),
 			"pkg/", style.Of(style.Blue, style.Bold),
 			"third_party/", style.Of(style.Blue, style.Bold),
-		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("./"),
+		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("./").UidF(uid.Map(
+			"./example/", "file://"+wd("")+"/example/",
+			"./example-nonposix/", "file://"+wd("")+"/example-nonposix/",
+			"./docs/", "file://"+wd("")+"/docs/",
+			"./internal/", "file://"+wd("")+"/internal/",
+			"./pkg/", "file://"+wd("")+"/pkg/",
+			"./third_party/", "file://"+wd("")+"/third_party/",
+		)),
 		ActionDirectories().Invoke(Context{Value: "./"}).Filter("./vendor/"),
 	)
 
@@ -142,14 +157,19 @@ func TestActionDirectories(t *testing.T) {
 		ActionStyledValues(
 			"_test/", style.Of(style.Blue, style.Bold),
 			"cmd/", style.Of(style.Blue, style.Bold),
-		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
+			"example/_test/", "file://"+wd("")+"/example/_test/",
+			"example/cmd/", "file://"+wd("")+"/example/cmd/",
+		)),
 		ActionDirectories().Invoke(Context{Value: "example/"}),
 	)
 
 	assertEqual(t,
 		ActionStyledValues(
 			"cmd/", style.Of(style.Blue, style.Bold),
-		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
+			"example/cmd/", "file://"+wd("")+"/example/cmd/",
+		)),
 		ActionDirectories().Invoke(Context{Value: "example/cm"}),
 	)
 }
@@ -164,7 +184,15 @@ func TestActionFiles(t *testing.T) {
 			"internal/", style.Of(style.Blue, style.Bold),
 			"pkg/", style.Of(style.Blue, style.Bold),
 			"third_party/", style.Of(style.Blue, style.Bold),
-		).NoSpace('/').Tag("files").Invoke(Context{}),
+		).NoSpace('/').Tag("files").Invoke(Context{}).UidF(uid.Map(
+			"README.md", "file://"+wd("")+"/README.md",
+			"example/", "file://"+wd("")+"/example/",
+			"example-nonposix/", "file://"+wd("")+"/example-nonposix/",
+			"docs/", "file://"+wd("")+"/docs/",
+			"internal/", "file://"+wd("")+"/internal/",
+			"pkg/", "file://"+wd("")+"/pkg/",
+			"third_party/", "file://"+wd("")+"/third_party/",
+		)),
 		ActionFiles(".md").Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
@@ -175,7 +203,13 @@ func TestActionFiles(t *testing.T) {
 			"cmd/", style.Of(style.Blue, style.Bold),
 			"main.go", style.Default,
 			"main_test.go", style.Default,
-		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/"),
+		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
+			"example/README.md", "file://"+wd("example")+"/README.md",
+			"example/_test/", "file://"+wd("example")+"/_test/",
+			"example/cmd/", "file://"+wd("example")+"/cmd/",
+			"example/main.go", "file://"+wd("example")+"/main.go",
+			"example/main_test.go", "file://"+wd("example")+"/main_test.go",
+		)),
 		ActionFiles().Invoke(Context{Value: "example/"}).Filter("example/example"),
 	)
 }
@@ -197,7 +231,10 @@ func TestActionFilesChdir(t *testing.T) {
 		ActionStyledValues(
 			"action.go", style.Default,
 			"snippet.go", style.Default,
-		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("elvish/"),
+		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("elvish/").UidF(uid.Map(
+			"elvish/action.go", "file://"+wd("internal/shell")+"/elvish/action.go",
+			"elvish/snippet.go", "file://"+wd("internal/shell")+"/elvish/snippet.go",
+		)),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{Value: "elvish/"}),
 	)
 

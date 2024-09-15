@@ -2,7 +2,7 @@ package log
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -11,7 +11,7 @@ import (
 	"github.com/carapace-sh/carapace/pkg/ps"
 )
 
-var LOG = log.New(ioutil.Discard, "", log.Flags())
+var LOG = log.New(io.Discard, "", log.Flags())
 
 func init() {
 	if !env.Log() {

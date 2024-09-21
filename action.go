@@ -453,8 +453,18 @@ func (a Action) UniqueListF(divider string, f func(s string) string) Action {
 	})
 }
 
-// Unless skips invokation if given condition succeeds.
-func (a Action) Unless(condition func(c Context) bool) Action {
+// Unless skips invokation if given condition is true.
+func (a Action) Unless(condition bool) Action {
+	return ActionCallback(func(c Context) Action {
+		if condition {
+			return ActionValues()
+		}
+		return a
+	})
+}
+
+// UnlessF skips invokation if given condition returns true.
+func (a Action) UnlessF(condition func(c Context) bool) Action {
 	return ActionCallback(func(c Context) Action {
 		if condition(c) {
 			return ActionValues()

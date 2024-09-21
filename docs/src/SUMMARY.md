@@ -39,6 +39,7 @@
     - [UniqueList](./carapace/action/uniqueList.md)
     - [UniqueListF](./carapace/action/uniqueListF.md)
     - [Unless](./carapace/action/unless.md)
+    - [UnlessF](./carapace/action/unlessF.md)
     - [Usage](./carapace/action/usage.md)
     - [UsageF](./carapace/action/usageF.md)
   - [InvokedAction](./carapace/invokedAction.md)

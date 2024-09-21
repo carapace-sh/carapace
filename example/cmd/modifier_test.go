@@ -463,9 +463,30 @@ func TestSplitP(t *testing.T) {
 				Usage("SplitP()"))
 	})
 }
+
 func TestUnless(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
-		s.Run("modifier", "--unless", "").
+		s.Run("modifier", "--unless", "true:").
+			Expect(carapace.ActionValues(
+				"yes",
+				"positive",
+			).Prefix("true:").
+				NoSpace(':').
+				Usage("Unless()"))
+
+		s.Run("modifier", "--unless", "false:").
+			Expect(carapace.ActionValues(
+				"no",
+				"negative",
+			).Prefix("false:").
+				NoSpace(':').
+				Usage("Unless()"))
+	})
+}
+
+func TestUnlessF(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--unlessf", "").
 			Expect(carapace.ActionValues(
 				"./local",
 				"~/home",
@@ -473,22 +494,22 @@ func TestUnless(t *testing.T) {
 				"one",
 				"two",
 				"three",
-			).Usage("Unless()"))
+			).Usage("UnlessF()"))
 
-		s.Run("modifier", "--unless", "t").
+		s.Run("modifier", "--unlessf", "t").
 			Expect(carapace.ActionValues(
 				"two",
 				"three",
-			).Usage("Unless()"))
+			).Usage("UnlessF()"))
 
-		s.Run("modifier", "--unless", ".").
-			Expect(carapace.ActionValues().Usage("Unless()"))
+		s.Run("modifier", "--unlessf", ".").
+			Expect(carapace.ActionValues().Usage("UnlessF()"))
 
-		s.Run("modifier", "--unless", "~").
-			Expect(carapace.ActionValues().Usage("Unless()"))
+		s.Run("modifier", "--unlessf", "~").
+			Expect(carapace.ActionValues().Usage("UnlessF()"))
 
-		s.Run("modifier", "--unless", "/").
-			Expect(carapace.ActionValues().Usage("Unless()"))
+		s.Run("modifier", "--unlessf", "/").
+			Expect(carapace.ActionValues().Usage("UnlessF()"))
 	})
 }
 

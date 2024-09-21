@@ -52,6 +52,7 @@ func init() {
 	modifierCmd.Flags().String("uniquelist", "", "UniqueList()")
 	modifierCmd.Flags().String("uniquelistf", "", "UniqueListF()")
 	modifierCmd.Flags().String("unless", "", "Unless()")
+	modifierCmd.Flags().String("unlessf", "", "UnlessF()")
 	modifierCmd.Flags().String("usage", "", "Usage()")
 
 	rootCmd.AddCommand(modifierCmd)
@@ -266,14 +267,31 @@ func init() {
 		}).UniqueListF(",", func(s string) string {
 			return strings.SplitN(s, ":", 2)[0]
 		}),
-		"unless": carapace.ActionValues(
+		"unless": carapace.ActionMultiPartsN(":", 2, func(c carapace.Context) carapace.Action {
+			switch len(c.Parts) {
+			case 0:
+				return carapace.ActionValues("true", "false").Suffix(":")
+			default:
+				return carapace.Batch(
+					carapace.ActionValues(
+						"yes",
+						"positive",
+					).Unless(c.Parts[0] != "true"),
+					carapace.ActionValues(
+						"no",
+						"negative",
+					).Unless(c.Parts[0] != "false"),
+				).ToA()
+			}
+		}),
+		"unlessf": carapace.ActionValues(
 			"./local",
 			"~/home",
 			"/abs",
 			"one",
 			"two",
 			"three",
-		).Unless(condition.CompletingPath),
+		).UnlessF(condition.CompletingPath),
 		"usage": carapace.ActionValues().Usage("explicit usage"),
 	})
 

@@ -1,6 +1,6 @@
 # Unless
 
-[`Unless`] skips invokation if given condition is `true`.
+[`Unless`] skips invocation if given condition is `true`.
 
 ```go
 carapace.ActionMultiPartsN(":", 2, func(c carapace.Context) carapace.Action {

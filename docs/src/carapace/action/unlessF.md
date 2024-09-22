@@ -1,6 +1,6 @@
 # UnlessF
 
-[`UnlessF`] skips invokation if given [condition] returns `true`.
+[`UnlessF`] skips invocation if given [condition] returns `true`.
 
 ```go
 carapace.ActionValues(

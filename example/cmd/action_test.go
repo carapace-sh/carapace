@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+	"runtime"
 	"testing"
 
 	"github.com/carapace-sh/carapace"
@@ -348,5 +350,50 @@ func TestActionMultipartsN(t *testing.T) {
 				Prefix("one=three=").
 				NoSpace('=').
 				Usage("ActionMultiPartsN()"))
+	})
+}
+
+func TestSymlink(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("no symlink support on windows")
+	}
+
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Files(
+			"dirA/file1.txt", "",
+			"dirA/file2.png", "",
+			"dirB/dirC/file3.go", "",
+			"dirB/file4.md", "",
+			"file5.go", "",
+		)
+		c := s.NewContext()
+		if err := os.Symlink(c.Dir+"/dirA", c.Dir+"/symA"); err != nil {
+			t.Error(err.Error())
+		}
+		if err := os.Symlink(c.Dir+"/missing", c.Dir+"/symB"); err != nil {
+			t.Error(err.Error())
+		}
+
+		s.Run("action", "--directories", "").
+			Expect(carapace.ActionValues("dirA/", "dirB/", "symA/").
+				Tag("directories").
+				StyleF(style.ForPath).
+				NoSpace('/').
+				Usage("ActionDirectories()"))
+
+		s.Run("action", "--files", "symA/").
+			Expect(carapace.ActionValues("file1.txt", "file2.png").
+				Prefix("symA/").
+				Tag("files").
+				StyleF(style.ForPath).
+				NoSpace('/').
+				Usage("ActionFiles()"))
+
+		s.Run("action", "--files", "s").
+			Expect(carapace.ActionValues("symA/", "symB").
+				Tag("files").
+				StyleF(style.ForPath).
+				NoSpace('/').
+				Usage("ActionFiles()"))
 	})
 }

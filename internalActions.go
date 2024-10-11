@@ -47,19 +47,23 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 				continue
 			}
 
-			resolvedFile, err := file.Info()
+			info, err := file.Info()
 			if err != nil {
 				return ActionMessage(err.Error())
 			}
-			if resolved, err := filepath.EvalSymlinks(actualFolder + file.Name()); err == nil {
-				if stat, err := os.Stat(resolved); err == nil {
-					resolvedFile = stat
+			symlinkedDir := false
+			if evaluatedPath, err := filepath.EvalSymlinks(actualFolder + "/" + file.Name()); err == nil {
+				if evaluatedInfo, err := os.Stat(evaluatedPath); err == nil {
+					symlinkedDir = evaluatedInfo.IsDir()
 				}
 			}
 
-			if resolvedFile.IsDir() {
+			switch {
+			case info.IsDir():
 				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()+"/"), c))
-			} else if !dirOnly {
+			case symlinkedDir:
+				vals = append(vals, displayFolder+file.Name()+"/", style.ForPath(filepath.Clean(actualFolder+"/"+file.Name()), c)) // TODO colorist not returning the symlink color
+			case !dirOnly:
 				if len(fileSuffixes) == 0 {
 					fileSuffixes = []string{""}
 				}

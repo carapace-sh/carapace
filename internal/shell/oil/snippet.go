@@ -4,7 +4,7 @@ package oil
 import (
 	"fmt"
 
-	"github.com/carapace-sh/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
 

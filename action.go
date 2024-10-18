@@ -16,6 +16,7 @@ import (
 	"github.com/carapace-sh/carapace/pkg/match"
 	"github.com/carapace-sh/carapace/pkg/style"
 	pkgtraverse "github.com/carapace-sh/carapace/pkg/traverse"
+	"github.com/carapace-sh/carapace/pkg/uid"
 )
 
 // Action indicates how to complete a flag or positional argument.
@@ -503,9 +504,11 @@ func (a Action) Uid(scheme, host string, opts ...string) Action {
 }
 
 // UidF TODO experimental
-func (a Action) UidF(f func(s string) (*url.URL, error)) Action {
+func (a Action) UidF(f func(s string, uc uid.Context) (*url.URL, error)) Action {
 	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).UidF(f).ToA()
+		return a.Invoke(c).UidF(func(s string) (*url.URL, error) {
+			return f(s, c)
+		}).ToA()
 	})
 }
 

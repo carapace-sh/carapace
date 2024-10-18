@@ -8,8 +8,8 @@ import (
 
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/pflagfork"
-	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/carapace-sh/carapace/pkg/util"
 	"github.com/spf13/cobra"
 )
@@ -112,7 +112,7 @@ func actionFlags(cmd *cobra.Command) Action {
 						}
 					}
 					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
-						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
+						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 					if f.IsOptarg() {
 						nospace = append(nospace, []rune(f.Shorthand)[0])
 					}
@@ -121,15 +121,15 @@ func actionFlags(cmd *cobra.Command) Action {
 				switch f.Mode() {
 				case pflagfork.NameAsShorthand:
 					batch = append(batch, ActionStyledValuesDescribed("-"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
-						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
+						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				case pflagfork.Default:
 					batch = append(batch, ActionStyledValuesDescribed("--"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
-						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
+						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				}
 
 				if f.Shorthand != "" && f.ShorthandDeprecated == "" {
 					batch = append(batch, ActionStyledValuesDescribed("-"+f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
-						UidF(func(s string) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
+						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				}
 			}
 		})

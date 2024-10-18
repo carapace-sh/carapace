@@ -11,6 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Context interface {
+	Abs(s string) (string, error)
+	Getenv(key string) string
+	LookupEnv(key string) (string, bool)
+}
+
 // Command creates a uid for given command.
 func Command(cmd *cobra.Command) *url.URL {
 	path := []string{cmd.Name()}

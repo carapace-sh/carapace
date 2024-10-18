@@ -6,7 +6,8 @@ import (
 	"sync"
 
 	"github.com/carapace-sh/carapace/internal/common"
-	"github.com/carapace-sh/carapace/internal/uid"
+	"github.com/carapace-sh/carapace/pkg/uid"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

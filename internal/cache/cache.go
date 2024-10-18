@@ -13,8 +13,8 @@ import (
 
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
-	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/cache/key"
+	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/carapace-sh/carapace/pkg/xdg"
 )
 

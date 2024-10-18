@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html lang="en" class="latte" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Reply - carapace</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="A multi-shell completion library. Supports Bash, Elvish, Fish, Nushell, Oil, Powershell, Xonsh and Zsh.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../asciinema/asciinema-player.css">
+        <link rel="stylesheet" href=".././theme/catppuccin.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "mocha" : "latte";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('latte')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../carapace.html"><strong aria-hidden="true">1.</strong> carapace</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/gen.html"><strong aria-hidden="true">1.1.</strong> Gen</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/gen/dashAnyCompletion.html"><strong aria-hidden="true">1.1.1.</strong> DashAnyCompletion</a></li><li class="chapter-item "><a href="../carapace/gen/dashCompletion.html"><strong aria-hidden="true">1.1.2.</strong> DashCompletion</a></li><li class="chapter-item "><a href="../carapace/gen/flagCompletion.html"><strong aria-hidden="true">1.1.3.</strong> FlagCompletion</a></li><li class="chapter-item "><a href="../carapace/gen/positionalAnyCompletion.html"><strong aria-hidden="true">1.1.4.</strong> PositionalAnyCompletion</a></li><li class="chapter-item "><a href="../carapace/gen/positionalCompletion.html"><strong aria-hidden="true">1.1.5.</strong> PositionalCompletion</a></li><li class="chapter-item "><a href="../carapace/gen/preInvoke.html"><strong aria-hidden="true">1.1.6.</strong> PreInvoke</a></li><li class="chapter-item "><a href="../carapace/gen/preRun.html"><strong aria-hidden="true">1.1.7.</strong> PreRun</a></li><li class="chapter-item "><a href="../carapace/gen/snippet.html"><strong aria-hidden="true">1.1.8.</strong> Snippet</a></li><li class="chapter-item "><a href="../carapace/gen/standalone.html"><strong aria-hidden="true">1.1.9.</strong> Standalone</a></li></ol></li><li class="chapter-item "><a href="../carapace/action.html"><strong aria-hidden="true">1.2.</strong> Action</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/action/cache.html"><strong aria-hidden="true">1.2.1.</strong> Cache</a></li><li class="chapter-item "><a href="../carapace/action/chdir.html"><strong aria-hidden="true">1.2.2.</strong> Chdir</a></li><li class="chapter-item "><a href="../carapace/action/chdirF.html"><strong aria-hidden="true">1.2.3.</strong> ChdirF</a></li><li class="chapter-item "><a href="../carapace/action/filter.html"><strong aria-hidden="true">1.2.4.</strong> Filter</a></li><li class="chapter-item "><a href="../carapace/action/filterArgs.html"><strong aria-hidden="true">1.2.5.</strong> FilterArgs</a></li><li class="chapter-item "><a href="../carapace/action/filterParts.html"><strong aria-hidden="true">1.2.6.</strong> FilterParts</a></li><li class="chapter-item "><a href="../carapace/action/invoke.html"><strong aria-hidden="true">1.2.7.</strong> Invoke</a></li><li class="chapter-item "><a href="../carapace/action/list.html"><strong aria-hidden="true">1.2.8.</strong> List</a></li><li class="chapter-item "><a href="../carapace/action/multiParts.html"><strong aria-hidden="true">1.2.9.</strong> MultiParts</a></li><li class="chapter-item "><a href="../carapace/action/multiPartsP.html"><strong aria-hidden="true">1.2.10.</strong> MultiPartsP</a></li><li class="chapter-item "><a href="../carapace/action/noSpace.html"><strong aria-hidden="true">1.2.11.</strong> NoSpace</a></li><li class="chapter-item "><a href="../carapace/action/prefix.html"><strong aria-hidden="true">1.2.12.</strong> Prefix</a></li><li class="chapter-item "><a href="../carapace/action/retain.html"><strong aria-hidden="true">1.2.13.</strong> Retain</a></li><li class="chapter-item "><a href="../carapace/action/shift.html"><strong aria-hidden="true">1.2.14.</strong> Shift</a></li><li class="chapter-item "><a href="../carapace/action/split.html"><strong aria-hidden="true">1.2.15.</strong> Split</a></li><li class="chapter-item "><a href="../carapace/action/splitP.html"><strong aria-hidden="true">1.2.16.</strong> SplitP</a></li><li class="chapter-item "><a href="../carapace/action/style.html"><strong aria-hidden="true">1.2.17.</strong> Style</a></li><li class="chapter-item "><a href="../carapace/action/styleF.html"><strong aria-hidden="true">1.2.18.</strong> StyleF</a></li><li class="chapter-item "><a href="../carapace/action/styleR.html"><strong aria-hidden="true">1.2.19.</strong> StyleR</a></li><li class="chapter-item "><a href="../carapace/action/suffix.html"><strong aria-hidden="true">1.2.20.</strong> Suffix</a></li><li class="chapter-item "><a href="../carapace/action/suppress.html"><strong aria-hidden="true">1.2.21.</strong> Suppress</a></li><li class="chapter-item "><a href="../carapace/action/tag.html"><strong aria-hidden="true">1.2.22.</strong> Tag</a></li><li class="chapter-item "><a href="../carapace/action/tagF.html"><strong aria-hidden="true">1.2.23.</strong> TagF</a></li><li class="chapter-item "><a href="../carapace/action/timeout.html"><strong aria-hidden="true">1.2.24.</strong> Timeout</a></li><li class="chapter-item "><a href="../carapace/action/uniqueList.html"><strong aria-hidden="true">1.2.25.</strong> UniqueList</a></li><li class="chapter-item "><a href="../carapace/action/uniqueListF.html"><strong aria-hidden="true">1.2.26.</strong> UniqueListF</a></li><li class="chapter-item "><a href="../carapace/action/unless.html"><strong aria-hidden="true">1.2.27.</strong> Unless</a></li><li class="chapter-item "><a href="../carapace/action/unlessF.html"><strong aria-hidden="true">1.2.28.</strong> UnlessF</a></li><li class="chapter-item "><a href="../carapace/action/usage.html"><strong aria-hidden="true">1.2.29.</strong> Usage</a></li><li class="chapter-item "><a href="../carapace/action/usageF.html"><strong aria-hidden="true">1.2.30.</strong> UsageF</a></li></ol></li><li class="chapter-item "><a href="../carapace/invokedAction.html"><strong aria-hidden="true">1.3.</strong> InvokedAction</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/invokedAction/filter.html"><strong aria-hidden="true">1.3.1.</strong> Filter</a></li><li class="chapter-item "><a href="../carapace/invokedAction/merge.html"><strong aria-hidden="true">1.3.2.</strong> Merge</a></li><li class="chapter-item "><a href="../carapace/invokedAction/prefix.html"><strong aria-hidden="true">1.3.3.</strong> Prefix</a></li><li class="chapter-item "><a href="../carapace/invokedAction/retain.html"><strong aria-hidden="true">1.3.4.</strong> Retain</a></li><li class="chapter-item "><a href="../carapace/invokedAction/suffix.html"><strong aria-hidden="true">1.3.5.</strong> Suffix</a></li><li class="chapter-item "><a href="../carapace/invokedAction/toA.html"><strong aria-hidden="true">1.3.6.</strong> ToA</a></li><li class="chapter-item "><a href="../carapace/invokedAction/toMultiPartsA.html"><strong aria-hidden="true">1.3.7.</strong> ToMultiPartsA</a></li></ol></li><li class="chapter-item "><a href="../carapace/defaultActions.html"><strong aria-hidden="true">1.4.</strong> DefaultActions</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/defaultActions/actionCallback.html"><strong aria-hidden="true">1.4.1.</strong> ActionCallback</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionCobra.html"><strong aria-hidden="true">1.4.2.</strong> ActionCobra</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionCommands.html"><strong aria-hidden="true">1.4.3.</strong> ActionCommands</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionDirectories.html"><strong aria-hidden="true">1.4.4.</strong> ActionDirectories</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionExecCommand.html"><strong aria-hidden="true">1.4.5.</strong> ActionExecCommand</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionExecCommandE.html"><strong aria-hidden="true">1.4.6.</strong> ActionExecCommandE</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionExecutables.html"><strong aria-hidden="true">1.4.7.</strong> ActionExecutables</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionExecute.html"><strong aria-hidden="true">1.4.8.</strong> ActionExecute</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionFiles.html"><strong aria-hidden="true">1.4.9.</strong> ActionFiles</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionImport.html"><strong aria-hidden="true">1.4.10.</strong> ActionImport</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionMessage.html"><strong aria-hidden="true">1.4.11.</strong> ActionMessage</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionMultiParts.html"><strong aria-hidden="true">1.4.12.</strong> ActionMultiParts</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionMultiPartsN.html"><strong aria-hidden="true">1.4.13.</strong> ActionMultiPartsN</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionPositional.html"><strong aria-hidden="true">1.4.14.</strong> ActionPositional</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionStyleConfig.html"><strong aria-hidden="true">1.4.15.</strong> ActionStyleConfig</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionStyledValues.html"><strong aria-hidden="true">1.4.16.</strong> ActionStyledValues</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionStyledValuesDescribed.html"><strong aria-hidden="true">1.4.17.</strong> ActionStyledValuesDescribed</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionStyles.html"><strong aria-hidden="true">1.4.18.</strong> ActionStyles</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionValues.html"><strong aria-hidden="true">1.4.19.</strong> ActionValues</a></li><li class="chapter-item "><a href="../carapace/defaultActions/actionValuesDescribed.html"><strong aria-hidden="true">1.4.20.</strong> ActionValuesDescribed</a></li></ol></li><li class="chapter-item "><a href="../carapace/customActions.html"><strong aria-hidden="true">1.5.</strong> CustomActions</a></li><li class="chapter-item "><a href="../carapace/context.html"><strong aria-hidden="true">1.6.</strong> Context</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/context/abs.html"><strong aria-hidden="true">1.6.1.</strong> Abs</a></li><li class="chapter-item "><a href="../carapace/context/command.html"><strong aria-hidden="true">1.6.2.</strong> Command</a></li><li class="chapter-item "><a href="../carapace/context/envSubst.html"><strong aria-hidden="true">1.6.3.</strong> Envsubst</a></li><li class="chapter-item "><a href="../carapace/context/getEnv.html"><strong aria-hidden="true">1.6.4.</strong> GetEnv</a></li><li class="chapter-item "><a href="../carapace/context/lookupEnv.html"><strong aria-hidden="true">1.6.5.</strong> LookupEnv</a></li><li class="chapter-item "><a href="../carapace/context/setEnv.html"><strong aria-hidden="true">1.6.6.</strong> SetEnv</a></li></ol></li><li class="chapter-item "><a href="../carapace/batch.html"><strong aria-hidden="true">1.7.</strong> Batch</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/batch/invoke.html"><strong aria-hidden="true">1.7.1.</strong> Invoke</a></li><li class="chapter-item "><a href="../carapace/batch/ToA.html"><strong aria-hidden="true">1.7.2.</strong> ToA</a></li></ol></li><li class="chapter-item "><a href="../carapace/invokedBatch.html"><strong aria-hidden="true">1.8.</strong> InvokedBatch</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/invokedBatch/merge.html"><strong aria-hidden="true">1.8.1.</strong> Merge</a></li></ol></li><li class="chapter-item "><a href="../carapace/export.html"><strong aria-hidden="true">1.9.</strong> Export</a></li><li class="chapter-item "><a href="../carapace/command.html"><strong aria-hidden="true">1.10.</strong> Command</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/command/group.html"><strong aria-hidden="true">1.10.1.</strong> Group</a></li></ol></li><li class="chapter-item "><a href="../carapace/standalone.html"><strong aria-hidden="true">1.11.</strong> Standalone</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/standalone/carapace-parse.html"><strong aria-hidden="true">1.11.1.</strong> carapace-parse</a></li><li class="chapter-item "><a href="../carapace/standalone/pflag.html"><strong aria-hidden="true">1.11.2.</strong> pflag</a></li></ol></li><li class="chapter-item expanded "><a href="../carapace/sandbox.html"><strong aria-hidden="true">1.12.</strong> Sandbox</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/clearCache.html"><strong aria-hidden="true">1.12.1.</strong> ClearCache</a></li><li class="chapter-item "><a href="../carapace/keep.html"><strong aria-hidden="true">1.12.2.</strong> Env</a></li><li class="chapter-item "><a href="../carapace/files.html"><strong aria-hidden="true">1.12.3.</strong> Files</a></li><li class="chapter-item "><a href="../carapace/keep.html"><strong aria-hidden="true">1.12.4.</strong> Keep</a></li><li class="chapter-item "><a href="../carapace/newContext.html"><strong aria-hidden="true">1.12.5.</strong> NewContext</a></li><li class="chapter-item expanded "><a href="../carapace/reply.html" class="active"><strong aria-hidden="true">1.12.6.</strong> Reply</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/reply/with.html"><strong aria-hidden="true">1.12.6.1.</strong> With</a></li></ol></li><li class="chapter-item "><a href="../carapace/run.html"><strong aria-hidden="true">1.12.7.</strong> Run</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../carapace/expect.html"><strong aria-hidden="true">1.12.7.1.</strong> Expect</a></li><li class="chapter-item "><a href="../carapace/expectNot.html"><strong aria-hidden="true">1.12.7.2.</strong> ExpectNot</a></li><li class="chapter-item "><a href="../carapace/output.html"><strong aria-hidden="true">1.12.7.3.</strong> Output</a></li></ol></li></ol></li></ol></li><li class="chapter-item "><a href="../development.html"><strong aria-hidden="true">2.</strong> development</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../development/additionalInformation.html"><strong aria-hidden="true">2.1.</strong> Additional Information</a></li><li class="chapter-item "><a href="../development/shells.html"><strong aria-hidden="true">2.2.</strong> Shells</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../development/shells/bash.html"><strong aria-hidden="true">2.2.1.</strong> Bash</a></li><li class="chapter-item "><a href="../development/shells/elvish.html"><strong aria-hidden="true">2.2.2.</strong> Elvish</a></li><li class="chapter-item "><a href="../development/shells/fish.html"><strong aria-hidden="true">2.2.3.</strong> Fish</a></li><li class="chapter-item "><a href="../development/shells/ion.html"><strong aria-hidden="true">2.2.4.</strong> Ion</a></li><li class="chapter-item "><a href="../development/shells/nushell.html"><strong aria-hidden="true">2.2.5.</strong> Nushell</a></li><li class="chapter-item "><a href="../development/shells/oil.html"><strong aria-hidden="true">2.2.6.</strong> Oil</a></li><li class="chapter-item "><a href="../development/shells/powershell.html"><strong aria-hidden="true">2.2.7.</strong> Powershell</a></li><li class="chapter-item "><a href="../development/shells/tcsh.html"><strong aria-hidden="true">2.2.8.</strong> Tcsh</a></li><li class="chapter-item "><a href="../development/shells/xonsh.html"><strong aria-hidden="true">2.2.9.</strong> Xonsh</a></li><li class="chapter-item "><a href="../development/shells/zsh.html"><strong aria-hidden="true">2.2.10.</strong> Zsh</a></li></ol></li><li class="chapter-item "><a href="../development/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li><li class="chapter-item "><a href="../development/asciinema.html"><strong aria-hidden="true">2.4.</strong> Asciinema</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="latte">Latte</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="frappe">Frappé</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="macchiato">Macchiato</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mocha">Mocha</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">carapace</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/carapace-sh/carapace" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/carapace-sh/carapace/edit/master/docs/src/carapace/reply.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="reply"><a class="header" href="#reply">Reply</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../carapace/newContext.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../carapace/reply/with.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../carapace/newContext.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../carapace/reply/with.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../asciinema/asciinema-player.min.js"></script>
+        <script src="../asciinema/load.js"></script>
+
+
+    </div>
+    </body>
+</html>

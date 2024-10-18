@@ -15,9 +15,9 @@ import (
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
 	"github.com/carapace-sh/carapace/internal/man"
-	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/match"
 	"github.com/carapace-sh/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/carapace-sh/carapace/third_party/github.com/acarl005/stripansi"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -138,7 +138,7 @@ func ActionDirectories() Action {
 		return actionPath([]string{""}, true).
 			MultiParts("/").
 			StyleF(style.ForPath).
-			UidF(func(s string) (*url.URL, error) { // TODO duplicated from ActionFiles
+			UidF(func(s string, uc uid.Context) (*url.URL, error) { // TODO duplicated from ActionFiles
 				abs, err := c.Abs(s)
 				if err != nil {
 					return nil, err
@@ -154,7 +154,7 @@ func ActionFiles(suffix ...string) Action {
 		return actionPath(suffix, false).
 			MultiParts("/").
 			StyleF(style.ForPath).
-			UidF(func(s string) (*url.URL, error) {
+			UidF(func(s string, uc uid.Context) (*url.URL, error) {
 				abs, err := c.Abs(s)
 				if err != nil {
 					return nil, err
@@ -457,7 +457,7 @@ func ActionExecutables(dirs ...string) Action {
 			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
 		}
 		return batch.ToA().
-			UidF(func(s string) (*url.URL, error) {
+			UidF(func(s string, uc uid.Context) (*url.URL, error) {
 				return &url.URL{Scheme: "cmd", Host: s}, nil
 			})
 	}).Tag("executables")
@@ -479,7 +479,7 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 					}
 				}
 			}
-			return ActionStyledValuesDescribed(vals...).UidF(func(s string) (*url.URL, error) {
+			return ActionStyledValuesDescribed(vals...).UidF(func(s string, uc uid.Context) (*url.URL, error) {
 				return url.Parse(fmt.Sprintf("file://%v/%v", dir, s)) // TODO trim slash suffix from dir | backslash path possible? (windows)
 			})
 		}
@@ -547,7 +547,7 @@ func ActionCommands(cmd *cobra.Command) Action {
 				}
 			}
 		}
-		return batch.ToA().UidF(func(s string) (*url.URL, error) {
+		return batch.ToA().UidF(func(s string, uc uid.Context) (*url.URL, error) {
 			uid := uid.Command(cmd)
 			if subCommand, _, err := cmd.Find([]string{s}); err == nil {
 				s = subCommand.Name() // alias -> actual name

@@ -7,8 +7,9 @@ import (
 	"os"
 
 	"github.com/carapace-sh/carapace/internal/env"
-	"github.com/carapace-sh/carapace/internal/uid"
+
 	"github.com/carapace-sh/carapace/pkg/ps"
+	"github.com/carapace-sh/carapace/pkg/uid"
 )
 
 var LOG = log.New(io.Discard, "", log.Flags())

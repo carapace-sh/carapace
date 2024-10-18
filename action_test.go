@@ -10,8 +10,8 @@ import (
 
 	"github.com/carapace-sh/carapace/internal/assert"
 	"github.com/carapace-sh/carapace/internal/common"
-	"github.com/carapace-sh/carapace/internal/uid"
 	"github.com/carapace-sh/carapace/pkg/style"
+	"github.com/carapace-sh/carapace/pkg/uid"
 )
 
 func init() {

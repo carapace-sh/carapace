@@ -1,6 +1,9 @@
+version: 2
+
 before:
   hooks:
     - go mod download
+
 builds:
   - id: example
     env:
@@ -20,20 +23,12 @@ builds:
       - darwin
     main: ./example-nonposix
     binary: example-nonposix
+
 archives:
   - name_template: 'example_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     format_overrides:
       - goos: windows
         format: zip
-checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Tag }}-next"
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+
 release:
   prerelease: auto

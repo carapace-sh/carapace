@@ -2,15 +2,15 @@
 package powershell
 
 import (
+	_ "embed"
 	"fmt"
+	"runtime"
 
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
 
-// Snippet creates the powershell completion script.
-func Snippet(cmd *cobra.Command) string {
-	return fmt.Sprintf(`using namespace System.Management.Automation
+const snippet = `using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 Function _%v_completer {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
@@ -37,14 +37,14 @@ Function _%v_completer {
       if ($t.get_Length() -eq 0){
         $t = '""'
       }
-      $elems += $t.replace('`+"`"+`,', ',') # quick fix
+      $elems += $t.replace('` + "`" + `,', ',') # quick fix
     }
 
     $completions = @(
       if (!$wordToComplete) {
-        %v _carapace powershell $($elems| ForEach-Object {$_}) '' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('`+"`"+`e[', "`+"`"+`e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
+        %v _carapace powershell $($elems| ForEach-Object {$_}) '' | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('` + "`" + `e[', "` + "`" + `e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
       } else {
-        %v _carapace powershell $($elems| ForEach-Object {$_}) | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('`+"`"+`e[', "`+"`"+`e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
+        %v _carapace powershell $($elems| ForEach-Object {$_}) | ConvertFrom-Json | ForEach-Object { [CompletionResult]::new($_.CompletionText, $_.ListItemText.replace('` + "`" + `e[', "` + "`" + `e["), [CompletionResultType]::ParameterValue, $_.ToolTip) }
       }
     )
 
@@ -54,6 +54,23 @@ Function _%v_completer {
 
     $completions
 }
-Register-ArgumentCompleter -Native -CommandName '%v' -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock
-`, cmd.Name(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name())
+Register-ArgumentCompleter -Native -CommandName '%v'     -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock
+%vRegister-ArgumentCompleter -Native -CommandName '%v.exe' -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock
+`
+
+// Snippet creates the powershell completion script.
+func Snippet(cmd *cobra.Command) string {
+	prefix := "# "
+	if runtime.GOOS == "windows" {
+		prefix = ""
+	}
+	return fmt.Sprintf(snippet,
+		cmd.Name(),
+		uid.Executable(),
+		uid.Executable(),
+		cmd.Name(),
+		cmd.Name(),
+		prefix,
+		cmd.Name(),
+		cmd.Name())
 }

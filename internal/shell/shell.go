@@ -86,8 +86,13 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			filtered = meta.Messages.Integrate(filtered, value)
 		}
 
-		if !meta.Messages.IsEmpty() && shell != "export" {
-			meta.Nospace.Add('*')
+		if shell != "export" {
+			switch {
+			case !meta.Messages.IsEmpty():
+				meta.Nospace.Add('*')
+			case env.Nospace() != "":
+				meta.Nospace.Add([]rune(env.Nospace())...)
+			}
 		}
 
 		sort.Sort(common.ByDisplay(filtered))

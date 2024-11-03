@@ -16,6 +16,7 @@ const (
 	CARAPACE_LENIENT       = "CARAPACE_LENIENT"       // allow unknown flags
 	CARAPACE_LOG           = "CARAPACE_LOG"           // enable logging
 	CARAPACE_MATCH         = "CARAPACE_MATCH"         // match case insensitive
+	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
 	CARAPACE_ZSH_HASH_DIRS = "CARAPACE_ZSH_HASH_DIRS" // zsh hash directories
 	CLICOLOR               = "CLICOLOR"               // disable color
@@ -64,4 +65,8 @@ func isGoRun() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-bui
 
 func Match() string { // see match.Match
 	return os.Getenv(CARAPACE_MATCH)
+}
+
+func Nospace() string {
+	return os.Getenv(CARAPACE_NOSPACE)
 }

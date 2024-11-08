@@ -54,13 +54,12 @@ Function _%v_completer {
 
     $completions
 }
-Register-ArgumentCompleter -Native -CommandName '%v'     -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock
-%vRegister-ArgumentCompleter -Native -CommandName '%v.exe' -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock
+Register-ArgumentCompleter -Native -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock -CommandName '%v'%v,'%v.exe'
 `
 
 // Snippet creates the powershell completion script.
 func Snippet(cmd *cobra.Command) string {
-	prefix := "# "
+	prefix := " # "
 	if runtime.GOOS == "windows" {
 		prefix = ""
 	}
@@ -71,6 +70,5 @@ func Snippet(cmd *cobra.Command) string {
 		cmd.Name(),
 		cmd.Name(),
 		prefix,
-		cmd.Name(),
 		cmd.Name())
 }

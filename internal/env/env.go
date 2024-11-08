@@ -18,21 +18,22 @@ const (
 	CARAPACE_MATCH         = "CARAPACE_MATCH"         // match case insensitive
 	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
+	CARAPACE_TOOLTIP       = "CARAPACE_TOOLTIP"       // enable tooltip style
 	CARAPACE_ZSH_HASH_DIRS = "CARAPACE_ZSH_HASH_DIRS" // zsh hash directories
 	CLICOLOR               = "CLICOLOR"               // disable color
 	NO_COLOR               = "NO_COLOR"               // disable color
 )
 
 func ColorDisabled() bool {
-	return os.Getenv(NO_COLOR) != "" || os.Getenv(CLICOLOR) == "0"
+	return getBool(NO_COLOR) || os.Getenv(CLICOLOR) == "0"
 }
 
 func Experimental() bool {
-	return os.Getenv(CARAPACE_EXPERIMENTAL) != ""
+	return getBool(CARAPACE_EXPERIMENTAL)
 }
 
 func Lenient() bool {
-	return os.Getenv(CARAPACE_LENIENT) != ""
+	return getBool(CARAPACE_LENIENT)
 }
 
 func Hashdirs() string {
@@ -50,11 +51,11 @@ func Sandbox() (m *common.Mock, err error) {
 }
 
 func Log() bool {
-	return os.Getenv(CARAPACE_LOG) != ""
+	return getBool(CARAPACE_LOG)
 }
 
 func Hidden() bool {
-	return os.Getenv(CARAPACE_HIDDEN) != ""
+	return getBool(CARAPACE_HIDDEN)
 }
 
 func CoverDir() string {
@@ -69,4 +70,17 @@ func Match() string { // see match.Match
 
 func Nospace() string {
 	return os.Getenv(CARAPACE_NOSPACE)
+}
+
+func Tooltip() bool {
+	return getBool(CARAPACE_TOOLTIP)
+}
+
+func getBool(s string) bool {
+	switch os.Getenv(s) {
+	case "true", "1":
+		return true
+	default:
+		return false
+	}
 }

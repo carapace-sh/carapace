@@ -8,6 +8,10 @@ import (
 
 // GoBinDir TODO experimental
 func GoBinDir(tc Context) (dir string, err error) {
+	if path, ok := tc.LookupEnv("GOBIN"); ok {
+		return filepath.ToSlash(path), nil
+	}
+
 	if path, ok := tc.LookupEnv("GOPATH"); ok {
 		dir = strings.Split(path, string(os.PathListSeparator))[0]
 	}
@@ -16,8 +20,8 @@ func GoBinDir(tc Context) (dir string, err error) {
 		if dir, err = UserHomeDir(tc); err != nil {
 			return "", err
 		}
-		dir += "/go"
+		dir = filepath.Join(dir, "go")
 	}
 
-	return filepath.ToSlash(dir) + "/bin", nil
+	return filepath.ToSlash(filepath.Join(dir, "bin")), nil
 }

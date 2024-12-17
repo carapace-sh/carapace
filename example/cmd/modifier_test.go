@@ -158,6 +158,33 @@ func TestMultiParts(t *testing.T) {
 	})
 }
 
+func TestMultiPartsN(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--multipartsn", "").
+			Expect(carapace.ActionValues("dir/").
+				NoSpace('/').
+				Usage("MultiParts()"))
+
+		s.Run("modifier", "--multipartsn", "dir/").
+			Expect(carapace.ActionValues("subdir1/", "subdir2/").
+				Prefix("dir/").
+				NoSpace('/').
+				Usage("MultiParts()"))
+
+		s.Run("modifier", "--multipartsn", "dir/subdir1/").
+			Expect(carapace.ActionValues("fileA.txt", "fileB.txt").
+				Prefix("dir/subdir1/").
+				NoSpace('/').
+				Usage("MultiParts()"))
+
+		s.Run("modifier", "--multipartsn", "dir/subdir2/").
+			Expect(carapace.ActionValues("fileC.txt").
+				Prefix("dir/subdir2/").
+				NoSpace('/').
+				Usage("MultiParts()"))
+	})
+}
+
 func TestPrefix(t *testing.T) {
 	os.Unsetenv("LS_COLORS")
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {

@@ -34,6 +34,7 @@ func init() {
 	modifierCmd.Flags().String("invoke", "", "Invoke()")
 	modifierCmd.Flags().String("list", "", "List()")
 	modifierCmd.Flags().String("multiparts", "", "MultiParts()")
+	modifierCmd.Flags().String("multipartsn", "", "MultiPartsN()")
 	modifierCmd.Flags().String("multipartsp", "", "MultiPartsP()")
 	modifierCmd.Flags().String("nospace", "", "NoSpace()")
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
@@ -137,6 +138,11 @@ func init() {
 			"dir/subdir1/fileB.txt",
 			"dir/subdir2/fileC.txt",
 		).MultiParts("/"),
+		"multipartsn": carapace.ActionValues(
+			"dir/subdir1/fileA.txt",
+			"dir/subdir1/fileB.txt",
+			"dir/subdir2/fileC.txt",
+		).MultiPartsN("/", 1),
 		"multipartsp": carapace.ActionStyledValuesDescribed(
 			"keys/<key>", "key example", style.Default,
 			"keys/<key>/<value>", "key/value example", style.Default,

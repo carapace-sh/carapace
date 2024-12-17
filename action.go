@@ -144,6 +144,15 @@ func (a Action) MultiParts(dividers ...string) Action {
 	})
 }
 
+func (a Action) MultiPartsN(divider string, n int) Action {
+	return ActionCallback(func(c Context) Action {
+		if strings.Count(c.Value, divider) < n {
+			return a.Invoke(c).ToMultiPartsA(divider)
+		}
+		return a
+	})
+}
+
 // MultiPartsP is like MultiParts but with placeholders.
 func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder string, matches map[string]string) Action) Action {
 	return ActionCallback(func(c Context) Action {

@@ -15,7 +15,7 @@ const (
 
 func (m Match) Equal(s, t string) bool {
 	if m == CASE_INSENSITIVE {
-		strings.EqualFold(s, t)
+		return strings.EqualFold(s, t)
 	}
 	return s == t
 

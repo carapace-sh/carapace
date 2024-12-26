@@ -13,6 +13,7 @@ func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
 function _%v_completion {
   local IFS=$'\n'
+  local words=${words[@]:0:$CURRENT}
   
   # shellcheck disable=SC2086,SC2154,SC2155
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then

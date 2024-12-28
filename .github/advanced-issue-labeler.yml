@@ -19,6 +19,8 @@ policy:
         label:
           - name: bash
             keys: ["Bash"]
+          - name: cmd-clink
+            keys: ["Cmd"]
           - name: elvish
             keys: ["Elvish"]
           - name: fish

@@ -49,6 +49,7 @@ body:
     description: Shell where this occured.
     options:
     - label: Bash
+    - label: Cmd
     - label: Elvish
     - label: Fish
     - label: Nushell

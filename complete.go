@@ -38,7 +38,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 				}
 				return ActionMessage(err.Error()).Invoke(context).value(args[0], args[len(args)-1]), nil
 			}
-		case "cmd":
+		case "cmd-clink":
 			var err error
 			args, err = cmd_clink.Patch(args)
 			LOG.Printf("patching args to %#v", args)

@@ -27,7 +27,7 @@ func DetermineShell() string {
 			}
 			return "bash"
 		case "cmd":
-			return "cmd"
+			return "cmd-clink"
 		case "elvish":
 			return "elvish"
 		case "fish":

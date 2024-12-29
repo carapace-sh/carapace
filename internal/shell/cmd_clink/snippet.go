@@ -18,7 +18,7 @@ func Snippet(cmd *cobra.Command) string {
   return true
 end
 
-clink.argmatcher("%v"):addarg({%v _completion}):loop(1)
+clink.argmatcher("%v"):addarg({%v_completion}):loop(1)
 `, cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name())
 	return result
 }

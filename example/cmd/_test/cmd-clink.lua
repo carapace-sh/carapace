@@ -1,12 +1,18 @@
-local function example_completion(word, word_index, line_state, match_builder)
-  local compline = string.sub(line_state:getline(), 1, line_state:getcursor())
-
-  local output = io.popen("env CARAPACE_COMPLINE=" .. string.format("%q", compline) .. " example _carapace cmd-clink '' ''"):read("*a")
-  for line in string.gmatch(output, '[^\r\n]+') do
-    match_builder:addmatch(string.gsub(line, '\t.*', ""))
-  end
-  return true
-end
-
-clink.argmatcher("example"):addarg({example _completion}):loop(1)
+set edit:completion:arg-completer[example] = {|@arg|
+    example _carapace elvish (all $arg) | from-json | each {|completion|
+		put $completion[Messages] | all (one) | each {|m|
+			edit:notify (styled "error: " red)$m
+		}
+		if (not-eq $completion[Usage] "") {
+			edit:notify (styled "usage: " $completion[DescriptionStyle])$completion[Usage]
+		}
+		put $completion[Candidates] | all (one) | peach {|c|
+			if (eq $c[Description] "") {
+		    	edit:complex-candidate $c[Value] &display=(styled $c[Display] $c[Style]) &code-suffix=$c[CodeSuffix]
+			} else {
+		    	edit:complex-candidate $c[Value] &display=(styled $c[Display] $c[Style])(styled " " $completion[DescriptionStyle]" bg-default")(styled "("$c[Description]")" $completion[DescriptionStyle]) &code-suffix=$c[CodeSuffix]
+			}
+		}
+    }
+}
 

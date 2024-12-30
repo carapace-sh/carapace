@@ -5,11 +5,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/third_party/github.com/mitchellh/go-ps"
 )
 
 // DetermineShell determines shell by parent process name.
 func DetermineShell() string {
+	if shell := env.Shell(); shell != "" {
+		return shell
+	}
+
 	process, err := ps.FindProcess(os.Getpid())
 	if err != nil {
 		return ""

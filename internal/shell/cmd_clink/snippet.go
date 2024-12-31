@@ -22,7 +22,7 @@ func Snippet(cmd *cobra.Command) string {
       display = matches[2],
       description = matches[3],
       appendchar = matches[4],
-      suppressappend = true
+      suppressappend = false
     })
   end
   return true

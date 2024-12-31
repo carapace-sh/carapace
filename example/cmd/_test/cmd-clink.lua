@@ -3,14 +3,17 @@ local function example_completion(word, word_index, line_state, match_builder)
 
   local output = io.popen("env CARAPACE_COMPLINE=" .. string.format("%q", compline) .. " example _carapace cmd-clink \"\""):read("*a")
   for line in string.gmatch(output, '[^\r\n]+') do
-    local matches = {} 
-    for m in string.gmatch(line, '[^\t]+') do 
-      table.insert(matches, m) 
-    end 
-    match_builder:addmatch({ 
-      match = matches[1], 
-      description = matches[2] 
-    }) 
+    local matches = {}
+    for m in string.gmatch(line, '[^\t]+') do
+      table.insert(matches, m)
+    end
+    match_builder:addmatch({
+      match = matches[1],
+      display = matches[2],
+      description = matches[3],
+      appendchar = matches[4],
+      suppressappend = true
+    })
   end
   return true
 end

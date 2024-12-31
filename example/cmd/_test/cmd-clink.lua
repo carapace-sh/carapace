@@ -11,6 +11,7 @@ local function example_completion(word, word_index, line_state, match_builder)
       match = matches[1],
       display = matches[2],
       description = matches[3],
+      type = "word",
       appendchar = matches[4],
       suppressappend = false
     })

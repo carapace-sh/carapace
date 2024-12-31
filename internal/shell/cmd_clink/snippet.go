@@ -21,6 +21,7 @@ func Snippet(cmd *cobra.Command) string {
       match = matches[1],
       display = matches[2],
       description = matches[3],
+      type = "word",
       appendchar = matches[4],
       suppressappend = false
     })

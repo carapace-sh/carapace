@@ -15,5 +15,5 @@ local function example_completion(word, word_index, line_state, match_builder)
   return true
 end
 
-clink.argmatcher("example"):addarg({example_completion}):loop(1)
+clink.argmatcher("example"):addarg({nowordbreakchars="'&backprime;+;,", example_completion}):loop(1)
 

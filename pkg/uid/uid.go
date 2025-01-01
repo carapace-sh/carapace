@@ -49,12 +49,17 @@ func Flag(cmd *cobra.Command, flag *pflagfork.Flag) *url.URL {
 
 // Executable returns the name of the executable.
 func Executable() string {
-	if executable, err := os.Executable(); err != nil {
+	executable, err := os.Executable()
+	if err != nil {
 		return "echo" // safe fallback that should never happen
-	} else if filepath.Base(executable) == "cmd.test" {
+	}
+	switch base := filepath.Base(executable); base {
+	case "cmd.test":
 		return "example" // for `go test -v ./...`
-	} else {
-		return filepath.Base(executable)
+	case "ld-musl-x86_64.so.1":
+		return filepath.Base(os.Args[0]) // alpine container workaround (gcompat)
+	default:
+		return base
 	}
 }
 

@@ -1,7 +1,7 @@
 #compdef example
 function _example_completion {
-  local IFS=$'\n'
   local words=${words[@]:0:$CURRENT}
+  local IFS=$'\n'
   
   # shellcheck disable=SC2086,SC2154,SC2155
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then

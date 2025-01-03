@@ -57,6 +57,7 @@ func addCompletionCommand(targetCmd *cobra.Command) {
 		ActionStyledValues(
 			"bash", "#d35673",
 			"bash-ble", "#c2039a",
+			"cmd-clink", "#2B3436",
 			"elvish", "#ffd6c9",
 			"export", style.Default,
 			"fish", "#7ea8fc",

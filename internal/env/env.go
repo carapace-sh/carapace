@@ -18,6 +18,7 @@ const (
 	CARAPACE_MATCH         = "CARAPACE_MATCH"         // match case insensitive
 	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
+	CARAPACE_SHELL         = "CARAPACE_SHELL"         // TODO
 	CARAPACE_TOOLTIP       = "CARAPACE_TOOLTIP"       // enable tooltip style
 	CARAPACE_ZSH_HASH_DIRS = "CARAPACE_ZSH_HASH_DIRS" // zsh hash directories
 	CLICOLOR               = "CLICOLOR"               // disable color
@@ -83,4 +84,8 @@ func getBool(s string) bool {
 	default:
 		return false
 	}
+}
+
+func Shell() string {
+	return os.Getenv(CARAPACE_SHELL)
 }

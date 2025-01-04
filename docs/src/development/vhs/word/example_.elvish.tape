@@ -10,9 +10,10 @@ Type "eval (example _carapace|slurp)" Enter
 Type "clear" Enter
 Show
 
+Output     out/example_.elvish.gif
+Output     out/example_.elvish.ascii
+
 Type "example "
 Sleep 1 Tab@1 Enter
 
 Sleep 2
-Output     out/example_.elvish.gif
-Output     out/example_.elvish.ascii

@@ -10,9 +10,10 @@ Type "source <(example _carapace oil)" Enter
 Type "clear" Enter
 Show
 
+Output     out/example_.oil.gif
+Output     out/example_.oil.ascii
+
 Type "example " Sleep 1 Tab@1 2
 Type "ac" Sleep 1 Tab@1
 
 Sleep 2
-Output     out/example_.oil.gif
-Output     out/example_.oil.ascii

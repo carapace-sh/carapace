@@ -1,0 +1,60 @@
+name: VHS
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/carapace-sh/carapace
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - name: build
+        run: |
+          cd example
+          go install
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: example
+          path: ~/go/bin/example
+          retention-days: 1
+
+  word:
+    runs-on: ubuntu-latest
+    container: ghcr.io/carapace-sh/carapace
+    needs: build
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: example
+          path: ~/go/bin/example
+
+      - name: word
+        run: | 
+          cd docs/src/development/vhs/word
+          ls *.tape | xargs -n1 vhs
+
+  nospace:
+    runs-on: ubuntu-latest
+    container: ghcr.io/carapace-sh/carapace
+    needs: build
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: example
+          path: ~/go/bin/example
+
+      - name: nospace
+        run: | 
+          cd docs/src/development/vhs/nospace
+          ls *.tape | xargs -n1 vhs

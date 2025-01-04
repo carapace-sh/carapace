@@ -1,0 +1,45 @@
+Set-PSReadLineOptio
+> Set-PSReadLineOption -Colors @{ "Selection" =
+ "`e[7m" }
+> Set-PSReadlineKeyHandler -Key Tab -Function M
+enuComplete
+> example _carapace powershell | Out-String | I
+nvoke-Expression
+example: The term 'example' is not recognized a
+────────────────────────────────────────────────────────────────────────────────
+> example modifier --nospace o
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example modifier --nospace o
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example modifier --nospace ./out/
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example modifier --nospace ./out/
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────

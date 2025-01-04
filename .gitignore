@@ -2,6 +2,7 @@ caraparse/caraparse
 .cover
 dist
 docs/book
+docs/src/development/vhs/*/out/*.gif
 example/cmd/_test_files/*.txt
 example/example
 example-nonposix/example-nonposix

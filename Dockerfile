@@ -83,15 +83,17 @@ RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.4.6/p
   && rm powershell_7.4.6-1.deb_amd64.deb
 
 RUN apt-get update \
-  && apt-get install -y fish \
-  elvish \
-  ffmpeg \
-  expect \
-  shellcheck \
-  sudo \
-  tcsh \
-  xonsh \
-  zsh
+  && apt-get install -y \
+                        chromium \
+                        elvish \
+                        expect \
+                        ffmpeg \
+                        fish \
+                        shellcheck \
+                        sudo \
+                        tcsh \
+                        xonsh \
+                        zsh
 
 RUN pwsh -Command "Install-Module PSScriptAnalyzer -Scope AllUsers -Force"
 
@@ -122,4 +124,5 @@ COPY --chown=1000:1000 .dockerfile/home /home/carapace/
 COPY .dockerfile/usr/local/bin/* /usr/local/bin/
 
 ENV TERM xterm
+ENV VHS_NO_SANDBOX 1
 ENTRYPOINT [ "entrypoint.sh" ]

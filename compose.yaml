@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   build: &base
     build: .
@@ -63,6 +61,10 @@ services:
     working_dir: /carapace
     command: fish -c "go test -v ./..."
 
+  vhs:
+    <<: *base
+    working_dir: /carapace/docs/src/development/vhs
+    command: bash -c "ls -d */ | xargs -I'{}' bash -c \"cd {};ls *.tape | xargs -n1 vhs\""
 
 volumes:
   go:

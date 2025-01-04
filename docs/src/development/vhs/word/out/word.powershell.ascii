@@ -1,0 +1,72 @@
+Set-PSReadLineOp
+> Set-PSReadLineOption -Colors @{ "Selection" =
+ "`e[7m" }
+> Set-PSReadlineKeyHandler -Key Tab -Function M
+enuComplete
+> example _carapace powershell | Out-String | I
+nvoke-Expression
+example: The term 'example' is not recognized a
+────────────────────────────────────────────────────────────────────────────────
+> example _carapace powershell | Out-String | I
+nvoke-Expression
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example _carapace powershell | Out-String | I
+nvoke-Expression
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./out/
+out                   word.oil.tape
+word.bash.tape        word.powershell.tape
+word.elvish.tape      word.xonsh.tape
+word.fish.tape        word.zsh.tape
+word.nushell.tape
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./ac
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./ac
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./ac
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./ac
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────

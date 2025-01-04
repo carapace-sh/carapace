@@ -99,3 +99,12 @@ services:
       RC_ZSH: |
         export PATH="/carapace/example/:$$PATH"
         source <(example _carapace)
+
+  vhs:
+    image: ghcr.io/carapace-sh/vhs
+    volumes:
+      - '.:/carapace/'
+    working_dir: /carapace/docs/src/development/vhs
+    command: bash --login -c "ls -d */ | xargs -I'{}' bash -c \"cd {};ls *.tape | xargs -n1 vhs\""
+    env_file:
+      - .github/workflows/vhs.env

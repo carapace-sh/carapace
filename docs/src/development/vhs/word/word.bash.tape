@@ -10,8 +10,8 @@ Type "source <(example _carapace oil)" Enter
 Type "clear" Enter
 Show
 
-Output     out/example_.bash.gif
-Output     out/example_.bash.ascii
+Output out/word.bash.gif
+Output out/word.bash.ascii
 
 Type "example " Sleep 1 Tab@1 2
 Type "q" # exit `more`

@@ -13,8 +13,8 @@ Type "source <(example _carapace)" Enter
 Type "clear" Enter
 Show
 
-Output     out/example_.zsh.gif
-Output     out/example_.zsh.ascii
+Output out/word.zsh.gif
+Output out/word.zsh.ascii
 
 Type "example "
 Sleep 1 Tab@1 2 Enter

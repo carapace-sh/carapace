@@ -10,8 +10,8 @@ Type "example _carapace | source" Enter
 Type "clear" Enter
 Show
 
-Output     out/example_.fish.gif
-Output     out/example_.fish.ascii
+Output out/word.fish.gif
+Output out/word.fish.ascii
 
 Type "example " Sleep 1 Tab@1 3
 

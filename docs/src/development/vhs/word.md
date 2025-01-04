@@ -1,14 +1,14 @@
 # Word
 
 - bash
-![](./word/out/example_.bash.gif)
+![](./word/out/word.bash.gif)
 - elvish
-![](./word/out/example_.elvish.gif)
+![](./word/out/word.elvish.gif)
 - fish
-![](./word/out/example_.fish.gif)
+![](./word/out/word.fish.gif)
 - oil
-![](./word/out/example_.oil.gif)
+![](./word/out/word.oil.gif)
 - xonsh
-![](./word/out/example_.xonsh.gif)
+![](./word/out/word.xonsh.gif)
 - zsh
-![](./word/out/example_.zsh.gif)
+![](./word/out/word.zsh.gif)

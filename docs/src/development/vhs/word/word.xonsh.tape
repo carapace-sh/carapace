@@ -10,8 +10,8 @@ Type "exec($(example _carapace xonsh))" Enter
 Type "clear" Enter
 Show
 
-Output     out/example_.xonsh.gif
-Output     out/example_.xonsh.ascii
+Output out/word.xonsh.gif
+Output out/word.xonsh.ascii
 
 Type "example "
 Sleep 1 Tab@1 2 Enter

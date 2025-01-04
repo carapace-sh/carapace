@@ -1,0 +1,8 @@
+> example _carapace xonsh
+         action       compat       group        modifier     special
+         alias        completion   help         multiparts   subcommand
+         chain        flag         interspersed plugin
+
+
+
+────────────────────────────────────────────────────────────────────────────────

@@ -1,30 +1,30 @@
-FROM golang:bookworm as base
+FROM golang:bookworm AS base
 LABEL org.opencontainers.image.source https://github.com/carapace-sh/carapace
 USER root
 
-FROM base as bat
+FROM base AS bat
 ARG version=0.24.0
 RUN curl -L https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-x86_64-unknown-linux-gnu.tar.gz \
   | tar -C /usr/local/bin/ --strip-components=1  -xvz bat-v${version}-x86_64-unknown-linux-gnu/bat \
   && chmod +x /usr/local/bin/bat
 
-FROM base as ble
+FROM base AS ble
 RUN git clone --recursive https://github.com/akinomyoga/ble.sh.git \
  && apt-get update && apt-get install -y gawk \
  && make -C ble.sh
 
-FROM base as elvish
+FROM base AS elvish
 ARG version=0.21.0
 RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish /usr/local/bin/elvish
 
-FROM base as goreleaser
+FROM base AS goreleaser
 ARG version=2.4.8
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
-FROM rsteube/ion-poc as ion-poc
-#FROM rust as ion
+FROM rsteube/ion-poc AS ion-poc
+#FROM rust AS ion
 #ARG version=master
 #RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.redox-os.org/redox-os/ion/ \
 # && cd ion \
@@ -32,12 +32,12 @@ FROM rsteube/ion-poc as ion-poc
 # && sudo make install prefix=/usr \
 # && sudo make update-shells prefix=/usr
 
-FROM base as nushell
+FROM base AS nushell
 ARG version=0.100.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
-FROM base as oil
+FROM base AS oil
 ARG version=0.24.0
 RUN apt-get update && apt-get install -y libreadline-dev
 RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
@@ -46,17 +46,28 @@ RUN curl https://www.oilshell.org/download/oil-${version}.tar.gz | tar -xvz \
   && make \
   && ./install
 
-FROM base as starship
+FROM base AS starship
 ARG version=1.21.1
 RUN wget -qO- "https://github.com/starship/starship/releases/download/v${version}/starship-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz starship \
  && mv starship /usr/local/bin/
 
-FROM base as vivid
+FROM base AS ttyd
+ARG version=1.7.7
+RUN wget -q "https://github.com/tsl0922/ttyd/releases/download/${version}/ttyd.x86_64" \
+ && chmod +x ttyd.x86_64 \
+ && mv ttyd.x86_64 /usr/local/bin/ttyd
+
+FROM base AS vivid
 ARG version=0.10.1
 RUN wget -qO- "https://github.com/sharkdp/vivid/releases/download/v${version}/vivid-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz vivid-v${version}-x86_64-unknown-linux-gnu/vivid \
  && mv vivid-v${version}-x86_64-unknown-linux-gnu/vivid /usr/local/bin/
 
-FROM base as mdbook
+FROM base AS vhs
+RUN git clone https://github.com/rsteube/vhs --depth 1 \
+ && cd vhs \
+ && GOBIN=/usr/local/bin/ go install
+
+FROM base AS mdbook
 ARG version=0.4.43
 RUN apt-get update && apt-get install -y unzip \
   && curl -L "https://github.com/rust-lang/mdBook/releases/download/v${version}/mdbook-v${version}-x86_64-unknown-linux-gnu.tar.gz" | tar -xvz mdbook \
@@ -74,6 +85,7 @@ RUN wget -q  https://github.com/PowerShell/PowerShell/releases/download/v7.4.6/p
 RUN apt-get update \
   && apt-get install -y fish \
   elvish \
+  ffmpeg \
   expect \
   shellcheck \
   sudo \
@@ -95,7 +107,9 @@ COPY --from=nushell /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/
 COPY --from=starship /usr/local/bin/* /usr/local/bin/
+COPY --from=ttyd /usr/local/bin/* /usr/local/bin/
 COPY --from=vivid /usr/local/bin/* /usr/local/bin/
+COPY --from=vhs /usr/local/bin/* /usr/local/bin/
 
 RUN groupadd --gid 1000 carapace \
  && useradd --uid 1000 --gid 1000 --create-home carapace \

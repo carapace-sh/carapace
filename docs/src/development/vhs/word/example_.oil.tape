@@ -11,7 +11,7 @@ Type "clear" Enter
 Show
 
 Type "example " Sleep 1 Tab@1 2
-Type "ac" Sleep 1 Tab Sleep 300ms
+Type "ac" Sleep 1 Tab@1
 
 Sleep 2
 Screenshot out/example_.oil.png

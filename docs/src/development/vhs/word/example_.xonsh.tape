@@ -11,8 +11,7 @@ Type "clear" Enter
 Show
 
 Type "example "
-Sleep 1 Tab@1 2
-Sleep 300ms
+Sleep 1 Tab@1 2 Enter
 
 Sleep 2
 Screenshot out/example_.xonsh.png

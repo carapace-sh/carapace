@@ -14,6 +14,5 @@ Type "example "
 Sleep 1 Tab@1 2 Enter
 
 Sleep 2
-Screenshot out/example_.xonsh.png
 Output     out/example_.xonsh.gif
 Output     out/example_.xonsh.ascii

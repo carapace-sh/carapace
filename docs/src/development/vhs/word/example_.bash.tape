@@ -15,6 +15,5 @@ Type "q" # exit `more`
 Type "ac" Sleep 1 Tab@1
 
 Sleep 2
-Screenshot out/example_.bash.png
 Output     out/example_.bash.gif
 Output     out/example_.bash.ascii

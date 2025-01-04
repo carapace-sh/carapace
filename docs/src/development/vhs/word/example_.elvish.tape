@@ -14,6 +14,5 @@ Type "example "
 Sleep 1 Tab@1 Enter
 
 Sleep 2
-Screenshot out/example_.elvish.png
 Output     out/example_.elvish.gif
 Output     out/example_.elvish.ascii

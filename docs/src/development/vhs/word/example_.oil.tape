@@ -14,6 +14,5 @@ Type "example " Sleep 1 Tab@1 2
 Type "ac" Sleep 1 Tab@1
 
 Sleep 2
-Screenshot out/example_.oil.png
 Output     out/example_.oil.gif
 Output     out/example_.oil.ascii

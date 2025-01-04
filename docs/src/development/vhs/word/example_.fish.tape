@@ -13,6 +13,5 @@ Show
 Type "example " Sleep 1 Tab@1 3
 
 Sleep 2
-Screenshot out/example_.fish.png
 Output     out/example_.fish.gif
 Output     out/example_.fish.ascii

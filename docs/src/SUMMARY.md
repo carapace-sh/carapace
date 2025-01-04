@@ -117,3 +117,7 @@
     - [Zsh](./development/shells/zsh.md)
   - [Testing](./development/testing.md)
   - [Asciinema](./development/asciinema.md)
+  - [VHS](./development/vhs.md)
+    - [Word](./development/vhs/word.md)
+    - [Nospace](./development/vhs/nospace.md)
+    - [Double Quote](./development/vhs/doubleQuote.md)

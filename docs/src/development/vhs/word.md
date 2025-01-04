@@ -8,6 +8,8 @@
 ![](./word/out/word.fish.gif)
 - oil
 ![](./word/out/word.oil.gif)
+- powershell
+![](./word/out/word.powershell.gif)
 - xonsh
 ![](./word/out/word.xonsh.gif)
 - zsh

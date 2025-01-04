@@ -9,7 +9,7 @@ Set Shell "zsh"
 Type "autoload -U compinit && compinit" Enter
 Type "zstyle ':completion:*' menu select" Enter
 Type "zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'" Enter
-Type "source <(example _carapace)" Enter
+Type "source <(example _carapace zsh)" Enter
 Type "clear" Enter
 Show
 

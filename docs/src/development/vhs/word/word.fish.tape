@@ -6,7 +6,7 @@ Set Padding 0
 
 Hide
 Set Shell "fish"
-Type "example _carapace | source" Enter
+Type "example _carapace fish | source" Enter
 Type "clear" Enter
 Show
 

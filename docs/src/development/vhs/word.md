@@ -6,6 +6,8 @@
 ![](./word/out/word.elvish.gif)
 - fish
 ![](./word/out/word.fish.gif)
+- nushell
+![](./word/out/word.nushell.gif)
 - oil
 ![](./word/out/word.oil.gif)
 - powershell

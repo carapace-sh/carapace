@@ -6,7 +6,7 @@ Set Padding 0
 
 Hide
 Set Shell "bash"
-Type "source <(example _carapace oil)" Enter
+Type "source <(example _carapace bash)" Enter
 Type "clear" Enter
 Show
 

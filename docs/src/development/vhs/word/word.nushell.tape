@@ -5,13 +5,12 @@ Set Height 300
 Set Padding 0
 
 Hide
-Set Shell "elvish"
-Type "eval (example _carapace elvish|slurp)" Enter
+Set Shell "nu"
 Type "clear" Enter
 Show
 
-Output out/word.elvish.gif
-Output out/word.elvish.ascii
+Output out/word.nushell.gif
+Output out/word.nushell.ascii
 
 Type "example "
 Sleep 1 Tab@1 Enter

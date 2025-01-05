@@ -5,6 +5,13 @@
 
 
 
+────────────────────────────────────────────────────────────────────────────────
+> example
+
+
+
+
+
 
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -14,24 +21,13 @@
 
 
 
-
-────────────────────────────────────────────────────────────────────────────────
-> example
-
-
-
-
-
-
-
 ────────────────────────────────────────────────────────────────────────────────
 > example action
- action       flag         multiparts
- alias        group        plugin
- chain        help         special
- compat       interspersed subcommand
- completion   modifier
- action example
+         action       compat       group        modifier     special
+         alias        completion   help         multiparts   subcommand
+         chain        flag         interspersed plugin
+         action example
+
 
 ────────────────────────────────────────────────────────────────────────────────
 > example action
@@ -41,10 +37,8 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example action
-
 
 
 

@@ -1,23 +1,12 @@
-Set-PSReadLineOpti
-> Set-PSReadLineOption -Colors @{ "Selection" =
- "`e[7m" }
-> Set-PSReadlineKeyHandler -Key Tab -Function M
-enuComplete
-> example _carapace powershell | Out-String | I
-nvoke-Expression
-example: The term 'example' is not recognized a
+Set-PSReadLine
+> Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
+> Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+> example _carapace powershell | Out-String | Invoke-Expression
+example: The term 'example' is not recognized as a name of a cmdlet, functio
+n, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the p
 ────────────────────────────────────────────────────────────────────────────────
 > example "ac"
-
-
-
-
-
-
-
-────────────────────────────────────────────────────────────────────────────────
-> example "ac"
-
 
 
 
@@ -32,10 +21,16 @@ example: The term 'example' is not recognized a
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example "ac"
 
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example "ac"
 
 
 

@@ -27,13 +27,14 @@ jobs:
           cd docs/src/development/vhs/${{ inputs.topic }}
           ls *.tape | xargs -n1 vhs
 
-      - name: check
-        run: |
-          git status --porcelain
-          [ -z "$(git status --porcelain)" ] # clean workspace unless .ascii files changed
-
       - uses: actions/upload-artifact@v4
         with:
           name: vhs-${{ inputs.topic }}
           path: docs/src/development/vhs/${{ inputs.topic }}/out
           retention-days: 1
+
+      - name: check
+        run: |
+          git status --porcelain
+          [ -z "$(git status --porcelain)" ] # clean workspace unless .ascii files changed
+

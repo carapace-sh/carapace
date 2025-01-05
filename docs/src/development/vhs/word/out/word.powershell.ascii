@@ -1,14 +1,12 @@
-Set-PSReadLineOp
-> Set-PSReadLineOption -Colors @{ "Selection" =
- "`e[7m" }
-> Set-PSReadlineKeyHandler -Key Tab -Function M
-enuComplete
-> example _carapace powershell | Out-String | I
-nvoke-Expression
-example: The term 'example' is not recognized a
+Set-PSReadLineOption
+> Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
+> Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+> example _carapace powershell | Out-String | Invoke-Expression
+example: The term 'example' is not recognized as a name of a cmdlet, functio
+n, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the p
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | I
-nvoke-Expression
+> example _carapace powershell | Out-String | Invoke-Expression
 
 
 
@@ -16,8 +14,7 @@ nvoke-Expression
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | I
-nvoke-Expression
+> example _carapace powershell | Out-String | Invoke-Expression
 
 
 
@@ -26,25 +23,14 @@ nvoke-Expression
 
 ────────────────────────────────────────────────────────────────────────────────
 > example ./out/
-out                   word.oil.tape
-word.bash.tape        word.powershell.tape
-word.elvish.tape      word.xonsh.tape
-word.fish.tape        word.zsh.tape
-word.nushell.tape
+out                   word.fish.tape        word.powershell.tape
+word.bash.tape        word.nushell.tape     word.xonsh.tape
+word.elvish.tape      word.oil.tape         word.zsh.tape
 
-
-────────────────────────────────────────────────────────────────────────────────
-> example ./ac
-
-
-
-
-
-
+/carapace/docs/src/development/vhs/word/out
 
 ────────────────────────────────────────────────────────────────────────────────
 > example ./ac
-
 
 
 
@@ -59,10 +45,16 @@ word.nushell.tape
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example ./ac
 
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example ./ac
 
 
 

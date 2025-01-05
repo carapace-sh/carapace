@@ -5,7 +5,6 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
 
@@ -14,10 +13,8 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
-
 
 
 
@@ -27,12 +24,11 @@
 ────────────────────────────────────────────────────────────────────────────────
 > example action
  COMPLETING argument
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script
-                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+action (action example)  completion (Generate the autocompletion script for
+alias (action example)   flag (flag example)
+chain (shorthand chain)  group (group example)
+compat                   help (Help about any command)
+                                           ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ────────────────────────────────────────────────────────────────────────────────
 > example action
 
@@ -41,10 +37,8 @@ completion (Generate the autocompletion script
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example action
-
 
 
 

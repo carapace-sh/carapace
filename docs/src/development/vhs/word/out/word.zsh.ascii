@@ -5,7 +5,6 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
 
@@ -14,10 +13,8 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
-
 
 
 
@@ -32,7 +29,6 @@ flag           -- flag example
 Completing modifier commands
 modifier  -- modifier example
 Completing other commands
-chain         -- shorthand chain
 ────────────────────────────────────────────────────────────────────────────────
 > example
 Completing main commands
@@ -41,7 +37,6 @@ flag           -- flag example
 Completing modifier commands
 modifier  -- modifier example
 Completing other commands
-chain         -- shorthand chain
 ────────────────────────────────────────────────────────────────────────────────
 > example
 Completing main commands
@@ -50,5 +45,4 @@ flag           -- flag example
 Completing modifier commands
 modifier  -- modifier example
 Completing other commands
-chain         -- shorthand chain
 ────────────────────────────────────────────────────────────────────────────────

@@ -5,7 +5,6 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
 
@@ -14,10 +13,8 @@
 
 
 
-
 ────────────────────────────────────────────────────────────────────────────────
 > example
-
 
 
 
@@ -30,8 +27,7 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -39,8 +35,7 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -48,8 +43,7 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -57,8 +51,7 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -66,8 +59,7 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
@@ -75,7 +67,6 @@ action (action example)
 alias (action example)
 chain (shorthand chain)
 compat
-completion (Generate the autocompletion script
-for the specified shell)
+completion (Generate the autocompletion script for the specified shell)
 flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────

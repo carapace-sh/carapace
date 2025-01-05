@@ -16,6 +16,8 @@ jobs:
         run: |
           cd example
           go install
+          whoami
+          pwd
 
       - uses: actions/upload-artifact@v4
         with:

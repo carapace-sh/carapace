@@ -89,6 +89,7 @@ RUN apt-get update \
                         expect \
                         ffmpeg \
                         fish \
+                        fonts-jetbrains-mono \
                         shellcheck \
                         sudo \
                         tcsh \

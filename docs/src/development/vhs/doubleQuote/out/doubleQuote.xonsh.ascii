@@ -1,5 +1,5 @@
->
-
+> exec($(example _carapace xonsh))
+clear
 
 
 

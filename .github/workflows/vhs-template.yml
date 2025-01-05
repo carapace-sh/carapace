@@ -10,6 +10,7 @@ on:
 jobs:
   vhs:
     runs-on: ubuntu-latest
+    continue-on-error: true
     container: ghcr.io/carapace-sh/carapace
     steps:
       - name: shallow clone

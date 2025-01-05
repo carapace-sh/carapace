@@ -1,12 +1,4 @@
-Set-PSReadLineO
-> Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
-> Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
-> example _carapace powershell | Out-String | Invoke-Expression
-example: The term 'example' is not recognized as a name of a cmdlet, functio
-n, script file, or executable program.
-Check the spelling of the name, or if a path was included, verify that the p
-────────────────────────────────────────────────────────────────────────────────
-> example modifier --nospace o
+>
 
 
 
@@ -22,7 +14,7 @@ Check the spelling of the name, or if a path was included, verify that the p
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example modifier --nospace ./out/
+> example modifier --nospace o
 
 
 
@@ -30,7 +22,15 @@ Check the spelling of the name, or if a path was included, verify that the p
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example modifier --nospace ./out/
+> example modifier --nospace 'one,'
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example modifier --nospace 'one,'
 
 
 

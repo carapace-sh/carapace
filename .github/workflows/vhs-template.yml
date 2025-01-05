@@ -36,6 +36,6 @@ jobs:
 
       - name: check
         run: |
-          git status --porcelain
+          git diff
           [ -z "$(git status --porcelain)" ] # clean workspace unless .ascii files changed
 

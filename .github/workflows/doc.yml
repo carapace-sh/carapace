@@ -61,6 +61,11 @@ jobs:
           path: docs/book/linkcheck
 
       - uses: actions/download-artifact@v4          
+        with:
+          path: docs/src/development/vhs/
+          
+      - name: Display structure of downloaded files
+        run: ls -R docs/src/development/vhs/
 
       - name: "build docs"
         run: |

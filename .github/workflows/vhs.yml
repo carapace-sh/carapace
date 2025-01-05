@@ -29,6 +29,7 @@ jobs:
 
 
   template-test:
+    needs: build
     uses: ./.github/workflows/vhs-template.yml
     with:
       topic: word

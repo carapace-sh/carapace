@@ -11,7 +11,6 @@ jobs:
   vhs:
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace
-    needs: build
     steps:
       - name: shallow clone
         uses: actions/checkout@v4

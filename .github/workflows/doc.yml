@@ -60,19 +60,7 @@ jobs:
           key: linkcheck
           path: docs/book/linkcheck
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: vhs-word
-          path: docs/src/development/vhs/word/out
-      - uses: actions/download-artifact@v4
-        with:
-          name: vhs-nospace
-          path: docs/src/development/vhs/nospace/out
-      - uses: actions/download-artifact@v4
-        with:
-          name: vhs-doubleQuote
-          path: docs/src/development/vhs/doubleQuote/out
-          
+      - uses: actions/download-artifact@v4          
 
       - name: "build docs"
         run: |

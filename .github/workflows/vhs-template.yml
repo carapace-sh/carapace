@@ -22,7 +22,7 @@ jobs:
 
       - run: chmod +x /usr/local/bin/example
 
-      - name: word
+      - name: vhs
         run: | 
           cd docs/src/development/vhs/${{ inputs.topic }}
           ls *.tape | xargs -n1 vhs

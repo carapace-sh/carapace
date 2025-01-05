@@ -16,15 +16,11 @@ jobs:
         run: |
           cd example
           go install
-          whoami
-          pwd
-          go env
-          ls /root/go/bin/
 
       - uses: actions/upload-artifact@v4
         with:
           name: example
-          path: /root/go/bin/example
+          path: /github/go/bin/example
           retention-days: 1
 
   word:
@@ -38,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /root/go/bin/example
+          path: /github/go/bin/example
 
       - name: word
         run: | 
@@ -56,7 +52,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /root/go/bin/example
+          path: /github/go/bin/example
 
       - name: nospace
         run: | 

@@ -19,21 +19,12 @@ RUN curl https://dl.elv.sh/linux-amd64/elvish-v${version}.tar.gz | tar -xvz \
   && mv elvish /usr/local/bin/elvish
 
 FROM base AS goreleaser
-ARG version=2.4.8
+ARG version=2.5.1
 RUN curl -L https://github.com/goreleaser/goreleaser/releases/download/v${version}/goreleaser_Linux_x86_64.tar.gz | tar -xvz goreleaser \
   && mv goreleaser /usr/local/bin/goreleaser
 
-FROM rsteube/ion-poc AS ion-poc
-#FROM rust AS ion
-#ARG version=master
-#RUN git clone --single-branch --branch "${version}" --depth 1 https://gitlab.redox-os.org/redox-os/ion/ \
-# && cd ion \
-# && RUSTUP=0 make # By default RUSTUP equals 1, which is for developmental purposes \
-# && sudo make install prefix=/usr \
-# && sudo make update-shells prefix=/usr
-
 FROM base AS nushell
-ARG version=0.100.0
+ARG version=0.101.0
 RUN curl -L https://github.com/nushell/nushell/releases/download/${version}/nu-${version}-x86_64-unknown-linux-gnu.tar.gz | tar -xvz \
  && mv nu-${version}-x86_64-unknown-linux-gnu/nu* /usr/local/bin
 
@@ -104,8 +95,6 @@ COPY --from=bat /usr/local/bin/* /usr/local/bin/
 COPY --from=ble /go/ble.sh /opt/ble.sh
 COPY --from=elvish /usr/local/bin/* /usr/local/bin/
 COPY --from=goreleaser /usr/local/bin/* /usr/local/bin/
-#COPY --from=ion /ion/target/release/ion /usr/local/bin/
-COPY --from=ion-poc /usr/local/bin/ion /usr/local/bin/
 COPY --from=nushell /usr/local/bin/* /usr/local/bin/
 COPY --from=mdbook /usr/local/bin/* /usr/local/bin/
 COPY --from=oil /usr/local/bin/* /usr/local/bin/

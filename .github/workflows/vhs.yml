@@ -27,6 +27,13 @@ jobs:
           path: example/example
           retention-days: 1
 
+
+  template-test:
+    uses: ./.github/workflows/vhs-template.yml
+    with:
+      topic: word
+
+
   word:
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace

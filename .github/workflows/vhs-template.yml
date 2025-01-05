@@ -1,0 +1,29 @@
+name: vhs template
+
+on:
+  workflow_call:
+    inputs:
+      topic:
+        required: true
+        type: string
+
+jobs:
+  word:
+    runs-on: ubuntu-latest
+    container: ghcr.io/carapace-sh/carapace
+    needs: build
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: example
+          path: /usr/local/bin/
+
+      - run: chmod +x /usr/local/bin/example
+
+      - name: word
+        run: | 
+          cd docs/src/development/vhs/${{ inputs.topic }}
+          ls *.tape | xargs -n1 vhs

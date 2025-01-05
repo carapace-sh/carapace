@@ -15,12 +15,12 @@ jobs:
       - name: build
         run: |
           cd example
-          go install
+          go build
 
       - uses: actions/upload-artifact@v4
         with:
           name: example
-          path: /github/go/bin/example
+          path: example/example
           retention-days: 1
 
   word:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /github/go/bin/example
+          path: /usr/local/bin/example
 
       - name: word
         run: | 
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /github/go/bin/example
+          path: /usr/local/bin/example
 
       - name: nospace
         run: | 

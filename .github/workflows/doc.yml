@@ -40,6 +40,9 @@ jobs:
       topic: nospace
   
   doc:
+    needs:
+      - word
+      - nospace
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace
     steps:
@@ -49,6 +52,16 @@ jobs:
         with:
           key: linkcheck
           path: docs/book/linkcheck
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vhs-word
+          path: docs/src/development/vhs/word
+      - uses: actions/download-artifact@v4
+        with:
+          name: vhs-nospace
+          path: docs/src/development/vhs/nospace
+          
 
       - name: "build docs"
         run: |

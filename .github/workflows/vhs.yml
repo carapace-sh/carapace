@@ -36,10 +36,7 @@ jobs:
           name: example
           path: /usr/local/bin/
 
-      - name: chmod
-        run: |
-          find /usr/local/bin
-          chmod +x /usr/local/bin/example
+      - run: chmod +x /usr/local/bin/example
 
       - name: word
         run: | 
@@ -58,6 +55,8 @@ jobs:
         with:
           name: example
           path: /usr/local/bin/
+
+      - run: chmod +x /usr/local/bin/example
 
       - name: nospace
         run: | 

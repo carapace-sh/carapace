@@ -38,6 +38,7 @@ jobs:
 
       - name: chmod
         run: |
+          find /usr/local/bin
           chmod +x /usr/local/bin/example
 
       - name: word

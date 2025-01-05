@@ -1,4 +1,4 @@
-Set-PSReadLineOption
+Set-PSReadLineO
 > Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
 > Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 > example _carapace powershell | Out-String | Invoke-Expression

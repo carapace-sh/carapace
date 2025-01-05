@@ -7,10 +7,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ghcr.io/carapace-sh/carapace
     steps:
       - name: shallow clone
         uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.0'
 
       - name: build
         run: |

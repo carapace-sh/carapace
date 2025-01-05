@@ -18,6 +18,8 @@ jobs:
           go install
           whoami
           pwd
+          go env
+          ls /root/go/bin/
 
       - uses: actions/upload-artifact@v4
         with:

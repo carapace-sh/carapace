@@ -34,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /usr/local/bin/example
+          path: /usr/local/bin/
 
       - name: chmod
         run: |
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: /usr/local/bin/example
+          path: /usr/local/bin/
 
       - name: nospace
         run: | 

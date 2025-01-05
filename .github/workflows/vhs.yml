@@ -20,7 +20,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: example
-          path: ~/go/bin/example
+          path: /home/carapce/go/bin/example
           retention-days: 1
 
   word:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: ~/go/bin/example
+          path: /home/carapce/go/bin/example
 
       - name: word
         run: | 
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: example
-          path: ~/go/bin/example
+          path: /home/carapce/go/bin/example
 
       - name: nospace
         run: | 

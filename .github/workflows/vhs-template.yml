@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  word:
+  vhs:
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace
     needs: build

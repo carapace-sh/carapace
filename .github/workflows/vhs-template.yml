@@ -29,6 +29,7 @@ jobs:
 
       - name: check
         run: |
+          git status --porcelain
           [ -z "$(git status --porcelain)" ] # clean workspace unless .ascii files changed
 
       - uses: actions/upload-artifact@v4

@@ -31,7 +31,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: vhs-${{ inputs.topic }}
-          path: docs/src/development/vhs/${{ inputs.topic }}/out
+          path: docs/src/development/vhs/${{ inputs.topic }}/out/
           retention-days: 1
 
       - name: check

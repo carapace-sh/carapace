@@ -1,48 +1,48 @@
-> >
-
-
-
-
-
-
-────────────────────────────────────────────────────────────────────────────────
-> > example
-
-
-
-
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example
-
-
-
-
-
-
-────────────────────────────────────────────────────────────────────────────────
-> | example
-action         action example
-alias          action example
-chain          shorthand chain
-compat
-completion     Generate the autocompletion script for the specified shell
-flag           flag example
-────────────────────────────────────────────────────────────────────────────────
-> > example action
-
-
-
-
-
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
+example
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example action
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
+example
 
+────────────────────────────────────────────────────────────────────────────────
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
+example
 
-
-
-
-
+────────────────────────────────────────────────────────────────────────────────
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
+example
+     __  ,
+────────────────────────────────────────────────────────────────────────────────
+No environment config file found at /home/carapace/.config/nushell/env.nu
+Would you like to create one with defaults (Y/n):
+clear
+No config file found at /home/carapace/.config/nushell/config.nu
+Would you like to create one with defaults (Y/n):
+example
+     __  ,
 ────────────────────────────────────────────────────────────────────────────────

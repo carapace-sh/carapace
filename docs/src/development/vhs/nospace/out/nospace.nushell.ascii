@@ -22,7 +22,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example modifier --nospace one,
+> > example modifier --nospace out/
 
 
 
@@ -30,7 +30,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example modifier --nospace one,
+> > example modifier --nospace out/
 
 
 

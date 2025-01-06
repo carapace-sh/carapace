@@ -10,6 +10,6 @@ Set Padding 0
 Set Shell "bash"
 
 Hide
-Type0 "source <(example _carapace bash)" Enter
-Type0 "clear" Enter
+Type@0 "source <(example _carapace bash)" Enter
+Type@0 "clear" Enter
 Show

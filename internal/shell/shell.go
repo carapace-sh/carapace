@@ -10,6 +10,7 @@ import (
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/shell/bash"
 	"github.com/carapace-sh/carapace/internal/shell/bash_ble"
+	"github.com/carapace-sh/carapace/internal/shell/cmd_clink"
 	"github.com/carapace-sh/carapace/internal/shell/elvish"
 	"github.com/carapace-sh/carapace/internal/shell/export"
 	"github.com/carapace-sh/carapace/internal/shell/fish"
@@ -33,6 +34,7 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 	shellSnippets := map[string]func(cmd *cobra.Command) string{
 		"bash":       bash.Snippet,
 		"bash-ble":   bash_ble.Snippet,
+		"cmd-clink":  cmd_clink.Snippet,
 		"export":     export.Snippet,
 		"fish":       fish.Snippet,
 		"elvish":     elvish.Snippet,
@@ -60,6 +62,7 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 	shellFuncs := map[string]func(currentWord string, meta common.Meta, values common.RawValues) string{
 		"bash":       bash.ActionRawValues,
 		"bash-ble":   bash_ble.ActionRawValues,
+		"cmd-clink":  cmd_clink.ActionRawValues,
 		"fish":       fish.ActionRawValues,
 		"elvish":     elvish.ActionRawValues,
 		"export":     export.ActionRawValues,

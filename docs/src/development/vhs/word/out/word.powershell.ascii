@@ -1,10 +1,10 @@
->
-
-
-
-
-
-
+Set-PSReadLineOp
+> Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
+> Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+> example _carapace powershell | Out-String | Invoke-Expression
+example: The term 'example' is not recognized as a name of a cmdlet, functio
+n, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the p
 ────────────────────────────────────────────────────────────────────────────────
 > example _carapace powershell | Out-String | Invoke-Expression
 
@@ -22,43 +22,43 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | Invoke-Expression
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script for the specified shell)
-flag (flag example)
+> example ./out/
+out                   word.fish.tape        word.powershell.tape
+word.bash.tape        word.nushell.tape     word.xonsh.tape
+word.elvish.tape      word.oil.tape         word.zsh.tape
+
+/carapace/docs/src/development/vhs/word/out
+
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | Invoke-Expression
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script for the specified shell)
-flag (flag example)
+> example ./ac
+
+
+
+
+
+
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | Invoke-Expression
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script for the specified shell)
-flag (flag example)
+> example ./ac
+
+
+
+
+
+
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | Invoke-Expression
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script for the specified shell)
-flag (flag example)
+> example ./ac
+
+
+
+
+
+
 ────────────────────────────────────────────────────────────────────────────────
-> example _carapace powershell | Out-String | Invoke-Expression
-action (action example)
-alias (action example)
-chain (shorthand chain)
-compat
-completion (Generate the autocompletion script for the specified shell)
-flag (flag example)
+> example ./ac
+
+
+
+
+
+
 ────────────────────────────────────────────────────────────────────────────────

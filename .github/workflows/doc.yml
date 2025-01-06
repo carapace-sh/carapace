@@ -27,23 +27,10 @@ jobs:
           path: example/example
           retention-days: 1
 
-  word:
-    needs: build
-    uses: ./.github/workflows/vhs-template.yml
-    with:
-      topic: word
 
-  nospace:
-    needs: build
-    uses: ./.github/workflows/vhs-template.yml
-    with:
-      topic: nospace
-
-  doubleQuote:
-    needs: build
-    uses: ./.github/workflows/vhs-template.yml
-    with:
-      topic: doubleQuote
+  word:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
+  nospace:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
+  doubleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
   
   doc:
     needs:

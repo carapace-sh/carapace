@@ -10,5 +10,5 @@ Set Padding 0
 Set Shell "nu"
 
 Hide
-Type@0.01 "clear" Enter
+Type@0 "clear" Enter
 Show

@@ -10,7 +10,7 @@ Set Padding 0
 Set Shell "osh"
 
 Hide
-Type@0.01 "source <(example _carapace oil)" Enter
-Type@0.01 "clear" Enter
+Type@0 "source <(example _carapace oil)" Enter
+Type@0 "clear" Enter
 Show
 

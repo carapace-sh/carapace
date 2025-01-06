@@ -10,9 +10,9 @@ Set Padding 0
 Set Shell "zsh"
 
 Hide
-Type@0.01 "autoload -U compinit && compinit" Enter
-Type@0.01 "zstyle ':completion:*' menu select" Enter
-Type@0.01 "zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'" Enter
-Type@0.01 "source <(example _carapace zsh)" Enter
-Type@0.01 "clear" Enter
+Type@0 "autoload -U compinit && compinit" Enter
+Type@0 "zstyle ':completion:*' menu select" Enter
+Type@0 "zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'" Enter
+Type@0 "source <(example _carapace zsh)" Enter
+Type@0 "clear" Enter
 Show

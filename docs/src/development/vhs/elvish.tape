@@ -10,6 +10,6 @@ Set Padding 0
 Set Shell "elvish"
 
 Hide
-Type@0.01 "eval (example _carapace elvish|slurp)" Enter
-Type@0.01 "clear" Enter
+Type@0 "eval (example _carapace elvish|slurp)" Enter
+Type@0 "clear" Enter
 Show

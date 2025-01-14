@@ -1,5 +1,0 @@
-export SHELL='oil'
-export STARSHIP_SHELL='oil'
-export LS_COLORS="$(vivid generate dracula)"
-PS1="$(starship prompt)"
-[[ -z "${TARGET}" ]] || source <(${TARGET} _carapace)

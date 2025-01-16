@@ -1,12 +1,42 @@
 name: Doc
 
 on:
+  pull_request:
   push:
-    branches:
-      - 'master'
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.0'
+
+      - name: build
+        run: |
+          cd example
+          go build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: example
+          path: example/example
+          retention-days: 1
+
+
+  word:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
+  nospace:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
+  doubleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
+
   doc:
+    needs:
+      - word
+      - nospace
+      - doubleQuote
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace
     steps:
@@ -16,6 +46,13 @@ jobs:
         with:
           key: linkcheck
           path: docs/book/linkcheck
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: docs/src/development/vhs/
+
+      - name: Display structure of downloaded files
+        run: ls -R docs/src/development/vhs/
 
       - name: "build docs"
         run: |

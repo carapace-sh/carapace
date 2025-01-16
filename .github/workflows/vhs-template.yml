@@ -1,0 +1,47 @@
+name: vhs template
+
+on:
+  workflow_call:
+    inputs:
+      topic:
+        required: true
+        type: string
+
+jobs:
+  vhs:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: ghcr.io/carapace-sh/vhs
+    env:
+      RC_BASH: "ln -sf /carapace/example/example /usr/local/bin/example"
+      RC_NUSHELL_ENV: "mkdir ~/.cache/\nexample _carapace nushell | save --force ~/.cache/example.nu"
+      RC_NUSHELL: "source ~/.cache/example.nu\n$$env.config.completions.external.completer = $$example_completer"
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: example
+          path: /usr/local/bin/
+
+      - run: chmod +x /usr/local/bin/example
+
+      - name: vhs
+        run: |
+          cd docs/src/development/vhs/${{ inputs.topic }}
+          ls *.tape | xargs -n1 vhs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.topic }}
+          path: |
+            docs/src/development/vhs/${{ inputs.topic }}/
+            !docs/src/development/vhs/${{ inputs.topic }}/*.tape
+          retention-days: 1
+
+      - name: check
+        run: |
+          git diff
+          [ -z "$(git status --porcelain)" ] # clean workspace unless .ascii files changed
+

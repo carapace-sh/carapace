@@ -6,7 +6,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example >/dev/null
+> example action embeddedP1 "embeddedP2 with
 
 
 
@@ -14,7 +14,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example >/dev/null
+> example action embeddedP1 "embeddedP2 with
 
 
 
@@ -22,15 +22,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example action
-         action       compat       group        modifier     special
-         alias        completion   help         multiparts   subcommand
-         chain        flag         interspersed plugin
-         action example
-
-
-────────────────────────────────────────────────────────────────────────────────
-> example action
+> example action embeddedP1 "embeddedP2 with space"
 
 
 
@@ -38,7 +30,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> example action
+> example action embeddedP1 "embeddedP2 with space"
 
 
 

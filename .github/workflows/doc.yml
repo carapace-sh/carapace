@@ -33,6 +33,7 @@ jobs:
   doubleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
   doubleQuoteOpen: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}
   singleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
+  singleQuoteOpen: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuoteOpen}}
   redirect:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
 
   doc:

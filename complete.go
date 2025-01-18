@@ -5,6 +5,7 @@ import (
 
 	"github.com/carapace-sh/carapace/internal/config"
 	"github.com/carapace-sh/carapace/internal/shell/bash"
+	"github.com/carapace-sh/carapace/internal/shell/cmd_clink"
 	"github.com/carapace-sh/carapace/internal/shell/nushell"
 	"github.com/carapace-sh/carapace/pkg/ps"
 	"github.com/spf13/cobra"
@@ -35,6 +36,14 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 					LOG.Printf("completing redirect target for %#v", args)
 					return ActionFiles().Invoke(context).value(args[0], args[len(args)-1]), nil
 				}
+				return ActionMessage(err.Error()).Invoke(context).value(args[0], args[len(args)-1]), nil
+			}
+		case "cmd-clink":
+			var err error
+			args, err = cmd_clink.Patch(args)
+			LOG.Printf("patching args to %#v", args)
+			if err != nil {
+				context := NewContext(args...)
 				return ActionMessage(err.Error()).Invoke(context).value(args[0], args[len(args)-1]), nil
 			}
 		}

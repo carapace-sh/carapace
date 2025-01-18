@@ -1,0 +1,40 @@
+>
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+usage: action [pos1] [pos2] [--] [dashAny]...
+error: no candidates
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+usage: action [pos1] [pos2] [--] [dashAny]...
+error: no candidates
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────

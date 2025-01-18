@@ -124,4 +124,5 @@
     - [Double Quote Open](./development/vhs/doubleQuoteOpen.md)
     - [Single Quote](./development/vhs/singleQuote.md)
     - [Single Quote Open](./development/vhs/singleQuoteOpen.md)
+    - [Escape](./development/vhs/escape.md)
     - [Redirect](./development/vhs/redirect.md)

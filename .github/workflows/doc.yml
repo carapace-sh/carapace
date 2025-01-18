@@ -42,6 +42,11 @@ jobs:
       - word
       - nospace
       - doubleQuote
+      - doubleQuoteOpen
+      - singleQuote
+      - singleQuoteOpen
+      - escape
+      - redirect
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/carapace
     steps:

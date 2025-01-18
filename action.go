@@ -528,3 +528,15 @@ func (a Action) UsageF(f func() string) Action {
 		return a
 	})
 }
+
+func (a Action) Context(c Context) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).ToA()
+	})
+}
+
+func (a Action) ContextF(f func(c Context) Context) Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Context(f(c))
+	})
+}

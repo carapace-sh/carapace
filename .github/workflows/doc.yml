@@ -28,11 +28,12 @@ jobs:
           retention-days: 1
 
 
-  word:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
-  nospace:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
-  doubleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
-  singleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
-  redirect:    {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
+  word:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
+  nospace:         {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
+  doubleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
+  doubleQuoteOpen: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}
+  singleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
+  redirect:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
 
   doc:
     needs:

@@ -121,3 +121,4 @@
     - [Word](./development/vhs/word.md)
     - [Nospace](./development/vhs/nospace.md)
     - [Double Quote](./development/vhs/doubleQuote.md)
+    - [Single Quote](./development/vhs/singleQuote.md)

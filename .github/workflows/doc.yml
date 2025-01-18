@@ -31,6 +31,7 @@ jobs:
   word:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
   nospace:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
   doubleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
+  singleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
 
   doc:
     needs:

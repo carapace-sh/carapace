@@ -19,3 +19,4 @@ enable = true
 
 [output.linkcheck]
 follow-web-links = true
+exclude = [ 'gnu\.org']

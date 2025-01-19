@@ -6,7 +6,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example
+> > example _carapace nushell | save --force /tmp/example.nu
 
 
 
@@ -14,7 +14,7 @@
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example
+> > example _carapace nushell | save --force /tmp/example.nu
 
 
 
@@ -23,22 +23,22 @@
 
 ────────────────────────────────────────────────────────────────────────────────
 > | example
-out/                  word.bash.tape        word.elvish.tape
-word.fish.tape        word.nushell.tape     word.oil.tape
-word.powershell.tape  word.xonsh.tape       word.zsh.tape
+action         action example
+alias          action example
+chain          shorthand chain
+compat
+completion     Generate the autocompletion script for the specified shell
+flag           flag example
+────────────────────────────────────────────────────────────────────────────────
+> > example action
+
+
+
 
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example out/
-
-
-
-
-
-
-────────────────────────────────────────────────────────────────────────────────
-> > example out/
+> > example action
 
 
 

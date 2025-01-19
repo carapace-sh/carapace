@@ -7,9 +7,9 @@ function _example_completion {
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
     local lines="$(echo ${words}"''" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
   elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_STATE=QUOTING_STATE CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   else
-    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_STATE=QUOTING_ESCAPING_STATE CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   fi
 
   local zstyle message data

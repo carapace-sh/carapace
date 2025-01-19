@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex"
 	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/env"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -63,6 +65,16 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			val.Value = quoteValue(val.Value)
 			val.Value = strings.ReplaceAll(val.Value, `\`, `\\`) // TODO find out why `_describe` needs another backslash
 			val.Value = strings.ReplaceAll(val.Value, `:`, `\:`) // TODO find out why `_describe` needs another backslash
+
+			switch env.State() {
+			// TODO depending on state value needs to be formatted differently
+			// TODO backspace strings are currently an issue
+			case shlex.QUOTING_STATE:
+				val.Value = val.Value + `'`
+			case shlex.QUOTING_ESCAPING_STATE:
+				val.Value = val.Value + `"`
+			}
+
 			if !meta.Nospace.Matches(val.Value) {
 				val.Value = val.Value + " "
 			}

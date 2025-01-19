@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex"
 	"github.com/carapace-sh/carapace/internal/common"
 )
 
@@ -18,6 +19,7 @@ const (
 	CARAPACE_MATCH         = "CARAPACE_MATCH"         // match case insensitive
 	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
+	CARAPACE_STATE         = "CARAPACE_STATE"         // current word state
 	CARAPACE_TOOLTIP       = "CARAPACE_TOOLTIP"       // enable tooltip style
 	CARAPACE_ZSH_HASH_DIRS = "CARAPACE_ZSH_HASH_DIRS" // zsh hash directories
 	CLICOLOR               = "CLICOLOR"               // disable color
@@ -74,6 +76,17 @@ func Nospace() string {
 
 func Tooltip() bool {
 	return getBool(CARAPACE_TOOLTIP)
+}
+
+func State() shlex.LexerState {
+	switch os.Getenv(CARAPACE_STATE) {
+	case "QUOTING_STATE":
+		return shlex.QUOTING_STATE
+	case "QUOTING_ESCAPING_STATE":
+		return shlex.QUOTING_ESCAPING_STATE
+	default:
+		return shlex.START_STATE
+	}
 }
 
 func getBool(s string) bool {

@@ -31,14 +31,17 @@ function _%v_completion {
   zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
   
-  local block tag displays values displaysArr valuesArr
+  local block tag displays values displaysArr valuesArr displaysNospaceArr valuesNospaceArr
   while IFS=$'\002' read -r -d $'\002' block; do
-    IFS=$'\003' read -r -d '' tag displays values <<<"${block}"
+    IFS=$'\003' read -r -d '' tag displays values displaysNospace valuesNospace <<<"${block}"
     # shellcheck disable=SC2034
     IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
     IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
+    IFS=$'\n' read -r -d $'\004' -A displaysNospaceArr <<<"${displaysNospace}"$'\004'
+    IFS=$'\n' read -r -d $'\004' -A valuesNospaceArr <<<"${valuesNospace}"$'\004'
   
     [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+    #[[ ${#valuesNospaceArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysNospaceArr valuesNospaceArr -Q -S ''
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _%v_completion

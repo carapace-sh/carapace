@@ -23,22 +23,22 @@
 
 ────────────────────────────────────────────────────────────────────────────────
 > | example >/dev/null
-out/                      redirect.bash.tape
-redirect.elvish.tape      redirect.fish.tape
-redirect.nushell.tape     redirect.oil.tape
-redirect.powershell.tape  redirect.xonsh.tape
-redirect.zsh.tape
-
-────────────────────────────────────────────────────────────────────────────────
-> > example >/dev/null out/
-
+NO RECORDS FOUND
 
 
 
 
 
 ────────────────────────────────────────────────────────────────────────────────
-> > example >/dev/null out/
+> > example >/dev/null
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example >/dev/null
 
 
 

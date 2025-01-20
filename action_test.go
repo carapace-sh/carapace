@@ -155,10 +155,8 @@ func TestActionDirectories(t *testing.T) {
 
 	assertEqual(t,
 		ActionStyledValues(
-			"_test/", style.Of(style.Blue, style.Bold),
 			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
-			"example/_test/", "file://"+wd("")+"/example/_test/",
 			"example/cmd/", "file://"+wd("")+"/example/cmd/",
 		)),
 		ActionDirectories().Invoke(Context{Value: "example/"}),
@@ -199,13 +197,11 @@ func TestActionFiles(t *testing.T) {
 	assertEqual(t,
 		ActionStyledValues(
 			"README.md", style.Default,
-			"_test/", style.Of(style.Blue, style.Bold),
 			"cmd/", style.Of(style.Blue, style.Bold),
 			"main.go", style.Default,
 			"main_test.go", style.Default,
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
 			"example/README.md", "file://"+wd("example")+"/README.md",
-			"example/_test/", "file://"+wd("example")+"/_test/",
 			"example/cmd/", "file://"+wd("example")+"/cmd/",
 			"example/main.go", "file://"+wd("example")+"/main.go",
 			"example/main_test.go", "file://"+wd("example")+"/main_test.go",

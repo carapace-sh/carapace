@@ -28,14 +28,16 @@ jobs:
           retention-days: 1
 
 
-  word:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
-  nospace:         {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
-  doubleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
-  doubleQuoteOpen: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}
-  singleQuote:     {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
-  singleQuoteOpen: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuoteOpen}}
-  escape:          {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: escape}}
-  redirect:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
+  word:               {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
+  nospace:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: nospace}}
+  doubleQuote:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
+  doubleQuoteOpen:    {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}
+  doubleQuotePartial: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuotePartial}}
+  singleQuote:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuote}}
+  singleQuoteOpen:    {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuoteOpen}}
+  singleQuotePartial: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuotePartial}}
+  escape:             {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: escape}}
+  redirect:           {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
 
   doc:
     needs:
@@ -43,8 +45,10 @@ jobs:
       - nospace
       - doubleQuote
       - doubleQuoteOpen
+      - doubleQuotePartial
       - singleQuote
       - singleQuoteOpen
+      - singleQuotePartial
       - escape
       - redirect
     runs-on: ubuntu-latest

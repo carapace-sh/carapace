@@ -38,6 +38,7 @@ jobs:
   singleQuotePartial: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: singleQuotePartial}}
   escape:             {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: escape}}
   redirect:           {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
+  special:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: special}}
 
   doc:
     needs:
@@ -51,6 +52,7 @@ jobs:
       - singleQuotePartial
       - escape
       - redirect
+      - special
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/mdbook
     steps:

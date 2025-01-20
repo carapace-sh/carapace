@@ -1,14 +1,27 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 )
 
+var special = `p1 & < > ' " { } $ # | ? ( ) ;  [ ] * \ $() ${} ` + "` ``"
+
 var specialCmd = &cobra.Command{
 	Use:   "special",
 	Short: "",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 0 && args[0] != special {
+			fmt.Printf("expected: %#v\n", special)
+			fmt.Printf("actual  : %#v\n", args[0])
+			os.Exit(1)
+		} else {
+			fmt.Println("ok")
+		}
+	},
 }
 
 func init() {
@@ -30,6 +43,6 @@ func init() {
 	})
 
 	carapace.Gen(specialCmd).PositionalCompletion(
-		carapace.ActionValues(`p1 & < > ' " { } $ # | ? ( ) ;  [ ] * \ `+"`", "positional1"),
+		carapace.ActionValues(special),
 	)
 }

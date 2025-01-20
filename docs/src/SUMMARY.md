@@ -129,3 +129,5 @@
     - [Escape](./development/vhs/escape.md)
     - [Redirect](./development/vhs/redirect.md)
     - [Special](./development/vhs/special.md)
+    - [Special Double Quote](./development/vhs/specialDoubleQuote.md)
+    - [Special Single Quote](./development/vhs/specialSingleQuote.md)

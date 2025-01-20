@@ -39,6 +39,8 @@ jobs:
   escape:             {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: escape}}
   redirect:           {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: redirect}}
   special:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: special}}
+  specialDoubleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: specialDoubleQuote}}
+  specialSingleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: specialSingleQuote}}
 
   doc:
     needs:
@@ -53,6 +55,8 @@ jobs:
       - escape
       - redirect
       - special
+      - specialDoubleQuote
+      - specialSingleQuote
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/mdbook
     steps:

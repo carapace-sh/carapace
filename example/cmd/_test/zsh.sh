@@ -2,14 +2,14 @@
 function _example_completion {
   local words=${words[@]:0:$CURRENT}
   local IFS=$'\n'
-  
+
   # shellcheck disable=SC2086,SC2154,SC2155
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words}"''" | CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
+    local lines="$(echo ${words}"''" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
   elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_STATE=QUOTING_STATE CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   else
-    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_STATE=QUOTING_ESCAPING_STATE CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   fi
 
   local zstyle message data

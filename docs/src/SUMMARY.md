@@ -128,3 +128,4 @@
     - [Single Quote Partial](./development/vhs/singleQuotePartial.md)
     - [Escape](./development/vhs/escape.md)
     - [Redirect](./development/vhs/redirect.md)
+    - [Special](./development/vhs/special.md)

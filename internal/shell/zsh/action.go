@@ -16,8 +16,18 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
-// TODO verify these are correct/complete (copied from bash)
-var quoter = strings.NewReplacer(
+var quotingReplacer = strings.NewReplacer(
+	`'`, `'\''`,
+)
+
+var quotingEscapingReplacer = strings.NewReplacer(
+	`\`, `\\`,
+	`"`, `\"`,
+	`$`, `\$`,
+	"`", "\\`",
+)
+
+var defaultReplacer = strings.NewReplacer(
 	`\`, `\\`,
 	`&`, `\&`,
 	`<`, `\<`,
@@ -41,11 +51,17 @@ var quoter = strings.NewReplacer(
 	`~`, `\~`,
 )
 
+// additional replacement for use with `_describe` in shell script
+var describeReplacer = strings.NewReplacer(
+	`\`, `\\`,
+	`:`, `\:`,
+)
+
 func quoteValue(s string) string {
 	if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
-		return "~" + quoter.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
+		return "~" + defaultReplacer.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
 	}
-	return quoter.Replace(s)
+	return defaultReplacer.Replace(s)
 }
 
 type state int
@@ -60,12 +76,18 @@ const (
 	// Values need to end with `'` as well.
 	// Weirdly regardless whether there are additional quotes within the word.
 	QUOTING_STATE
-	// Word starts and ends with quotes.
+	// Word starts and ends with `"`.
 	// Space suffix somehow ends up within the quotes.
 	//    `"action"<TAB>`
 	//    `"action "<CURSOR>`
 	// Workaround for now is to force nospace.
-	FULLY_QUOTED_STATE
+	FULL_QUOTING_ESCAPING_STATE
+	// Word starts and ends with `'`.
+	// Space suffix somehow ends up within the quotes.
+	//    `'action'<TAB>`
+	//    `'action '<CURSOR>`
+	// Workaround for now is to force nospace.
+	FULL_QUOTING_STATE
 )
 
 // ActionRawValues formats values for zsh
@@ -74,13 +96,16 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	state := DEFAULT_STATE
 	if err == nil {
 		rawValue := splitted.CurrentToken().RawValue
+		// TODO use token state to determine actual state (might have mixture).
 		switch {
 		case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
 			state = QUOTING_STATE
 		case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
 			state = QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^".*"$|^'.*'$`).MatchString(rawValue):
-			state = FULLY_QUOTED_STATE
+		case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
+			state = FULL_QUOTING_ESCAPING_STATE
+		case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
+			state = FULL_QUOTING_STATE
 		}
 	}
 
@@ -97,26 +122,37 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		displays := make([]string, len(values))
 		for index, val := range values {
 			value := sanitizer.Replace(val.Value)
-			value = quoteValue(value)
-			value = strings.ReplaceAll(value, `\`, `\\`) // TODO find out why `_describe` needs another backslash
-			value = strings.ReplaceAll(value, `:`, `\:`) // TODO find out why `_describe` needs another backslash
 
 			switch state {
-			// TODO depending on state value needs to be formatted differently
-			// TODO backspace strings are currently an issue
-			case QUOTING_STATE:
-				value = value + `'`
 			case QUOTING_ESCAPING_STATE:
+				value = quotingEscapingReplacer.Replace(value)
+				value = describeReplacer.Replace(value)
 				value = value + `"`
+			case QUOTING_STATE:
+				value = quotingReplacer.Replace(value)
+				value = describeReplacer.Replace(value)
+				value = value + `'`
+			case FULL_QUOTING_ESCAPING_STATE:
+				value = quotingEscapingReplacer.Replace(value)
+				value = describeReplacer.Replace(value)
+			case FULL_QUOTING_STATE:
+				value = quotingReplacer.Replace(value)
+				value = describeReplacer.Replace(value)
+			default:
+				value = quoteValue(value)
+				value = describeReplacer.Replace(value)
 			}
 
-			if !meta.Nospace.Matches(val.Value) && state != FULLY_QUOTED_STATE {
-				value += " "
+			if !meta.Nospace.Matches(val.Value) {
+				switch state {
+				case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
+				default:
+					value += " "
+				}
 			}
 
 			display := sanitizer.Replace(val.Display)
-			display = strings.ReplaceAll(display, `\`, `\\`) // TODO find out why `_describe` needs another backslash
-			display = strings.ReplaceAll(display, `:`, `\:`) // TODO find out why `_describe` needs another backslash
+			display = describeReplacer.Replace(display) // TODO check if this needs to be applied to description as well
 			description := sanitizer.Replace(val.Description)
 
 			vals[index] = value

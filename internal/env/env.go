@@ -20,6 +20,7 @@ const (
 	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
 	CARAPACE_TOOLTIP       = "CARAPACE_TOOLTIP"       // enable tooltip style
+	CARAPACE_UNFILTERED    = "CARAPACE_UNFILTERED"    // skip the final filtering step
 	CARAPACE_ZSH_HASH_DIRS = "CARAPACE_ZSH_HASH_DIRS" // zsh hash directories
 	CLICOLOR               = "CLICOLOR"               // disable color
 	NO_COLOR               = "NO_COLOR"               // disable color
@@ -79,6 +80,10 @@ func Tooltip() bool {
 
 func Compline() string {
 	return os.Getenv(CARAPACE_COMPLINE)
+}
+
+func Unfiltered() bool {
+	return getBool(CARAPACE_UNFILTERED)
 }
 
 func getBool(s string) bool {

@@ -79,11 +79,15 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			style.Carapace.Usage = style.Italic
 			values = values.Decolor()
 		}
-		filtered := values.FilterPrefix(value)
+
+		if !env.Unfiltered() {
+			values = values.FilterPrefix(value)
+		}
+
 		switch shell {
 		case "elvish", "export", "zsh": // shells with support for showing messages
 		default:
-			filtered = meta.Messages.Integrate(filtered, value)
+			values = meta.Messages.Integrate(values, value)
 		}
 
 		if shell != "export" {
@@ -95,16 +99,16 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			}
 		}
 
-		sort.Sort(common.ByDisplay(filtered))
+		sort.Sort(common.ByDisplay(values))
 		if env.Experimental() {
 			if _, err := exec.LookPath("tabdance"); err == nil {
-				return f(value, meta, filtered)
+				return f(value, meta, values)
 			}
 		}
-		for index := range filtered {
-			filtered[index].Uid = ""
+		for index := range values {
+			values[index].Uid = ""
 		}
-		return f(value, meta, filtered)
+		return f(value, meta, values)
 	}
 	return ""
 }

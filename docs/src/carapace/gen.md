@@ -34,6 +34,9 @@ command _carapace [SHELL]
 # bash
 source <(command _carapace)
 
+# cmd (~/AppData/Local/clink/{command}.lua
+load(io.popen('command _carapace cmd-clink'):read("*a"))()
+
 # elvish
 eval (command _carapace | slurp)
 

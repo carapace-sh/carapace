@@ -15,6 +15,5 @@ function _example_callback
 end
 
 complete -e 'example'
-complete -c 'example' -f
 complete -c 'example' -f -a '(_example_callback)' -r
 

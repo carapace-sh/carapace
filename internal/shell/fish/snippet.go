@@ -27,7 +27,6 @@ function _%v_callback
 end
 
 complete -e '%v'
-complete -c '%v' -f
 complete -c '%v' -f -a '(_%v_callback)' -r
-`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name(), cmd.Name())
+`, cmd.Name(), cmd.Name(), cmd.Name(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
 }

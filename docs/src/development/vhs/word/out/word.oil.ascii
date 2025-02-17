@@ -36,7 +36,7 @@
  chain (shorthand chain)
  compat
  completion (Generate the autocompletion script for the specified shell)
- flag (flaacexample)
+ flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
  action (action example)
@@ -44,7 +44,7 @@
  chain (shorthand chain)
  compat
  completion (Generate the autocompletion script for the specified shell)
- flag (flaacexample)
+ flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
  action (action example)
@@ -52,7 +52,7 @@
  chain (shorthand chain)
  compat
  completion (Generate the autocompletion script for the specified shell)
- flag (flaaction le)
+ flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────
 > example
  action (action example)
@@ -60,5 +60,5 @@
  chain (shorthand chain)
  compat
  completion (Generate the autocompletion script for the specified shell)
- flag (flaaction le)
+ flag (flag example)
 ────────────────────────────────────────────────────────────────────────────────

@@ -27,6 +27,7 @@ func complete(cmd *cobra.Command, args []string) (string, error) {
 		case "bash": // TODO what about oil and such?
 			LOG.Printf("COMP_LINE is %#v", os.Getenv("COMP_LINE"))
 			LOG.Printf("COMP_POINT is %#v", os.Getenv("COMP_POINT"))
+			LOG.Printf("COMP_WORDBREAKS is %#v", os.Getenv("COMP_WORDBREAKS"))
 			var err error
 			args, err = bash.Patch(args) // handle redirects
 			LOG.Printf("patching args to %#v", args)

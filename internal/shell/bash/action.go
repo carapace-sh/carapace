@@ -14,11 +14,34 @@ var sanitizer = strings.NewReplacer(
 	"\t", ``,
 )
 
-var valueReplacer = strings.NewReplacer(
+var escapingQuotedReplacer = strings.NewReplacer(
 	`\`, `\\`,
 	`"`, `\"`,
 	`$`, `\$`,
 	"`", "\\`",
+)
+
+var escapingReplacer = strings.NewReplacer(
+	`\`, `\\`,
+	`&`, `\&`,
+	`<`, `\<`,
+	`>`, `\>`,
+	"`", "\\`",
+	`'`, `\'`,
+	`"`, `\"`,
+	`{`, `\{`,
+	`}`, `\}`,
+	`$`, `\$`,
+	`#`, `\#`,
+	`|`, `\|`,
+	`?`, `\?`,
+	`(`, `\(`,
+	`)`, `\)`,
+	`;`, `\;`,
+	` `, `\ `,
+	`[`, `\[`,
+	`]`, `\]`,
+	`*`, `\*`,
 )
 
 var displayReplacer = strings.NewReplacer(
@@ -81,19 +104,11 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			nospace = nospace || meta.Nospace.Matches(val.Value)
 
 			vals[index] = sanitizer.Replace(val.Value)
-			if requiresQuoting(vals[index]) {
-				vals[index] = valueReplacer.Replace(vals[index])
-				switch {
-				case strings.HasPrefix(vals[index], "~"): // assume homedir expansion
-					if splitted := strings.SplitAfterN(vals[index], "/", 2); len(splitted) == 2 {
-						vals[index] = fmt.Sprintf(`%v"%v"`, splitted[0], splitted[1])
-					} else {
-						// TODO homedir expansion won't work this way, but shouldn't reach this point anyway.
-						vals[index] = fmt.Sprintf(`~"%v"`, strings.TrimPrefix(vals[index], "~"))
-					}
-				default:
-					vals[index] = fmt.Sprintf(`"%v"`, vals[index])
-				}
+			switch {
+			case strings.HasPrefix(vals[index], "~"): // assume homedir expansion
+				vals[index] = escapingReplacer.Replace(vals[index])
+			case requiresQuoting(vals[index]):
+				vals[index] = fmt.Sprintf(`"%v"`, escapingQuotedReplacer.Replace(vals[index]))
 			}
 		} else {
 			nospace = true
@@ -111,6 +126,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 
 func requiresQuoting(s string) bool {
 	chars := " \t\r\n`" + `[]{}()<>;|$&:*#`
+	chars += `'"`
 	chars += os.Getenv("COMP_WORDBREAKS")
 	chars += `\`
 	return strings.ContainsAny(s, chars)

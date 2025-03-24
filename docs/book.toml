@@ -19,4 +19,4 @@ enable = true
 
 [output.linkcheck]
 follow-web-links = true
-exclude = [ 'gnu\.org', '\./.+/out/.+\.gif']
+exclude = [ 'gnu\.org', '\./.+/out/.+\.gif', 'go\.dev', 'microsoft\.com']

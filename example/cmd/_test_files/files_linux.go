@@ -22,6 +22,8 @@ package testfiles
 //go:generate touch -- quote_double_".txt
 //go:generate touch -- quote_both_'".txt
 //go:generate touch -- hash_#.txt
+//go:generate touch -- percent_d_%d.txt
+//go:generate touch -- percent_2f_%2F.txt
 //go:generate touch -- pipe_|.txt
 //go:generate touch -- question_?.txt
 //go:generate touch -- round-bracket_left_(.txt

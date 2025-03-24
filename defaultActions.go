@@ -143,7 +143,7 @@ func ActionDirectories() Action {
 				if err != nil {
 					return nil, err
 				}
-				return url.Parse("file://" + abs)
+				return url.Parse("file://" + uid.PathEscape(abs))
 			})
 	}).Tag("directories")
 }
@@ -159,7 +159,7 @@ func ActionFiles(suffix ...string) Action {
 				if err != nil {
 					return nil, err
 				}
-				return url.Parse("file://" + abs)
+				return url.Parse("file://" + uid.PathEscape(abs))
 			})
 	}).Tag("files")
 }
@@ -458,7 +458,7 @@ func ActionExecutables(dirs ...string) Action {
 		}
 		return batch.ToA().
 			UidF(func(s string, uc uid.Context) (*url.URL, error) {
-				return &url.URL{Scheme: "cmd", Host: s}, nil
+				return &url.URL{Scheme: "cmd", Host: uid.PathEscape(s)}, nil
 			})
 	}).Tag("executables")
 }
@@ -480,7 +480,7 @@ func actionDirectoryExecutables(dir string, prefix string, manDescriptions map[s
 				}
 			}
 			return ActionStyledValuesDescribed(vals...).UidF(func(s string, uc uid.Context) (*url.URL, error) {
-				return url.Parse(fmt.Sprintf("file://%v/%v", dir, s)) // TODO trim slash suffix from dir | backslash path possible? (windows)
+				return url.Parse(fmt.Sprintf("file://%v/%v", uid.PathEscape(dir), uid.PathEscape(s))) // TODO trim slash suffix from dir | backslash path possible? (windows)
 			})
 		}
 		return ActionValues()
@@ -555,9 +555,9 @@ func ActionCommands(cmd *cobra.Command) Action {
 
 			switch uid.Path {
 			case "":
-				uid.Path = s
+				uid.Path = url.PathEscape(s)
 			default:
-				uid.Path = uid.Path + "/" + s
+				uid.Path = uid.Path + "/" + url.PathEscape(s)
 			}
 			return uid, nil
 		})

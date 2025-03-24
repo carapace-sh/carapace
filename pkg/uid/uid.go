@@ -21,7 +21,7 @@ type Context interface {
 func Command(cmd *cobra.Command) *url.URL {
 	path := []string{cmd.Name()}
 	for parent := cmd.Parent(); parent != nil; parent = parent.Parent() {
-		path = append(path, parent.Name())
+		path = append(path, url.PathEscape(parent.Name()))
 	}
 	reverse(path) // TODO slices.Reverse
 	return &url.URL{

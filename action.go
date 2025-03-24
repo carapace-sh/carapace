@@ -485,8 +485,8 @@ func (a Action) Uid(scheme, host string, opts ...string) Action {
 		for index, v := range invoked.action.rawValues {
 			uid := url.URL{
 				Scheme: scheme,
-				Host:   host,
-				Path:   v.Value,
+				Host:   url.PathEscape(host),
+				Path:   uid.PathEscape(v.Value),
 			}
 			if len(opts) > 0 {
 				values := uid.Query()

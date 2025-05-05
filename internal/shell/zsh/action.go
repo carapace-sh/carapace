@@ -109,13 +109,6 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		}
 	}
 
-	for index, value := range values {
-		switch value.Tag {
-		case "shorthand flags", "longhand flags":
-			values[index].Tag = "flags" // join to single tag group for classic zsh side-by-side view
-		}
-	}
-
 	tagGroup := make([]string, 0)
 	values.EachTag(func(tag string, values common.RawValues) {
 		vals := make([]string, len(values))

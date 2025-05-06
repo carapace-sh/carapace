@@ -11,7 +11,7 @@ import (
 
 // Snippet creates the xonsh completion script.
 func Snippet(cmd *cobra.Command) string {
-	functionName := strings.Replace(cmd.Name(), "-", "__", -1)
+	functionName := strings.ReplaceAll(cmd.Name(), "-", "__")
 	return fmt.Sprintf(`from xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
 

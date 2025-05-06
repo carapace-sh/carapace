@@ -320,7 +320,7 @@ func (a Action) split(pipelines bool) Action {
 				case shlex.QUOTING_STATE:
 					invoked.action.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.ReplaceAll(value.Value, `'`, `'"'"'`))
 				default:
-					invoked.action.rawValues[index].Value = strings.Replace(value.Value, ` `, `\ `, -1)
+					invoked.action.rawValues[index].Value = strings.ReplaceAll(value.Value, ` `, `\ `)
 				}
 			}
 			if !invoked.action.meta.Nospace.Matches(value.Value) {

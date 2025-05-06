@@ -95,7 +95,7 @@ func load(name string, c configMap) error {
 func GetStyleConfigs() []string                   { return config.Styles.Keys() }
 func GetStyleFields(name string) ([]Field, error) { return config.Styles.Fields(name) }
 func SetStyle(key, value string) error {
-	return set("styles", key, strings.Replace(value, ",", " ", -1))
+	return set("styles", key, strings.ReplaceAll(value, ",", " "))
 }
 
 func set(name, key, value string) error {

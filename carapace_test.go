@@ -11,8 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	os.Unsetenv("LS_COLORS")
+	os.Exit(m.Run())
 }
 
 func execCompletion(args ...string) (context Context) {

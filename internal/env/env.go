@@ -17,6 +17,7 @@ const (
 	CARAPACE_LENIENT       = "CARAPACE_LENIENT"       // allow unknown flags
 	CARAPACE_LOG           = "CARAPACE_LOG"           // enable logging
 	CARAPACE_MATCH         = "CARAPACE_MATCH"         // match case insensitive
+	CARAPACE_MERGEFLAGS    = "CARAPACE_MERGEFLAGS"    // merge flags to single tag group
 	CARAPACE_NOSPACE       = "CARAPACE_NOSPACE"       // nospace suffixes
 	CARAPACE_SANDBOX       = "CARAPACE_SANDBOX"       // mock context for sandbox tests
 	CARAPACE_TOOLTIP       = "CARAPACE_TOOLTIP"       // enable tooltip style
@@ -68,6 +69,13 @@ func isGoRun() bool { return strings.HasPrefix(os.Args[0], os.TempDir()+"/go-bui
 
 func Match() string { // see match.Match
 	return os.Getenv(CARAPACE_MATCH)
+}
+
+func MergeFlags() (bool, bool) {
+	if _, ok := os.LookupEnv(CARAPACE_MERGEFLAGS); !ok {
+		return false, false
+	}
+	return getBool(CARAPACE_MERGEFLAGS), true
 }
 
 func Nospace() string {

@@ -87,6 +87,12 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			values = values.FilterPrefix(value)
 		}
 
+		switch merge, ok := env.MergeFlags(); {
+		case merge, // explicit
+			!ok && shell == "zsh": // implicit for classic zsh side-by-side view
+			mergeFlags(values)
+		}
+
 		switch shell {
 		case "elvish", "export", "zsh": // shells with support for showing messages
 		default:
@@ -114,4 +120,13 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		return f(value, meta, values)
 	}
 	return ""
+}
+
+func mergeFlags(values common.RawValues) {
+	for index, value := range values {
+		switch value.Tag {
+		case "shorthand flags", "longhand flags":
+			values[index].Tag = "flags"
+		}
+	}
 }

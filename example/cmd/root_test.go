@@ -185,3 +185,49 @@ func TestOptarg(t *testing.T) {
 				Usage("Help message for toggle"))
 	})
 }
+
+func TestMergeFlags(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Env("CARAPACE_MERGEFLAGS", "1")
+		s.Run("-").
+			Expect(carapace.Batch(
+				carapace.ActionStyledValuesDescribed(
+					"-C", "change work directory", style.Blue,
+					"-a", "multiflag", style.Blue,
+					"-h", "help for example", style.Default,
+					"-p", "Help message for persistentFlag", style.Yellow,
+					"-t", "Help message for toggle", style.Default,
+					"-v", "version for example", style.Default,
+					"--chdir", "change work directory", style.Blue,
+					"--array", "multiflag", style.Blue,
+					"--help", "help for example", style.Default,
+					"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+					"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
+					"--toggle", "Help message for toggle", style.Default,
+					"--version", "version for example", style.Default,
+				).Tag("flags"),
+			).ToA().NoSpace('.'))
+
+		s.Env("CARAPACE_MERGEFLAGS", "0")
+		s.Run("-").
+			Expect(carapace.Batch(
+				carapace.ActionStyledValuesDescribed(
+					"-C", "change work directory", style.Blue,
+					"-a", "multiflag", style.Blue,
+					"-h", "help for example", style.Default,
+					"-p", "Help message for persistentFlag", style.Yellow,
+					"-t", "Help message for toggle", style.Default,
+					"-v", "version for example", style.Default,
+				).Tag("shorthand flags"),
+				carapace.ActionStyledValuesDescribed(
+					"--chdir", "change work directory", style.Blue,
+					"--array", "multiflag", style.Blue,
+					"--help", "help for example", style.Default,
+					"--persistentFlag", "Help message for persistentFlag", style.Yellow,
+					"--persistentFlag2", "Help message for persistentFlag2", style.Blue,
+					"--toggle", "Help message for toggle", style.Default,
+					"--version", "version for example", style.Default,
+				).Tag("longhand flags"),
+			).ToA().NoSpace('.'))
+	})
+}

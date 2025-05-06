@@ -126,7 +126,7 @@ func (m Messages) Integrate(values RawValues, prefix string) RawValues {
 }
 
 func (m Messages) MarshalJSON() ([]byte, error) {
-	var result []string = make([]string, 0, len(m.messages))
+	var result = make([]string, 0, len(m.messages))
 	for key := range m.messages {
 		result = append(result, key)
 	}

@@ -74,7 +74,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	for _, r := range values {
 		// TODO optimize
 		if wordbreaks, ok := os.LookupEnv("COMP_WORDBREAKS"); ok {
-			wordbreaks = strings.Replace(wordbreaks, " ", "", -1)
+			wordbreaks = strings.ReplaceAll(wordbreaks, " ", "")
 			if index := strings.LastIndexAny(currentWord, wordbreaks); index != -1 {
 				r.Value = strings.TrimPrefix(r.Value, currentWord[:index+1])
 				lastSegment = currentWord[index+1:]
@@ -101,7 +101,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		} else {
 			if val.Description != "" {
 				// TODO seems actual value needs to be used or it won't be shown if the prefix doesn't match
-				vals[index] = fmt.Sprintf("%v_(%v)", quoter.Replace(sanitizer.Replace(val.Value)), quoter.Replace(strings.Replace(sanitizer.Replace(val.TrimmedDescription()), " ", "_", -1)))
+				vals[index] = fmt.Sprintf("%v_(%v)", quoter.Replace(sanitizer.Replace(val.Value)), quoter.Replace(strings.ReplaceAll(sanitizer.Replace(val.TrimmedDescription()), " ", "_")))
 			} else {
 				vals[index] = quoter.Replace(sanitizer.Replace(val.Value))
 			}

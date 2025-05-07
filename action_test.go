@@ -14,10 +14,6 @@ import (
 	"github.com/carapace-sh/carapace/pkg/uid"
 )
 
-func init() {
-	os.Unsetenv("LS_COLORS")
-}
-
 func assertEqual(t *testing.T, expected, actual InvokedAction) {
 	sort.Sort(common.ByValue(expected.action.rawValues))
 	sort.Sort(common.ByValue(actual.action.rawValues))

@@ -28,13 +28,13 @@ func init() {
 	carapace.Gen(specialCmd).Standalone()
 
 	specialCmd.Flags().CountP("count", "c", "count flag")
-	specialCmd.Flags().Bool("exclusive1", false, "mutually exclusive flag")
-	specialCmd.Flags().Bool("exclusive2", false, "mutually exclusive flag")
+	specialCmd.Flags().Bool("exclusive", false, "mutually exclusive flag")
+	specialCmd.Flags().Count("exclusiveRepeatable", "mutually exclusive repeatable flag")
 	specialCmd.Flags().StringP("optarg", "o", "", "optional argument")
 
 	specialCmd.Flag("optarg").NoOptDefVal = " "
 
-	specialCmd.MarkFlagsMutuallyExclusive("exclusive1", "exclusive2")
+	specialCmd.MarkFlagsMutuallyExclusive("exclusive", "exclusiveRepeatable")
 
 	rootCmd.AddCommand(specialCmd)
 

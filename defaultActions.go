@@ -539,12 +539,19 @@ func ActionCommands(cmd *cobra.Command) Action {
 
 		batch := Batch()
 		for _, subcommand := range cmd.Commands() {
-			if (!subcommand.Hidden || env.Hidden()) && subcommand.Deprecated == "" {
-				group := common.Group{Cmd: subcommand}
-				batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
-				for _, alias := range subcommand.Aliases {
-					batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
-				}
+			switch {
+			case subcommand.Hidden && subcommand.Name() == "_carapace" && env.Hidden() != env.HIDDEN_INCLUDE_CARAPACE:
+				continue // skip `_carapace` subcommand
+			case subcommand.Hidden && env.Hidden() == env.HIDDEN_NONE:
+				continue // skip all hidden commands
+			case subcommand.Deprecated != "":
+				continue // skip deprecated commands
+			}
+
+			group := common.Group{Cmd: subcommand}
+			batch = append(batch, ActionStyledValuesDescribed(subcommand.Name(), subcommand.Short, group.Style()).Tag(group.Tag()))
+			for _, alias := range subcommand.Aliases {
+				batch = append(batch, ActionStyledValuesDescribed(alias, subcommand.Short, group.Style()).Tag(group.Tag()))
 			}
 		}
 		return batch.ToA().UidF(func(s string, uc uid.Context) (*url.URL, error) {

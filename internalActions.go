@@ -94,7 +94,7 @@ func actionFlags(cmd *cobra.Command) Action {
 		batch := Batch()
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
 			switch {
-			case f.Hidden && !env.Hidden():
+			case f.Hidden && env.Hidden() == env.HIDDEN_NONE:
 				return // skip hidden flags
 			case f.Deprecated != "":
 				return // skip deprecated flags

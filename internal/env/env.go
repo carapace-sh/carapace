@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/common"
@@ -57,8 +58,23 @@ func Log() bool {
 	return getBool(CARAPACE_LOG)
 }
 
-func Hidden() bool {
-	return getBool(CARAPACE_HIDDEN)
+type hidden int
+
+const (
+	HIDDEN_NONE hidden = iota
+	HIDDEN_EXCLUDE_CARAPACE
+	HIDDEN_INCLUDE_CARAPACE
+)
+
+func Hidden() hidden {
+	switch parsed, _ := strconv.Atoi(os.Getenv(CARAPACE_HIDDEN)); parsed {
+	case 1:
+		return HIDDEN_EXCLUDE_CARAPACE
+	case 2:
+		return HIDDEN_INCLUDE_CARAPACE
+	default: // 0 or error
+		return HIDDEN_NONE
+	}
 }
 
 func CoverDir() string {

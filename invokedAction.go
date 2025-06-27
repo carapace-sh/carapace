@@ -135,7 +135,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 							Description: "",
 							Style:       "",
 							Tag:         val.Tag,
-							Uid:         val.Uid,
+							Uid:         "",
 						}
 					}
 				}

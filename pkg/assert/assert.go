@@ -1,47 +1,51 @@
-// Package assert provides test helpers
 package assert
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"testing"
 
 	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff"
 	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/myers"
 	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
-type T interface {
-	Cleanup(func())
-	Error(args ...interface{})
-	Errorf(format string, args ...interface{})
-	Fail()
-	FailNow()
-	Failed() bool
-	Fatal(args ...interface{})
-	Fatalf(format string, args ...interface{})
-	Helper()
-	Log(args ...interface{})
-	Logf(format string, args ...interface{})
-	Name() string
-	Setenv(key, value string)
-	Skip(args ...interface{})
-	SkipNow()
-	Skipf(format string, args ...interface{})
-	Skipped() bool
-	TempDir() string
-}
+func compare(t *testing.T, expected, actual interface{}, equal bool) {
+	var sExpected, sActual string
+	var ok bool
+	if sExpected, ok = expected.(string); !ok {
+		m, err := json.MarshalIndent(expected, "", " ")
+		if err != nil {
+			t.Error(err.Error())
+		}
+		sExpected = string(m)
+	}
+	if sActual, ok = actual.(string); !ok {
+		m, err := json.MarshalIndent(actual, "", " ")
+		if err != nil {
+			t.Error(err.Error())
+		}
+		sActual = string(m)
+	}
 
-// Equal calls t.Error if given strings are not equal.
-func Equal(t T, expected string, actual string) {
-	if expected != actual {
+	if sExpected != sActual == equal {
 		_, file, line, _ := runtime.Caller(2)
-		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, Diff(expected, actual))
+		t.Errorf("%v:%v:\n%v", filepath.Base(file), line, diff(sExpected, sActual))
 	}
 }
 
-func Diff(expected, actual string) string {
+func Equal(t *testing.T, expected, actual interface{}) {
+	compare(t, expected, actual, true)
+}
+
+func NotEqual(t *testing.T, expected, actual interface{}) {
+	compare(t, expected, actual, false)
+}
+
+func diff(expected, actual string) string {
 	edits := myers.ComputeEdits(span.URIFromPath(""), expected, actual)
 	diff := fmt.Sprint(gotextdiff.ToUnified("expected", "actual", expected, edits))
 

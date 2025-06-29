@@ -1,43 +1,16 @@
 package carapace
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
-	"sort"
 	"testing"
 	"time"
 
-	"github.com/carapace-sh/carapace/internal/assert"
 	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/carapace-sh/carapace/pkg/style"
 	"github.com/carapace-sh/carapace/pkg/uid"
 )
-
-func assertEqual(t *testing.T, expected, actual InvokedAction) {
-	sort.Sort(common.ByValue(expected.action.rawValues))
-	sort.Sort(common.ByValue(actual.action.rawValues))
-
-	e, _ := json.MarshalIndent(expected.action.rawValues, "", "  ")
-	a, _ := json.MarshalIndent(actual.action.rawValues, "", "  ")
-	assert.Equal(t, string(e), string(a))
-
-	eMeta, _ := json.MarshalIndent(expected.action.meta, "", "  ")
-	aMeta, _ := json.MarshalIndent(actual.action.meta, "", "  ")
-	assert.Equal(t, string(eMeta), string(aMeta))
-}
-
-func assertNotEqual(t *testing.T, expected, actual InvokedAction) {
-	sort.Sort(common.ByValue(expected.action.rawValues))
-	sort.Sort(common.ByValue(actual.action.rawValues))
-
-	e, _ := json.MarshalIndent(expected.action.rawValues, "", "  ")
-	a, _ := json.MarshalIndent(actual.action.rawValues, "", "  ")
-
-	if string(e) == string(a) {
-		t.Errorf("should differ:\n%v", a)
-	}
-}
 
 func TestActionCallback(t *testing.T) {
 	a := ActionCallback(func(c Context) Action {
@@ -53,7 +26,7 @@ func TestActionCallback(t *testing.T) {
 		},
 	}
 	actual := a.Invoke(Context{})
-	assertEqual(t, expected, actual)
+	assert.Equal(t, expected, actual)
 }
 
 func TestCache(t *testing.T) {
@@ -65,11 +38,11 @@ func TestCache(t *testing.T) {
 
 	a1 := f().Invoke(Context{})
 	a2 := f().Invoke(Context{})
-	assertEqual(t, a1, a2)
+	assert.Equal(t, a1, a2)
 
 	time.Sleep(16 * time.Millisecond)
 	a3 := f().Invoke(Context{})
-	assertNotEqual(t, a1, a3)
+	assert.NotEqual(t, a1, a3)
 }
 
 func TestSkipCache(t *testing.T) {
@@ -111,7 +84,7 @@ func TestNoSpace(t *testing.T) {
 }
 
 func TestActionDirectories(t *testing.T) {
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"example/", style.Of(style.Blue, style.Bold),
 			"example-nonposix/", style.Of(style.Blue, style.Bold),
@@ -130,7 +103,7 @@ func TestActionDirectories(t *testing.T) {
 		ActionDirectories().Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"example/", style.Of(style.Blue, style.Bold),
 			"example-nonposix/", style.Of(style.Blue, style.Bold),
@@ -149,7 +122,7 @@ func TestActionDirectories(t *testing.T) {
 		ActionDirectories().Invoke(Context{Value: "./"}).Filter("./vendor/"),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
@@ -158,7 +131,7 @@ func TestActionDirectories(t *testing.T) {
 		ActionDirectories().Invoke(Context{Value: "example/"}),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
@@ -169,7 +142,7 @@ func TestActionDirectories(t *testing.T) {
 }
 
 func TestActionFiles(t *testing.T) {
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"README.md", style.Default,
 			"example/", style.Of(style.Blue, style.Bold),
@@ -190,7 +163,7 @@ func TestActionFiles(t *testing.T) {
 		ActionFiles(".md").Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"README.md", style.Default,
 			"cmd/", style.Of(style.Blue, style.Bold),
@@ -209,17 +182,17 @@ func TestActionFiles(t *testing.T) {
 func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionMessage(fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))).Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{}),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionMessage(fmt.Sprintf("not a directory: %v/go.mod", wd(""))).Invoke(Context{}),
 		ActionFiles(".md").Chdir("go.mod").Invoke(Context{Value: ""}),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionStyledValues(
 			"action.go", style.Default,
 			"snippet.go", style.Default,
@@ -239,14 +212,14 @@ func TestActionMessage(t *testing.T) {
 	expected := ActionValues()
 	expected.meta.Messages.Add("example message")
 
-	assertEqual(t,
+	assert.Equal(t,
 		expected.Invoke(Context{}),
 		ActionMessage("example message").Invoke(Context{Value: "docs/"}),
 	)
 }
 
 func TestActionMessageSuppress(t *testing.T) {
-	assertEqual(t,
+	assert.Equal(t,
 		Batch(
 			ActionMessage("example message").Suppress("example"),
 			ActionValues("test"),
@@ -258,12 +231,12 @@ func TestActionMessageSuppress(t *testing.T) {
 func TestActionExecCommand(t *testing.T) {
 	context := NewContext()
 	context.Value = "docs/"
-	assertEqual(t,
+	assert.Equal(t,
 		ActionMessage("go unknown: unknown command").Invoke(NewContext()).Prefix("docs/"),
 		ActionExecCommand("go", "unknown")(func(output []byte) Action { return ActionValues() }).Invoke(context),
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		ActionValues("module github.com/carapace-sh/carapace\n").Invoke(Context{}),
 		ActionExecCommand("head", "-n1", "go.mod")(func(output []byte) Action { return ActionValues(string(output)) }).Invoke(Context{}),
 	)

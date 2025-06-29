@@ -3,6 +3,7 @@ package carapace
 import (
 	"testing"
 
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +17,7 @@ func TestGetFlag(t *testing.T) {
 		"flag": ActionValues("a", "b"),
 	})
 
-	assertEqual(t, ActionValues("a", "b").Invoke(Context{}), storage.getFlag(subcmd, "flag").Invoke(Context{}))
+	assert.Equal(t, ActionValues("a", "b").Invoke(Context{}), storage.getFlag(subcmd, "flag").Invoke(Context{}))
 }
 
 func TestGetPositional(t *testing.T) {
@@ -31,9 +32,9 @@ func TestGetPositional(t *testing.T) {
 		ActionValues("pos", "any"),
 	)
 
-	assertEqual(t, ActionValues("pos", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
-	assertEqual(t, ActionValues("pos", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))
-	assertEqual(t, ActionValues("pos", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
+	assert.Equal(t, ActionValues("pos", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
+	assert.Equal(t, ActionValues("pos", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))
+	assert.Equal(t, ActionValues("pos", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
 }
 
 func TestGetDash(t *testing.T) {
@@ -50,9 +51,9 @@ func TestGetDash(t *testing.T) {
 
 	_ = cmd.Flags().Parse([]string{"--", ""})
 
-	assertEqual(t, ActionValues("dash", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
-	assertEqual(t, ActionValues("dash", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))
-	assertEqual(t, ActionValues("dash", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
+	assert.Equal(t, ActionValues("dash", "1").Invoke(Context{}), storage.getPositional(cmd, 0).Invoke(Context{}))
+	assert.Equal(t, ActionValues("dash", "2").Invoke(Context{}), storage.getPositional(cmd, 1).Invoke(Context{}))
+	assert.Equal(t, ActionValues("dash", "any").Invoke(Context{}), storage.getPositional(cmd, 2).Invoke(Context{}))
 }
 
 func TestCheck(t *testing.T) {

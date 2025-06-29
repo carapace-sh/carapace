@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/carapace-sh/carapace"
-	"github.com/carapace-sh/carapace/internal/assert"
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/spf13/cobra"
 )
 

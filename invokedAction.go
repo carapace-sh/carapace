@@ -1,6 +1,7 @@
 package carapace
 
 import (
+	"encoding/json"
 	"net/url"
 	"strings"
 
@@ -13,6 +14,10 @@ import (
 // InvokedAction is a logical alias for an Action whose (nested) callback was invoked.
 type InvokedAction struct {
 	action Action
+}
+
+func (ia InvokedAction) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ia.export())
 }
 
 func (ia InvokedAction) export() export.Export {

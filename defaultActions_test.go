@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +31,7 @@ func TestActionImport(t *testing.T) {
     }
   ]
 }`
-	assertEqual(t, ActionValues("positional1", "p1").Tag("first").Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
+	assert.Equal(t, ActionValues("positional1", "p1").Tag("first").Invoke(Context{}), ActionImport([]byte(s)).Invoke(Context{}))
 }
 
 func TestActionFlags(t *testing.T) {
@@ -40,7 +41,7 @@ func TestActionFlags(t *testing.T) {
 
 	cmd.Flag("alpha").Changed = true
 	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
-	assertEqual(
+	assert.Equal(
 		t,
 		ActionValuesDescribed(
 			"b", "",

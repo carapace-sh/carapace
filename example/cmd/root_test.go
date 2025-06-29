@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/carapace-sh/carapace"
-	"github.com/carapace-sh/carapace/internal/assert"
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/carapace-sh/carapace/pkg/sandbox"
 	"github.com/carapace-sh/carapace/pkg/style"
 )

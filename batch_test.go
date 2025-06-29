@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/pkg/assert"
 )
 
 func TestBatch(t *testing.T) {
@@ -18,7 +19,7 @@ func TestBatch(t *testing.T) {
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
-	assertEqual(t, expected, actual)
+	assert.Equal(t, expected, actual)
 }
 
 func TestBatchSingle(t *testing.T) {
@@ -31,7 +32,7 @@ func TestBatchSingle(t *testing.T) {
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
-	assertEqual(t, expected, actual)
+	assert.Equal(t, expected, actual)
 }
 
 func TestBatchNone(t *testing.T) {
@@ -42,7 +43,7 @@ func TestBatchNone(t *testing.T) {
 		},
 	}
 	actual := b.Invoke(Context{}).Merge()
-	assertEqual(t, expected, actual)
+	assert.Equal(t, expected, actual)
 }
 
 func TestBatchToA(t *testing.T) {
@@ -57,5 +58,5 @@ func TestBatchToA(t *testing.T) {
 		},
 	}
 	actual := b.ToA().Invoke(Context{})
-	assertEqual(t, expected, actual)
+	assert.Equal(t, expected, actual)
 }

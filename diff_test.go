@@ -3,6 +3,7 @@ package carapace
 import (
 	"testing"
 
+	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/carapace-sh/carapace/pkg/style"
 )
 
@@ -16,7 +17,7 @@ func TestDiff(t *testing.T) {
 		"added",
 	)
 
-	assertEqual(t,
+	assert.Equal(t,
 		Diff(original, new).Invoke(NewContext()),
 		ActionStyledValues(
 			"removed", style.Red,

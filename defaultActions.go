@@ -144,6 +144,13 @@ func ActionDirectories() Action {
 					return nil, err
 				}
 				return url.Parse("file://" + uid.PathEscape(abs))
+			}).
+			QueryF(func(s string, uc uid.Context) (*url.URL, error) {
+				abs, err := c.Abs(c.Dir)
+				if err != nil {
+					return nil, err
+				}
+				return url.Parse(fmt.Sprintf("file://%v?directories=true", uid.PathEscape(abs)))
 			})
 	}).Tag("directories")
 }
@@ -160,7 +167,24 @@ func ActionFiles(suffix ...string) Action {
 					return nil, err
 				}
 				return url.Parse("file://" + uid.PathEscape(abs))
+			}).
+			QueryF(func(s string, uc uid.Context) (*url.URL, error) {
+				abs, err := c.Abs(c.Dir)
+				if err != nil {
+					return nil, err
+				}
+				query := &url.URL{
+					Scheme: "file",
+					Path:   abs,
+				}
+				if len(suffix) > 0 {
+					values := query.Query()
+					values.Set("suffix", strings.Join(suffix, ","))
+					query.RawQuery = values.Encode()
+				}
+				return query, nil
 			})
+		// Query("file", "", c.Dir, "suffix", strings.Join(suffix, ","))
 	}).Tag("files")
 }
 
@@ -459,7 +483,8 @@ func ActionExecutables(dirs ...string) Action {
 		return batch.ToA().
 			UidF(func(s string, uc uid.Context) (*url.URL, error) {
 				return &url.URL{Scheme: "cmd", Host: uid.PathEscape(s)}, nil
-			})
+			}).
+			Query("cmd", "", "", "directories", strings.Join(dirs, ", "))
 	}).Tag("executables")
 }
 

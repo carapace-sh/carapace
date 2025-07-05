@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -54,6 +55,9 @@ func (ia InvokedAction) Prefix(prefix string) InvokedAction {
 	for index, val := range ia.action.rawValues {
 		ia.action.rawValues[index].Value = prefix + val.Value
 	}
+	if prefix != "" {
+		ia.action.meta.Queries.Modify(fmt.Sprintf("prefix(%v)", prefix))
+	}
 	return ia
 }
 
@@ -72,6 +76,9 @@ func (ia InvokedAction) Retain(values ...string) InvokedAction {
 func (ia InvokedAction) Suffix(suffix string) InvokedAction {
 	for index, val := range ia.action.rawValues {
 		ia.action.rawValues[index].Value = val.Value + suffix
+	}
+	if suffix != "" {
+		ia.action.meta.Queries.Modify(fmt.Sprintf("suffix(%v)", suffix))
 	}
 	return ia
 }
@@ -163,6 +170,11 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 		}
 		return a
 	})
+}
+
+func (ia InvokedAction) Query(q string) InvokedAction {
+	ia.action.meta.Queries.Add(q)
+	return ia
 }
 
 func (ia InvokedAction) value(shell string, value string) string {

@@ -117,6 +117,7 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		for index := range values {
 			values[index].Uid = ""
 		}
+		values = values.Unique() // re-filter after clearance
 		return f(value, meta, values)
 	}
 	return ""

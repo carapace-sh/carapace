@@ -47,9 +47,13 @@ func RawValuesFrom(values ...string) RawValues {
 }
 
 func (r RawValues) Unique() RawValues {
-	uniqueRawValues := make(map[string]RawValue)
+	type key struct {
+		Value string
+		Uid   string
+	}
+	uniqueRawValues := make(map[key]RawValue)
 	for _, value := range r {
-		uniqueRawValues[value.Value] = value
+		uniqueRawValues[key{value.Value, value.Uid}] = value
 	}
 
 	rawValues := make([]RawValue, 0, len(uniqueRawValues))
@@ -150,6 +154,17 @@ func (a ByValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 // ByDisplay alias to filter by display.
 type ByDisplay []RawValue
 
-func (a ByDisplay) Len() int           { return len(a) }
-func (a ByDisplay) Less(i, j int) bool { return a[i].Display < a[j].Display }
-func (a ByDisplay) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDisplay) Len() int { return len(a) }
+func (a ByDisplay) Less(i, j int) bool {
+	if a[i].Display == a[j].Display {
+		return ByUid(a).Less(i, j) // ensure consistency in export
+	}
+	return a[i].Display < a[j].Display
+}
+func (a ByDisplay) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type ByUid []RawValue
+
+func (a ByUid) Len() int           { return len(a) }
+func (a ByUid) Less(i, j int) bool { return a[i].Uid < a[j].Uid }
+func (a ByUid) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

@@ -113,8 +113,21 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	values.EachTag(func(tag string, values common.RawValues) {
 		vals := make([]string, len(values))
 		displays := make([]string, len(values))
+		suffixes := make([]string, len(values))
 		for index, val := range values {
 			value := sanitizer.Replace(val.Value)
+			suffix := ""
+
+			// If a value is set to not have a space suffix, we want to delegate suffix
+			// management to Zsh's completion system as much as possible.
+			// The last character of the value is checked to see if it is a nospace
+			// character itself (like '/' or ','), and if so, it's treated as a suffix
+			// to be handled by the Zsh script.
+			if meta.Nospace.Matches(val.Value) && len(val.Value) > 0 {
+				if meta.Nospace.Matches(lastChar) {
+					suffix = lastChar
+					value = strings.TrimSuffix(value, suffix)
+			}
 
 			switch state {
 			case QUOTING_ESCAPING_STATE:
@@ -136,11 +149,17 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 				value = describeReplacer.Replace(value)
 			}
 
-			if !meta.Nospace.Matches(val.Value) {
-				switch state {
-				case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
-				default:
-					value += " "
+			// If there is no suffix, and the value is not a nospace value, we want to
+			// add a space suffix. This is also delegated to the Zsh script, which will
+			// handle the space suffix appropriately (e.g., removing it when another
+			// space is typed).
+			if suffix == "" {
+				if !meta.Nospace.Matches(val.Value) {
+					switch state {
+					case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
+					default:
+						suffix = " "
+					}
 				}
 			}
 
@@ -149,6 +168,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			description := sanitizer.Replace(val.Description)
 
 			vals[index] = value
+			suffixes[index] = suffix
 
 			if strings.TrimSpace(description) == "" {
 				displays[index] = display
@@ -156,7 +176,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 				displays[index] = fmt.Sprintf("%v:%v", display, description)
 			}
 		}
-		tagGroup = append(tagGroup, strings.Join([]string{tag, strings.Join(displays, "\n"), strings.Join(vals, "\n")}, "\003"))
+		tagGroup = append(tagGroup, strings.Join([]string{tag, strings.Join(displays, "\n"), strings.Join(vals, "\n"), strings.Join(suffixes, "\n")}, "\003"))
 	})
 	return fmt.Sprintf("%v\001%v\001%v\001", zstyles{values}.Format(), message{meta}.Format(), strings.Join(tagGroup, "\002")+"\002")
 }

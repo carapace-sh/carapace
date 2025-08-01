@@ -70,3 +70,4 @@ function _example_completion {
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example
+

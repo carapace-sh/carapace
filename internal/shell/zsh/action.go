@@ -124,9 +124,9 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			// character itself (like '/' or ','), and if so, it's treated as a suffix
 			// to be handled by the Zsh script.
 			if meta.Nospace.Matches(val.Value) && len(val.Value) > 0 {
-				if meta.Nospace.Matches(lastChar) {
-					suffix = lastChar
-					value = strings.TrimSuffix(value, suffix)
+				lastChar := val.Value[len(val.Value)-1:]
+				suffix = lastChar
+				value = strings.TrimSuffix(value, suffix)
 			}
 
 			switch state {

@@ -26,9 +26,6 @@ function _%v_completion {
     completion_input="${words[1,-2]} ${words[-1]}\\"
   fi
   
-  local go_start
-  go_start=$(zsh_timer)
-  
   local lines
   lines="$(echo "${completion_input}" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh)"
   

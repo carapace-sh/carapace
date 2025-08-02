@@ -15,7 +15,7 @@ func Snippet(cmd *cobra.Command) string {
 function _%v_completion {
   local words=${words[@]:0:$CURRENT}
   local IFS=$'\n'
-
+  
   # shellcheck disable=SC2086,SC2154,SC2155
   local completion_input
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
@@ -25,10 +25,13 @@ function _%v_completion {
   else
     completion_input="${words[1,-2]} ${words[-1]}\\"
   fi
-
+  
+  local go_start
+  go_start=$(zsh_timer)
+  
   local lines
   lines="$(echo "${completion_input}" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh)"
-
+  
   local zstyle message data
   IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
   # shellcheck disable=SC2154
@@ -36,49 +39,30 @@ function _%v_completion {
   zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
   
-  local block tag displays values suffixes
+  local block tag suffix displays values
+  local -A tags
   while IFS=$'\002' read -r -d $'\002' block; do
-    IFS=$'\003' read -r -d '' tag displays values suffixes <<<"${block}"
-
+    IFS=$'\003' read -r -d '' tag suffix displays values <<<"${block}"
+    
     local -a displaysArr=("${(f@)displays}")
     local -a valuesArr=("${(f@)values}")
-    local -a suffixesArr=("${(f@)suffixes}")
 
-    typeset -A grouped_values=()
-    typeset -A grouped_displays=()
-
-    for i in {1..${#valuesArr[@]}}; do
-      local suffix_key="${suffixesArr[$i]:-__NOSUFFIX__}"
-      grouped_values[$suffix_key]+="${valuesArr[$i]}"$'\n'
-      grouped_displays[$suffix_key]+="${displaysArr[$i]}"$'\n'
-    done
-
-    local first_call=1
-    for suffix_key in "${(@k)grouped_values}"; do
-      local -a s_values=("${(f@)${grouped_values[$suffix_key]%%$'\n'}}")
-      local -a s_displays=("${(f@)${grouped_displays[$suffix_key]%%$'\n'}}")
-
-      if [[ ${#s_values[@]} -eq 0 ]]; then
-        continue
-      fi
-
-      local -a describe_args
-      if (( first_call )); then
-        describe_args=(-t "${tag}" "${tag}")
-        first_call=0
-      else
-		describe_args=(-t "${tag}" "")
-      fi
-
-      local separators=" /,.':@"
-      if [[ "$suffix_key" == "__NOSUFFIX__" ]]; then
-        _describe "${describe_args[@]}" s_displays s_values -Q
-      elif [[ "$separators" == *"$suffix_key"* ]]; then
-        _describe "${describe_args[@]}" s_displays s_values -Q -S "$suffix_key" -r ' '
-      else
-        _describe "${describe_args[@]}" s_displays s_values -Q -S "$suffix_key" -r "0-9a-zA-Z"
-      fi
-    done
+    local -a describe_args
+    if [[ -z ${tags[$tag]} ]]; then
+      describe_args=(-t "${tag}" "${tag}")
+      tags[$tag]=1
+    else
+      describe_args=(-t "${tag}" "")
+    fi
+    
+    local separators=" /,.':@="
+    if [[ "$suffix" == "" ]]; then
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S ' ' -r "${separators}0-9a-zA-Z"
+    elif [[ "$separators" == *"$suffix"* ]]; then
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S "$suffix" -r ' '
+    else
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S "$suffix" -r "0-9a-zA-Z"
+    fi
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _%v_completion

@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
+	"unicode"
 
 	shlex "github.com/carapace-sh/carapace-shlex"
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/log"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -17,7 +20,7 @@ var sanitizer = strings.NewReplacer(
 )
 
 var quotingReplacer = strings.NewReplacer(
-	`'`, `'\''`,
+	`'`, `'''`,
 )
 
 var quotingEscapingReplacer = strings.NewReplacer(
@@ -92,6 +95,11 @@ const (
 
 // ActionRawValues formats values for zsh
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
+	start := time.Now()
+	defer func() {
+		log.LOG.Printf("zsh action processing took %v", time.Since(start))
+	}()
+
 	splitted, err := shlex.Split(env.Compline())
 	state := DEFAULT_STATE
 	if err == nil {
@@ -100,83 +108,104 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		switch {
 		case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
 			state = QUOTING_STATE
-		case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
+		case regexp.MustCompile(`^"$|^\".*[^\"]$`).MatchString(rawValue):
 			state = QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
+		case regexp.MustCompile(`^\".*\"$`).MatchString(rawValue):
 			state = FULL_QUOTING_ESCAPING_STATE
 		case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
 			state = FULL_QUOTING_STATE
 		}
 	}
 
-	tagGroup := make([]string, 0)
-	values.EachTag(func(tag string, values common.RawValues) {
-		vals := make([]string, len(values))
-		displays := make([]string, len(values))
-		suffixes := make([]string, len(values))
-		for index, val := range values {
-			value := sanitizer.Replace(val.Value)
-			suffix := ""
+	tagGroups := make([]string, 0)
+	values.EachTag(func(tag string, tagValues common.RawValues) {
+		for suffix, suffixedValues := range groupValuesBySuffix(tagValues, meta, state) {
+			vals := make([]string, len(suffixedValues))
+			displays := make([]string, len(suffixedValues))
 
-			// If a value is set to not have a space suffix, we want to delegate suffix
-			// management to Zsh's completion system as much as possible.
-			// The last character of the value is checked to see if it is a nospace
-			// character itself (like '/' or ','), and if so, it's treated as a suffix
-			// to be handled by the Zsh script.
-			if meta.Nospace.Matches(val.Value) && len(val.Value) > 0 {
-				lastChar := val.Value[len(val.Value)-1:]
-				suffix = lastChar
-				value = strings.TrimSuffix(value, suffix)
-			}
+			for index, val := range suffixedValues {
+				value := sanitizer.Replace(val.Value)
+				if suffix != " " && suffix != "" {
+					value = strings.TrimSuffix(value, suffix)
+				}
 
-			switch state {
-			case QUOTING_ESCAPING_STATE:
-				value = quotingEscapingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
-				value = value + `"`
-			case QUOTING_STATE:
-				value = quotingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
-				value = value + `'`
-			case FULL_QUOTING_ESCAPING_STATE:
-				value = quotingEscapingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
-			case FULL_QUOTING_STATE:
-				value = quotingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
-			default:
-				value = quoteValue(value)
-				value = describeReplacer.Replace(value)
-			}
+				switch state {
+				case QUOTING_ESCAPING_STATE:
+					value = quotingEscapingReplacer.Replace(value)
+					value = describeReplacer.Replace(value)
+					value = value + `"`
+				case QUOTING_STATE:
+					value = quotingReplacer.Replace(value)
+					value = describeReplacer.Replace(value)
+					value = value + `'`
+				case FULL_QUOTING_ESCAPING_STATE:
+					value = quotingEscapingReplacer.Replace(value)
+					value = describeReplacer.Replace(value)
+				case FULL_QUOTING_STATE:
+					value = quotingReplacer.Replace(value)
+					value = describeReplacer.Replace(value)
+				default:
+					value = quoteValue(value)
+					value = describeReplacer.Replace(value)
+				}
 
-			// If there is no suffix, and the value is not a nospace value, we want to
-			// add a space suffix. This is also delegated to the Zsh script, which will
-			// handle the space suffix appropriately (e.g., removing it when another
-			// space is typed).
-			if suffix == "" {
-				if !meta.Nospace.Matches(val.Value) {
-					switch state {
-					case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
-					default:
-						suffix = " "
-					}
+				display := sanitizer.Replace(val.Display)
+				display = describeReplacer.Replace(display) // TODO check if this needs to be applied to description as well
+				description := sanitizer.Replace(val.Description)
+
+				vals[index] = value
+				if strings.TrimSpace(description) == "" {
+					displays[index] = display
+				} else {
+					displays[index] = fmt.Sprintf("%v:%v", display, description)
 				}
 			}
+			tagGroups = append(tagGroups, strings.Join([]string{tag, suffix, strings.Join(displays, "\n"), strings.Join(vals, "\n")}, "\003"))
+		}
+	})
+	return fmt.Sprintf("%v\001%v\001%v\002", zstyles{values}.Format(), message{meta}.Format(), strings.Join(tagGroups, "\002"))
+}
 
-			display := sanitizer.Replace(val.Display)
-			display = describeReplacer.Replace(display) // TODO check if this needs to be applied to description as well
-			description := sanitizer.Replace(val.Description)
+func groupValuesBySuffix(values common.RawValues, meta common.Meta, state state) map[string]common.RawValues {
+	groups := make(map[string]common.RawValues)
+	for _, val := range values {
+		suffix := ""
+		var removableSuffix bool
 
-			vals[index] = value
-			suffixes[index] = suffix
+		// If the last character is not an alphanumeric character, we assume that
+		// this character should be removed if the user inserts either a space, the
+		// same character or any type separator character ( /,.:@=)
+		if len(val.Value) > 0 {
+			lastChar := val.Value[len(val.Value)-1:]
+			removableSuffix = !isAlphaNumeric(rune(lastChar[len(lastChar)-1]))
+		}
 
-			if strings.TrimSpace(description) == "" {
-				displays[index] = display
-			} else {
-				displays[index] = fmt.Sprintf("%v:%v", display, description)
+		// If we have matched the value suffix against carapace-registered suffixes,
+		// and the suffix is not an alphanumeric, then we should register the suffix
+		// as removable by ZSH (ie. ZSH will handle automatic insert/erase)
+		if meta.Nospace.Matches(val.Value) && len(val.Value) > 0 && removableSuffix {
+			lastChar := val.Value[len(val.Value)-1:]
+			suffix = lastChar
+		}
+
+		if suffix == "" {
+			if !meta.Nospace.Matches(val.Value) {
+				switch state {
+				case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
+				default:
+					suffix = " "
+				}
 			}
 		}
-		tagGroup = append(tagGroup, strings.Join([]string{tag, strings.Join(displays, "\n"), strings.Join(vals, "\n"), strings.Join(suffixes, "\n")}, "\003"))
-	})
-	return fmt.Sprintf("%v\001%v\001%v\001", zstyles{values}.Format(), message{meta}.Format(), strings.Join(tagGroup, "\002")+"\002")
+
+		if _, ok := groups[suffix]; !ok {
+			groups[suffix] = make(common.RawValues, 0)
+		}
+		groups[suffix] = append(groups[suffix], val)
+	}
+	return groups
+}
+
+func isAlphaNumeric(suffix rune) bool {
+	return unicode.IsDigit(suffix) || unicode.IsNumber(suffix) || unicode.IsLetter(suffix)
 }

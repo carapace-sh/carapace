@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: shallow clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: "!startsWith(github.ref, 'refs/tags/')"
 
       - name: deep clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: startsWith(github.ref, 'refs/tags/')
         with:
           fetch-depth: 0

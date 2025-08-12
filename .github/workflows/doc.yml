@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: shallow clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/carapace-sh/mdbook
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/cache@v4
         with:

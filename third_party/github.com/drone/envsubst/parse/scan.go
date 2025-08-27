@@ -227,6 +227,10 @@ func acceptColon(r rune, i int) bool {
 	return r == ':'
 }
 
+func acceptOneExclamationMark(r rune, i int) bool {
+	return r == '!' && i == 1
+}
+
 func acceptOneHash(r rune, i int) bool {
 	return r == '#' && i == 1
 }

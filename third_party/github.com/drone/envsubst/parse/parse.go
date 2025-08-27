@@ -90,6 +90,8 @@ func (t *Tree) parseFunc() (Node, error) {
 	// Turn on all escape characters
 	t.scanner.escapeChars = escapeAll
 	switch t.scanner.peek() {
+	case '!':
+		return t.parseIgnoredFunc()
 	case '#':
 		return t.parseLenFunc()
 	}
@@ -352,6 +354,29 @@ func (t *Tree) parseCasingFunc(name string) (Node, error) {
 		return nil, ErrBadSubstitution
 	}
 
+	return node, t.consumeRbrack()
+}
+
+// parses the ignored ${!...} function
+func (t *Tree) parseIgnoredFunc() (Node, error) {
+	node := new(TextNode)
+
+	t.scanner.accept = acceptOneExclamationMark
+	t.scanner.mode = scanIdent
+	switch t.scanner.scan() {
+	case tokenIdent:
+	default:
+		return nil, ErrBadSubstitution
+	}
+
+	t.scanner.accept = acceptNotClosing
+	t.scanner.mode = scanIdent
+	switch t.scanner.scan() {
+	case tokenIdent:
+		node.Value = "${" + t.scanner.string() + "}"
+	default:
+		return nil, ErrBadSubstitution
+	}
 	return node, t.consumeRbrack()
 }
 

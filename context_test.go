@@ -96,21 +96,32 @@ func TestEnv(t *testing.T) {
 
 func TestEnvsubst(t *testing.T) {
 	c := Context{}
+	c.Setenv("REPLACE", "me")
+	for s, expected := range map[string]string{
+		"BEFORE${REPLACE}AFTER":  "BEFOREmeAFTER",
+		"BEFORE${!REPLACE}AFTER": "BEFORE${REPLACE}AFTER",
 
-	if s, err := c.Envsubst("start${example}end"); s != "startend" || err != nil {
-		t.Fail()
-	}
+		"BEFORE${REPLACE:-default}AFTER":  "BEFOREmeAFTER",
+		"BEFORE${!REPLACE:-default}AFTER": "BEFORE${REPLACE:-default}AFTER",
 
-	if s, err := c.Envsubst("start${example:-default}end"); s != "startdefaultend" || err != nil {
-		t.Fail()
-	}
+		"BEFORE${REPLACE/me/you}AFTER":  "BEFOREyouAFTER",
+		"BEFORE${!REPLACE/me/you}AFTER": "BEFORE${REPLACE/me/you}AFTER",
 
-	c.Setenv("example", "value")
-	if s, err := c.Envsubst("start${example}end"); s != "startvalueend" || err != nil {
-		t.Fail()
-	}
+		// TODO support curly brackets
+		// "BEFORE${REPLACE/me/with\\}curly}AFTER":  "BEFOREwith}curlyAFTER",
+		// "BEFORE${!REPLACE/me/with\\}curly}AFTER": "BEFORE${REPLACE/me/with\\}curly}AFTER",
 
-	if s, err := c.Envsubst("start${example:-default}end"); s != "startvalueend" || err != nil {
-		t.Fail()
+		"BEFORE${UNSET:-default}AFTER":  "BEFOREdefaultAFTER",
+		"BEFORE${!UNSET:-default}AFTER": "BEFORE${UNSET:-default}AFTER",
+	} {
+		t.Run(s, func(t *testing.T) {
+			actual, err := c.Envsubst(s)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if actual != expected {
+				t.Fatalf("invalid replacement\nexpected: %#v\nactual  : %#v", expected, actual)
+			}
+		})
 	}
 }

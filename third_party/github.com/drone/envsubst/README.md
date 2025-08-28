@@ -2,8 +2,6 @@
 
 Expands variables in a string using `${var}` syntax.
 
-> Only strips the `!` prefix from expressions with a `${!var}` syntax.
-
 ## Supported Functions
 
 | Expression                    | Meaning                                                             |
@@ -28,3 +26,12 @@ Expands variables in a string using `${var}` syntax.
 | `${var//pattern/replacement}` | Replace as many `pattern` matches as possible with `replacement`    |
 | `${var/#pattern/replacement}` | Replace `pattern` match with `replacement` from `$var` start        |
 | `${var/%pattern/replacement}` | Replace `pattern` match with `replacement` from `$var` end          |
+
+Skip expansion with a `!` prefix.
+
+| Expression           | Substitution           |
+|----------------------|------------------------|
+| `${HOME}`            | `/home/user`           |
+| `${!HOME}`           | `${HOME}`              |
+| `${UNSET:-default}`  | `default`              |
+| `${!UNSET:-default}` | `${UNSET:-default}`    |

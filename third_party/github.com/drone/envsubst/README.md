@@ -1,8 +1,8 @@
 # Envsubst
 
-Expands variables in a string using [drone/envsubst].
+Expands variables in a string using `${var}` syntax.
 
-> Expressions are ignored if the variable name has a `!` prefix (which is stripped).
+> Only strips the `!` prefix from expressions with a `${!var}` syntax.
 
 ## Supported Functions
 
@@ -28,5 +28,3 @@ Expands variables in a string using [drone/envsubst].
 | `${var//pattern/replacement}` | Replace as many `pattern` matches as possible with `replacement`    |
 | `${var/#pattern/replacement}` | Replace `pattern` match with `replacement` from `$var` start        |
 | `${var/%pattern/replacement}` | Replace `pattern` match with `replacement` from `$var` end          |
-
-[drone/envsubst]:https://github.com/drone/envsubst

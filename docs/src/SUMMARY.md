@@ -75,7 +75,7 @@
   - [Context](./carapace/context.md)
     - [Abs](./carapace/context/abs.md)
     - [Command](./carapace/context/command.md)
-    - [Envsubst](./carapace/context/envSubst.md)
+    - [Envsubst](./carapace/context/envsubst.md)
     - [GetEnv](./carapace/context/getEnv.md)
     - [LookupEnv](./carapace/context/lookupEnv.md)
     - [SetEnv](./carapace/context/setEnv.md)

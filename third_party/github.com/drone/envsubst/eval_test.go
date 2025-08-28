@@ -17,6 +17,12 @@ func TestExpand(t *testing.T) {
 			input:  "abcdEFGH28ij",
 			output: "abcdEFGH28ij",
 		},
+		// ignored
+		{
+			params: map[string]string{"var01": "abcdEFGH28ij"},
+			input:  "${!var01}",
+			output: "${var01}",
+		},
 		// length
 		{
 			params: map[string]string{"var01": "abcdEFGH28ij"},

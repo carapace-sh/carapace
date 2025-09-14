@@ -33,5 +33,11 @@ func TestInterspersed(t *testing.T) {
 
 		s.Run("interspersed", "--bool", "p1", "-").
 			Expect(carapace.ActionValues())
+
+		s.Run("interspersed", "--bool", "p1", "--", "").
+			Expect(carapace.ActionValues())
+
+		s.Run("interspersed", "--bool", "p1", "--", "", "").
+			Expect(carapace.ActionValues())
 	})
 }

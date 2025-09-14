@@ -24,6 +24,7 @@ func traverse(cmd *cobra.Command, args []string) (Action, Context) {
 	var inFlag *pflagfork.Flag  // last encountered flag that still expects arguments
 	cmd.LocalFlags()            // TODO force  c.mergePersistentFlags() which is missing from c.Flags()
 	fs := pflagfork.FlagSet{FlagSet: cmd.Flags()}
+	var dash bool // dash encountered
 
 	context := NewContext(args...)
 	context.cmd = cmd
@@ -45,6 +46,7 @@ loop:
 		case arg == "--":
 			LOG.Printf("arg %#v is dash\n", arg)
 			inArgs = append(inArgs, context.Args[i:]...)
+			dash = true
 			break loop
 
 		// flag
@@ -85,10 +87,12 @@ loop:
 	}
 
 	toParse := inArgs
-	if inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes("") {
+	switch {
+	case dash: // skip looking for flags in dash arguments
+	case inFlag != nil && len(inFlag.Args) == 0 && inFlag.Consumes(""):
 		LOG.Printf("removing arg %#v since it is a flag missing its argument\n", toParse[len(toParse)-1])
 		toParse = toParse[:len(toParse)-1]
-	} else if (fs.IsInterspersed() || len(inPositionals) == 0) && fs.IsShorthandSeries(context.Value) { // TODO shorthand series isn't correct anymore (can have value attached)
+	case (fs.IsInterspersed() || len(inPositionals) == 0) && fs.IsShorthandSeries(context.Value): // TODO shorthand series isn't correct anymore (can have value attached)
 		LOG.Printf("arg %#v is a shorthand flag series", context.Value) // TODO not aways correct
 		localInFlag := fs.LookupArg(context.Value)
 
@@ -101,7 +105,6 @@ loop:
 			LOG.Printf("adding shorthand flag %#v", context.Value)
 			toParse = append(toParse, context.Value)
 		}
-
 	}
 
 	// TODO duplicated code

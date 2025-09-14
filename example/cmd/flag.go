@@ -135,4 +135,13 @@ func init() {
 		"Uint":           carapace.ActionValues("1", "2", "3"),
 		"UintSlice":      carapace.ActionValues("1", "2", "3"),
 	})
+
+	carapace.Gen(flagCmd).DashCompletion(
+		carapace.ActionValues("d1", "dash1", "-d1", "--dash1"),
+		carapace.ActionValues("d2", "dash2", "-d2", "--dash2"),
+	)
+
+	carapace.Gen(flagCmd).DashAnyCompletion(
+		carapace.ActionValues("dAny", "dashAny", "-dAny", "--dashAny"),
+	)
 }

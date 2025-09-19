@@ -54,6 +54,8 @@ func (sm *SuffixMatcher) UnmarshalJSON(data []byte) (err error) {
 
 type ByRune []rune
 
-func (r ByRune) Len() int           { return len(r) }
-func (r ByRune) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
+func (r ByRune) Len() int { return len(r) }
+
+func (r ByRune) Swap(i, j int) { r[i], r[j] = r[j], r[i] }
+
 func (r ByRune) Less(i, j int) bool { return r[i] < r[j] }

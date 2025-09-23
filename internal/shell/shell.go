@@ -118,6 +118,7 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 			values[index].Uid = ""
 		}
 		values = values.Unique() // re-filter after clearance
+		meta.Queries = make(common.Queries, 0)
 		return f(value, meta, values)
 	}
 	return ""

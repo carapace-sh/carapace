@@ -528,3 +528,41 @@ func (a Action) UsageF(f func() string) Action {
 		return a
 	})
 }
+
+// Query TODO experimental
+func (a Action) Query(scheme, host, path string, opts ...string) Action {
+	return ActionCallback(func(c Context) Action {
+		if length := len(opts); length%2 != 0 {
+			return ActionMessage("invalid amount of arguments [Query]: %v", length)
+		}
+
+		query := url.URL{
+			Scheme: scheme,
+			Host:   url.PathEscape(host),
+			Path:   uid.PathEscape(path),
+		}
+		if len(opts) > 0 {
+			values := query.Query()
+			for i := 0; i < len(opts); i += 2 {
+				if opts[i+1] != "" { // implicitly skip empty values
+					values.Set(opts[i], opts[i+1])
+				}
+			}
+			query.RawQuery = values.Encode()
+		}
+		a.meta.Queries.Add(query.String())
+		return a
+	})
+}
+
+// QueryF TODO experimental
+func (a Action) QueryF(f func(s string, uc uid.Context) (*url.URL, error)) Action { // TODO remove the string
+	return ActionCallback(func(c Context) Action {
+		query, err := f(c.Value, c)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+		a.meta.Queries.Add(query.String())
+		return a
+	})
+}

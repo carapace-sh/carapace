@@ -172,7 +172,7 @@ func (ia InvokedAction) ToMultiPartsA(dividers ...string) Action {
 	})
 }
 
-func (ia InvokedAction) Query(q string) InvokedAction {
+func (ia InvokedAction) QueryS(q string) InvokedAction {
 	ia.action.meta.Queries.Add(q)
 	return ia
 }

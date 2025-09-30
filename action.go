@@ -561,7 +561,7 @@ func (a Action) Query(scheme, host, path string, opts ...string) Action {
 // QueryF TODO experimental
 func (a Action) QueryF(f func(s string, uc uid.Context) (*url.URL, error)) Action { // TODO remove the string
 	return ActionCallback(func(c Context) Action {
-		query, err := f(c.Value, c)
+		query, err := f("", c) // TODO string parameter from uid isn't really needed here
 		if err != nil {
 			return ActionMessage(err.Error())
 		}

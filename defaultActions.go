@@ -135,6 +135,10 @@ func ActionExecute(cmd *cobra.Command) Action {
 // ActionDirectories completes directories.
 func ActionDirectories() Action {
 	return ActionCallback(func(c Context) Action {
+		cDir, err := c.Abs(c.Dir)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
 		return actionPath([]string{""}, true).
 			MultiParts("/").
 			StyleF(style.ForPath).
@@ -145,19 +149,17 @@ func ActionDirectories() Action {
 				}
 				return url.Parse("file://" + uid.PathEscape(abs))
 			}).
-			QueryF(func(s string, uc uid.Context) (*url.URL, error) {
-				abs, err := c.Abs(c.Dir)
-				if err != nil {
-					return nil, err
-				}
-				return url.Parse(fmt.Sprintf("file://%v?directories=true", uid.PathEscape(abs)))
-			})
+			Query("file", "directories", "", "C_DIR", cDir)
 	}).Tag("directories")
 }
 
 // ActionFiles completes files with optional suffix filtering.
 func ActionFiles(suffix ...string) Action {
 	return ActionCallback(func(c Context) Action {
+		cDir, err := c.Abs(c.Dir)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
 		return actionPath(suffix, false).
 			MultiParts("/").
 			StyleF(style.ForPath).
@@ -168,23 +170,9 @@ func ActionFiles(suffix ...string) Action {
 				}
 				return url.Parse("file://" + uid.PathEscape(abs))
 			}).
-			QueryF(func(s string, uc uid.Context) (*url.URL, error) {
-				abs, err := c.Abs(c.Dir)
-				if err != nil {
-					return nil, err
-				}
-				query := &url.URL{
-					Scheme: "file",
-					Path:   abs,
-				}
-				if len(suffix) > 0 {
-					values := query.Query()
-					values.Set("suffix", strings.Join(suffix, ","))
-					query.RawQuery = values.Encode()
-				}
-				return query, nil
-			})
-		// Query("file", "", c.Dir, "suffix", strings.Join(suffix, ","))
+			Query("file", "files", "",
+				"C_DIR", cDir,
+				"suffix", strings.Join(suffix, ","))
 	}).Tag("files")
 }
 

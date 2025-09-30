@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -99,7 +100,9 @@ func TestActionDirectories(t *testing.T) {
 			"internal/", "file://"+wd("")+"/internal/",
 			"pkg/", "file://"+wd("")+"/pkg/",
 			"third_party/", "file://"+wd("")+"/third_party/",
-		)).Query(fmt.Sprintf("file://%v/?directories=true", wd(""))),
+		)).QueryS(fmt.Sprintf("file://directories?C_DIR=%v",
+			url.QueryEscape(wd("")+"/"),
+		)),
 		ActionDirectories().Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
@@ -118,7 +121,10 @@ func TestActionDirectories(t *testing.T) {
 			"./internal/", "file://"+wd("")+"/internal/",
 			"./pkg/", "file://"+wd("")+"/pkg/",
 			"./third_party/", "file://"+wd("")+"/third_party/",
-		)).Query(fmt.Sprintf("file://%v/?directories=true", wd(""))),
+		)).QueryS(fmt.Sprintf("file://directories?C_DIR=%v&C_VALUE=%v",
+			url.QueryEscape(wd("")+"/"),
+			url.QueryEscape("./"),
+		)),
 		ActionDirectories().Invoke(Context{Value: "./"}).Filter("./vendor/"),
 	)
 
@@ -127,7 +133,10 @@ func TestActionDirectories(t *testing.T) {
 			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
 			"example/cmd/", "file://"+wd("")+"/example/cmd/",
-		)).Query(fmt.Sprintf("file://%v/?directories=true", wd(""))),
+		)).QueryS(fmt.Sprintf("file://directories?C_DIR=%v&C_VALUE=%v",
+			url.QueryEscape(wd("")+"/"),
+			url.QueryEscape("example/"),
+		)),
 		ActionDirectories().Invoke(Context{Value: "example/"}),
 	)
 
@@ -136,7 +145,10 @@ func TestActionDirectories(t *testing.T) {
 			"cmd/", style.Of(style.Blue, style.Bold),
 		).NoSpace('/').Tag("directories").Invoke(Context{}).Prefix("example/").UidF(uid.Map(
 			"example/cmd/", "file://"+wd("")+"/example/cmd/",
-		)).Query(fmt.Sprintf("file://%v/?directories=true", wd(""))),
+		)).QueryS(fmt.Sprintf("file://directories?C_DIR=%v&C_VALUE=%v",
+			url.QueryEscape(wd("")+"/"),
+			url.QueryEscape("example/cm"),
+		)),
 		ActionDirectories().Invoke(Context{Value: "example/cm"}),
 	)
 }
@@ -159,7 +171,9 @@ func TestActionFiles(t *testing.T) {
 			"internal/", "file://"+wd("")+"/internal/",
 			"pkg/", "file://"+wd("")+"/pkg/",
 			"third_party/", "file://"+wd("")+"/third_party/",
-		)).Query(fmt.Sprintf("file://%v/?suffix=.md", wd(""))),
+		)).QueryS(fmt.Sprintf("file://files?C_DIR=%v&suffix=.md",
+			url.QueryEscape(wd("")+"/"),
+		)),
 		ActionFiles(".md").Invoke(Context{Value: ""}).Filter("vendor/"),
 	)
 
@@ -174,7 +188,10 @@ func TestActionFiles(t *testing.T) {
 			"example/cmd/", "file://"+wd("example")+"/cmd/",
 			"example/main.go", "file://"+wd("example")+"/main.go",
 			"example/main_test.go", "file://"+wd("example")+"/main_test.go",
-		)).Query(fmt.Sprintf("file://%v/", wd(""))),
+		)).QueryS(fmt.Sprintf("file://files?C_DIR=%v&C_VALUE=%v",
+			url.QueryEscape(wd("")+"/"),
+			url.QueryEscape("example/"),
+		)),
 		ActionFiles().Invoke(Context{Value: "example/"}).Filter("example/example"),
 	)
 }
@@ -199,7 +216,10 @@ func TestActionFilesChdir(t *testing.T) {
 		).NoSpace('/').Tag("files").Invoke(Context{}).Prefix("elvish/").UidF(uid.Map(
 			"elvish/action.go", "file://"+wd("internal/shell")+"/elvish/action.go",
 			"elvish/snippet.go", "file://"+wd("internal/shell")+"/elvish/snippet.go",
-		)).Query(fmt.Sprintf("file://%v/internal/shell", wd(""))), // TODO uid shouldn't include internal/shell
+		)).QueryS(fmt.Sprintf("file://files?C_DIR=%v&C_VALUE=%v",
+			url.QueryEscape(wd("internal/shell")),
+			url.QueryEscape("elvish/"),
+		)),
 		ActionFiles().Chdir("internal/shell").Invoke(Context{Value: "elvish/"}),
 	)
 

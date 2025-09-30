@@ -548,6 +548,9 @@ func (a Action) Query(scheme, host, path string, opts ...string) Action {
 					values.Set(opts[i], opts[i+1])
 				}
 			}
+			if c.Value != "" {
+				values.Set("C_VALUE", c.Value)
+			}
 			query.RawQuery = values.Encode()
 		}
 		a.meta.Queries.Add(query.String())
@@ -562,6 +565,13 @@ func (a Action) QueryF(f func(s string, uc uid.Context) (*url.URL, error)) Actio
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
+
+		if c.Value != "" {
+			values := query.Query()
+			values.Set("C_VALUE", c.Value)
+			query.RawQuery = values.Encode()
+		}
+
 		a.meta.Queries.Add(query.String())
 		return a
 	})

@@ -2,16 +2,20 @@
 function _example_completion {
   local words=${words[@]:0:$CURRENT}
   local IFS=$'\n'
-
+  
   # shellcheck disable=SC2086,SC2154,SC2155
+  local completion_input
   if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words}"''" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
-  elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    completion_input="${words}''"
+  elif echo "${words[1,-2]} ${words[-1]}'" | xargs echo 2>/dev/null > /dev/null; then
+    completion_input="${words[1,-2]} ${words[-1]}'"
   else
-    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    completion_input="${words[1,-2]} ${words[-1]}\\"
   fi
-
+  
+  local lines
+  lines="$(echo "${completion_input}" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+  
   local zstyle message data
   IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
   # shellcheck disable=SC2154
@@ -19,14 +23,30 @@ function _example_completion {
   zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
   
-  local block tag displays values displaysArr valuesArr
+  local block tag suffix displays values
+  local -A tags
   while IFS=$'\002' read -r -d $'\002' block; do
-    IFS=$'\003' read -r -d '' tag displays values <<<"${block}"
-    # shellcheck disable=SC2034
-    IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
-    IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
-  
-    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+    IFS=$'\003' read -r -d '' tag suffix displays values <<<"${block}"
+    
+    local -a displaysArr=("${(f@)displays}")
+    local -a valuesArr=("${(f@)values}")
+
+    local -a describe_args
+    if [[ -z ${tags[$tag]} ]]; then
+      describe_args=(-t "${tag}" "${tag}")
+      tags[$tag]=1
+    else
+      describe_args=(-t "${tag}" "")
+    fi
+    
+    local separators=" /,.':@="
+    if [[ "$suffix" == "" ]]; then
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S ' ' -r "${separators}0-9a-zA-Z"
+    elif [[ "$separators" == *"$suffix"* ]]; then
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S "$suffix" -r ' '
+    else
+      _describe "${describe_args[@]}" displaysArr valuesArr -Q -S "$suffix" -r "0-9a-zA-Z"
+    fi
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _example_completion

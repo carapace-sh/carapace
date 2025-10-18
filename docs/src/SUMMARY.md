@@ -36,6 +36,7 @@
     - [Tag](./carapace/action/tag.md)
     - [TagF](./carapace/action/tagF.md)
     - [Timeout](./carapace/action/timeout.md)
+    - [Unique](./carapace/action/unique.md)
     - [UniqueList](./carapace/action/uniqueList.md)
     - [UniqueListF](./carapace/action/uniqueListF.md)
     - [Unless](./carapace/action/unless.md)

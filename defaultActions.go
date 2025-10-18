@@ -465,14 +465,15 @@ func ActionExecutables(dirs ...string) Action {
 		}
 		manDescriptions := man.Descriptions(c.Value) // TODO allow additional descriptions to be registered somewhere for carapace-bin (key, value,...)
 		batch := Batch()
-		for i := len(dirs) - 1; i >= 0; i-- {
-			batch = append(batch, actionDirectoryExecutables(dirs[i], c.Value, manDescriptions))
+		for _, dir := range dirs {
+			batch = append(batch, actionDirectoryExecutables(dir, c.Value, manDescriptions))
 		}
 		return batch.ToA().
 			UidF(func(s string, uc uid.Context) (*url.URL, error) {
 				return &url.URL{Scheme: "cmd", Host: uid.PathEscape(s)}, nil
 			}).
-			Query("cmd", "", "", "directories", strings.Join(dirs, ", "))
+			Query("cmd", "", "", "directories", strings.Join(dirs, ", ")).
+			Unique()
 	}).Tag("executables")
 }
 

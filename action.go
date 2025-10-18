@@ -437,6 +437,15 @@ func (a Action) Timeout(d time.Duration, alternative Action) Action {
 	})
 }
 
+// Unique ensures the Action only contains unique values.
+func (a Action) Unique() Action {
+	return ActionCallback(func(c Context) Action {
+		invoked := a.Invoke(c)
+		invoked.action.rawValues = invoked.action.rawValues.Unique()
+		return invoked.ToA()
+	})
+}
+
 // UniqueList wraps the Action in an ActionMultiParts with given divider.
 func (a Action) UniqueList(divider string) Action {
 	return ActionMultiParts(divider, func(c Context) Action {

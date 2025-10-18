@@ -49,6 +49,7 @@ func init() {
 	modifierCmd.Flags().String("tag", "", "Tag()")
 	modifierCmd.Flags().String("tagf", "", "TagF()")
 	modifierCmd.Flags().String("timeout", "", "Timeout()")
+	modifierCmd.Flags().String("unique", "", "Unique()")
 	modifierCmd.Flags().String("uniquelist", "", "UniqueList()")
 	modifierCmd.Flags().String("uniquelistf", "", "UniqueListF()")
 	modifierCmd.Flags().String("unless", "", "Unless()")
@@ -256,6 +257,7 @@ func init() {
 				return ""
 			}
 		}),
+		"unique":     carapace.ActionValues("one", "two", "two", "three", "three", "three").Unique(),
 		"uniquelist": carapace.ActionValues("one", "two", "three").UniqueList(","),
 		"uniquelistf": carapace.ActionMultiPartsN(":", 2, func(c carapace.Context) carapace.Action {
 			switch len(c.Parts) {

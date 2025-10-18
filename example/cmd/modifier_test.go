@@ -513,6 +513,18 @@ func TestUnlessF(t *testing.T) {
 	})
 }
 
+func TestUnique(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
+		s.Run("modifier", "--unique", "").
+			Expect(carapace.ActionValues(
+				"one",
+				"two",
+				"three",
+			).Usage("Unique()"))
+
+	})
+}
+
 func TestUniqueList(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("modifier", "--uniquelist", "").

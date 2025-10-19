@@ -1,8 +1,8 @@
 function _example_quote_suffix
   if not commandline -cp | xargs echo 2>/dev/null >/dev/null
-    if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null
+    if echo (commandline -cp)'"' | xargs echo 2>/dev/null >/dev/null
       echo '"'
-    else if commandline -cp | sed "s/\$/'/"| xargs echo 2>/dev/null >/dev/null
+    else if echo (commandline -cp)"'" | xargs echo 2>/dev/null >/dev/null
       echo "'"
     end
   else 
@@ -11,7 +11,7 @@ function _example_quote_suffix
 end
 
 function _example_callback
-  commandline -cp | sed "s/\$/"(_example_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs example _carapace fish
+  echo (commandline -cp)(_example_quote_suffix) | sed "s/ \$/ ''/" | xargs example _carapace fish
 end
 
 complete -e 'example'

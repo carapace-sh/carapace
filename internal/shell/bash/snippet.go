@@ -19,12 +19,12 @@ _%v_completion() {
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
 
-  if echo ${compline}"''" | xargs echo 2>/dev/null > /dev/null; then
-  	data=$(echo ${compline}"''" | xargs %v _carapace bash)
-  elif echo ${compline} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-  	data=$(echo ${compline} | sed "s/\$/'/" | xargs %v _carapace bash)
+  if echo "${compline}''" | xargs echo 2>/dev/null > /dev/null; then
+  	data=$(echo "${compline}''" | xargs %v _carapace bash)
+  elif echo "${compline}'" | xargs echo 2>/dev/null > /dev/null; then
+  	data=$(echo "${compline}'" | xargs %v _carapace bash)
   else
-  	data=$(echo ${compline} | sed 's/$/"/' | xargs %v _carapace bash)
+  	data=$(echo "${compline}\"" | xargs %v _carapace bash)
   fi
 
   IFS=$'\001' read -r -d '' nospace data <<<"${data}"

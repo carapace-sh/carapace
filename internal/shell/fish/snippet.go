@@ -12,9 +12,9 @@ import (
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`function _%v_quote_suffix
   if not commandline -cp | xargs echo 2>/dev/null >/dev/null
-    if commandline -cp | sed 's/$/"/'| xargs echo 2>/dev/null >/dev/null
+    if echo (commandline -cp)'"' | xargs echo 2>/dev/null >/dev/null
       echo '"'
-    else if commandline -cp | sed "s/\$/'/"| xargs echo 2>/dev/null >/dev/null
+    else if echo (commandline -cp)"'" | xargs echo 2>/dev/null >/dev/null
       echo "'"
     end
   else 
@@ -23,7 +23,7 @@ func Snippet(cmd *cobra.Command) string {
 end
 
 function _%v_callback
-  commandline -cp | sed "s/\$/"(_%v_quote_suffix)"/" | sed "s/ \$/ ''/" | xargs %v _carapace fish
+  echo (commandline -cp)(_%v_quote_suffix) | sed "s/ \$/ ''/" | xargs %v _carapace fish
 end
 
 complete -e '%v'

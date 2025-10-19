@@ -1,15 +1,15 @@
 #compdef example
 function _example_completion {
-  local words=${words[@]:0:$CURRENT}
+  local compline=${words[@]:0:$CURRENT}
   local IFS=$'\n'
 
   # shellcheck disable=SC2086,SC2154,SC2155
-  if echo ${words}"''" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words}"''" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
-  elif echo ${words} | sed "s/\$/'/" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo ${words} | sed "s/\$/'/" | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+  if echo "${compline}''" | xargs echo 2>/dev/null > /dev/null; then
+    local lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh )"
+  elif echo "${compline}'" | xargs echo 2>/dev/null > /dev/null; then
+    local lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   else
-    local lines="$(echo ${words} | sed 's/$/"/' | CARAPACE_COMPLINE="${words}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
+    local lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh)"
   fi
 
   local zstyle message data

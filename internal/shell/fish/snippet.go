@@ -11,6 +11,7 @@ import (
 // Snippet creates the fish completion script.
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`function _%[1]v_completion
+  set --local data
   IFS='' set data (echo (commandline -cp)'' | sed "s/ \$/ ''/" | xargs %[2]v _carapace fish 2>/dev/null)
   if [ $status -eq 1 ]
     IFS='' set data (echo (commandline -cp)"'" | sed "s/ \$/ ''/" | xargs %[2]v _carapace fish 2>/dev/null)

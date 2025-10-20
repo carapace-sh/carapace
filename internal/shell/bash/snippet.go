@@ -36,7 +36,7 @@ _%[1]v_completion() {
   [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
 }
 
-complete -o noquote -F _%[1]v_completion %v
+complete -o noquote -F _%[1]v_completion %[1]v
 `, cmd.Name(), uid.Executable())
 
 	return result

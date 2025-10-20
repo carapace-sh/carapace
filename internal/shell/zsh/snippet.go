@@ -14,14 +14,15 @@ func Snippet(cmd *cobra.Command) string {
 function _%v_completion {
   local compline=${words[@]:0:$CURRENT}
   local IFS=$'\n'
+  local lines
 
   # shellcheck disable=SC2086,SC2154,SC2155
-  if echo "${compline}''" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh )"
-  elif echo "${compline}'" | xargs echo 2>/dev/null > /dev/null; then
-    local lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh)"
-  else
-    local lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh)"
+  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+  if [ $? -eq 1 ]; then
+    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+    if [ $? -eq 1 ]; then
+      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+    fi
   fi
 
   local zstyle message data

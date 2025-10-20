@@ -11,17 +11,17 @@ import (
 // Snippet creates the zsh completion script
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
-function _%v_completion {
+function _%[1]v_completion {
   local compline=${words[@]:0:$CURRENT}
   local IFS=$'\n'
   local lines
 
   # shellcheck disable=SC2086,SC2154,SC2155
-  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
   if [ $? -eq 1 ]; then
-    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
     if [ $? -eq 1 ]; then
-      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %v _carapace zsh 2>/dev/null)"
+      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
     fi
   fi
 
@@ -42,7 +42,7 @@ function _%v_completion {
     [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
   done <<<"${data}"
 }
-compquote '' 2>/dev/null && _%v_completion
-compdef _%v_completion %v
-`, cmd.Name(), cmd.Name(), uid.Executable(), uid.Executable(), uid.Executable(), cmd.Name(), cmd.Name(), cmd.Name())
+compquote '' 2>/dev/null && _%[1]v_completion
+compdef _%[1]v_completion %[1]v
+`, cmd.Name(), uid.Executable())
 }

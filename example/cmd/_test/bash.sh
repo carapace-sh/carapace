@@ -7,12 +7,12 @@ _example_completion() {
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
 
-  if echo "${compline}''" | xargs echo 2>/dev/null > /dev/null; then
-  	data=$(echo "${compline}''" | xargs example _carapace bash)
-  elif echo "${compline}'" | xargs echo 2>/dev/null > /dev/null; then
-  	data=$(echo "${compline}'" | xargs example _carapace bash)
-  else
-  	data=$(echo "${compline}\"" | xargs example _carapace bash)
+  data=$(echo "${compline}''" | xargs example _carapace bash 2>/dev/null)
+  if [ $? -eq 1 ]; then
+    data=$(echo "${compline}'" | xargs example _carapace bash 2>/dev/null)
+    if [ $? -eq 1 ]; then
+    	data=$(echo "${compline}\"" | xargs example _carapace bash 2>/dev/null)
+    fi
   fi
 
   IFS=$'\001' read -r -d '' nospace data <<<"${data}"

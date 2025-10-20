@@ -1,19 +1,14 @@
-function _example_quote_suffix
-  if not commandline -cp | xargs echo 2>/dev/null >/dev/null
-    if echo (commandline -cp)'"' | xargs echo 2>/dev/null >/dev/null
-      echo '"'
-    else if echo (commandline -cp)"'" | xargs echo 2>/dev/null >/dev/null
-      echo "'"
+function _example_completion
+  IFS='' set data (echo (commandline -cp)'' | sed "s/ \$/ ''/" | xargs example _carapace fish 2>/dev/null)
+  if [ $status -eq 1 ]
+    IFS='' set data (echo (commandline -cp)"'" | sed "s/ \$/ ''/" | xargs example _carapace fish 2>/dev/null)
+    if [ $status -eq 1 ]
+      IFS='' set data (echo (commandline -cp)'"' | sed "s/ \$/ ''/" | xargs example _carapace fish 2>/dev/null)
     end
-  else 
-    echo ""
   end
-end
-
-function _example_callback
-  echo (commandline -cp)(_example_quote_suffix) | sed "s/ \$/ ''/" | xargs example _carapace fish
+  echo $data
 end
 
 complete -e 'example'
-complete -c 'example' -f -a '(_example_callback)' -r
+complete -c 'example' -f -a '(_example_completion)' -r
 

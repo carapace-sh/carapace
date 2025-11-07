@@ -11,7 +11,7 @@ func TestCompatPersistent(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
 		s.Run("compat", "sub", "--persistent-compat", "").
 			Expect(carapace.ActionValues(
-				`args: []string(nil) toComplete: ""`,
+				`args: []string{} toComplete: ""`,
 				"alternative",
 			).Usage("persistent flag defined with cobra"))
 

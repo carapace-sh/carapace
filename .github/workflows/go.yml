@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: shallow clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         if: "!startsWith(github.ref, 'refs/tags/')"
 
       - name: deep clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         if: startsWith(github.ref, 'refs/tags/')
         with:
           fetch-depth: 0
@@ -65,7 +65,7 @@ jobs:
     needs: build
     steps:
       - name: shallow clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: actions/download-artifact@v6
         with:

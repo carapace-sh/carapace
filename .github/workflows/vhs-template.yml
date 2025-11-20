@@ -17,7 +17,7 @@ jobs:
       RC_NUSHELL: "source ~/.cache/example.nu\n$$env.config.completions.external.completer = $$example_completer"
     steps:
       - name: shallow clone
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - uses: actions/download-artifact@v6
         with:

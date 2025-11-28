@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
@@ -38,8 +39,17 @@ func reverse(s []string) {
 	}
 }
 
+var mLocalFlags sync.Mutex
+
 // Flag creates a uid for given flag.
 func Flag(cmd *cobra.Command, flag *pflagfork.Flag) *url.URL {
+	mLocalFlags.Lock()
+	fs := cmd.LocalFlags() // TODO causes a concurrent map write without lock
+	mLocalFlags.Unlock()
+
+	if fs.Lookup(flag.Name) == nil && cmd.HasParent() {
+		return Flag(cmd.Parent(), flag)
+	}
 	uid := Command(cmd)
 	values := uid.Query()
 	values.Set("flag", flag.Name)

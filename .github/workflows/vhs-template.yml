@@ -31,7 +31,7 @@ jobs:
           cd docs/src/development/vhs/${{ inputs.topic }}
           ls *.tape | xargs -n1 vhs
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.topic }}
           path: |

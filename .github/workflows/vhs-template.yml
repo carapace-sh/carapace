@@ -19,7 +19,7 @@ jobs:
       - name: shallow clone
         uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: example
           path: /usr/local/bin/

@@ -12,16 +12,17 @@ import (
 func Snippet(cmd *cobra.Command) string {
 	return fmt.Sprintf(`#compdef %v
 function _%[1]v_completion {
+  local command="$(basename $words[1])"
   local compline=${words[@]:0:$CURRENT}
   local IFS=$'\n'
   local lines
 
   # shellcheck disable=SC2086,SC2154,SC2155
-  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
+  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs "${command}" _carapace zsh 2>/dev/null)"
   if [ $? -eq 1 ]; then
-    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
+    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs "${command}" _carapace zsh 2>/dev/null)"
     if [ $? -eq 1 ]; then
-      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v _carapace zsh 2>/dev/null)"
+      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs "${command}" _carapace zsh 2>/dev/null)"
     fi
   fi
 

@@ -87,7 +87,7 @@ func (p *UnixProcess) Refresh() error {
 }
 
 func toString(array []byte, len int) string {
-	for i := 0; i < len; i++ {
+	for i := range len {
 		if array[i] == 0 {
 			return string(array[:i])
 		}

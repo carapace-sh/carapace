@@ -182,7 +182,7 @@ func (ia InvokedAction) value(shell string, value string) string {
 }
 
 func init() {
-	common.FromInvokedAction = func(i interface{}) (common.Meta, common.RawValues) {
+	common.FromInvokedAction = func(i any) (common.Meta, common.RawValues) {
 		if invoked, ok := i.(InvokedAction); ok {
 			return invoked.action.meta, invoked.action.rawValues
 		}

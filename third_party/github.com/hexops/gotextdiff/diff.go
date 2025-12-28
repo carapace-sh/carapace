@@ -132,11 +132,9 @@ func addEdit(before string, edits []TextEdit, edit TextEdit) []TextEdit {
 	if start.Offset() >= len(before) && start.Line() > 1 && before[len(before)-1] != '\n' {
 		// after end of file that does not end in eol, so join to last line of file
 		// to do this we need to know where the start of the last line was
-		eol := strings.LastIndex(before, "\n")
-		if eol < 0 {
+		eol := max(strings.LastIndex(before, "\n"),
 			// file is one non terminated line
-			eol = 0
-		}
+			0)
 		delta := len(before) - eol
 		start = span.NewPoint(start.Line()-1, 1, start.Offset()-delta)
 		edit.Span = span.New(edit.Span.URI(), start, end)

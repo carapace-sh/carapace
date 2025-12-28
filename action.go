@@ -522,9 +522,14 @@ func (a Action) UidF(f func(s string, uc uid.Context) (*url.URL, error)) Action 
 }
 
 // Usage sets the usage.
-func (a Action) Usage(usage string, args ...interface{}) Action {
+func (a Action) Usage(usage string, args ...any) Action {
 	return a.UsageF(func() string {
-		return fmt.Sprintf(usage, args...)
+		if len(args) == 0 {
+			return usage
+		}
+		return func(u string, a ...any) string { // avoids failed inferred printf check: non-constant format string
+			return fmt.Sprintf(u, a...)
+		}(usage, args...)
 	})
 }
 

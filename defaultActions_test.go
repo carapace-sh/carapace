@@ -60,8 +60,8 @@ func TestActionFlags(t *testing.T) {
 
 func TestActionExecCommandEnv(t *testing.T) {
 	ActionExecCommand("env")(func(output []byte) Action {
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(string(output), "\n")
+		for line := range lines {
 			if strings.Contains(line, "carapace_TestActionExecCommand") {
 				t.Error("should not contain env carapace_TestActionExecCommand")
 			}
@@ -72,8 +72,8 @@ func TestActionExecCommandEnv(t *testing.T) {
 	c := Context{}
 	c.Setenv("carapace_TestActionExecCommand", "test")
 	ActionExecCommand("env")(func(output []byte) Action {
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines {
+		lines := strings.SplitSeq(string(output), "\n")
+		for line := range lines {
 			if line == "carapace_TestActionExecCommand=test" {
 				return ActionValues()
 			}

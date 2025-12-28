@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/carapace-sh/carapace"
@@ -13,24 +14,14 @@ import (
 // Arch returns true if any of the given strings matches `runtime.GOARCH`.
 func Arch(s ...string) func(c carapace.Context) bool {
 	return func(c carapace.Context) bool {
-		for _, arch := range s {
-			if arch == runtime.GOARCH {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(s, runtime.GOARCH)
 	}
 }
 
 // Arch returns true if any of the given strings matches `runtime.GOOS`.
 func Os(s ...string) func(c carapace.Context) bool {
 	return func(c carapace.Context) bool {
-		for _, os := range s {
-			if os == runtime.GOOS {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(s, runtime.GOOS)
 	}
 }
 

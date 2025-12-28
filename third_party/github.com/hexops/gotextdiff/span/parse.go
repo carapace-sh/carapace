@@ -30,10 +30,10 @@ func Parse(input string) Span {
 		hadCol = true
 		suf = rstripSuffix(suf.remains)
 	}
-	switch {
-	case suf.sep == ":":
+	switch suf.sep {
+	case ":":
 		return New(URIFromPath(suf.remains), NewPoint(suf.num, hold, offset), Point{})
-	case suf.sep == "-":
+	case "-":
 		// we have a span, fall out of the case to continue
 	default:
 		// separator not valid, rewind to either the : or the start

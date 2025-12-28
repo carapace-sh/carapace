@@ -13,7 +13,7 @@ import (
 	"github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff/span"
 )
 
-func compare(t *testing.T, expected, actual interface{}, equal bool) {
+func compare(t *testing.T, expected, actual any, equal bool) {
 	var sExpected, sActual string
 	var ok bool
 	if sExpected, ok = expected.(string); !ok {
@@ -37,11 +37,11 @@ func compare(t *testing.T, expected, actual interface{}, equal bool) {
 	}
 }
 
-func Equal(t *testing.T, expected, actual interface{}) {
+func Equal(t *testing.T, expected, actual any) {
 	compare(t, expected, actual, true)
 }
 
-func NotEqual(t *testing.T, expected, actual interface{}) {
+func NotEqual(t *testing.T, expected, actual any) {
 	compare(t, expected, actual, false)
 }
 
@@ -50,7 +50,7 @@ func diff(expected, actual string) string {
 	diff := fmt.Sprint(gotextdiff.ToUnified("expected", "actual", expected, edits))
 
 	highlighted := make([]string, 0)
-	for _, line := range strings.Split(diff, "\n") {
+	for line := range strings.SplitSeq(diff, "\n") {
 		switch {
 		case strings.HasPrefix(line, "-"):
 			highlighted = append(highlighted, fmt.Sprintf("\033[0;31m%v\033[0m", line))

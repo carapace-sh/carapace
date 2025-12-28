@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/common"
@@ -235,7 +236,7 @@ func ActionStyledValuesDescribed(values ...string) Action {
 }
 
 // ActionMessage displays a help messages in places where no completions can be generated.
-func ActionMessage(msg string, args ...interface{}) Action {
+func ActionMessage(msg string, args ...any) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(args) > 0 {
 			msg = fmt.Sprintf(msg, args...)
@@ -542,10 +543,8 @@ func ActionCommands(cmd *cobra.Command) Action {
 	return ActionCallback(func(c Context) Action {
 		if len(c.Args) > 0 {
 			for _, subCommand := range cmd.Commands() {
-				for _, name := range append(subCommand.Aliases, subCommand.Name()) {
-					if name == c.Args[0] { // cmd.Find is too lenient
-						return ActionCommands(subCommand).Shift(1)
-					}
+				if slices.Contains(append(subCommand.Aliases, subCommand.Name()), c.Args[0]) { // cmd.Find is too lenient
+					return ActionCommands(subCommand).Shift(1)
 				}
 			}
 			return ActionMessage("unknown subcommand %#v for %#v", c.Args[0], cmd.Name())

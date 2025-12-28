@@ -92,7 +92,7 @@ func prepareEdits(before string, edits []TextEdit) (*span.TokenConverter, []Text
 }
 
 // lineEdits rewrites the edits to always be full line edits
-func lineEdits(before string, c *span.TokenConverter, edits []TextEdit) []TextEdit {
+func lineEdits(before string, _ *span.TokenConverter, edits []TextEdit) []TextEdit {
 	adjusted := make([]TextEdit, 0, len(edits))
 	current := TextEdit{Span: span.Invalid}
 	for _, edit := range edits {

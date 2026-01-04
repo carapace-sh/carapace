@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	CARAPACE_COLOR         = "CARAPACE_COLOR"         // enable color
 	CARAPACE_COMPLINE      = "CARAPACE_COMPLINE"      // TODO
 	CARAPACE_COVERDIR      = "CARAPACE_COVERDIR"      // coverage directory for sandbox tests
 	CARAPACE_EXPERIMENTAL  = "CARAPACE_EXPERIMENTAL"  // enable experimental features
@@ -29,6 +30,9 @@ const (
 )
 
 func ColorDisabled() bool {
+	if v, ok := os.LookupEnv(CARAPACE_COLOR); ok { // TODO multiple modes
+		return v == "0"
+	}
 	return getBool(NO_COLOR) || os.Getenv(CLICOLOR) == "0"
 }
 

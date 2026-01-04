@@ -79,7 +79,7 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			case true:
 				listItemText = sanitizer.Replace(val.Display)
 				if val.Description != "" {
-					listItemText = sanitizer.Replace(val.TrimmedDescription())
+					listItemText = fmt.Sprintf("%v (%v)", listItemText, sanitizer.Replace(val.TrimmedDescription()))
 				}
 			default:
 				listItemText = fmt.Sprintf("`e[21;22;23;24;25;29m`e[%vm%v`e[21;22;23;24;25;29;39;49m", sgr(val.Style), sanitizer.Replace(val.Display))

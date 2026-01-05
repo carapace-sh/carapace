@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	CARAPACE_COLOR         = "CARAPACE_COLOR"         // TODO
+	CARAPACE_COLOR         = "CARAPACE_COLOR"         // enable color
 	CARAPACE_COMPLINE      = "CARAPACE_COMPLINE"      // TODO
 	CARAPACE_COVERDIR      = "CARAPACE_COVERDIR"      // coverage directory for sandbox tests
 	CARAPACE_EXPERIMENTAL  = "CARAPACE_EXPERIMENTAL"  // enable experimental features

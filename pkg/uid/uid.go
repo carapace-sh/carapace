@@ -40,6 +40,9 @@ func reverse(s []string) {
 
 // Flag creates a uid for given flag.
 func Flag(cmd *cobra.Command, flag *pflagfork.Flag) *url.URL {
+	if cmd.LocalFlags().Lookup(flag.Name) == nil && cmd.HasParent() {
+		return Flag(cmd.Parent(), flag)
+	}
 	uid := Command(cmd)
 	values := uid.Query()
 	values.Set("flag", flag.Name)

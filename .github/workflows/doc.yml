@@ -67,7 +67,7 @@ jobs:
           key: linkcheck
           path: docs/book/linkcheck
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           path: docs/src/development/vhs/
 

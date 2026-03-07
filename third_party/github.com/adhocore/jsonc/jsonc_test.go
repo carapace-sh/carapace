@@ -1,7 +1,6 @@
 package jsonc
 
 import (
-	"os"
 	"strings"
 	"testing"
 )
@@ -12,17 +11,16 @@ type Case struct {
 }
 
 func TestStrip(t *testing.T) {
-	j := New()
 	for name, test := range testcases() {
 		t.Run("Strip "+name, func(t *testing.T) {
-			actual := j.StripS(test.json)
-			if actual != test.expect {
+			actual := Strip([]byte(test.json))
+			if string(actual) != test.expect {
 				t.Errorf("[%s] expected %s, got %s",
 					name,
 					strings.ReplaceAll(test.expect, "\t", "."),
-					strings.ReplaceAll(actual, "\t", "."),
+					strings.ReplaceAll(string(actual), "\t", "."),
 				)
-			} else if actual != string(j.Strip([]byte(test.json))) {
+			} else if string(actual) != string(Strip([]byte(test.json))) {
 				t.Error("byte str should match")
 			}
 		})
@@ -30,59 +28,20 @@ func TestStrip(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
-	j := New()
 	for name, test := range testcases() {
 		t.Run("Unmarshal "+name, func(t *testing.T) {
-			var ref map[string]interface{}
-			if err := j.Unmarshal([]byte(test.json), &ref); err != nil {
+			var ref map[string]any
+			if err := Unmarshal([]byte(test.json), &ref); err != nil {
 				t.Errorf("[%s] unmarshal should not error, got %#v", name, err)
 			}
 			if name == "nested subjson" {
 				jo := ref["jo"].(string)
-				if err := j.Unmarshal([]byte(jo), &ref); err != nil {
+				if err := Unmarshal([]byte(jo), &ref); err != nil {
 					t.Errorf("[%v] unmarshal should not error, got %#v", jo, err)
 				}
 			}
 		})
 	}
-
-	t.Run("UnmarshalFile", func(t *testing.T) {
-		files := []string{"chromium.json5", "test1.json5", "test.json5"}
-		for _, file := range files {
-			t.Run(file, func(t *testing.T) {
-				var ref map[string]interface{}
-				if err := j.UnmarshalFile("./examples/"+file, &ref); err != nil {
-					t.Errorf("UnmarshalFile should not error, got %#v", err)
-				}
-				if file != "test.json5" {
-					return
-				}
-				s := ref["g"]
-				if err := j.Unmarshal([]byte(s.(string)), &ref); err != nil {
-					t.Errorf("[%v] unmarshal should not error, got %#v", s, err)
-				}
-				if err := j.UnmarshalFile("./examples/invalid.json5", &ref); err == nil {
-					t.Error("invalid file should error, got none")
-				}
-			})
-		}
-	})
-}
-
-func TestCachedDecoder(t *testing.T) {
-	file := "./examples/test1.json5"
-	cd, val := NewCachedDecoder(), make(map[string]interface{})
-	t.Run("before cache", func(t *testing.T) {
-		os.Remove("./examples/test1.cached.json")
-		if err := cd.Decode(file, &val); err != nil {
-			t.Errorf("[%v] decode should not error, got %#v", file, err)
-		}
-		t.Run("after cache", func(t *testing.T) {
-			if err := cd.Decode(file, &val); err != nil {
-				t.Errorf("[%v] decode should not error, got %#v", file, err)
-			}
-		})
-	})
 }
 
 func testcases() map[string]Case {

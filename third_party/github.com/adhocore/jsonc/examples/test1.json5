@@ -1,0 +1,13 @@
+// kitchen sink example of json5: https://github.com/json5/json5#example
+{
+    // comments
+    unquoted: 'and you can quote me on that',
+    singleQuotes: 'I can use "double quotes" here',
+    lineBreaks: "Look, Mom! \
+    No \\n's!", // comment
+    hexadecimal: 0xdecaf,
+    leadingDecimalPoint: .8675309, andTrailing: 8675309.,
+    positiveSign: /* comment */ +1,
+    trailingComma: 'in objects', andIn: ['arrays',],
+    "backwardsCompatible": "with JSON",,
+}

@@ -1,0 +1,35 @@
+
+{
+    "a": [
+        "bb",
+        "cc",
+    
+        123,
+        10,
+        -20,
+        0.25,
+        5.0,
+        11259375,
+        {
+            "123": 15,
+            "xx": [1, 0.1, "xyz"], "y": "2"
+        },
+        "// not a comment",
+        "/* also not a comment */",
+        ["", "", true, false, null, 1, 0.5, 2.0, 15,
+            {"key":"val"}],
+        "single quoted"
+    ],
+    "aa": ["AA", {"in": ["a", "b" ]}],
+    "d": {
+        "t": true, "f": false,
+        "a_b": 1, "_1_z": 2, "Ḁẟḕỻ": "ɷɻɐỨẞṏḉ",
+        "n": null 
+        
+        
+    },
+    "e": "it's \"good\", eh?",
+    "g": "/*comment*/{\"i\" : 1, \"url\" : \"http://foo.bar\" }//comment",
+    "h": "a new line after word 'literal'\nthis text is in a new line as there is literal EOL just above. but this one is continued in same line due to backslash escape"
+}
+

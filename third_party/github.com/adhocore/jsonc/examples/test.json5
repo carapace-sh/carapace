@@ -1,0 +1,45 @@
+/*start*/
+//..
+{
+    // this is line comment
+    a: [ // unquoted key
+        'bb', // single quoted string
+        "cc", // double quoted string
+    /* multi line
+     * comment
+     */
+        123, // number
+        +10, // +ve number, equivalent to 10
+        -20, // -ve number
+        .25, // floating number, equivalent to 0.25
+        5.,  // floating number, equivalent to 5.0
+        0xabcDEF, // hex base16 number, equivalent to base10 counterpart: 11259375
+        {
+            123: 0xf, // even number as key?
+            xx: [1, .1, 'xyz',], y: '2', // array inside object, inside array
+        },
+        "// not a comment",
+        "/* also not a comment */",
+        ['', "", true, false, null, 1, .5, 2., 0xf, // all sort of data types
+            {key:'val'/*comment*/,}], // object inside array, inside array
+        'single quoted',
+    ],
+    /*aa*/aa: ['AA', {in: ['a', "b", ],},],
+    'd': { // single quoted key
+        t: /*creepy comment*/true, 'f': false,
+        a_b: 1, _1_z: 2, Ḁẟḕỻ: 'ɷɻɐỨẞṏḉ', // weird keys?
+        "n": null /*multiple trailing commas?*/,,,
+        /* 1 */
+        /* 2 */
+    },
+    "e": 'it\'s "good", eh?', // double quoted key, single quoted value with escaped quote
+    // json with comment inside json with comment, read that again:
+    "g": "/*comment*/{\"i\" : 1, \"url\" : \"http://foo.bar\" }//comment",
+    "h": "a new line after word 'literal'
+this text is in a new line as there is literal EOL just above. \
+but this one is continued in same line due to backslash escape",
+    // 1.
+    // 2.
+}
+//..
+/*end*/

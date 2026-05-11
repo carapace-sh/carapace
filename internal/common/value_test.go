@@ -14,6 +14,39 @@ func TestTrimmedDescription(t *testing.T) {
 	}
 }
 
+func TestTrimmedDescriptionLength(t *testing.T) {
+	t.Setenv("CARAPACE_DESCRIPTION_LENGTH", "20")
+
+	r := RawValue{
+		Description: "1234567890123456789012345",
+	}
+	if r.TrimmedDescription() != "12345678901234567..." {
+		t.Error("description should use CARAPACE_DESCRIPTION_LENGTH")
+	}
+}
+
+func TestTrimmedDescriptionLengthInvalid(t *testing.T) {
+	t.Setenv("CARAPACE_DESCRIPTION_LENGTH", "invalid")
+
+	r := RawValue{
+		Description: "123456789012345678901234567890123456789012345678901234567890123456789012345678901",
+	}
+	if r.TrimmedDescription() != "12345678901234567890123456789012345678901234567890123456789012345678901234567..." {
+		t.Error("invalid CARAPACE_DESCRIPTION_LENGTH should keep default length")
+	}
+}
+
+func TestTrimmedDescriptionShortLength(t *testing.T) {
+	t.Setenv("CARAPACE_DESCRIPTION_LENGTH", "3")
+
+	r := RawValue{
+		Description: "1234567890",
+	}
+	if r.TrimmedDescription() != "123" {
+		t.Error("short CARAPACE_DESCRIPTION_LENGTH should not exceed configured length")
+	}
+}
+
 func TestRawValuesFrom(t *testing.T) {
 	v := RawValuesFrom("first", "second")
 	if !equalRawValues(v[0], RawValue{

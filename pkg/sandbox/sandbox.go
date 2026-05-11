@@ -13,6 +13,7 @@ import (
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
+	"github.com/carapace-sh/carapace/internal/mock"
 	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +23,7 @@ type Sandbox struct {
 	cmdF func() *cobra.Command
 	env  map[string]string
 	keep bool
-	mock *common.Mock
+	mock *mock.Mock
 }
 
 func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
@@ -30,7 +31,7 @@ func newSandbox(t *testing.T, f func() *cobra.Command) Sandbox {
 		t:    t,
 		cmdF: f,
 		env:  make(map[string]string),
-		mock: common.NewMock(t),
+		mock: mock.NewMock(t),
 	}
 }
 

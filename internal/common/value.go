@@ -2,11 +2,10 @@
 package common
 
 import (
-	"os"
 	"sort"
-	"strconv"
 	"strings"
 
+	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/pkg/match"
 	"github.com/carapace-sh/carapace/pkg/style"
 )
@@ -27,7 +26,7 @@ type RawValue struct {
 
 // TrimmedDescription returns the trimmed description.
 func (r RawValue) TrimmedDescription() string {
-	maxLength := descriptionLength()
+	maxLength := env.DescriptionLength()
 	description := strings.SplitN(r.Description, "\n", 2)[0]
 	description = strings.TrimSpace(description)
 	runes := []rune(description)
@@ -38,13 +37,6 @@ func (r RawValue) TrimmedDescription() string {
 		description = string(runes[:maxLength-3]) + "..."
 	}
 	return description
-}
-
-func descriptionLength() int {
-	if parsed, err := strconv.Atoi(os.Getenv("CARAPACE_DESCRIPTION_LENGTH")); err == nil && parsed > 0 {
-		return parsed
-	}
-	return 80
 }
 
 // RawValues is an alias for []RawValue.

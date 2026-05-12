@@ -231,7 +231,7 @@ func TestComplete(t *testing.T) {
 	cmd.Flags().BoolP("a", "1", false, "")
 	cmd.Flags().BoolP("b", "2", false, "")
 
-	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim","Candidates":[{"Value":"-12","Display":"2","Description":"","CodeSuffix":"","Style":"default"},{"Value":"-1h","Display":"h","Description":"help for test","CodeSuffix":"","Style":"default"}]}` {
+	if s, err := complete(cmd, []string{"elvish", "_", "test", "-1"}); err != nil || s != `{"Usage":"","Messages":[],"DescriptionStyle":"dim","Candidates":[{"Value":"-1","Display":"-1","Description":"","CodeSuffix":" ","Style":"default"},{"Value":"-12","Display":"2","Description":"","CodeSuffix":"","Style":"default"},{"Value":"-1h","Display":"h","Description":"help for test","CodeSuffix":"","Style":"default"}]}` {
 		t.Error(s)
 	}
 }

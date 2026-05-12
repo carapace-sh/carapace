@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/carapace-sh/carapace/pkg/style"
@@ -89,16 +90,21 @@ func actionFlags(cmd *cobra.Command) Action {
 
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
+		currentShorthand := ""
+		if isShorthandSeries {
+			currentShorthand = currentShorthandFlag(c.Value)
+		}
 
 		nospace := make([]rune, 0)
 		batch := Batch()
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
+			isCurrentShorthand := isShorthandSeries && f.Shorthand != "" && f.Shorthand == currentShorthand
 			switch {
 			case f.Hidden && env.Hidden() == env.HIDDEN_NONE:
 				return // skip hidden flags
 			case f.Deprecated != "":
 				return // skip deprecated flags
-			case f.Changed && !f.IsRepeatable():
+			case f.Changed && !f.IsRepeatable() && !isCurrentShorthand:
 				return // don't repeat flag
 			case flagSet.IsMutuallyExclusive(f.Flag):
 				return // skip flag of group already set
@@ -111,9 +117,12 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
-						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
-					if f.IsOptarg() {
+					value, display := f.Shorthand, f.Shorthand
+					if isCurrentShorthand {
+						value, display = "", c.Value
+					}
+					batch = append(batch, actionShorthandFlag(cmd, f, value, display))
+					if f.IsOptarg() && value != "" {
 						nospace = append(nospace, []rune(f.Shorthand)[0])
 					}
 				}
@@ -142,6 +151,25 @@ func actionFlags(cmd *cobra.Command) Action {
 		}
 		return batch.ToA().MultiParts(".") // multiparts completion for flags grouped with `.`
 	})
+}
+
+func currentShorthandFlag(value string) string {
+	if runes := []rune(value); len(runes) > 1 {
+		return string(runes[len(runes)-1])
+	}
+	return ""
+}
+
+func actionShorthandFlag(cmd *cobra.Command, f *pflagfork.Flag, value string, display string) Action {
+	return ActionCallback(func(Context) Action {
+		return Action{rawValues: common.RawValues{{
+			Value:       value,
+			Display:     display,
+			Description: f.Usage,
+			Style:       f.Style(),
+		}}}
+	}).Tag("shorthand flags").
+		UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil })
 }
 
 func initHelpCompletion(cmd *cobra.Command) {

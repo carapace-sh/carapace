@@ -13,8 +13,8 @@ function _example_completion {
     fi
   fi
 
-  local zstyle message data
-  IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
+  local zstyle message noprefix data
+  IFS=$'\001' read -r -d '' zstyle message noprefix data <<<"${lines}"
   # shellcheck disable=SC2154
   zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
   zstyle ":completion:${curcontext}:*" group-name ''
@@ -29,7 +29,8 @@ function _example_completion {
   
     [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
   done <<<"${data}"
+
+  [[ "${noprefix}" = "true" ]] && compstate[insert]=menu
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example
-

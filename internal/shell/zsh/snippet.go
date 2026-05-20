@@ -25,8 +25,8 @@ function _%[1]v_completion {
     fi
   fi
 
-  local zstyle message data
-  IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
+  local zstyle message noprefix data
+  IFS=$'\001' read -r -d '' zstyle message noprefix data <<<"${lines}"
   # shellcheck disable=SC2154
   zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
   zstyle ":completion:${curcontext}:*" group-name ''
@@ -41,8 +41,9 @@ function _%[1]v_completion {
   
     [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
   done <<<"${data}"
+
+  [[ "${noprefix}" = "true" ]] && compstate[insert]=menu
 }
 compquote '' 2>/dev/null && _%[1]v_completion
-compdef _%[1]v_completion %[1]v
-`, cmd.Name(), uid.Executable())
+compdef _%[1]v_completion %[1]v`, cmd.Name(), uid.Executable())
 }

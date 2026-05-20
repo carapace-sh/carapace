@@ -158,5 +158,5 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 		}
 		tagGroup = append(tagGroup, strings.Join([]string{tag, strings.Join(displays, "\n"), strings.Join(vals, "\n")}, "\003"))
 	})
-	return fmt.Sprintf("%v\001%v\001%v\001", zstyles{values}.Format(), message{meta}.Format(), strings.Join(tagGroup, "\002")+"\002")
+	return fmt.Sprintf("%v\001%v\001%v\001%v\001", zstyles{values}.Format(), message{meta}.Format(), meta.NoPrefix, strings.Join(tagGroup, "\002")+"\002")
 }

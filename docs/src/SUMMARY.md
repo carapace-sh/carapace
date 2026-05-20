@@ -23,6 +23,7 @@
     - [MultiParts](./carapace/action/multiParts.md)
     - [MultiPartsP](./carapace/action/multiPartsP.md)
     - [NoSpace](./carapace/action/noSpace.md)
+    - [NoPrefix](./carapace/action/noPrefix.md)
     - [Prefix](./carapace/action/prefix.md)
     - [Retain](./carapace/action/retain.md)
     - [Shift](./carapace/action/shift.md)

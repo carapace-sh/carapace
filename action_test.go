@@ -84,6 +84,22 @@ func TestNoSpace(t *testing.T) {
 	}
 }
 
+func TestNoPrefix(t *testing.T) {
+	a := ActionCallback(func(c Context) Action {
+		return ActionValues().Invoke(c).Merge(
+			ActionCallback(func(c Context) Action {
+				return ActionValues("one", "two").NoPrefix()
+			}).Invoke(c)).
+			ToA()
+	})
+	if a.meta.NoPrefix {
+		t.Fatal("uninvoked action should not disable prefix insertion")
+	}
+	if !a.Invoke(Context{}).action.meta.NoPrefix {
+		t.Fatal("invoked action should disable prefix insertion")
+	}
+}
+
 func TestActionDirectories(t *testing.T) {
 	assert.Equal(t,
 		ActionStyledValues(

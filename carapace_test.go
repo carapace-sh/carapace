@@ -213,6 +213,8 @@ func TestSnippet(t *testing.T) {
 
 	if s, _ := Gen(cmd).Snippet("zsh"); !strings.Contains(s, "compdef") {
 		t.Error("zsh")
+	} else if !strings.Contains(s, "CARAPACE_ZSH_NO_COMMON_PREFIX") || !strings.Contains(s, "_describe -t") || !strings.Contains(s, `"${describeOptions[@]}"`) {
+		t.Error("zsh no common prefix option missing")
 	}
 
 	if _, err := Gen(cmd).Snippet("unknown"); err == nil {

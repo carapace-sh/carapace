@@ -19,6 +19,8 @@ function _example_completion {
   zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
   zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
+  local describeOptions
+  [ "${CARAPACE_ZSH_NO_COMMON_PREFIX}" = true ] || [ "${CARAPACE_ZSH_NO_COMMON_PREFIX}" = 1 ] && describeOptions=(-U)
   
   local block tag displays values displaysArr valuesArr
   while IFS=$'\002' read -r -d $'\002' block; do
@@ -27,9 +29,8 @@ function _example_completion {
     IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
     IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
   
-    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S '' "${describeOptions[@]}"
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _example_completion
 compdef _example_completion example
-

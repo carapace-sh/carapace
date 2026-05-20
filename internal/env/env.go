@@ -11,23 +11,24 @@ import (
 )
 
 const (
-	CARAPACE_COLOR              = "CARAPACE_COLOR"              // enable color
-	CARAPACE_COMPLINE           = "CARAPACE_COMPLINE"           // TODO
-	CARAPACE_COVERDIR           = "CARAPACE_COVERDIR"           // coverage directory for sandbox tests
-	CARAPACE_DESCRIPTION_LENGTH = "CARAPACE_DESCRIPTION_LENGTH" // maximum description length
-	CARAPACE_EXPERIMENTAL       = "CARAPACE_EXPERIMENTAL"       // enable experimental features
-	CARAPACE_HIDDEN             = "CARAPACE_HIDDEN"             // show hidden commands/flags
-	CARAPACE_LENIENT            = "CARAPACE_LENIENT"            // allow unknown flags
-	CARAPACE_LOG                = "CARAPACE_LOG"                // enable logging
-	CARAPACE_MATCH              = "CARAPACE_MATCH"              // match case insensitive
-	CARAPACE_MERGEFLAGS         = "CARAPACE_MERGEFLAGS"         // merge flags to single tag group
-	CARAPACE_NOSPACE            = "CARAPACE_NOSPACE"            // nospace suffixes
-	CARAPACE_SANDBOX            = "CARAPACE_SANDBOX"            // mock context for sandbox tests
-	CARAPACE_TOOLTIP            = "CARAPACE_TOOLTIP"            // enable tooltip style
-	CARAPACE_UNFILTERED         = "CARAPACE_UNFILTERED"         // skip the final filtering step
-	CARAPACE_ZSH_HASH_DIRS      = "CARAPACE_ZSH_HASH_DIRS"      // zsh hash directories
-	CLICOLOR                    = "CLICOLOR"                    // disable color
-	NO_COLOR                    = "NO_COLOR"                    // disable color
+	CARAPACE_COLOR                = "CARAPACE_COLOR"                // enable color
+	CARAPACE_COMPLINE             = "CARAPACE_COMPLINE"             // TODO
+	CARAPACE_COVERDIR             = "CARAPACE_COVERDIR"             // coverage directory for sandbox tests
+	CARAPACE_DESCRIPTION_LENGTH   = "CARAPACE_DESCRIPTION_LENGTH"   // maximum description length
+	CARAPACE_EXPERIMENTAL         = "CARAPACE_EXPERIMENTAL"         // enable experimental features
+	CARAPACE_HIDDEN               = "CARAPACE_HIDDEN"               // show hidden commands/flags
+	CARAPACE_LENIENT              = "CARAPACE_LENIENT"              // allow unknown flags
+	CARAPACE_LOG                  = "CARAPACE_LOG"                  // enable logging
+	CARAPACE_MATCH                = "CARAPACE_MATCH"                // match case insensitive
+	CARAPACE_MERGEFLAGS           = "CARAPACE_MERGEFLAGS"           // merge flags to single tag group
+	CARAPACE_NOSPACE              = "CARAPACE_NOSPACE"              // nospace suffixes
+	CARAPACE_SANDBOX              = "CARAPACE_SANDBOX"              // mock context for sandbox tests
+	CARAPACE_TOOLTIP              = "CARAPACE_TOOLTIP"              // enable tooltip style
+	CARAPACE_UNFILTERED           = "CARAPACE_UNFILTERED"           // skip the final filtering step
+	CARAPACE_ZSH_HASH_DIRS        = "CARAPACE_ZSH_HASH_DIRS"        // zsh hash directories
+	CARAPACE_ZSH_NO_COMMON_PREFIX = "CARAPACE_ZSH_NO_COMMON_PREFIX" // prevent zsh common prefix insertion
+	CLICOLOR                      = "CLICOLOR"                      // disable color
+	NO_COLOR                      = "NO_COLOR"                      // disable color
 )
 
 func ColorDisabled() bool {
@@ -117,6 +118,10 @@ func Compline() string {
 
 func Unfiltered() bool {
 	return getBool(CARAPACE_UNFILTERED)
+}
+
+func ZshNoCommonPrefix() bool {
+	return getBool(CARAPACE_ZSH_NO_COMMON_PREFIX)
 }
 
 func getBool(s string) bool {

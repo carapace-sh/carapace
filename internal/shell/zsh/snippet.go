@@ -4,6 +4,7 @@ package zsh
 import (
 	"fmt"
 
+	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +32,8 @@ function _%[1]v_completion {
   zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
   zstyle ":completion:${curcontext}:*" group-name ''
   [ -z "$message" ] || _message -r "${message}"
+  local describeOptions
+  [ "${%[3]v}" = true ] || [ "${%[3]v}" = 1 ] && describeOptions=(-U)
   
   local block tag displays values displaysArr valuesArr
   while IFS=$'\002' read -r -d $'\002' block; do
@@ -39,10 +42,9 @@ function _%[1]v_completion {
     IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
     IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
   
-    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S '' "${describeOptions[@]}"
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _%[1]v_completion
-compdef _%[1]v_completion %[1]v
-`, cmd.Name(), uid.Executable())
+compdef _%[1]v_completion %[1]v`, cmd.Name(), uid.Executable(), env.CARAPACE_ZSH_NO_COMMON_PREFIX)
 }

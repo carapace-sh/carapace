@@ -66,4 +66,4 @@ exec($(command _carapace))
 source <(command _carapace)
 ```
 
-> Directly sourcing multiple completions in your shell init script increases startup time [considerably](https://jzelinskie.com/posts/dont-recommend-sourcing-shell-completion/). See [lazycomplete](https://github.com/rsteube/lazycomplete) for a solution to this problem.
+> Directly sourcing multiple completions in your shell init script increases startup time considerably. See [lazycomplete](https://github.com/rsteube/lazycomplete) for a solution to this problem.

@@ -25,4 +25,5 @@ def _example_completer(context):
         return result
 
 add_one_completer('example', _example_completer, 'start')
+# completer registered for example
 

@@ -485,31 +485,7 @@ func (a Action) UnlessF(condition func(c Context) bool) Action {
 
 // Uid TODO experimental
 func (a Action) Uid(scheme, host string, opts ...string) Action {
-	return ActionCallback(func(c Context) Action {
-		if length := len(opts); length%2 != 0 {
-			return ActionMessage("invalid amount of arguments [Uid]: %v", length)
-		}
-
-		invoked := a.Invoke(c)
-		for index, v := range invoked.action.rawValues {
-			uid := url.URL{
-				Scheme: scheme,
-				Host:   url.PathEscape(host),
-				Path:   uid.PathEscape(v.Value),
-			}
-			if len(opts) > 0 {
-				values := uid.Query()
-				for i := 0; i < len(opts); i += 2 {
-					if opts[i+1] != "" { // implicitly skip empty values
-						values.Set(opts[i], opts[i+1])
-					}
-				}
-				uid.RawQuery = values.Encode()
-			}
-			invoked.action.rawValues[index].Uid = uid.String()
-		}
-		return invoked.ToA()
-	})
+	return a.UidF(uid.UidF(scheme, host, opts...))
 }
 
 // UidF TODO experimental

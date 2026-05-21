@@ -2,6 +2,7 @@
 package uid
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -16,6 +17,31 @@ type Context interface {
 	Abs(s string) (string, error)
 	Getenv(key string) string
 	LookupEnv(key string) (string, bool)
+}
+
+// UidF TODO experimental
+func UidF(scheme, host string, opts ...string) func(v string, uc Context) (*url.URL, error) {
+	return func(v string, uc Context) (*url.URL, error) {
+		if length := len(opts); length%2 != 0 {
+			return nil, fmt.Errorf("invalid amount of arguments [Uid]: %v", length)
+		}
+
+		uid := &url.URL{
+			Scheme: scheme,
+			Host:   url.PathEscape(host),
+			Path:   PathEscape(v),
+		}
+		if len(opts) > 0 {
+			values := uid.Query()
+			for i := 0; i < len(opts); i += 2 {
+				if opts[i+1] != "" { // implicitly skip empty values
+					values.Set(opts[i], opts[i+1])
+				}
+			}
+			uid.RawQuery = values.Encode()
+		}
+		return uid, nil
+	}
 }
 
 // Command creates a uid for given command.

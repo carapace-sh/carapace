@@ -57,6 +57,10 @@ var describeReplacer = strings.NewReplacer(
 	`:`, `\:`,
 )
 
+var describeValueReplacer = strings.NewReplacer(
+	`:`, `\:`,
+)
+
 func quoteValue(s string) string {
 	if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
 		return "~" + defaultReplacer.Replace(strings.TrimPrefix(s, "~")) // assume file path expansion
@@ -119,21 +123,21 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 			switch state {
 			case QUOTING_ESCAPING_STATE:
 				value = quotingEscapingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
+				value = describeValueReplacer.Replace(value)
 				value = value + `"`
 			case QUOTING_STATE:
 				value = quotingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
+				value = describeValueReplacer.Replace(value)
 				value = value + `'`
 			case FULL_QUOTING_ESCAPING_STATE:
 				value = quotingEscapingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
+				value = describeValueReplacer.Replace(value)
 			case FULL_QUOTING_STATE:
 				value = quotingReplacer.Replace(value)
-				value = describeReplacer.Replace(value)
+				value = describeValueReplacer.Replace(value)
 			default:
 				value = quoteValue(value)
-				value = describeReplacer.Replace(value)
+				value = describeValueReplacer.Replace(value)
 			}
 
 			if !meta.Nospace.Matches(val.Value) {

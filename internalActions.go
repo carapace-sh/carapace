@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/carapace-sh/carapace/pkg/style"
@@ -90,15 +91,26 @@ func actionFlags(cmd *cobra.Command) Action {
 		flagSet := pflagfork.FlagSet{FlagSet: cmd.Flags()}
 		isShorthandSeries := flagSet.IsShorthandSeries(c.Value)
 
+		// currentShorthand is the last shorthand character of the value being
+		// completed (e.g. "d" for "-vd"). When set, the corresponding flag is
+		// also offered as a completion candidate so its description is visible.
+		currentShorthand := ""
+		if isShorthandSeries {
+			if runes := []rune(c.Value); len(runes) > 1 {
+				currentShorthand = string(runes[len(runes)-1])
+			}
+		}
+
 		nospace := make([]rune, 0)
 		batch := Batch()
 		flagSet.VisitAll(func(f *pflagfork.Flag) {
+			isCurrentShorthand := isShorthandSeries && f.Shorthand != "" && f.Shorthand == currentShorthand
 			switch {
 			case f.Hidden && env.Hidden() == env.HIDDEN_NONE:
 				return // skip hidden flags
 			case f.Deprecated != "":
 				return // skip deprecated flags
-			case f.Changed && !f.IsRepeatable():
+			case f.Changed && !f.IsRepeatable() && !isCurrentShorthand:
 				return // don't repeat flag
 			case flagSet.IsMutuallyExclusive(f.Flag):
 				return // skip flag of group already set
@@ -111,10 +123,15 @@ func actionFlags(cmd *cobra.Command) Action {
 							return // abort shorthand flag series if a previous one is not bool or count and requires an argument (no default value)
 						}
 					}
-					batch = append(batch, ActionStyledValuesDescribed(f.Shorthand, f.Usage, f.Style()).Tag("shorthand flags").
-						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
-					if f.IsOptarg() {
-						nospace = append(nospace, []rune(f.Shorthand)[0])
+					if isCurrentShorthand {
+						// offer the currently entered short flag as-is so its
+						// description is visible to the user
+						batch = append(batch, actionShorthandFlagEntry(cmd, f, "", c.Value))
+					} else {
+						batch = append(batch, actionShorthandFlagEntry(cmd, f, f.Shorthand, f.Shorthand))
+						if f.IsOptarg() {
+							nospace = append(nospace, []rune(f.Shorthand)[0])
+						}
 					}
 				}
 			} else {
@@ -142,6 +159,21 @@ func actionFlags(cmd *cobra.Command) Action {
 		}
 		return batch.ToA().MultiParts(".") // multiparts completion for flags grouped with `.`
 	})
+}
+
+// actionShorthandFlagEntry builds the completion entry for a single shorthand
+// flag inside a shorthand series. `value` is what gets inserted after the
+// existing prefix (`c.Value`), while `display` is shown to the user.
+func actionShorthandFlagEntry(cmd *cobra.Command, f *pflagfork.Flag, value string, display string) Action {
+	return ActionCallback(func(Context) Action {
+		return Action{rawValues: common.RawValues{{
+			Value:       value,
+			Display:     display,
+			Description: f.Usage,
+			Style:       f.Style(),
+		}}}
+	}).Tag("shorthand flags").
+		UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil })
 }
 
 func initHelpCompletion(cmd *cobra.Command) {

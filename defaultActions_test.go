@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/pkg/assert"
-	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
 
@@ -41,19 +41,15 @@ func TestActionFlags(t *testing.T) {
 
 	cmd.Flag("alpha").Changed = true
 	a := actionFlags(cmd).Invoke(Context{Value: "-a"})
+	expected := Action{rawValues: common.RawValues{
+		{Value: "-a", Display: "-a", Tag: "shorthand flags", Uid: "cmd://actionFlags?flag=alpha"},
+		{Value: "-ab", Display: "b", Tag: "shorthand flags", Uid: "cmd://actionFlags?flag=beta"},
+		{Value: "-ah", Display: "h", Description: "help for actionFlags", Tag: "shorthand flags", Uid: "cmd://actionFlags?flag=help"},
+	}}
+	expected.meta.Nospace.Add('b', 'h')
 	assert.Equal(
 		t,
-		ActionValuesDescribed(
-			"b", "",
-			"h", "help for actionFlags",
-		).Tag("shorthand flags").
-			NoSpace('b', 'h').
-			Invoke(Context{}).
-			Prefix("-a").
-			UidF(uid.Map(
-				"-ab", "cmd://actionFlags?flag=beta",
-				"-ah", "cmd://actionFlags?flag=help",
-			)),
+		expected.Invoke(Context{}),
 		a,
 	)
 }

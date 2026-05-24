@@ -70,11 +70,15 @@ var mLocalFlags sync.Mutex
 // Flag creates a uid for given flag.
 func Flag(cmd *cobra.Command, flag *pflagfork.Flag) *url.URL {
 	mLocalFlags.Lock()
-	fs := cmd.LocalFlags() // TODO causes a concurrent map write without lock
-	mLocalFlags.Unlock()
+	defer mLocalFlags.Unlock()
+	return flagRecursive(cmd, flag)
+}
 
-	if fs.Lookup(flag.Name) == nil && cmd.HasParent() {
-		return Flag(cmd.Parent(), flag)
+func flagRecursive(cmd *cobra.Command, flag *pflagfork.Flag) *url.URL {
+	_ = cmd.LocalFlags() // Force flag merge; not thread-safe internally
+
+	if cmd.LocalFlags().Lookup(flag.Name) == nil && cmd.HasParent() {
+		return flagRecursive(cmd.Parent(), flag)
 	}
 	uid := Command(cmd)
 	values := uid.Query()

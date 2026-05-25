@@ -46,3 +46,123 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 	_test("-ccbs=val1", "string", "-ccbs=", "val1")
 	_test("-ccbsval1", "string", "-ccbs", "val1")
 }
+
+func TestArgumentStyleAcceptance(t *testing.T) {
+	// Test AcceptNext only accepts next argument style
+	t.Run("AcceptNext_rejects_delimited", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-next", "", "Accept next only")
+		fs.Lookup("accept-next").ArgumentStyle = pflag.AcceptNext
+
+		err := fs.Parse([]string{"--accept-next=value"})
+		if err == nil {
+			t.Error("expected error for delimited style, got nil")
+		}
+	})
+
+	// Test AcceptDelimited only accepts delimited argument style
+	t.Run("AcceptDelimited_rejects_next", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-delimited", "", "Accept delimited only")
+		fs.Lookup("accept-delimited").ArgumentStyle = pflag.AcceptDelimited
+
+		err := fs.Parse([]string{"--accept-delimited", "value"})
+		if err == nil {
+			t.Error("expected error for next style, got nil")
+		}
+	})
+
+	// Test AcceptDelimited accepts delimited argument style
+	t.Run("AcceptDelimited_accepts_delimited", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-delimited", "", "Accept delimited only")
+		fs.Lookup("accept-delimited").ArgumentStyle = pflag.AcceptDelimited
+
+		err := fs.Parse([]string{"--accept-delimited=value"})
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+		if fs.Lookup("accept-delimited").Value.String() != "value" {
+			t.Errorf("expected 'value', got %s", fs.Lookup("accept-delimited").Value.String())
+		}
+	})
+
+	// Test AcceptDelimited|AcceptNext accepts both
+	t.Run("AcceptDelimitedOrNext_accepts_both", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-both", "", "Accept both")
+		fs.Lookup("accept-both").ArgumentStyle = pflag.AcceptDelimited | pflag.AcceptNext
+
+		err := fs.Parse([]string{"--accept-both=value"})
+		if err != nil {
+			t.Errorf("expected no error for delimited, got %v", err)
+		}
+
+		fs = &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-both", "", "Accept both")
+		fs.Lookup("accept-both").ArgumentStyle = pflag.AcceptDelimited | pflag.AcceptNext
+		err = fs.Parse([]string{"--accept-both", "value"})
+		if err != nil {
+			t.Errorf("expected no error for next, got %v", err)
+		}
+	})
+
+	// Test shorthand with AcceptNext
+	t.Run("AcceptNext_shorthand_rejects_delimited", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.StringP("accept-next-s", "n", "", "Accept next only")
+		fs.Lookup("accept-next-s").ArgumentStyle = pflag.AcceptNext
+
+		err := fs.Parse([]string{"-n=value"})
+		if err == nil {
+			t.Error("expected error for delimited style, got nil")
+		}
+	})
+
+	// Test shorthand with AcceptDelimited
+	t.Run("AcceptDelimited_shorthand_accepts_delimited", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.StringP("accept-delimited-s", "d", "", "Accept delimited only")
+		fs.Lookup("accept-delimited-s").ArgumentStyle = pflag.AcceptDelimited
+
+		err := fs.Parse([]string{"-d=value"})
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
+	// Test shorthand with AcceptNext accepts next
+	t.Run("AcceptNext_shorthand_accepts_next", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.StringP("accept-next-s", "n", "", "Accept next only")
+		fs.Lookup("accept-next-s").ArgumentStyle = pflag.AcceptNext
+
+		err := fs.Parse([]string{"-n", "value"})
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
+	// Test AcceptNext|AcceptAttached accepts next but not delimited
+	// Note: Attached style works for shorthand (-nvalue) not longhand (--flagvalue)
+	t.Run("AcceptNextOrAttached_accepts_next", func(t *testing.T) {
+		fs := &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-next-or-attached", "", "Accept next or attached")
+		fs.Lookup("accept-next-or-attached").ArgumentStyle = pflag.AcceptNext | pflag.AcceptAttached
+
+		// Accepts next style
+		err := fs.Parse([]string{"--accept-next-or-attached", "value"})
+		if err != nil {
+			t.Errorf("expected no error for next, got %v", err)
+		}
+
+		// Rejects delimited style
+		fs = &FlagSet{pflag.NewFlagSet("test", pflag.ContinueOnError)}
+		fs.String("accept-next-or-attached", "", "Accept next or attached")
+		fs.Lookup("accept-next-or-attached").ArgumentStyle = pflag.AcceptNext | pflag.AcceptAttached
+		err = fs.Parse([]string{"--accept-next-or-attached=value"})
+		if err == nil {
+			t.Error("expected error for delimited style, got nil")
+		}
+	})
+}

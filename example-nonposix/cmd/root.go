@@ -31,6 +31,7 @@ func init() {
 	rootCmd.Flags().CountN("count", "c", "CountN")
 	rootCmd.Flags().StringSlice("nargs-any", []string{}, "Nargs")
 	rootCmd.Flags().StringSlice("nargs-two", []string{}, "Nargs")
+	rootCmd.Flags().StringN("overlapping", "o", "", "overlapping shorthand")
 
 	rootCmd.Flag("delim-colon").NoOptDefVal = " "
 	rootCmd.Flag("delim-colon").OptargDelimiter = ':'
@@ -57,6 +58,7 @@ func init() {
 				return carapace.ActionValues()
 			}
 		}),
+		"overlapping": carapace.ActionValues("o1", "o2", "o3"),
 	})
 
 	carapace.Gen(rootCmd).PositionalCompletion(

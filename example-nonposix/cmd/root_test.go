@@ -110,3 +110,42 @@ func TestNargs(t *testing.T) {
 				Tag("longhand flags"))
 	})
 }
+
+func TestOverlapping(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		s.Run("-o").
+			Expect(
+				carapace.Batch(
+					carapace.ActionValuesDescribed(
+						"-o", "overlapping shorthand",
+					).Tag("shorthand flags"),
+					carapace.ActionValuesDescribed(
+						"-overlapping", "overlapping shorthand",
+					).Tag("longhand flags"),
+				).ToA().
+					Style(style.Blue).
+					NoSpace('.'))
+
+		s.Run("-ov").
+			Expect(
+				carapace.ActionValuesDescribed(
+					"-overlapping", "overlapping shorthand",
+				).Tag("longhand flags").
+					Style(style.Blue).
+					NoSpace('.'))
+
+		s.Run("-o", "").
+			Expect(carapace.ActionValues(
+				"o1",
+				"o2",
+				"o3",
+			).Usage("overlapping shorthand"))
+
+		s.Run("-overlapping", "").
+			Expect(carapace.ActionValues(
+				"o1",
+				"o2",
+				"o3",
+			).Usage("overlapping shorthand"))
+	})
+}

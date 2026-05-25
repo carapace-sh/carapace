@@ -16,4 +16,4 @@ require (
 
 replace github.com/carapace-sh/carapace => ../
 
-replace github.com/spf13/pflag => github.com/carapace-sh/carapace-pflag v1.1.0
+replace github.com/spf13/pflag => ../../carapace-pflag/

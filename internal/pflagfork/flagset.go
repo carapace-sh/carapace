@@ -62,6 +62,11 @@ func (fs FlagSet) LookupArg(arg string) (result *Flag) {
 	case isPosix:
 		return fs.lookupPosixShorthandArg(arg)
 	case !isPosix:
+		// In non-posix mode, try longhand first (single dash with name)
+		// to handle cases where name overlaps with shorthand
+		if result = fs.LookupNonPosixLonghandArg(arg); result != nil {
+			return result
+		}
 		return fs.lookupNonPosixShorthandArg(arg)
 	}
 	return
@@ -151,4 +156,17 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		}
 	})
 	return
+}
+
+// LookupNonPosixLonghandArg looks up a non-posix longhand argument (single dash with name)
+func (fs FlagSet) LookupNonPosixLonghandArg(arg string) *Flag {
+	if !strings.HasPrefix(arg, "-") || strings.HasPrefix(arg, "--") {
+		return nil
+	}
+
+	name := arg[1:] // remove single dash
+	if flag := fs.Lookup(name); flag != nil {
+		return &Flag{Flag: flag, Args: []string{}}
+	}
+	return nil
 }

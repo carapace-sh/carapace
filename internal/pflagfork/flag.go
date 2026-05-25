@@ -32,15 +32,15 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
-func (f Flag) acceptsNext() bool {
+func (f Flag) AcceptsNext() bool {
 	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&1 != 0
 }
 
-func (f Flag) acceptsDelimited() bool {
+func (f Flag) AcceptsDelimited() bool {
 	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&2 != 0
 }
 
-func (f Flag) acceptsAttached() bool {
+func (f Flag) AcceptsAttached() bool {
 	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&4 != 0
 }
 

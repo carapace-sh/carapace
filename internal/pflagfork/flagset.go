@@ -95,10 +95,10 @@ func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "--"+f.Name {
 			// Check ArgumentStyle constraints
-			if len(splitted) > 1 && !f.acceptsDelimited() {
+			if len(splitted) > 1 && !f.AcceptsDelimited() {
 				return // flag doesn't accept delimited style (--flag=value)
 			}
-			if len(splitted) == 1 && !f.acceptsNext() && f.NoOptDefVal == "" {
+			if len(splitted) == 1 && !f.AcceptsNext() && f.NoOptDefVal == "" {
 				return // flag doesn't accept next style and has no default
 			}
 			flag = f
@@ -132,14 +132,14 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 		hasNext := index == len(arg)-1 || hasDelimiter || hasAttached
 
 		switch {
-		case hasDelimiter && !flag.acceptsDelimited():
+		case hasDelimiter && !flag.AcceptsDelimited():
 			// Flag doesn't accept delimited style
 			continue
-		case hasAttached && !flag.acceptsAttached():
+		case hasAttached && !flag.AcceptsAttached():
 			// Flag doesn't accept attached style
 			continue
-		case hasNext && len(arg) == index+1 && !flag.acceptsNext() && flag.NoOptDefVal == "":
-			// Flag doesn't accept next style and has no default
+		case hasNext && len(arg) == index+1 && !flag.AcceptsNext() && !flag.AcceptsAttached():
+			// Flag doesn't accept next style and has no default, and doesn't accept attached for completion
 			continue
 		}
 
@@ -178,7 +178,7 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		baseArg := strings.TrimSuffix(splitted[0], string(f.OptargDelimiter()))
 
 		// Check ArgumentStyle constraints
-		if len(splitted) > 1 && !f.acceptsDelimited() {
+		if len(splitted) > 1 && !f.AcceptsDelimited() {
 			return // flag doesn't accept delimited style
 		}
 

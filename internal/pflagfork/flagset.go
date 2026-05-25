@@ -88,12 +88,19 @@ func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
 	}
 
 	fs.VisitAll(func(f *Flag) { // TODO needs to be sorted to try longest matching first
-		if flag != nil || f.Mode() != Default {
+		if flag != nil || f.GetMode() != Default {
 			return
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "--"+f.Name {
+			// Check ArgumentStyle constraints
+			if len(splitted) > 1 && !f.acceptsDelimited() {
+				return // flag doesn't accept delimited style (--flag=value)
+			}
+			if len(splitted) == 1 && !f.acceptsNext() && f.NoOptDefVal == "" {
+				return // flag doesn't accept next style and has no default
+			}
 			flag = f
 			flag.Prefix = splitted[0]
 			if len(splitted) > 1 {
@@ -113,17 +120,38 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 		index += 1
 		flag := fs.ShorthandLookup(string(r))
 
-		switch {
-		case flag == nil:
+		if flag == nil {
 			return flag
+		}
+
+		// Check if there's a delimiter (=)
+		hasDelimiter := index < len(arg)-1 && arg[index+1] == byte(flag.OptargDelimiter())
+		// Check if value is attached (e.g., -fvalue)
+		hasAttached := index < len(arg)-1 && !hasDelimiter
+		// Check if value is in next position
+		hasNext := index == len(arg)-1 || hasDelimiter || hasAttached
+
+		switch {
+		case hasDelimiter && !flag.acceptsDelimited():
+			// Flag doesn't accept delimited style
+			continue
+		case hasAttached && !flag.acceptsAttached():
+			// Flag doesn't accept attached style
+			continue
+		case hasNext && len(arg) == index+1 && !flag.acceptsNext() && flag.NoOptDefVal == "":
+			// Flag doesn't accept next style and has no default
+			continue
+		}
+
+		switch {
 		case len(arg) == index+1:
 			flag.Prefix = arg
 			return flag
-		case arg[index+1] == byte(flag.OptargDelimiter()) && len(arg) > index+2:
+		case hasDelimiter && len(arg) > index+2:
 			flag.Prefix = arg[:index+2]
 			flag.Args = []string{arg[index+2:]}
 			return flag
-		case arg[index+1] == byte(flag.OptargDelimiter()):
+		case hasDelimiter:
 			flag.Prefix = arg[:index+2]
 			flag.Args = []string{""}
 			return flag
@@ -147,7 +175,14 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
-		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "-"+f.Shorthand {
+		baseArg := strings.TrimSuffix(splitted[0], string(f.OptargDelimiter()))
+
+		// Check ArgumentStyle constraints
+		if len(splitted) > 1 && !f.acceptsDelimited() {
+			return // flag doesn't accept delimited style
+		}
+
+		if baseArg == "-"+f.Shorthand {
 			result = f
 			result.Prefix = splitted[0]
 			if len(splitted) > 1 {

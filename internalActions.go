@@ -118,11 +118,11 @@ func actionFlags(cmd *cobra.Command) Action {
 					}
 				}
 			} else {
-				switch f.Mode() {
-				case pflagfork.NameAsShorthand:
+				switch int(f.Flag.Mode) {
+				case 2: // pflagfork.NameAsShorthand
 					batch = append(batch, ActionStyledValuesDescribed("-"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
 						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
-				case pflagfork.Default:
+				case 0: // pflagfork.Default
 					batch = append(batch, ActionStyledValuesDescribed("--"+f.Name, f.Usage, f.Style()).Tag("longhand flags").
 						UidF(func(s string, uc uid.Context) (*url.URL, error) { return uid.Flag(cmd, f), nil }))
 				}

@@ -14,7 +14,6 @@ import (
 	"github.com/carapace-sh/carapace/internal/env"
 	"github.com/carapace-sh/carapace/internal/export"
 	"github.com/carapace-sh/carapace/internal/mock"
-	"github.com/carapace-sh/carapace/pkg/assert"
 	"github.com/spf13/cobra"
 )
 
@@ -153,6 +152,7 @@ type run struct {
 // TODO rename
 func (r run) invoke(a carapace.Action) string {
 	meta, rawValues := common.FromInvokedAction(a.Invoke(r.context))
+
 	rawValues = rawValues.FilterPrefix(r.context.Value)
 	sort.Sort(common.ByValue(rawValues))
 
@@ -171,7 +171,11 @@ func (r run) invoke(a carapace.Action) string {
 func (r run) Expect(expected carapace.Action) {
 	r.t.Run(r.id, func(t *testing.T) {
 		// t.Parallel() TODO prevent concurrent map write for this (storage.go)
-		assert.Equal(r.t, r.invoke(expected), r.invoke(r.actual))
+		expectedOut := r.invoke(expected)
+		actualOut := r.invoke(r.actual)
+		if expectedOut != actualOut {
+			t.Fatalf("expected output does not match actual:\n--- expected ---\n%s\n--- actual ---\n%s\n", expectedOut, actualOut)
+		}
 	})
 }
 

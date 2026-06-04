@@ -9,6 +9,8 @@ import (
 )
 
 // Snippet creates the oil completion script.
+// TODO: Export COMP_WORDBREAKS (Oil supports it at the shell level, same as bash).
+// TODO: The sed expression 's/"/\"/g' is effectively a no-op since the shell already consumed quotes in "$compline".
 func Snippet(cmd *cobra.Command) string {
 	result := fmt.Sprintf(`#!/bin/osh
 _%v_completion() {

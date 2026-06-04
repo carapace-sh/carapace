@@ -8,7 +8,7 @@ import (
 	"github.com/carapace-sh/carapace/internal/common"
 )
 
-var sanitizer = strings.NewReplacer( // TODO
+var sanitizer = strings.NewReplacer( // TODO: values containing both single quotes and backslashes (e.g., "it's\\path") produce broken raw strings — the \' escaping inside r'...' closes the string prematurely
 	"\n", ``,
 	"\t", ``,
 	`'`, `\'`,

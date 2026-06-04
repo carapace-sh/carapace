@@ -1,0 +1,769 @@
+---
+name: carapace-dev-shell-zsh
+description: >
+  Use when implementing or debugging carapace's zsh shell integration — the completion
+  snippet, output formatting, quoting/escaping state machine, _describe integration,
+  zstyle color rendering, named directory expansion, _message display, per-candidate
+  nospace, and the CARAPACE_COMPLINE quoting context. Covers the zsh formatter in
+  internal/shell/zsh/. Triggers on: "zsh completion", "zsh snippet", "zsh shell",
+  "zstyle", "_describe", "CARAPACE_COMPLINE", "zsh quoting", "named directory",
+  "zsh nospace", "carapace zsh integration".
+user-invocable: true
+---
+
+# Carapace Library: Zsh Shell Integration Deep Dive
+
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s zsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles zsh-specific edge cases including the quoting state machine, zstyle coloring, named directories, and the `_describe` tag-grouping protocol. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+
+## Source Files
+
+| File | Purpose |
+|------|---------|
+| `internal/shell/zsh/snippet.go` | Zsh completion script generation (`#compdef`, `_describe` dispatch) |
+| `internal/shell/zsh/action.go` | Value formatting, 5-state quoting machine, tag grouping, nospace |
+| `internal/shell/zsh/zstyle.go` | `zstyle list-colors` pattern generation from `RawValue.Style` |
+| `internal/shell/zsh/message.go` | `_message` rendering with SGR escape codes |
+| `internal/shell/zsh/namedDirectory.go` | Named directory (`~name/`) expansion from `hash -d` |
+| `internal/shell/zsh/special.sh` | Test fixture for special-character escaping in `_describe` |
+| `internal/shell/shell.go` | Shared dispatch — flag merging, message integration, nospace propagation |
+| `complete.go` | Entry point — no zsh-specific patching (unlike bash/nushell/cmd-clink) |
+
+## Zsh Completion System Background
+
+### The `compdef` Mechanism
+
+Zsh registers completion functions via `compdef function_name command_name`. When the user presses TAB, zsh:
+
+1. Sets `words` (array of all words on the command line), `CURRENT` (1-based index of the word being completed), `PREFIX` (text before cursor in current word), `SUFFIX` (text after cursor)
+2. Invokes the registered completion function
+3. The function calls `compadd` or higher-level utilities like `_describe`, `_arguments`, `_alternative` to register completion candidates
+4. Zsh's completion system displays the candidates and handles insertion
+
+### The `_describe` Utility
+
+`_describe` is the high-level function carapace uses to register candidates. It takes:
+
+- A **tag** name (used for grouping in the completion display)
+- A **display array** — strings shown to the user in the format `display:description`
+- A **values array** — strings inserted into the command line when selected
+- Flags: `-Q` (don't quote metacharacters), `-S ''` (empty suffix = no trailing space)
+
+```zsh
+_describe -t "tag" "tag" displaysArr valuesArr -Q -S ''
+```
+
+The display and values arrays are separate — the display can differ from the actual inserted value. This is how carapace shows human-readable `display:description` pairs while inserting clean values.
+
+### Colons in `_describe`
+
+Colons separate the display text from the description in `_describe` arrays:
+
+```zsh
+displaysArr=('display_text:description text')
+```
+
+A literal colon in display text or description must be escaped with backslash (`\:`). Carapace's `describeReplacer` handles this.
+
+### The `zstyle` System
+
+`zstyle` configures zsh completion behavior using pattern-matched context strings:
+
+```zsh
+zstyle ':completion:${curcontext}:*' list-colors "pattern1:color1:pattern2:color2"
+zstyle ':completion:${curcontext}:*' group-name ''
+```
+
+- **`list-colors`**: Controls per-candidate colors using `(#b)` extended glob patterns with capture groups
+- **`group-name`**: Set to `''` to merge all tag groups into a single list (carapace handles its own grouping via `_describe -t` tags)
+- **`curcontext`**: Automatically set by zsh to the current completion context (e.g., `:complete:git:`)
+
+### The `_message` Built-in
+
+`_message` displays informational text in the completion area when no completions are available:
+
+```zsh
+_message -r "error text"
+```
+
+The `-r` flag treats the argument as a raw string (not a format string). Carapace uses this for error messages and usage hints.
+
+### `compquote` and Immediate Execution
+
+```zsh
+compquote '' 2>/dev/null && _example_completion
+```
+
+`compquote` is a zsh builtin that only succeeds when called from within the completion system. This line conditionally executes the completion function immediately — needed to initialize the completion state on the first TAB press. The `2>/dev/null` suppresses errors when `compquote` is not available (e.g., in older zsh versions). Note: `compquote ''` passes an empty string (not a valid parameter name), so it likely always fails — but the `&&` short-circuits and the completion function runs regardless when sourced interactively. The `compdef` registration on the next line is the actual mechanism that makes completion work.
+
+## The Zsh Snippet
+
+Generated by `zsh.Snippet(cmd)` in `internal/shell/zsh/snippet.go`:
+
+```zsh
+#compdef example
+function _example_completion {
+  local compline=${words[@]:0:$CURRENT}
+  local IFS=$'\n'
+  local lines
+
+  # shellcheck disable=SC2086,SC2154,SC2155
+  lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh 2>/dev/null)"
+  if [ $? -eq 1 ]; then
+    lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh 2>/dev/null)"
+    if [ $? -eq 1 ]; then
+      lines="$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh 2>/dev/null)"
+    fi
+  fi
+
+  local zstyle message data
+  IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
+  # shellcheck disable=SC2154
+  zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
+  zstyle ":completion:${curcontext}:*" group-name ''
+  [ -z "$message" ] || _message -r "${message}"
+
+  local block tag displays values displaysArr valuesArr
+  while IFS=$'\002' read -r -d $'\002' block; do
+    IFS=$'\003' read -r -d '' tag displays values <<<"${block}"
+    # shellcheck disable=SC2034
+    IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
+    IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
+
+    [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+  done <<<"${data}"
+}
+compquote '' 2>/dev/null && _example_completion
+compdef _example_completion example
+```
+
+### Snippet Walkthrough
+
+**1. Build `compline` from `words`**
+
+```zsh
+local compline=${words[@]:0:$CURRENT}
+```
+
+Zsh provides `words` (all command-line words) and `CURRENT` (index of the word being completed). The slice `${words[@]:0:$CURRENT}` extracts all words up to and including the current word. Unlike bash, zsh's tokenization preserves quotes and doesn't split on `:` or `=`.
+
+**2. Open-quote retry logic**
+
+```zsh
+lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs example _carapace zsh 2>/dev/null)"
+if [ $? -eq 1 ]; then
+  lines="$(echo "${compline}'" | ... )"
+  if [ $? -eq 1 ]; then
+    lines="$(echo "${compline}\"" | ... )"
+  fi
+fi
+```
+
+**Why this is needed**: When the user types `example --flag "partial_wor⇥`, zsh's `words` array includes the opening double quote. But `xargs` (used to split the line into arguments) fails with exit status 1 if there's an unmatched quote. The retry logic progressively tries to close the quote:
+
+1. `''` — close with empty single-quoted string (handles normal case and open single quote like `'partial`)
+2. `'"` — close with single quote then double quote (handles `'partial` case)
+3. `"` — close with double quote (handles `"partial` case)
+
+**3. Pass `CARAPACE_COMPLINE` and `CARAPACE_ZSH_HASH_DIRS`**
+
+Two environment variables are set for each invocation:
+
+- **`CARAPACE_COMPLINE`**: The raw `compline` string before xargs processing. This is critical — `action.go` uses `shlex.Split(env.Compline())` to re-lex the original command line and detect the quoting state of the current word. Without this, carapace cannot determine whether the user is inside single quotes, double quotes, or unquoted.
+- **`CARAPACE_ZSH_HASH_DIRS`**: The output of `hash -d`, which lists zsh named directories (e.g., `code=~/projects/code`). This enables `~nameddir/` path completion.
+
+**4. Parse the three-section output**
+
+```zsh
+IFS=$'\001' read -r -d '' zstyle message data <<<"${lines}"
+```
+
+The output from `ActionRawValues()` uses `\001` (SOH) as a section delimiter:
+
+```
+zstyle_string\001message_string\001tag_group_data\002
+```
+
+- **`zstyle`**: Color/style rules for `zstyle list-colors`
+- **`message`**: Error/usage messages for `_message -r`
+- **`data`**: Tag-grouped completion candidates
+
+**5. Apply zstyle and message**
+
+```zsh
+zstyle ":completion:${curcontext}:*" list-colors "${zstyle}"
+zstyle ":completion:${curcontext}:*" group-name ''
+[ -z "$message" ] || _message -r "${message}"
+```
+
+- **`list-colors`**: Dynamically sets per-candidate colors for the current completion context
+- **`group-name ''`**: Merges all tag groups into one display group (carapace handles grouping via `_describe -t` tags instead of zsh's group-name style)
+- **`_message -r`**: Shows error messages if present
+
+**6. Parse tag groups and call `_describe`**
+
+```zsh
+while IFS=$'\002' read -r -d $'\002' block; do
+  IFS=$'\003' read -r -d '' tag displays values <<<"${block}"
+  IFS=$'\n' read -r -d $'\004' -A displaysArr <<<"${displays}"$'\004'
+  IFS=$'\n' read -r -d $'\004' -A valuesArr <<<"${values}"$'\004'
+
+  [[ ${#valuesArr[@]} -gt 1 ]] && _describe -t "${tag}" "${tag}" displaysArr valuesArr -Q -S ''
+done <<<"${data}"
+```
+
+The `data` section uses nested delimiters:
+
+| Delimiter | Character | Purpose |
+|-----------|-----------|---------|
+| `\002` (STX) | Between tag groups | Each block = one tag group |
+| `\003` (ETX) | Within a tag group | Separates tag, displays, values |
+| `\n` | Within displays/values | Separates individual candidates |
+| `\004` (EOT) | Terminator for array parsing | Ensures `read -A` gets all elements |
+
+For each tag group:
+- `tag` — the group name (e.g., "flags", "longhand flags", "shorthand flags")
+- `displays` — newline-separated `display:description` strings
+- `values` — newline-separated insertion values (with quoting and nospace suffix)
+
+**`_describe` flags**:
+- `-t "${tag}"` — sets the tag for this group (shown as group header in completion display)
+- `-Q` — don't quote metacharacters (carapace handles its own quoting)
+- `-S ''` — empty suffix (no trailing space; carapace controls nospace per-candidate via the value's space suffix)
+
+**`[[ ${#valuesArr[@]} -gt 1 ]]`** — only call `_describe` if there's more than one candidate. With a single candidate, `_describe -Q -S ''` may not insert correctly (zsh treats single matches differently in menu completion).
+
+
+## Value Formatting: `ActionRawValues()`
+
+`zsh.ActionRawValues(currentWord, meta, values)` in `internal/shell/zsh/action.go` is the most feature-rich shell formatter in carapace. It handles quoting, tag grouping, nospace, zstyle generation, and assembles the `_describe` protocol.
+
+### Output Format
+
+```
+zstyle_string\001message_string\001tag1\003display1\ndisplay2\n\003value1\nvalue2\n\002tag2\003display3\003value3\002
+```
+
+Three sections delimited by `\001` (SOH):
+1. **zstyle** — color pattern string for `zstyle list-colors`
+2. **message** — text for `_message -r` (empty if none)
+3. **data** — tag groups delimited by `\002` (STX), each containing tag/displays/values delimited by `\003` (ETX)
+
+### Step 1: Determine Quoting State
+
+```go
+splitted, err := shlex.Split(env.Compline())
+state := DEFAULT_STATE
+if err == nil {
+    rawValue := splitted.CurrentToken().RawValue
+    switch {
+    case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
+        state = QUOTING_STATE
+    case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
+        state = QUOTING_ESCAPING_STATE
+    case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
+        state = FULL_QUOTING_ESCAPING_STATE
+    case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
+        state = FULL_QUOTING_STATE
+    }
+}
+```
+
+Carapace re-tokenizes `CARAPACE_COMPLINE` using [carapace-shlex](https://github.com/carapace-sh/carapace-shlex) and inspects the `RawValue` of the current token to determine its quoting state. This is the most sophisticated quoting analysis in any carapace shell formatter:
+
+| State | Condition | Example Input | Behavior |
+|-------|-----------|---------------|----------|
+| `DEFAULT_STATE` | No quotes, or mixed quotes | `action` | Apply `defaultReplacer` escaping, add space suffix for nospace |
+| `QUOTING_STATE` | Inside single quotes (open `'`) | `'act` | Apply `quotingReplacer` (`'` → `'\''`), append closing `'`, add space suffix |
+| `QUOTING_ESCAPING_STATE` | Inside double quotes (open `"`) | `"act` | Apply `quotingEscapingReplacer` (`\` → `\\`, `"` → `\"`, `$` → `\$`), append closing `"`, add space suffix |
+| `FULL_QUOTING_STATE` | Fully single-quoted | `'action'` | Apply `quotingReplacer`, NO space suffix (zsh places it inside the quotes) |
+| `FULL_QUOTING_ESCAPING_STATE` | Fully double-quoted | `"action"` | Apply `quotingEscapingReplacer`, NO space suffix (zsh places it inside the quotes) |
+
+The `FULL_QUOTING_*` states handle a zsh-specific quirk: when a word is fully quoted (`'action'` or `"action"`), zsh places the space suffix inside the closing quote, producing `'action '` instead of `'action' `. The workaround is to **not add a space suffix** in these states, letting `_describe -S ''` handle it correctly.
+
+### Step 2: Escaping Replacers
+
+Carapace uses four different character replacers depending on the quoting state:
+
+**`defaultReplacer`** (for `DEFAULT_STATE`):
+
+```go
+var defaultReplacer = strings.NewReplacer(
+    `\`, `\\`,  `&`, `\&`,  `<`, `\<`,  `>`, `\>`,
+    "`", "\\`", `'`, `\'`,  `"`, `\"`,  `{`, `\{`,
+    `}`, `\}`,  `$`, `\$`,  `#`, `\#`,  `|`, `\|`,
+    `?`, `\?`,  `(`, `\(`,  `)`, `\)`,  `;`, `\;`,
+    ` `, `\ `,  `[`, `\[`,  `]`, `\]`,  `*`, `\*`,
+    `~`, `\~`,
+)
+```
+
+This is the most aggressive replacer — it escapes all shell metacharacters with backslash. Since `_describe -Q` is used (which tells zsh not to quote metacharacters), carapace must handle all escaping itself. The backslash escaping ensures that characters like `*`, `?`, `$`, `~`, `{`, `}` are treated literally.
+
+**`quotingReplacer`** (for `QUOTING_STATE` and `FULL_QUOTING_STATE`):
+
+```go
+var quotingReplacer = strings.NewReplacer(
+    `'`, `'\''`,
+)
+```
+
+Inside single quotes, only the single quote itself needs escaping. The `'\''` pattern ends the current single-quoted string, adds an escaped single quote, and starts a new single-quoted string.
+
+**`quotingEscapingReplacer`** (for `QUOTING_ESCAPING_STATE` and `FULL_QUOTING_ESCAPING_STATE`):
+
+```go
+var quotingEscapingReplacer = strings.NewReplacer(
+    `\`, `\\`,  `"`, `\"`,  `$`, `\$`,  "`", "\\`",
+)
+```
+
+Inside double quotes, only four characters need escaping: backslash, double quote, dollar sign, and backtick. Other characters are literal inside double quotes.
+
+**`describeReplacer`** (for `_describe` display strings):
+
+```go
+var describeReplacer = strings.NewReplacer(
+    `\`, `\\`,  `:`, `\:`,
+)
+```
+
+This is applied to all values regardless of quoting state because `_describe` uses colons to separate display text from descriptions. A literal colon in display text must be escaped as `\:`.
+
+**`sanitizer`** (control character removal):
+
+```go
+var sanitizer = strings.NewReplacer(
+    "\n", ``,
+    "\r", ``,
+    "\t", ``,
+)
+```
+
+Strips newlines, carriage returns, and tabs — these would break the `\n`-delimited output format.
+
+### Step 3: Format Values Per Tag Group
+
+```go
+values.EachTag(func(tag string, values common.RawValues) {
+    vals := make([]string, len(values))
+    displays := make([]string, len(values))
+    for index, val := range values {
+        value := sanitizer.Replace(val.Value)
+        // ... apply quoting based on state ...
+        // ... apply nospace suffix ...
+        display := sanitizer.Replace(val.Display)
+        display = describeReplacer.Replace(display)
+        description := sanitizer.Replace(val.Description)
+
+        vals[index] = value
+        if strings.TrimSpace(description) == "" {
+            displays[index] = display
+        } else {
+            displays[index] = fmt.Sprintf("%v:%v", display, description)
+        }
+    }
+    tagGroup = append(tagGroup, strings.Join([]string{tag, strings.Join(displays, "\n"), strings.Join(vals, "\n")}, "\003"))
+})
+```
+
+For each tag group, two arrays are built:
+- **`displays`** — formatted as `display:description` (colon-separated, with colons escaped via `describeReplacer`). If there's no description, just `display`.
+- **`vals`** — the insertion values with quoting applied and a space suffix added for nospace.
+
+The display and value arrays are then joined into a `\003`-delimited block: `tag\003displays\n...\003vals\n...`.
+
+### Step 4: Nospace Handling
+
+```go
+if !meta.Nospace.Matches(val.Value) {
+    switch state {
+    case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
+    default:
+        value += " "
+    }
+}
+```
+
+Zsh is the only carapace shell with **per-candidate nospace support**. The `SuffixMatcher` checks if a value's last character matches a nospace suffix. If it matches (or `*` is in the set), no trailing space is added. Otherwise, a space is appended.
+
+The `FULL_QUOTING_*` states are excluded from space addition because zsh places the space inside the closing quote, which is incorrect. This is a known workaround — when the word is fully quoted, `_describe -S ''` ensures no trailing space, but if nospace matches, the value still doesn't get a space (which is correct).
+
+
+### Step 5: Tilde and Named Directory Handling
+
+```go
+func quoteValue(s string) string {
+    if strings.HasPrefix(s, "~/") || NamedDirectories.Matches(s) {
+        return "~" + defaultReplacer.Replace(strings.TrimPrefix(s, "~"))
+    }
+    return defaultReplacer.Replace(s)
+}
+```
+
+Values starting with `~/` (home directory) or matching a named directory prefix (like `~code/`) are specially handled:
+
+1. The `~` prefix is preserved (not escaped)
+2. The rest of the path is escaped with `defaultReplacer`
+
+This ensures `~/Documents` appears as `~/Documents` in the completion list (not `\~/Documents`) and is properly expanded by zsh when inserted.
+
+The `NamedDirectories` map is populated at init time from `CARAPACE_ZSH_HASH_DIRS`:
+
+```go
+func init() {
+    if hashDirs := env.Hashdirs(); hashDirs != "" {
+        for line := range strings.SplitSeq(hashDirs, "\n") {
+            if splitted := strings.SplitN(line, "=", 2); len(splitted) == 2 {
+                NamedDirectories[splitted[0]] = splitted[1]
+            }
+        }
+    }
+}
+```
+
+The snippet passes `CARAPACE_ZSH_HASH_DIRS="$(hash -d)"`, which outputs named directories in `name=path` format (e.g., `code=/home/user/code`).
+
+## zstyle Color Rendering
+
+`zstyles.Format()` in `internal/shell/zsh/zstyle.go` generates `zstyle list-colors` patterns for per-candidate coloring. This is the most sophisticated color system in any carapace shell formatter.
+
+### How zstyle list-colors Work
+
+The `list-colors` style uses `(#b)` (extended glob with backreferences) patterns in the format:
+
+```
+=(#b)(PATTERN)(GROUP_PATTERN)=0=VALUE_COLOR=DESC_COLOR
+```
+
+When zsh displays a completion candidate, it matches the display text against these patterns. The `(#b)` flag enables capture groups, and the `=` delimiters separate the pattern from color assignments. The `0=` resets the color, and subsequent `=COLOR` entries apply to the capture groups.
+
+### Pattern Generation
+
+For each `RawValue`, two patterns are generated:
+
+1. **Value with description**: `=(#b)(DISPLAY)([ ]## -- *)=0=VALUE_COLOR=DESC_COLOR`
+2. **Value only**: `=(#b)(DISPLAY)=0=VALUE_COLOR`
+
+Plus a fallback pattern for descriptions:
+3. **Description fallback**: `=(#b)(-- *)=DESC_COLOR`
+
+The patterns use the display text (not the value) because zsh matches against what the user sees. The `([ ]## -- *)` part matches the description separator that zsh adds.
+
+### Special Character Escaping in Patterns
+
+```go
+var replacer = strings.NewReplacer(
+    "#", `\#`,  "*", `\*`,  "(", `\(`,  ")", `\)`,
+    "[", `\[`,  "]", `\]`,  "|", `\|`,  "~", `\~`,
+)
+```
+
+Since the patterns use zsh extended glob, metacharacters in display text must be escaped. The replacer handles glob-special characters.
+
+### Performance: Disabled for Large Sets
+
+```go
+if len(z.rawValues) < 500 {
+    // generate patterns
+}
+```
+
+When there are 500 or more candidates, zstyle patterns are still generated but without per-value patterns. Only the fallback description pattern is included. This avoids the severe performance degradation that hundreds of glob patterns cause in zsh's pattern matcher.
+
+### Color Resolution
+
+```go
+func (z zstyles) valueSGR(val common.RawValue) string {
+    if val.Style != "" && ui.ParseStyling(val.Style) != nil {
+        return style.SGR(val.Style)
+    }
+    if ui.ParseStyling(style.Carapace.Value) != nil {
+        return style.SGR(style.Carapace.Value)
+    }
+    return style.SGR(style.Default)
+}
+```
+
+Each value's color is resolved with a fallback chain:
+1. Per-value `Style` field (if valid)
+2. Global `style.Carapace.Value` (if configured)
+3. `style.Default` (ANSI reset)
+
+The `style.SGR()` function converts carapace style strings to ANSI SGR (Select Graphic Rendition) escape sequences, which zsh's `list-colors` understands natively.
+
+### Fallback When Colors Are Disabled
+
+In `shell.go`, when `env.ColorDisabled()` is true:
+- `style.Carapace.Value` is set to `style.Default`
+- `style.Carapace.Description` is set to `style.Default`
+- `style.Carapace.Error` is set to `style.Underlined`
+- All `RawValue.Style` fields are cleared via `values.Decolor()`
+
+This produces minimal zstyle output without per-candidate colors.
+
+## Message Handling
+
+`message.Format()` in `internal/shell/zsh/message.go` renders completion messages using zsh's native `_message` builtin.
+
+### Implementation
+
+```go
+func (m message) Format() string {
+    formatted := make([]string, 0)
+    for _, message := range m.Messages.Get() {
+        formatted = append(formatted, m.formatMessage(message, style.Carapace.Error))
+    }
+    if m.Usage != "" {
+        formatted = append(formatted, m.formatMessage(m.Usage, style.Carapace.Usage))
+    }
+    if len(formatted) > 0 {
+        return strings.Join(formatted, "\n")
+    }
+    return ""
+}
+
+func (m message) formatMessage(message, _style string) string {
+    msg := strings.NewReplacer("\n", ``, "\r", ``, "\t", ``, "\v", ``, "\f", ``, "\b", ``).Replace(message)
+    return fmt.Sprintf("\x1b[%vm%v\x1b[%vm", style.SGR(_style), msg, style.SGR("fg-default"))
+}
+```
+
+Messages are rendered as ANSI-escaped text using SGR sequences. Each message gets:
+- **Error messages** (`m.Messages`): Styled with `style.Carapace.Error` (underlined by default)
+- **Usage hints** (`m.Usage`): Styled with `style.Carapace.Usage` (italic by default)
+
+The SGR escape sequences are wrapped with `\x1b[...m` (CSI sequences). After the message text, `style.SGR("fg-default")` resets the foreground color.
+
+Control characters (`\n`, `\r`, `\t`, `\v`, `\f`, `\b`) are stripped from messages to prevent breaking the `\001`-delimited output format.
+
+### How Messages Reach the Snippet
+
+In `shell.go`, zsh is one of the shells with native message support:
+
+```go
+switch shell {
+case "elvish", "export", "zsh": // shells with support for showing messages
+default:
+    values = meta.Messages.Integrate(values, value)
+}
+```
+
+For zsh, messages are **not** injected as synthetic completion values (unlike fish/bash). Instead, they're passed through the `message` section of the output and displayed via `_message -r` in the snippet. 
+## No Zsh-Side Patching
+
+Unlike bash and nushell, **zsh has no `Patch()` function**. The `complete.go` dispatch has no `case "zsh"` branch — zsh arguments are passed directly to `traverse()` unmodified.
+
+This is because zsh does not suffer from the problems that require patching in other shells.
+
+Zsh's `words` array is properly tokenized — no COMP_WORDBREAKS-style word splitting, no redirect leaking. The open-quote problem is still present but is handled entirely in the snippet (the 3-stage xargs retry), not in Go-side patching.
+
+## Implicit Flag Merging
+
+In `shell.go`, zsh implicitly merges "shorthand flags" and "longhand flags" tags into a single "flags" tag:
+
+```go
+switch merge, ok := env.MergeFlags(); {
+case merge, // explicit
+    !ok && shell == "zsh": // implicit for classic zsh side-by-side view
+    mergeFlags(values)
+}
+```
+
+This means zsh always merges flag tag groups (unless `CARAPACE_MERGEFLAGS` is explicitly set). The reason is that in zsh's classic side-by-side completion display, having separate "shorthand flags" and "longhand flags" groups looks cluttered. Merged flags display cleanly in a single column.
+
+Other shells only merge when `CARAPACE_MERGEFLAGS=1` is explicitly set.
+
+## Completion Dispatch Flow for Zsh
+
+```
+User presses TAB
+  → Zsh invokes _cmd_completion()
+  → Snippet builds compline=${words[@]:0:$CURRENT}
+  → Snippet calls: echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs cmd _carapace zsh
+  → carapace _carapace subcommand receives args
+  → complete() in complete.go — no zsh-specific patching
+  → traverse(cmd, args[2:]) → resolve action + context
+  → action.Invoke(context) → InvokedAction
+  → InvokedAction.value("zsh", currentWord)
+  → shell.Value() applies global preprocessing:
+      1. Color disable check
+      2. Prefix filtering
+      3. Implicit flag merging (zsh always merges)
+      4. Messages NOT integrated as values (zsh has native _message)
+      5. Nospace propagation
+      6. Sort + dedup
+  → zsh.ActionRawValues(currentWord, meta, values):
+      1. Re-tokenize CARAPACE_COMPLINE to determine quoting state
+      2. For each tag group:
+         a. Sanitize values
+         b. Apply quoting based on state (5-state machine)
+         c. Apply describeReplacer for colon escaping
+         d. Add space suffix unless nospace matches
+         e. Build display strings (display:description)
+         f. Join as tag\003displays\003values
+      3. Build zstyle patterns from values
+      4. Build message text from meta
+      5. Return: zstyle\001message\001tagGroups\002
+  → Snippet parses output:
+      1. IFS=$'\001' split into zstyle, message, data
+      2. Set zstyle ":completion:${curcontext}:*" list-colors
+      3. Set zstyle group-name ''
+      4. Display message with _message -r
+      5. For each tag group (IFS=$'\002'):
+         a. Split tag/displays/values (IFS=$'\003')
+         b. Read displays and values into arrays (IFS=$'\n')
+         c. Call _describe -t tag tag displaysArr valuesArr -Q -S ''
+  → Zsh displays completions with colors, descriptions, and grouping
+```
+
+## Edge Cases and Known Issues
+
+### 1. Quoting State Detection Heuristic
+
+The quoting state is determined by regex-matching the raw token from `shlex.Split`:
+
+```go
+case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
+    state = QUOTING_STATE
+case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
+    state = QUOTING_ESCAPING_STATE
+case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
+    state = FULL_QUOTING_ESCAPING_STATE
+case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
+    state = FULL_QUOTING_STATE
+```
+
+**Known limitation**: The regex approach doesn't handle mixed quoting (e.g., `"it's a test`). The TODO in the code notes:
+
+```go
+// TODO use token state to determine actual state (might have mixture).
+```
+
+The `shlex` tokenizer may expose more granular quoting state in the future, but for now the regex heuristic covers the common cases.
+
+### 2. Full-Quote Nospace Workaround
+
+When a word is fully quoted (`'action'` or `"action"`), zsh places the space suffix inside the closing quote. This produces incorrect results like `'action '` instead of `'action' `. The workaround is to suppress space suffix entirely in `FULL_QUOTING_*` states:
+
+```go
+case FULL_QUOTING_ESCAPING_STATE, FULL_QUOTING_STATE: // nospace workaround
+default:
+    value += " "
+```
+
+This means that after completing a fully-quoted word, the user must type a space manually. This is acceptable because fully-quoted completions are uncommon (the user typically types the opening quote and carapace closes it).
+
+### 3. Colons in `_describe` Display Text
+
+`_describe` uses colons to separate display values from descriptions. The `describeReplacer` escapes colons in display text:
+
+```go
+var describeReplacer = strings.NewReplacer(
+    `\`, `\\`,  `:`, `\:`,
+)
+```
+
+Without this, a display value like `http://example.com` would be misinterpreted as having a description starting with `//example.com`. The backslash-escaped colon (`\:`) is understood by `_describe` as a literal colon.
+
+The TODO notes that `describeReplacer` may also need to be applied to descriptions:
+
+```go
+display = describeReplacer.Replace(display) // TODO check if this needs to be applied to description as well
+```
+
+Currently, colons in descriptions are not escaped, which could cause issues if a description contains a colon.
+
+### 4. Open-Quote Completion
+
+Zsh has the open-quote problem. When the user is inside an unclosed quote:
+
+```
+example --flag "partial_wor⇥
+```
+
+The snippet's 3-stage retry handles this by progressively closing the quote before passing to `xargs`.
+
+**Limitation**: The retry logic is a heuristic. It covers:
+1. No open quote (append `''`)
+2. Open single quote (append `'"`)
+3. Open double quote (append `"`)
+
+It may fail for nested quotes or escaped quotes within quotes.
+
+### 5. Named Directory Expansion
+
+Zsh's `${words}` array does not expand named directories (e.g., `~code/src`). The snippet passes `CARAPACE_ZSH_HASH_DIRS="$(hash -d)"` to make named directory mappings available to carapace.
+
+The `NamedDirectories` map is populated at init time and supports:
+- `Matches(s)` — checks if `s` has a known named directory prefix
+- `Replace(s)` — replaces the named directory prefix with the actual path
+- `quoteValue(s)` — preserves the `~` prefix instead of escaping it
+
+**Known limitation**: Named directories with `=` in the path (e.g., `hash -d code=/home/user/code=project`) may be incorrectly parsed since `SplitN(line, "=", 2)` splits at the first `=`.
+
+### 6. zstyle Performance with Large Value Sets
+
+For 500+ candidates, per-value zstyle patterns are skipped:
+
+```go
+if len(z.rawValues) < 500 { // disable styling for large amount of values (bad performance)
+    for _, val := range z.rawValues {
+        formatted = append(formatted, ...)
+    }
+}
+```
+
+Zsh's pattern matching engine becomes noticeably slow with hundreds of glob patterns. The fallback pattern `=(#b)(-- *)=DESC_COLOR` still colors descriptions, but individual value colors are lost.
+
+### 7. compquote Guard
+
+The snippet uses `compquote '' 2>/dev/null && _cmd_completion` as a guard:
+
+```zsh
+compquote '' 2>/dev/null && _example_completion
+```
+
+`compquote` is only available within zsh's completion system context. If the function is sourced outside of a completion context (e.g., in an interactive shell), `compquote` fails silently and the completion function is not executed. This prevents errors from running the completion function in the wrong context.
+
+### 8. `group-name ''` Disables Tag Grouping
+
+The snippet sets:
+
+```zsh
+zstyle ":completion:${curcontext}:*" group-name ''
+```
+
+This disables zsh's default tag-based grouping headers. Carapace's `_describe -t tag` already creates visual grouping with tag names as headers, so the additional `group-name` headers would be redundant and clutter the display.
+
+
+## References
+
+### Documentation
+
+- [Zsh Manual: Completion System](https://zsh.sourceforge.io/Doc/Release/Completion-System.html) — official reference for `compdef`, `_describe`, `compadd`, `zstyle`, `_message`
+- [Zsh Manual: Completion Widgets](https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#Completion-Widgets) — `compadd`, `compstate`, `compquote` builtins
+- [Zsh Manual: Zsh Modules — zsh/computil](https://zsh.sourceforge.io/Doc/Release/Zsh-Modules.html#The-zsh_002fcomputil-Module) — `compquote`, `compargv`
+- [zshcompsys(1) man page](https://linux.die.net/man/1/zshcompsys) — completion system reference
+- [zshcompwid(1) man page](https://linux.die.net/man/1/zshcompwid) — completion widgets reference
+- [zshcontrib(1) man page](https://linux.die.net/man/1/zshcontrib) — `_describe` and utility functions
+
+### Tutorials & Blog Posts
+
+- [A Guide to ZSH Completion With Examples](https://thevaluable.dev/zsh-completion-guide-examples/) — comprehensive walkthrough of writing zsh completions
+- [Zsh Completions HOWTO](https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org) — community guide for writing completions
+- [Writing ZSH Completion Functions](https://github.com/zsh-users/zsh-completions/issues/2) — practical patterns and tips
+- [Mastering ZSH: Completion System Demystified](https://blog.blackwell-systems.com/posts/zsh-completion-system-explained/) — architecture and context system explained
+- [Zsh Completion Architecture (DeepWiki)](https://deepwiki.com/zsh-users/zsh/4.1-completion-architecture) — internal architecture analysis
+
+### Source Code
+
+- [zsh `_describe` source](https://github.com/zsh-users/zsh/blob/master/Completion/Base/Utility/_describe) — the utility function carapace's output targets
+- [zsh `compadd` source](https://github.com/zsh-users/zsh/blob/master/Src/Zle/complete.c) — the core completion builtin
+- [zsh `computil.c`](https://github.com/zsh-users/zsh/blob/master/Src/Zle/computil.c) — `compquote` and utility implementation
+
+## Related Skills
+
+- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
+- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
+- **carapace-dev-style** — how styles are resolved and converted to SGR sequences
+- **carapace-setup** — user-facing shell integration setup

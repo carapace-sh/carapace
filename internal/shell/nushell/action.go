@@ -10,7 +10,7 @@ import (
 
 type record struct {
 	Value       string        `json:"value"`
-	Display     string        `json:"display"`
+	Display     string        `json:"display_override"`
 	Description string        `json:"description,omitempty"`
 	Style       *nushellStyle `json:"style,omitempty"`
 }

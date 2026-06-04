@@ -185,6 +185,7 @@ Each shell handles "no trailing space" differently:
 - **carapace-dev-traverse** — the completion engine that produces Actions before formatting
 - **carapace-dev-style** — how styles are resolved before shell rendering
 - **carapace-dev-shell-bash** — bash integration deep dive
+- **carapace-dev-shell-elvish** — elvish integration deep dive
 - **carapace-dev-shell-fish** — fish integration deep dive
 - **carapace-dev-shell-zsh** — zsh integration deep dive
 - **carapace-dev-shell-xonsh** — xonsh integration deep dive

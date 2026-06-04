@@ -681,7 +681,7 @@ Currently, colons in descriptions are not escaped, which could cause issues if a
 
 ### 4. Open-Quote Completion
 
-Like bash and fish, zsh has the open-quote problem. When the user is inside an unclosed quote:
+Zsh has the open-quote problem. When the user is inside an unclosed quote:
 
 ```
 example --flag "partial_wor⇥

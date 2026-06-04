@@ -248,7 +248,7 @@ def fix_prefix(s):
 
 **Why this is needed**: When the user types a partially quoted argument like `'prefix` and presses TAB, `context.prefix` may include the opening quote character. Carapace's traversal engine doesn't expect quote characters in the completion prefix — it needs the raw prefix without quotes to match against completion values. `fix_prefix` strips both single and double quote characters from the prefix.
 
-This is simpler than the open-quote retry logic used in bash/fish/zsh snippets. Xonsh's Python-based parser already handles most quoting — the only remaining issue is quote characters leaking into the prefix value passed to carapace.
+`fix_prefix` handles the remaining edge case where a quote character leaks into `context.prefix`.
 
 **4. Invoke carapace as a subprocess**
 
@@ -265,7 +265,7 @@ This constructs the carapace command line:
 - `*[a.value for a in context.args]` — the parsed argument values (unquoted, since `CommandArg.value` strips quotes)
 - `fix_prefix(context.prefix)` — the current prefix being completed, with quotes stripped
 
-Key point: `context.args` provides `CommandArg` objects where `a.value` is the unquoted argument value. Xonsh's parser has already handled tokenization and quote stripping — no `xargs` is needed (unlike bash/fish/zsh which use `xargs` to split the command line).
+Key point: `context.args` provides `CommandArg` objects where `a.value` is the unquoted argument value. Xonsh's parser has already handled tokenization and quote stripping — no `xargs` is needed.
 
 **5. Parse JSON output into `RichCompletion` objects**
 
@@ -308,7 +308,7 @@ Registers at the **start** of the completer chain, giving carapace highest prior
 
 ### Why No Open-Quote Retry?
 
-Unlike the bash/fish/zsh snippets which use a 3-stage retry (`''`, `'"'`, `'"`) to handle open quotes in `xargs`, the xonsh snippet has **no retry logic**. This is because:
+The xonsh snippet has **no retry logic** for open quotes. This is because:
 
 1. **Xonsh's Python parser** handles tokenization — `context.args` already contains properly parsed `CommandArg` objects with quote awareness (`opening_quote`, `closing_quote`, `value`)
 2. **No `xargs` involvement** — the snippet doesn't pipe through an external shell command that would fail on unmatched quotes
@@ -523,7 +523,7 @@ def fix_prefix(s):
     return s.translate(str.maketrans('', '', '\'"'))
 ```
 
-This is a simpler approach than the open-quote retry logic in bash/fish/zsh, because xonsh's parser already handles most quoting issues. The snippet passes `fix_prefix(context.prefix)` as the last argument to carapace.
+The snippet passes `fix_prefix(context.prefix)` as the last argument to carapace.
 
 ### 3. Nospace (No Trailing Space)
 

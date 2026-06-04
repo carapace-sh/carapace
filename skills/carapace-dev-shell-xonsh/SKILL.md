@@ -248,8 +248,6 @@ def fix_prefix(s):
 
 **Why this is needed**: When the user types a partially quoted argument like `'prefix` and presses TAB, `context.prefix` may include the opening quote character. Carapace's traversal engine doesn't expect quote characters in the completion prefix — it needs the raw prefix without quotes to match against completion values. `fix_prefix` strips both single and double quote characters from the prefix.
 
-`fix_prefix` handles the remaining edge case where a quote character leaks into `context.prefix`.
-
 **4. Invoke carapace as a subprocess**
 
 ```python
@@ -305,17 +303,6 @@ add_one_completer('example', _example_completer, 'start')
 ```
 
 Registers at the **start** of the completer chain, giving carapace highest priority over built-in completers.
-
-### Why No Open-Quote Retry?
-
-The xonsh snippet has **no retry logic** for open quotes. This is because:
-
-1. **Xonsh's Python parser** handles tokenization — `context.args` already contains properly parsed `CommandArg` objects with quote awareness (`opening_quote`, `closing_quote`, `value`)
-2. **No `xargs` involvement** — the snippet doesn't pipe through an external shell command that would fail on unmatched quotes
-3. **`sub_proc_get_output`** is a Python function that directly invokes the carapace binary with properly separated arguments
-4. **The `fix_prefix` helper** handles the remaining edge case where a quote character leaks into `context.prefix`
-
-The only quoting issue that remains is when the user types a partially quoted prefix like `'partial` — `context.prefix` would be `'partial` which needs quote stripping before passing to carapace.
 
 ## Value Formatting: `ActionRawValues()`
 

@@ -72,3 +72,4 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 - For in-depth bash shell knowledge (programmable completion, Readline, quoting/expansion, execution model, startup files), use the **bash** skill (in this repo).
 - For in-depth clink/cmd.exe knowledge (argmatcher API, match generators, Readline integration, DLL injection, prompt filtering, auto-suggestions, input line coloring), use the **cmd-clink** skill (in this repo).
 - For in-depth elvish shell knowledge (arg-completer, complex-candidate, matcher, editor API, styled text, language fundamentals, modules, rc.elv), use the **elvish** skill (in this repo).
+- For in-depth xonsh shell knowledge (RichCompletion, CommandContext, contextual_command_completer, completer pipeline, prompt-toolkit integration, Python/shell hybrid model, xontribs, event system, rc.xsh), use the **xonsh** skill (in this repo).

@@ -166,6 +166,12 @@ cobra command invoked with _carapace subcommand
     references/styling.md          Styled text and colors
     references/language.md         Language fundamentals
     references/startup-config.md   Startup and configuration
+  xonsh/                     Xonsh shell in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       Xonsh completion system
+    references/prompt-toolkit.md   Prompt-toolkit integration
+    references/language-execution.md Python/shell hybrid model and execution
+    references/startup-config.md   Startup, configuration, and events
 ```
 
 ## Conventions
@@ -314,7 +320,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink and elvish have their own composite skills (`skills/cmd-clink/` and `skills/elvish/`) for in-depth shell knowledge beyond carapace integration.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink, elvish, and xonsh have their own composite skills (`skills/cmd-clink/`, `skills/elvish/`, and `skills/xonsh/`) for in-depth shell knowledge beyond carapace integration.
 
 ### Structure
 

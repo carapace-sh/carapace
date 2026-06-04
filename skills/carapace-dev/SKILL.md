@@ -33,6 +33,17 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 | Xonsh, RichCompletion, prefix_len, append_closing_quote, contextual_command_completer | [references/shell-xonsh.md](references/shell-xonsh.md) |
 | Style system, XTerm256, TrueColor, ForKeyword, ForPath, ForPathExt, LS_COLORS, style config | [references/style.md](references/style.md) |
 | Bridge, bridgeActions, actionCommand, output parsing, NoSpace detection, shell config, Detect() | [references/bridge.md](references/bridge.md) |
+| Storage, global map, mutex, entry, FlagCompletion, PositionalCompletion, PreRun, PreInvoke, storage.get, gotchas | [references/storage.md](references/storage.md) |
+| Sandbox, Command, Package, Action, Files, Reply, Run, Expect, ExpectNot, ClearCache, SANDBOX env, subprocess isolation | [references/sandbox.md](references/sandbox.md) |
+| Batch, Invoke, parallelize, Merge, ToA, invokedBatch, goroutine model, shared Context, parallel invocation | [references/batch.md](references/batch.md) |
+| Cache, Action.Cache, File, Load, Write, cache key, file:line, key.Key types, FolderStats, TTL, sandbox override | [references/cache.md](references/cache.md) |
+| UID, url.URL, cmd:// scheme, Command, Flag, mLocalFlags mutex, PathEscape, Executable, UidF, uid.Map | [references/uid.md](references/uid.md) |
+| Config, styles.json, RegisterStyle, Load, CARAPACE_* env vars, LOG, ColorDisabled, Hidden, Sandbox, isGoRun | [references/config-env.md](references/config-env.md) |
+| Spec, spec.Spec, yaml.Marshal, Command struct, Flags, PersistentFlags, _carapace skip, pflagfork.Flag.Definition | [references/spec.md](references/spec.md) |
+| Export, Export struct, MarshalJSON, version, RawValue, Meta, cache format, sandbox invoke, ActionImport | [references/export.md](references/export.md) |
+| Conditionals, Arch, Os, Executable, File, CompletingPath, UnlessF, Context predicates, pkg/condition | [references/conditionals.md](references/conditionals.md) |
+| _carapace CLI, command.go, addCompletionCommand, spec, style set, export re-invocation, PositionalAnyCompletion | [references/command-cli.md](references/command-cli.md) |
+| Mock, Mock struct, NewMock, Dir, Replies, CacheDir, WorkDir, t interface, Reply mechanism, sandbox integration | [references/mock.md](references/mock.md) |
 
 ## Quick Guide
 
@@ -43,6 +54,17 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 - **How does a specific shell format completions?** → [references/shell-{name}.md](references/shell-bash.md)
 - **How do styles/colors work?** → [references/style.md](references/style.md)
 - **How do bridges work internally?** → [references/bridge.md](references/bridge.md)
+- **How does the global storage map work?** → [references/storage.md](references/storage.md)
+- **How do I write/run sandbox tests?** → [references/sandbox.md](references/sandbox.md)
+- **How does Batch parallel invocation work?** → [references/batch.md](references/batch.md)
+- **How does Action.Cache work?** → [references/cache.md](references/cache.md)
+- **How do UID identifiers work?** → [references/uid.md](references/uid.md)
+- **How is styles.json loaded?** → [references/config-env.md](references/config-env.md)
+- **How does spec YAML generation work?** → [references/spec.md](references/spec.md)
+- **What is the JSON wire format?** → [references/export.md](references/export.md)
+- **What conditional helpers exist?** → [references/conditionals.md](references/conditionals.md)
+- **How does the _carapace CLI work?** → [references/command-cli.md](references/command-cli.md)
+- **How does the mock system work?** → [references/mock.md](references/mock.md)
 
 ## Cross-Project References
 

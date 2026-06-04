@@ -159,6 +159,13 @@ cobra command invoked with _carapace subcommand
     references/suggestions.md      Auto-suggestions
     references/history.md          History system
     references/scripting.md        Lua scripting system
+  elvish/                    Elvish shell in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       Elvish completion system
+    references/editor.md           Editor API and modes
+    references/styling.md          Styled text and colors
+    references/language.md         Language fundamentals
+    references/startup-config.md   Startup and configuration
 ```
 
 ## Conventions
@@ -307,7 +314,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink has its own composite skill (`skills/cmd-clink/`) for in-depth clink/cmd.exe knowledge.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink and elvish have their own composite skills (`skills/cmd-clink/` and `skills/elvish/`) for in-depth shell knowledge beyond carapace integration.
 
 ### Structure
 

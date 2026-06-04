@@ -187,6 +187,7 @@ Each shell handles "no trailing space" differently:
 - **carapace-dev-shell-bash** — bash integration deep dive
 - **carapace-dev-shell-elvish** — elvish integration deep dive
 - **carapace-dev-shell-fish** — fish integration deep dive
+- **carapace-dev-shell-powershell** — PowerShell integration deep dive
 - **carapace-dev-shell-zsh** — zsh integration deep dive
 - **carapace-dev-shell-xonsh** — xonsh integration deep dive
 - **carapace-dev-shell-nushell** — nushell integration deep dive

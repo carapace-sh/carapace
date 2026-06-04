@@ -13,7 +13,7 @@ user-invocable: true
 
 # Carapace Library: Elvish Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s elvish completion integration — how the snippet works, how completion output is formatted, and how carapace handles elvish-specific edge cases including JSON output via `from-json`, `edit:complex-candidate` with `CodeSuffix` for nospace, `styled` for per-candidate colors, and `edit:notify` for error messages.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s elvish completion integration — how the snippet works, how completion output is formatted, and how carapace handles elvish-specific edge cases including JSON output via `from-json`, `edit:complex-candidate` with `CodeSuffix` for nospace, `styled` for per-candidate colors, and `edit:notify` for error messages. For cross-shell comparisons, see the **carapace-dev-shell** skill.
 
 ## Source Files
 
@@ -271,25 +271,6 @@ set edit:completion:arg-completer[example.exe] = $edit:completion:arg-completer[
 
 On Windows, commands may be invoked with the `.exe` suffix. The snippet registers the same completer for both names.
 
-### Comparison With Other Shells
-
-The elvish snippet is **structurally similar to nushell** — both use JSON output parsed natively by the shell. Key differences:
-
-| Aspect | Elvish | Nushell |
-|--------|--------|---------|
-| Argument passing | `(all $arg)` spread | `...$spans` spread |
-| JSON parsing | `\| from-json` | `\| from json` |
-| Candidate construction | `edit:complex-candidate` per item | JSON records parsed directly |
-| Message display | `edit:notify` | `description` field |
-| Style application | `styled` builtin in snippet | JSON `style` record |
-| Windows support | `.exe` alias in snippet | Not needed |
-
-Unlike bash/zsh/fish:
-- **No open-quote retry logic** — elvish's parser handles quoting natively and passes clean arguments
-- **No xargs processing** — `(all $arg)` handles argument passing without shell word-splitting
-- **No special environment variables** — elvish doesn't need `COMP_LINE`, `CARAPACE_COMPLINE`, or similar
-
-For a cross-shell comparison of snippet design, see the **carapace-dev-shell** skill.
 
 ## No Elvish-Side Patching
 
@@ -593,8 +574,6 @@ This is superior to the fallback approach (used by bash/fish/oil/powershell/tcsh
 2. **Styled text** — the `styled` builtin allows error styling: `(styled "error: " red)$m`
 3. **No value collision** — messages don't need fake `ERR` values that could conflict with real completions
 4. **Persistent visibility** — `edit:notify` messages remain visible until dismissed, unlike transient completion candidates
-
-For a cross-shell comparison of message handling, see the **carapace-dev-shell** skill.
 
 ## Usage Suppression
 

@@ -14,7 +14,7 @@ user-invocable: true
 
 # Carapace Library: PowerShell Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s PowerShell completion integration — how the snippet works, how completion output is formatted, and how carapace handles PowerShell-specific edge cases including the AST-based argument parsing, CompletionResult construction, single-quote stripping, empty string rejection, SGR color rendering, and nospace handling.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s PowerShell completion integration — how the snippet works, how completion output is formatted, and how carapace handles PowerShell-specific edge cases including the AST-based argument parsing, CompletionResult construction, single-quote stripping, empty string rejection, SGR color rendering, and nospace handling. For cross-shell comparisons, see the **carapace-dev-shell** skill.
 
 ## Source Files
 
@@ -483,60 +483,8 @@ if ($_.Extent.EndOffset -gt $cursorPosition) {
 
 This calculates the portion of the token before the cursor and passes only that prefix to carapace for completion matching. This is similar to how bash uses `COMP_POINT` and fish uses `commandline -cp` — but PowerShell's AST provides this information directly via `Extent` offsets.
 
-## Shell Comparison: PowerShell vs Other Shells
-
-### PowerShell vs Bash
-
-| Feature | Bash | PowerShell |
-|---------|------|------------|
-| Argument acquisition | `COMP_LINE`/`COMP_POINT` env vars | `$commandAst.CommandElements` with `Extent` offsets |
-| Tokenization | Manual (`xargs` + `shlex` re-lexing) | AST-based (built into PowerShell) |
-| Redirect filtering | Required (`bash.Patch()` strips `>`, `2>`, etc.) | Not needed (AST handles redirects) |
-| Word-splitting fix | Required (COMP_WORDBREAKS strips `:`, `=`, `@`) | Not needed (AST preserves quoted strings) |
-| Output format | `\001`-delimited nospace+values | JSON `completionResult` array |
-| Nospace | `compopt -o nospace` (global) | Trailing space in `CompletionText` (per-candidate) |
-| Style/color | Not supported | SGR escape codes in `ListItemText` |
-| Description display | COMP_TYPE=63 only | Always via `ListItemText` or `ToolTip` |
-| Quote handling | 2-mode (unquoted/double-quoted) | Single-quote wrapping for special chars |
-| Empty values | Allowed in `COMPREPLY` | Rejected by `CompletionResult` — skipped |
-| Messages | Integrated as values | Integrated as styled `ListItemText` |
-| Go-side patching | Yes (`bash.Patch()`) | No |
-
-### PowerShell vs Zsh
-
-| Feature | Zsh | PowerShell |
-|---------|-----|------------|
-| Argument acquisition | `CARAPACE_COMPLINE` env var + `words` array | `$commandAst.CommandElements` |
-| Registration | `compdef` + `compquote` guard | `Register-ArgumentCompleter -Native` |
-| Output format | `\001`-delimited zstyle+message+tag groups | JSON `completionResult` array |
-| Nospace | Per-candidate `CodeSuffix` (empty = no space) | Trailing space in `CompletionText` |
-| Style/color | `zstyle list-colors` with `(#b)` patterns | SGR escape codes in `ListItemText` |
-| Description display | `_describe -t` with tag grouping | `ListItemText` (value + description) or `ToolTip` |
-| Tag grouping | Native via `_describe -t` | Not supported — all values in one flat list |
-| Messages | Native `_message -r` | Integrated as styled values |
-| Named directories | Supported via `hash -d` | Not supported |
-| Go-side patching | No | No |
-
-### PowerShell vs Xonsh
-
-| Feature | Xonsh | PowerShell |
-|---------|-------|------------|
-| Language | Python | PowerShell |
-| Output format | JSON `{Value, Display, Description, Style}` | JSON `{CompletionText, ListItemText, ToolTip}` |
-| Nospace | Space baked into `Value` field | Space baked into `CompletionText` field |
-| Special char quoting | Python single-quoted or raw strings | PowerShell single-quoted strings |
-| Style format | Xonsh `bg:/fg:` format | SGR escape codes |
-| Open-quote handling | `fix_prefix` strips quotes from `context.prefix` | AST `Extent.Text` + snippet strips single quotes |
-| Fallback on empty | Return `RichCompletion(prefix, ...)` | Return `""` to prevent file completion |
-
 ## Related Skills
 
-- **carapace-dev-shell** — overview of all 12 shell formatters, shared dispatch, and cross-shell feature comparison
-- **carapace-dev-shell-bash** — bash integration deep dive (COMP_WORDBREAKS, redirect patching, word-splitting)
-- **carapace-dev-shell-zsh** — zsh integration deep dive (5-state quoting machine, zstyle, named directories)
-- **carapace-dev-shell-fish** — fish integration deep dive (simplest formatter, tab-separated format)
-- **carapace-dev-shell-elvish** — elvish integration deep dive (JSON complexCandidate, CodeSuffix, styled builtin)
-- **carapace-dev-shell-xonsh** — xonsh integration deep dive (RichCompletion, prefix_len, contextual_command_completer)
-- **carapace-dev-shell-nushell** — nushell integration deep dive (JSON format, style mapping, open-quote patching)
+- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
 - **carapace-dev-traverse** — the completion engine that produces Actions before shell formatting
 - **carapace-dev-style** — how styles are resolved before SGR rendering

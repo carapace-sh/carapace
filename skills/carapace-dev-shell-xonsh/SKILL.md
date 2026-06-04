@@ -13,7 +13,7 @@ user-invocable: true
 
 # Carapace Library: Xonsh Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles xonsh-specific edge cases including quoting, RichCompletion construction, and style conversion.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles xonsh-specific edge cases including quoting, RichCompletion construction, and style conversion. For cross-shell comparisons, see the **carapace-dev-shell** skill.
 
 ## Source Files
 
@@ -520,7 +520,6 @@ The snippet passes `fix_prefix(context.prefix)` as the last argument to carapace
 - When `meta.Nospace.Matches(val.Value)` is `true` (nospace), the value is left as-is (no trailing space)
 - When `nospace` does NOT match, `" "` is appended to the value
 
-For a cross-shell comparison of nospace handling, see the **carapace-dev-shell** skill.
 
 The snippet does NOT use `RichCompletion.append_space=True`. This is because:
 1. `append_space` adds space **after** the closing quote, which doesn't work when carapace has already quoted the value
@@ -582,6 +581,6 @@ The style string is always prefixed with `"bg-default fg-default "` to ensure bo
 
 ## Related Skills
 
-- **carapace-dev-shell** — overview of all 12 shell formatters and their differences
+- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
 - **carapace-dev-traverse** — the completion engine that produces Actions before formatting
 - **carapace-dev-style** — how styles are resolved before shell rendering

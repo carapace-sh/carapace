@@ -4,16 +4,15 @@ description: >
   Use when implementing or debugging carapace's bash shell integration — the completion
   snippet, output formatting, quoting/escaping, COMP_TYPE handling, COMP_WORDBREAKS
   word-splitting, redirect patching, open-quote retry, nospace, and the partial completion
-  workaround. Covers the bash and bash-ble formatters in internal/shell/bash/ and
-  internal/shell/bash_ble/. Triggers on: "bash completion", "bash snippet", "bash shell",
-  "COMP_TYPE", "COMP_WORDBREAKS", "bash quoting", "bash redirect", "bash nospace",
-  "bash-ble", "carapace bash integration".
+  workaround. Covers the bash formatter in internal/shell/bash/. Triggers on: "bash completion",
+  "bash snippet", "bash shell", "COMP_TYPE", "COMP_WORDBREAKS", "bash quoting", "bash redirect",
+  "bash nospace", "carapace bash integration".
 user-invocable: true
 ---
 
 # Carapace Library: Bash Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash completion integration — how the snippet works, how completion output is formatted, and how carapace handles bash-specific edge cases that other shells don't have.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash completion integration — how the snippet works, how completion output is formatted, and how carapace handles bash-specific edge cases. For cross-shell comparisons, see the **carapace-dev-shell** skill.
 
 ## Source Files
 
@@ -22,17 +21,15 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash complet
 | `internal/shell/bash/snippet.go` | Bash completion script generation |
 | `internal/shell/bash/action.go` | Value formatting, quoting, COMP_TYPE handling |
 | `internal/shell/bash/patch.go` | COMP_LINE re-lexing, redirect filtering, wordbreak prefix |
-| `internal/shell/bash_ble/snippet.go` | Bash BLE (Bash Line Editor) completion script |
-| `internal/shell/bash_ble/action.go` | BLE-specific value formatting |
 | `complete.go` | Entry point — calls `bash.Patch()` for shell-specific arg patching |
 
-## Bash Programmable Completion Background
+## Shell Background
 
 ### The `complete -F` Mechanism
 
 Bash registers completion functions via `complete -F function_name command`. When the user presses TAB, bash:
 
-1. Sets `COMP_LINE` (full command line), `COMP_POINT` (cursor position), `COMP_TYPE` (completion type), `COMP_WORDBREAKS` (word-break characters), and other `COMP_*` variables
+1. Sets `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS`, and other `COMP_*` variables
 2. Invokes the registered function with `$1`=command name, `$2`=word being completed, `$3`=previous word
 3. Reads `COMPREPLY` array for completion candidates
 
@@ -63,7 +60,7 @@ Default value: `" \t\n\"'@><=;|&(:`". Characters that bash uses to split the com
 - **Equals (`=`)** — breaks `--option=value` into `--option` and `value`
 - **At sign (`@`)** — breaks `user@host`
 
-Bash passes only the **last segment** (after the most recent word-break character) as `$2` to the completion function. This means carapace receives a truncated word and must reconstruct the full context.
+Bash passes only the **last segment** (after the most recent word-break character) as `$2` to the completion function.
 
 ## The Bash Snippet
 
@@ -106,25 +103,13 @@ The snippet exports `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` so
 
 **2. Compute `compline`**
 
-`compline="${COMP_LINE:0:${COMP_POINT}}"` extracts the command line up to the cursor position. This is the portion that matters for completion.
+`compline="${COMP_LINE:0:${COMP_POINT}}"` extracts the command line up to the cursor position.
 
 **3. Open-quote retry logic**
 
 The three-stage retry handles the **open-quote problem**:
 
-```bash
-data=$(echo "${compline}''" | xargs example _carapace bash 2>/dev/null)  # try closing with ''
-if [ $? -eq 1 ]; then
-  data=$(echo "${compline}'" | xargs example _carapace bash 2>/dev/null)  # try closing with '
-  if [ $? -eq 1 ]; then
-    data=$(echo "${compline}\"" | xargs example _carapace bash 2>/dev/null)  # try closing with "
-  fi
-fi
-```
-
-**Why this is needed**: When the user types `example --flag "partial_wor⇥`, bash passes the entire line including the opening double quote to the completion function. But `xargs` (used to split the line into arguments) fails if there's an unmatched quote. The retry logic progressively tries to close the quote:
-
-1. `''` — close with empty single-quoted string (handles case where user typed `'partial`)
+1. `''` — close with empty single-quoted string (handles normal case and open single quote)
 2. `'"` — close with single quote then double quote (handles `'partial` case)
 3. `"` — close with double quote (handles `"partial` case)
 
@@ -132,124 +117,45 @@ This ensures `xargs` can split the command line into individual arguments regard
 
 **4. Parse nospace flag and data**
 
-```bash
-IFS=$'\001' read -r -d '' nospace data <<<"${data}"
-```
-
-The output format from `ActionRawValues()` is: `nospace\001data` where:
-- `nospace` is `true` or `false`
-- `\001` (SOH) is the delimiter separating the nospace flag from the completion data
-- `data` is newline-separated completion values
+The output format from `ActionRawValues()` is: `nospace\001data` where `\001` (SOH) is the delimiter.
 
 **5. Populate COMPREPLY**
 
-```bash
-mapfile -t COMPREPLY < <(echo "${data}")
-unset COMPREPLY[-1]
-```
-
-`mapfile` reads each line into an array element. The `unset COMPREPLY[-1]` removes the trailing empty element that `mapfile` creates from the trailing newline in the output.
+`mapfile -t COMPREPLY` reads each line into an array element. `unset COMPREPLY[-1]` removes the trailing empty element.
 
 **6. Apply nospace**
 
-```bash
-[ "${nospace}" = true ] && compopt -o nospace
-```
-
-`compopt -o nospace` tells Readline not to append a trailing space after the completed word. This is bash's mechanism for nospace — applied globally to all candidates in the current completion (bash doesn't support per-candidate nospace like zsh/elvish).
+`compopt -o nospace` tells Readline not to append a trailing space. This is bash's mechanism for nospace — applied globally to all candidates in the current completion.
 
 **7. Register with `complete -o noquote`**
 
-```bash
-complete -o noquote -F _example_completion example
-```
-
-The `-o noquote` option tells Readline **not** to automatically quote the completion candidates. Carapace handles its own quoting in `ActionRawValues()`, so bash's auto-quoting would double-escape values.
+The `-o noquote` option tells Readline **not** to automatically quote the completion candidates. Carapace handles its own quoting in `ActionRawValues()`.
 
 ## The Patch Phase: `bash.Patch()`
 
-Before traversal, `complete()` in `complete.go` calls `bash.Patch(args)` when the shell is bash. This is the most complex shell-specific patching in carapace. It handles three problems that bash creates:
+Before traversal, `complete()` calls `bash.Patch(args)` when the shell is bash. This is the most complex shell-specific patching in carapace.
 
 ### Problem 1: Redirects Leak Into Completion Args
 
-Bash passes redirect tokens (`>`, `<`, `>>`, `2>`, etc.) to the completion function. For example:
+Bash passes redirect tokens (`>`, `<`, `>>`, `2>`, etc.) to the completion function. `Patch()` re-lexes `COMP_LINE` using [carapace-shlex](https://github.com/carapace-sh/carapace-shlex), then `FilterRedirects()` removes redirect operators and their targets.
 
-```
-User types: example action >/tmp/stdout.txt --values 2>/tmp/stderr.txt fi[TAB]
-Bash passes: ["example", "action", ">", "/tmp/stdout.txt", "--values", "2", ">", "/tmp/stderr.txt", "fi"]
-```
-
-If unfiltered, the traversal engine would see `>` and `/tmp/stdout.txt` as positional arguments, breaking flag/positional resolution.
-
-**Solution**: `Patch()` re-lexes `COMP_LINE` using [carapace-shlex](https://github.com/carapace-sh/carapace-shlex), which tokenizes the line and classifies wordbreak tokens. Then `FilterRedirects()` removes redirect operators and their targets:
-
-```go
-args = append(args[:1], tokens.CurrentPipeline().FilterRedirects().Words().Strings()...)
-```
-
-This produces: `["example", "action", "--values", "fi"]`
-
-If the cursor is right after a redirect operator (completing a redirect target), `Patch()` returns a `RedirectError` and `complete()` falls back to `ActionFiles()`:
-
-```go
-if previous := tokens[len(tokens)-2]; previous.WordbreakType.IsRedirect() {
-    return append(args[:1], tokens[len(tokens)-1].Value), RedirectError{}
-}
-```
+If the cursor is right after a redirect operator (completing a redirect target), `Patch()` returns a `RedirectError` and `complete()` falls back to `ActionFiles()`.
 
 ### Problem 2: COMP_WORDBREAKS Splits Words
 
-Bash splits the word being completed at `COMP_WORDBREAKS` characters and only passes the **last segment** as the current word. For example, with `:` in COMP_WORDBREAKS:
+Bash splits the word being completed at `COMP_WORDBREAKS` characters and only passes the **last segment** as the current word. `Patch()` uses `carapace-shlex` to re-lex `COMP_LINE` and extracts the `wordbreakPrefix` — the portion before the last word-break character that bash stripped.
 
-```
-User types: example --host:po[TAB]
-Bash passes current word: "po"  (not "--host:po")
-```
+This prefix is stored as a **package-level variable** (`bash.wordbreakPrefix`) consumed by `ActionRawValues()`, which trims it from completion values.
 
-**Solution**: `Patch()` uses `carapace-shlex` to re-lex `COMP_LINE` and extracts the `wordbreakPrefix` — the portion before the last word-break character that bash stripped:
-
-```go
-wordbreakPrefix = tokens.CurrentPipeline().WordbreakPrefix()
-```
-
-This prefix is stored as a **package-level variable** (`bash.wordbreakPrefix`) consumed by `ActionRawValues()`, which trims it from completion values:
-
-```go
-for index, value := range values {
-    values[index].Value = strings.TrimPrefix(value.Value, wordbreakPrefix)
-}
-```
-
-This way, when carapace generates completions like `--host:port1`, `--host:port2`, the prefix `--host:` is stripped so bash only sees `port1`, `port2` — matching the `po` it expects.
-
-**Known limitation**: The TODO in `patch.go` notes that wordbreak splitting for `:` specifically needs more work. The `@` character is specially excluded from the wordbreak prefix by `carapace-shlex` (it doesn't count as a prefix-building wordbreak).
+**Known limitation**: The TODO in `patch.go` notes that wordbreak splitting for `:` specifically needs more work. The `@` character is specially excluded from the wordbreak prefix by `carapace-shlex`.
 
 ### Problem 3: COMP_TYPE Must Be Propagated
 
-The `COMP_TYPE` environment variable determines whether to show values or display+description. `Patch()` reads it and stores it as a package-level variable:
-
-```go
-compType = os.Getenv("COMP_TYPE")
-```
-
-This is consumed by `ActionRawValues()` to switch formatting mode on successive tabs.
+The `COMP_TYPE` environment variable determines whether to show values or display+description. `Patch()` reads it and stores it as a package-level variable, consumed by `ActionRawValues()`.
 
 ### Cleanup: Unsetting COMP_* Variables
 
-After reading all COMP_* variables, `Patch()` calls `unsetBashCompEnv()` to unset them:
-
-```go
-func unsetBashCompEnv() {
-    for _, key := range []string{
-        "COMP_CWORD", "COMP_LINE", "COMP_POINT",
-        "COMP_TYPE", "COMP_KEY", "COMP_WORDBREAKS", "COMP_WORDS",
-    } {
-        os.Unsetenv(key)
-    }
-}
-```
-
-This prevents the variables from leaking into subsequent completion callbacks (e.g., when carapace re-invokes itself via the `export` shell for subcommand completions).
+After reading all COMP_* variables, `Patch()` calls `unsetBashCompEnv()` to unset them, preventing them from leaking into subsequent completion callbacks.
 
 ### Package-Level State (Acknowledged Tech Debt)
 
@@ -260,11 +166,11 @@ Both `wordbreakPrefix` and `compType` are set by `Patch()` as package-level glob
 // introduces state and hides what is happening but works for now
 ```
 
-This works because completions are sequential — no concurrent calls to `Patch()` and `ActionRawValues()` for the same process.
+This works because completions are sequential — no concurrent calls for the same process.
 
 ## Value Formatting: `ActionRawValues()`
 
-`bash.ActionRawValues(currentWord, meta, values)` in `internal/shell/bash/action.go` formats completion candidates for bash consumption. This is the most complex shell formatter in carapace (~135 lines vs ~37 for oil) due to bash-specific edge cases.
+`bash.ActionRawValues(currentWord, meta, values)` in `internal/shell/bash/action.go` formats completion candidates for bash consumption. This is the most complex shell formatter in carapace (~135 lines) due to bash-specific edge cases.
 
 ### Output Format
 
@@ -272,201 +178,70 @@ This works because completions are sequential — no concurrent calls to `Patch(
 nospace\001value1\nvalue2\nvalue3
 ```
 
-- `\001` (SOH) separates the boolean `nospace` flag from the newline-delimited values
-- The snippet reads this with `IFS=$'\001' read -r -d '' nospace data`
-
 ### Step 1: Trim Wordbreak Prefix
 
-```go
-for index, value := range values {
-    values[index].Value = strings.TrimPrefix(value.Value, wordbreakPrefix)
-}
-```
-
-Values that include COMP_WORDBREAKS-split prefixes (e.g., `--host:port`) have the prefix (`--host:`) stripped so bash only sees the relevant segment.
+Values that include COMP_WORDBREAKS-split prefixes have the prefix stripped so bash only sees the relevant segment.
 
 ### Step 2: Partial Completion Workaround
 
-When all display values share a common prefix, bash will auto-insert that prefix as a partial completion. This destroys formatting because bash's partial insertion bypasses the custom quoting/escaping. The workaround:
+When all display values share a common prefix, bash auto-inserts that prefix, destroying formatting. Two sub-strategies:
 
-```go
-if len(values) > 1 && commonDisplayPrefix(values...) != "" {
-    if valuePrefix := commonValuePrefix(values...); lastSegment != valuePrefix {
-        // Collapse to just the common value prefix — bash inserts it cleanly
-        values = common.RawValuesFrom(commonValuePrefix(values...))
-    } else {
-        // Prefix a space to the first display to break the common prefix
-        values[0].Display = " " + values[0].Display
-    }
-    meta.Nospace.Add('*')
-}
-```
+1. **Collapse to common prefix** — If the common value prefix hasn't been inserted yet, replace all candidates with just the common prefix.
+2. **Space-prefix hack** — If the common prefix is already present, prepend a space to the first display value.
 
-Two sub-strategies:
-
-1. **Collapse to common prefix** — If the common value prefix hasn't been inserted yet, replace all candidates with just the common prefix. Bash inserts it as a single completion, and the next TAB press will show the remaining candidates.
-
-2. **Space-prefix hack** — If the common prefix is already present (lastSegment matches valuePrefix), prepend a space to the first display value. This breaks the common display prefix, preventing bash from treating it as a partial completion. The space is invisible to the user but stops bash's auto-insertion.
-
-In both cases, `nospace` is set to `*` (match all) to prevent a trailing space after the partial insertion.
+In both cases, `nospace` is set to `*` to prevent a trailing space after the partial insertion.
 
 ### Step 3: Format Values Based on COMP_TYPE
 
-```go
-if len(values) == 1 || compType != COMP_TYPE_LIST_SUCCESSIVE_TABS {
-    // Normal mode: output values (what gets inserted)
-    vals[index] = sanitizer.Replace(val.Value)
-    // Apply quoting if needed
-} else {
-    // Successive tabs mode: output display + description (what gets shown)
-    vals[index] = fmt.Sprintf("%v (%v)", val.Display, sanitizer.Replace(val.TrimmedDescription()))
-}
-```
+**Normal mode** (COMP_TYPE=9 or single candidate): Outputs the `Value` field.
 
-**Normal mode** (COMP_TYPE=9 or single candidate): Outputs the `Value` field — the text that will be inserted into the command line. This is the insertion text.
-
-**Successive tabs mode** (COMP_TYPE=63): Outputs `Display (Description)` — human-readable text for the listing. On successive tabs, bash shows all candidates in a column listing, so the display+description format is more useful than raw insertion values.
+**Successive tabs mode** (COMP_TYPE=63): Outputs `Display (Description)`.
 
 ### Step 4: Bash-Specific Quoting
 
-Carapace does its own quoting because the snippet registers with `complete -o noquote` (disabling bash's auto-quoting). Two quoting modes:
+Two quoting modes, applied because the snippet uses `complete -o noquote`:
 
-**Unquoted mode** (`escapingReplacer`): Escapes special characters with backslash. Used for `~`-prefixed values (home directory expansion) and values that don't require quoting:
+**Unquoted mode** (`escapingReplacer`): Backslash-escapes special characters. Used for `~`-prefixed values and values that don't require quoting.
 
-```go
-var escapingReplacer = strings.NewReplacer(
-    `\`, `\\`,  `&`, `\&`,  `<`, `\<`,  `>`, `\>`,
-    "`", "\\`", `'`, `\'`,  `"`, `\"`,  `{`, `\{`,
-    `}`, `\}`,  `$`, `\$`,  `#`, `\#`,  `|`, `\|`,
-    `?`, `\?`,  `(`, `\(`,  `)`, `\)`,  `;`, `\;`,
-    ` `, `\ `,  `[`, `\[`,  `]`, `\]`,  `*`, `\*`,
-)
-```
+**Double-quoted mode** (`escapingQuotedReplacer`): Used when `requiresQuoting()` returns true. Only ``, `"`, `$`, and backtick need escaping inside double quotes.
 
-**Double-quoted mode** (`escapingQuotedReplacer`): Used when `requiresQuoting()` returns true:
-
-```go
-var escapingQuotedReplacer = strings.NewReplacer(
-    `\`, `\\`,  `"`, `\"`,  `$`, `\$`,  "`", "\\`",
-)
-```
-
-Fewer characters need escaping inside double quotes — only `\`, `"`, `$`, and backtick.
-
-**`requiresQuoting()`** checks if a value contains any character that needs quoting:
-
-```go
-func requiresQuoting(s string) bool {
-    chars := " \t\r\n`" + `[]{}()<>;|$&:*#`
-    chars += `'"`
-    chars += os.Getenv("COMP_WORDBREAKS")
-    chars += `\`
-    return strings.ContainsAny(s, chars)
-}
-```
-
-Notably, it includes `COMP_WORDBREAKS` characters. If the value contains `:`, `=`, or `@` (which are in the default COMP_WORDBREAKS), it will be quoted — preventing bash from re-splitting the completed value.
-
-**Tilde expansion handling**: Values starting with `~` are escaped using the unquoted replacer (not double-quoted) because double-quoting suppresses tilde expansion in bash:
-
-```go
-case strings.HasPrefix(vals[index], "~"):
-    vals[index] = escapingReplacer.Replace(vals[index])
-```
+**Tilde expansion handling**: Values starting with `~` use the unquoted replacer because double-quoting suppresses tilde expansion.
 
 ### Step 5: Sanitizer
 
-The sanitizer strips control characters that would break the output format:
-
-```go
-var sanitizer = strings.NewReplacer(
-    "\n", ``,
-    "\r", ``,
-    "\t", ``,
-)
-```
-
-Newlines, carriage returns, and tabs are removed because the output format uses newlines as value delimiters.
+Strips `\n`, `\r`, `\t` — these would break the newline-delimited output format.
 
 ### Step 6: Display Replacer
 
-For successive-tab mode, the `displayReplacer` handles `${` in display text to prevent bash variable expansion:
-
-```go
-var displayReplacer = strings.NewReplacer(
-    `${`, `\\\${`,
-)
-```
+For successive-tab mode, the `displayReplacer` handles `${` in display text to prevent bash variable expansion.
 
 ## Nospace Handling
 
-Bash handles "no trailing space" differently from most other shells:
+Bash handles "no trailing space" as an all-or-nothing setting:
 
-- **No per-candidate nospace**: Bash's `compopt -o nospace` is an all-or-nothing setting — it applies to ALL candidates in the current completion. This contrasts with zsh (per-candidate `CodeSuffix`) and elvish (per-candidate `CodeSuffix`).
-- **Output format**: The `ActionRawValues()` output includes a single `true`/`false` nospace flag. If ANY candidate matches the nospace suffix matcher, the flag is `true` and `compopt -o nospace` is applied globally.
-- **SuffixMatcher**: In `ActionRawValues()`, `meta.Nospace.Matches(val.Value)` checks if any value's suffix matches a nospace character. The wildcard `*` matches all values.
+- `compopt -o nospace` applies to **ALL** candidates in the current completion
+- If ANY candidate matches the nospace suffix matcher, `compopt -o nospace` is applied globally
+- This contrasts with shells that support per-candidate nospace (zsh, elvish, nushell, etc.)
 
-## Bash BLE Integration
+For a cross-shell comparison of nospace handling, see the **carapace-dev-shell** skill.
 
-[Bash BLE](https://github.com/akinomyoga/ble.sh) (Bash Line Editor) is an alternative line editor for bash that provides richer completion display, including descriptions.
+## Edge Cases and Known Issues
 
-### BLE Snippet
+### Open-Quote Completion with Spaces
 
-The BLE snippet in `internal/shell/bash_ble/snippet.go` wraps the regular bash snippet and adds a BLE-specific completion function:
+There's a known issue with completing values containing spaces when inside quotes. The commented-out test in `example/main_test.go` notes this doesn't work correctly with bash.
 
-```bash
-_example_completion_ble() {
-  if [[ ${BLE_ATTACHED-} ]]; then
-    [[ :$comp_type: == *:auto:* ]] && return
+### COMP_WORDBREAKS Colon Handling
 
-    compopt -o ble/no-default
-    bleopt complete_menu_style=desc
+The TODO in `patch.go` acknowledges that `:` handling needs more work.
 
-    local compline="${COMP_LINE:0:${COMP_POINT}}"
-    local IFS=$'\n'
-    local c
-    mapfile -t c < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs example _carapace bash-ble)
-    [[ "${c[*]}" == "" ]] && c=()
+### Package-Level Globals
 
-    local cand
-    for cand in "${c[@]}"; do
-      [ ! -z "$cand" ] && ble/complete/cand/yield mandb "${cand%%$'\t'*}" "${cand##*$'\t'}"
-    done
-  else
-    complete -F _example_completion example
-  fi
-}
+The `wordbreakPrefix` and `compType` globals set by `Patch()` are acknowledged as technical debt.
 
-complete -F _example_completion_ble example
-```
+### mapfile Trailing Empty Element
 
-Key differences from the regular bash snippet:
-
-1. **Auto-completion check**: `[[ :$comp_type: == *:auto:* ]] && return` — skips during auto-completion to avoid flickering
-2. **BLE-specific options**: `compopt -o ble/no-default` prevents BLE's default completer; `bleopt complete_menu_style=desc` enables description display
-3. **Tab-delimited format**: Uses `cand%%$'\t'*` and `cand##*$'\t'` to split value and description on tab
-4. **Fallback**: If BLE is not attached (`${BLE_ATTACHED-}`), falls back to the regular bash completer
-
-### BLE Value Format
-
-BLE uses a completely different format from regular bash (`internal/shell/bash_ble/action.go`):
-
-```
-value\tdisplay\x1c\x1csuffix\x1cdescription
-```
-
-Each entry is tab-separated with `\x1c` (FS) delimiters within fields:
-- `value` — insertion text
-- `display` — display text (after tab)
-- `\x1c` — empty (style field)
-- `suffix` — ` ` (space) or empty (nospace)
-- `description` — description text
-
-The `\x1c` separators are BLE's internal candidate format, and `ble/complete/cand/yield` parses them.
-
-### BLE Nospace
-
-Unlike regular bash, BLE supports per-candidate nospace via the suffix field. Each candidate independently specifies ` ` (space) or `` (no space), avoiding the all-or-nothing limitation.
+`mapfile -t COMPREPLY` creates an extra empty element from the trailing newline. The snippet removes it with `unset COMPREPLY[-1]`.
 
 ## Completion Dispatch Flow for Bash
 
@@ -500,80 +275,15 @@ User presses TAB
   → Bash displays completions
 ```
 
-## Edge Cases and Known Issues
-
-### Open-Quote Completion with Spaces
-
-There's a known issue with completing values containing spaces when the user is inside quotes. The commented-out test in `example/main_test.go` notes:
-
-```go
-// `example action "positional1 `: "positional1 with space", // TODO this test does not yet work with bash as it's missing quote handling in the snippet
-```
-
-The snippet's `xargs`-based argument splitting doesn't perfectly handle all quoting scenarios.
-
-### Oil Shell Doesn't Get Patching
-
-The TODO in `complete.go` notes:
-
-```go
-case "bash": // TODO what about oil and such?
-```
-
-Oil (osh) uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash but doesn't receive the redirect patching or COMP_WORDBREAKS handling. Oil's snippet is simpler — it doesn't export `COMP_TYPE` or `COMP_WORDBREAKS`, and its nospace detection uses hardcoded suffix patterns (`[/=@:.,\001]`) rather than the dynamic SuffixMatcher.
-
-### COMP_WORDBREAKS Colon Handling
-
-The TODO in `patch.go` acknowledges:
-
-```go
-func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak splitting (e.g. `:`)
-```
-
-The colon in COMP_WORDBREAKS is particularly problematic because it's common in URLs, git refs, and module names. The bash-completion project provides `__ltrim_colon_completions` as a workaround, but carapace's approach (re-lexing with carapace-shlex) is more systematic.
-
-### Package-Level Globals
-
-The `wordbreakPrefix` and `compType` globals set by `Patch()` are acknowledged as technical debt. A better solution would thread these through the function signatures, but this would require changes to the shell.Value() dispatch path.
-
-### mapfile Trailing Empty Element
-
-`mapfile -t COMPREPLY` creates an extra empty element from the trailing newline in the output. The snippet removes it with `unset COMPREPLY[-1]`. Additionally, when the data is empty, `mapfile` still creates a non-empty array with one empty string — fixed by `[[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=()`.
-
-## Comparison: Bash vs Oil vs Bash BLE
-
-| Feature | Bash | Oil | Bash BLE |
-|---------|------|-----|----------|
-| Redirect patching | Yes (carapace-shlex) | No | No |
-| COMP_WORDBREAKS handling | Yes (wordbreakPrefix) | No | No |
-| COMP_TYPE successive tabs | Yes (display+description) | No | No |
-| Partial completion workaround | Yes (common prefix hack) | No | No |
-| Custom quoting | Two modes (unquoted/double-quoted) | None | None |
-| Nospace | Global (`compopt -o nospace`) | Inline `\001` indicator | Per-candidate suffix |
-| Description display | COMP_TYPE=63 only | Inline `(description)` | Always (tab-delimited) |
-| Open-quote retry | 3-stage (`''`, `'"`, `"`) | `sed` + xargs | `sed` + xargs |
-| Style support | None | None | None |
-
 ## References
 
-### Documentation
-
-- [Bash Manual: Programmable Completion](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html) — official reference for `complete`, `compgen`, `compopt`
-- [Bash Manual: Programmable Completion Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html) — `complete`, `compgen`, `compopt` syntax
-- [Bash Manual: Completion Variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html) — `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS`, `COMPREPLY`
-- [ble.sh Documentation](https://github.com/akinomyoga/ble.sh/wiki) — Bash Line Editor (BLE) documentation
-
-### Tutorials & Blog Posts
-
-- [The Bash Programmable Completion Guide](https://devdocs.io/bash/programmable-completion) — devdocs reference
-- [An Introduction to Programmable Completion](https://linuxcommand.org/lc3_man_pages/compgen.html) — compgen and complete tutorial
-- [Writing your own Bash Completion Function](https://germaniumhome.wordpress.com/2013/06/18/writing-your-own-bash-completion-function/) — step-by-step guide
-- [Deeper into Bash Completion](https://bash.cyberciti.biz/guide/Chapter_24:_Advanced_Command_Shell) — Bash Guide for Beginners, Chapter 24
+- [Bash Manual: Programmable Completion](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html)
+- [Bash Manual: Completion Variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html)
 
 ## Related Skills
 
-- **carapace-dev-shell** — overview of all 12 shell formatters
+- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
+- **carapace-dev-shell-bash-ble** — bash BLE integration deep dive
+- **carapace-dev-shell-oil** — oil integration deep dive
 - **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved (bash doesn't support styles)
-- **carapace-dev-bridge** — bridges that may use the `export` shell format internally
-- **carapace-setup** — user-facing shell integration setup
+- **carapace-dev-style** — how styles are resolved (bash doesn't support per-candidate styles)

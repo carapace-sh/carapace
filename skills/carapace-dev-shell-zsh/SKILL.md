@@ -13,7 +13,7 @@ user-invocable: true
 
 # Carapace Library: Zsh Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s zsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles zsh-specific edge cases including the quoting state machine, zstyle coloring, named directories, and the `_describe` tag-grouping protocol.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s zsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles zsh-specific edge cases including the quoting state machine, zstyle coloring, named directories, and the `_describe` tag-grouping protocol. For cross-shell comparisons, see the **carapace-dev-shell** skill.
 
 ## Source Files
 
@@ -232,7 +232,6 @@ For each tag group:
 
 **`[[ ${#valuesArr[@]} -gt 1 ]]`** — only call `_describe` if there's more than one candidate. With a single candidate, `_describe -Q -S ''` may not insert correctly (zsh treats single matches differently in menu completion).
 
-For a cross-shell comparison of snippet approaches, see the **carapace-dev-shell** skill.
 
 ## Value Formatting: `ActionRawValues()`
 
@@ -389,10 +388,6 @@ Zsh is the only carapace shell with **per-candidate nospace support**. The `Suff
 
 The `FULL_QUOTING_*` states are excluded from space addition because zsh places the space inside the closing quote, which is incorrect. This is a known workaround — when the word is fully quoted, `_describe -S ''` ensures no trailing space, but if nospace matches, the value still doesn't get a space (which is correct).
 
-This is in contrast to:
-- **Bash**: Global `compopt -o nospace` (all-or-nothing per completion)
-- **Fish**: No nospace support at all
-- **Elvish/Nushell**: Per-candidate via `CodeSuffix` or JSON field
 
 ### Step 5: Tilde and Named Directory Handling
 
@@ -553,13 +548,12 @@ default:
 }
 ```
 
-For zsh, messages are **not** injected as synthetic completion values (unlike fish/bash). Instead, they're passed through the `message` section of the output and displayed via `_message -r` in the snippet. For a cross-shell comparison of message handling, see the **carapace-dev-shell** skill.
-
+For zsh, messages are **not** injected as synthetic completion values (unlike fish/bash). Instead, they're passed through the `message` section of the output and displayed via `_message -r` in the snippet. 
 ## No Zsh-Side Patching
 
 Unlike bash and nushell, **zsh has no `Patch()` function**. The `complete.go` dispatch has no `case "zsh"` branch — zsh arguments are passed directly to `traverse()` unmodified.
 
-This is because zsh does not suffer from the problems that require patching in other shells (see the **carapace-dev-shell** skill for a cross-shell comparison of patching needs).
+This is because zsh does not suffer from the problems that require patching in other shells.
 
 Zsh's `words` array is properly tokenized — no COMP_WORDBREAKS-style word splitting, no redirect leaking. The open-quote problem is still present but is handled entirely in the snippet (the 3-stage xargs retry), not in Go-side patching.
 
@@ -741,7 +735,6 @@ zstyle ":completion:${curcontext}:*" group-name ''
 
 This disables zsh's default tag-based grouping headers. Carapace's `_describe -t tag` already creates visual grouping with tag names as headers, so the additional `group-name` headers would be redundant and clutter the display.
 
-For a full cross-shell comparison table, see the **carapace-dev-shell** skill.
 
 ## References
 
@@ -770,9 +763,7 @@ For a full cross-shell comparison table, see the **carapace-dev-shell** skill.
 
 ## Related Skills
 
-- **carapace-dev-shell** — overview of all 12 shell formatters
+- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
 - **carapace-dev-traverse** — the completion engine that produces Actions before formatting
 - **carapace-dev-style** — how styles are resolved and converted to SGR sequences
-- **carapace-dev-shell-bash** — bash integration deep dive (comparison point for zsh)
-- **carapace-dev-shell-fish** — fish integration deep dive (comparison point for zsh)
 - **carapace-setup** — user-facing shell integration setup

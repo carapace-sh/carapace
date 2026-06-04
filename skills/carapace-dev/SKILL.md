@@ -68,4 +68,5 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 
 ## Cross-Project References
 
-For user-facing topics (integrating carapace into a CLI, writing specs, macros, setup, choices), use the **carapace** skill (in the carapace-bin repo).
+- For user-facing topics (integrating carapace into a CLI, writing specs, macros, setup, choices), use the **carapace** skill (in the carapace-bin repo).
+- For in-depth bash shell knowledge (programmable completion, Readline, quoting/expansion, execution model, startup files), use the **bash** skill (in this repo).

@@ -105,9 +105,13 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 
 ### Xonsh
 
-- **Format**: JSON array of `{Value, Display, Description, Style}`. Special chars trigger single-quoted values; backslash triggers raw strings (`r'...'`).
-- **Style mapping**: Converts to xonsh format (`bg:ansiblack fg:ansired bold italic underline blink reverse`). Full 256-color hex/ansi mapping.
-- **Snippet**: Python `@contextual_command_completer` decorator with `RichCompletion` objects.
+- **Format**: JSON array of `{Value, Display, Description, Style}`. Special chars trigger single-quoted values; backslash triggers raw strings (`r'...'`). Trailing space for nospace is baked into the `Value` field.
+- **Style mapping**: Converts to xonsh format (`bg:ansiblack fg:ansired bold italic underline blink reverse`). Full 256-color hex/ansi mapping. XTerm256 colors mapped to hex.
+- **Snippet**: Python `@contextual_command_completer` decorator with `RichCompletion` objects. Uses `sub_proc_get_output` to invoke carapace subprocess. `fix_prefix` strips quotes from partial prefixes. `add_one_completer` registers at `'start'` priority.
+- **Nospace**: Encoded as trailing space in `Value`; `append_closing_quote=False` prevents xonsh from adding its own closing quote.
+- **Quoting**: Values containing ` ()[]{}*$?\"|<>&;#` or backtick are wrapped in Python single-quoted strings; values with backslashes use raw strings (`r'...'`).
+- **No open-quote retry**: Xonsh's Python parser handles quoting natively via `CommandContext.args`; `fix_prefix` strips residual quote chars from `context.prefix`.
+- **Go-side patching**: None — xonsh's parser handles redirects and word-splitting.
 
 ### Tcsh
 
@@ -140,29 +144,29 @@ Each shell handles "no trailing space" differently:
 | nushell | Omits trailing space in JSON output |
 | powershell | Strips trailing space from `CompletionText` |
 | oil | `\001` suffix indicates nospace |
-| xonsh | `append_closing_quote=False` in `RichCompletion` |
+| xonsh | Space baked into `Value` field; `append_closing_quote=False` prevents double-quoting |
 | tcsh | Built-in nospace support |
 
 ## Shell Comparison
 
-| Feature | Fish | Bash | Zsh | Elvish | Nushell |
-|---------|------|------|-----|--------|---------|
-| Argument acquisition | `commandline -cp` + `xargs` | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var | JSON via `from-json` | JSON via `from json` |
-| Open-quote handling | Snippet retry (`''`, `'"'`, `'"`) | Snippet retry (`''`, `'"'`, `"`) | zsh handles natively | JSON parsing | JSON parsing |
-| Output format | Tab-separated `value\tdesc\n` | `\001`-delimited nospace+values | `\001`-delimited groups | JSON `complexCandidate` | JSON `{value,display,description,style}` |
-| Nospace | **Not supported** | Global `compopt -o nospace` | Per-candidate `CodeSuffix` | Per-candidate `CodeSuffix` | Per-candidate (omit space) |
-| Style/color | Not supported | Not supported | zstyle patterns | JSON `styled` | Full style mapping |
-| Messages | Integrated as `ERR` values | Integrated as values | Native `_message` | Native `edit:notify` | JSON `description` |
-| Redirect patching | Not needed | Required (`bash.Patch`) | Not needed | Not needed | Not needed |
-| Wordbreak patching | Not needed | Required (COMP_WORDBREAKS) | Not needed | Not needed | Not needed |
-| Description display | Pager column | COMP_TYPE=63 only | Right column | Right column | Right column |
-| Tag grouping | Not supported | Not supported | `_describe` groups | Not supported | Not supported |
-| Go-side patching | None | `bash.Patch()` | None | None | `nushell.Patch()` |
+| Feature | Fish | Bash | Zsh | Elvish | Nushell | Xonsh |
+|---------|------|------|-----|--------|---------|-------|
+| Argument acquisition | `commandline -cp` + `xargs` | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var | JSON via `from-json` | JSON via `from json` | `CommandContext.args` + `sub_proc_get_output` |
+| Open-quote handling | Snippet retry (`''`, `'"'`, `'"`) | Snippet retry (`''`, `'"'`, `"`) | zsh handles natively | JSON parsing | JSON parsing | `fix_prefix` strips quotes |
+| Output format | Tab-separated `value\tdesc\n` | `\001`-delimited nospace+values | `\001`-delimited groups | JSON `complexCandidate` | JSON `{value,display,description,style}` | JSON `{Value,Display,Description,Style}` |
+| Nospace | **Not supported** | Global `compopt -o nospace` | Per-candidate `CodeSuffix` | Per-candidate `CodeSuffix` | Per-candidate (omit space) | Space baked into `Value` field |
+| Style/color | Not supported | Not supported | zstyle patterns | JSON `styled` | Full style mapping | Full 256-color mapping |
+| Messages | Integrated as `ERR` values | Integrated as values | Native `_message` | Native `edit:notify` | JSON `description` | Integrated as styled values |
+| Redirect patching | Not needed | Required (`bash.Patch`) | Not needed | Not needed | Not needed | Not needed |
+| Wordbreak patching | Not needed | Required (COMP_WORDBREAKS) | Not needed | Not needed | Not needed | Not needed |
+| Description display | Pager column | COMP_TYPE=63 only | Right column | Right column | Right column | Right column |
+| Tag grouping | Not supported | Not supported | `_describe` groups | Not supported | Not supported | Not supported |
+| Go-side patching | None | `bash.Patch()` | None | None | `nushell.Patch()` | None |
 
 | Feature | Oil | PowerShell | Xonsh | Tcsh | Ion | Clink | Export |
 |---------|-----|------------|-------|------|-----|-------|--------|
 | Output format | Values + `\001` nospace | JSON `CompletionResult` | JSON `{Value,Display,Description,Style}` | Values on lines | Simple values | Lua via `CARAPACE_COMPLINE` | JSON `{"Version","Meta","Values"}` |
-| Nospace | `\001` suffix | Strip trailing space | `append_closing_quote=False` | Built-in | N/A | N/A | N/A |
+| Nospace | `\001` suffix | Strip trailing space | Space baked into `Value` | Built-in | N/A | N/A | N/A |
 | Style/color | Not supported | SGR in `ListItemText` | Full 256-color mapping | Not supported | Not supported | Not supported | JSON styles |
 
 ## Related Skills
@@ -173,3 +177,4 @@ Each shell handles "no trailing space" differently:
 - **carapace-dev-shell-bash** — bash integration deep dive
 - **carapace-dev-shell-fish** — fish integration deep dive
 - **carapace-dev-shell-zsh** — zsh integration deep dive
+- **carapace-dev-shell-xonsh** — xonsh integration deep dive

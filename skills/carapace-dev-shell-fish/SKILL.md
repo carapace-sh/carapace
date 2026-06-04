@@ -152,17 +152,7 @@ complete -c 'example' -f -a '(_example_completion)' -r
 - `-a '(_example_completion)'` — the function is invoked as a command substitution; its stdout is parsed as completion candidates
 - `-r` / `--require-parameter` — tells fish that a parameter is required after the command name (enables completion after space)
 
-### Comparison: Fish vs Bash Snippet
-
-| Aspect | Fish | Bash |
-|--------|------|------|
-| Get command line | `commandline -cp` | `COMP_LINE` / `COMP_POINT` env vars |
-| Argument splitting | `xargs` | `xargs` |
-| Open-quote retry | 3-stage (`''`, `'"'`, `'"`) | 3-stage (`''`, `'"'`, `"`) |
-| Trailing space fix | `sed "s/ $/ ''/"` | Not needed (bash handles this) |
-| Nospace | Not handled in snippet | `compopt -o nospace` |
-| Output format | Tab-separated `value\tdescription` | `\001`-delimited nospace + values |
-| Registration | `complete -c ... -f -a '...' -r` | `complete -o noquote -F ...` |
+For a cross-shell comparison of snippet design, see the **carapace-dev-shell** skill.
 
 ## Value Formatting: `ActionRawValues()`
 
@@ -204,30 +194,13 @@ All candidates are joined with `\n`. Fish splits on newlines to get individual c
 
 ### What Fish's Formatter Does NOT Do
 
-Compared to other shell formatters, fish's is notably minimal:
-
-| Feature | Fish | Bash | Zsh | Elvish |
-|---------|------|------|-----|--------|
-| Custom quoting/escaping | No | Yes (2 modes) | Yes (5 states) | No (JSON) |
-| COMP_TYPE handling | N/A | Yes | N/A | N/A |
-| Partial completion workaround | No | Yes | No | No |
-| Wordbreak prefix trimming | No | Yes | No | No |
-| Nospace per-candidate | No | Global | Per-candidate | Per-candidate |
-| Style/color support | No | No | zstyle | JSON styles |
-| Tag grouping | No | No | Yes (`_describe`) | No |
-| Message display | Integrated as `ERR` values | Integrated as values | Native `edit:notify` | Native `edit:notify` |
+See the **carapace-dev-shell** skill for a cross-shell feature comparison.
 
 ## No Fish-Side Patching
 
 Unlike bash and nushell, **fish has no `Patch()` function**. The `complete.go` dispatch has no `case "fish"` branch — fish arguments are passed directly to `traverse()` unmodified.
 
-This is because fish does not suffer from the problems that require patching in other shells:
-
-| Problem | Bash | Nushell | Fish |
-|---------|------|---------|------|
-| Redirects leak into args | Yes (requires `bash.Patch`) | No | No — fish's tokenizer handles redirects separately |
-| Word-break splitting | Yes (COMP_WORDBREAKS) | No | No — fish doesn't split on `:`, `=`, `@` |
-| Open-quote tokenization | In snippet (xargs retry) | `nushell.Patch()` | In snippet (xargs retry) |
+This is because fish does not suffer from the problems that require patching in other shells (see the **carapace-dev-shell** skill for a cross-shell comparison of patching needs).
 
 Fish's tokenizer (using the `TOK_ACCEPT_UNFINISHED` flag) is designed for completion — it can handle partially typed, syntactically invalid command lines. The `commandline -cp` output is already a clean representation of the command line up to the cursor, without the redirect-leaking or word-splitting problems that bash has.
 
@@ -314,14 +287,7 @@ This means messages are **integrated as synthetic completion candidates** via `m
 
 When only one message exists and no other candidates, an additional `_` placeholder value is added to prevent fish from auto-inserting the error message.
 
-### Comparison: Fish vs Shells with Native Message Support
-
-| Shell | Message Mechanism |
-|-------|-------------------|
-| **elvish** | `edit:notify` — native notification popup |
-| **zsh** | `_message` — native zsh message display |
-| **export** | JSON `Messages` field — programmatic access |
-| **fish** | Integrated as `ERR` completion values — shows in pager like regular completions |
+For a cross-shell comparison of message handling, see the **carapace-dev-shell** skill.
 
 ## Description Display and the Fish Pager
 

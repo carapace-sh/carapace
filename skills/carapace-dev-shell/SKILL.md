@@ -149,25 +149,35 @@ Each shell handles "no trailing space" differently:
 
 ## Shell Comparison
 
+### Primary Shells
+
 | Feature | Fish | Bash | Zsh | Elvish | Nushell | Xonsh |
 |---------|------|------|-----|--------|---------|-------|
-| Argument acquisition | `commandline -cp` + `xargs` | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var | JSON via `from-json` | JSON via `from json` | `CommandContext.args` + `sub_proc_get_output` |
-| Open-quote handling | Snippet retry (`''`, `'"'`, `'"`) | Snippet retry (`''`, `'"'`, `"`) | zsh handles natively | JSON parsing | JSON parsing | `fix_prefix` strips quotes |
-| Output format | Tab-separated `value\tdesc\n` | `\001`-delimited nospace+values | `\001`-delimited groups | JSON `complexCandidate` | JSON `{value,display,description,style}` | JSON `{Value,Display,Description,Style}` |
-| Nospace | **Not supported** | Global `compopt -o nospace` | Per-candidate `CodeSuffix` | Per-candidate `CodeSuffix` | Per-candidate (omit space) | Space baked into `Value` field |
-| Style/color | Not supported | Not supported | zstyle patterns | JSON `styled` | Full style mapping | Full 256-color mapping |
-| Messages | Integrated as `ERR` values | Integrated as values | Native `_message` | Native `edit:notify` | JSON `description` | Integrated as styled values |
+| Argument acquisition | `commandline -cp` + `xargs` | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var + `words` array | JSON via `from-json` | JSON via `from json` | `CommandContext.args` + `sub_proc_get_output` |
+| Registration | `complete -c 'cmd' -f -a '(func)' -r` | `complete -o noquote -F func cmd` | `compdef func cmd` + `compquote` guard | `edit:completion:arg-completer[cmd]` | Closure `let cmd_completer = {\|spans\| ...}` | `@contextual_command_completer` + `add_one_completer` |
+| Extra env vars | None | `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` | `CARAPACE_COMPLINE`, `CARAPACE_ZSH_HASH_DIRS` | None | None | None |
+| Open-quote handling | Snippet retry (`''`, `'"'`, `'"`) + `sed` trailing space fix | Snippet retry (`''`, `'"'`, `"`) | Snippet retry (`''`, `'"'`, `"`) | JSON parsing (n/a) | JSON parsing (n/a) | `fix_prefix` strips quotes (no retry needed) |
+| Output format | Tab-separated `value\tdesc\n` | `\001`-delimited nospace+values | `\001`-delimited zstyle+message+tag groups | JSON `complexCandidate` | JSON `{value,display,description,style}` | JSON `{Value,Display,Description,Style}` |
+| Nospace | **Not supported** | Global `compopt -o nospace` | Per-candidate `CodeSuffix` (empty = no space) | Per-candidate `CodeSuffix` | Per-candidate (omit trailing space) | Space baked into `Value` field |
+| Style/color | Not supported | Not supported | zstyle `(#b)` patterns + SGR | JSON `styled` | Full 256-color + attribute mapping | Full 256-color mapping (`bg:/fg:` format) |
+| Messages | Integrated as `ERR` values | Integrated as values | Native `_message -r` | Native `edit:notify` | JSON `description` field | Integrated as styled values |
 | Redirect patching | Not needed | Required (`bash.Patch`) | Not needed | Not needed | Not needed | Not needed |
 | Wordbreak patching | Not needed | Required (COMP_WORDBREAKS) | Not needed | Not needed | Not needed | Not needed |
-| Description display | Pager column | COMP_TYPE=63 only | Right column | Right column | Right column | Right column |
-| Tag grouping | Not supported | Not supported | `_describe` groups | Not supported | Not supported | Not supported |
+| Description display | Pager column | COMP_TYPE=63 only | Right column via `_describe` | Right column | Right column | Right column |
+| Tag grouping | Not supported | Not supported | `_describe -t` groups | Not supported | Not supported | Not supported |
+| Flag merging | Explicit only (via `CARAPACE_MERGEFLAGS`) | Explicit only | **Implicit** (always merges shorthand+longhand) | Explicit only | Explicit only | Explicit only |
+| Quoting complexity | None (tab-separated) | 2 modes (unquoted/double-quoted) | 5-state machine (DEFAULT, QUOTING, QUOTING_ESCAPING, FULL_QUOTING, FULL_QUOTING_ESCAPING) | None (JSON) | None (JSON) | 2 modes (single-quoted `''` or raw `r''`) |
 | Go-side patching | None | `bash.Patch()` | None | None | `nushell.Patch()` | None |
+| Named directories | N/A | N/A | Supported via `hash -d` (`CARAPACE_ZSH_HASH_DIRS`) | N/A | N/A | N/A |
+| COMP TYPE handling | N/A | Yes (successive tabs show descriptions) | N/A | N/A | N/A | N/A |
 
-| Feature | Oil | PowerShell | Xonsh | Tcsh | Ion | Clink | Export |
-|---------|-----|------------|-------|------|-----|-------|--------|
-| Output format | Values + `\001` nospace | JSON `CompletionResult` | JSON `{Value,Display,Description,Style}` | Values on lines | Simple values | Lua via `CARAPACE_COMPLINE` | JSON `{"Version","Meta","Values"}` |
-| Nospace | `\001` suffix | Strip trailing space | Space baked into `Value` | Built-in | N/A | N/A | N/A |
-| Style/color | Not supported | SGR in `ListItemText` | Full 256-color mapping | Not supported | Not supported | Not supported | JSON styles |
+### Secondary Shells
+
+| Feature | Oil | PowerShell | Tcsh | Ion | Clink | Export |
+|---------|-----|------------|------|-----|-------|--------|
+| Output format | Values + `\001` nospace | JSON `CompletionResult` | Values on lines | Simple values | Lua via `CARAPACE_COMPLINE` | JSON `{"Version","Meta","Values"}` |
+| Nospace | `\001` suffix | Strip trailing space | Built-in | N/A | N/A | N/A |
+| Style/color | Not supported | SGR in `ListItemText` | Not supported | Not supported | Not supported | JSON styles |
 
 ## Related Skills
 

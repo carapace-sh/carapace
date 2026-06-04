@@ -533,11 +533,7 @@ This is a simpler approach than the open-quote retry logic in bash/fish/zsh, bec
 - When `meta.Nospace.Matches(val.Value)` is `true` (nospace), the value is left as-is (no trailing space)
 - When `nospace` does NOT match, `" "` is appended to the value
 
-This differs from how other shells handle nospace:
-- **Zsh**: Uses `CodeSuffix` (empty suffix = no space) in `_describe`
-- **Bash**: Uses `compopt -o nospace`
-- **Elvish**: Uses `CodeSuffix` in `complexCandidate`
-- **Xonsh**: Bakes the space into the `Value` directly
+For a cross-shell comparison of nospace handling, see the **carapace-dev-shell** skill.
 
 The snippet does NOT use `RichCompletion.append_space=True`. This is because:
 1. `append_space` adds space **after** the closing quote, which doesn't work when carapace has already quoted the value

@@ -93,7 +93,7 @@ The `-r` flag treats the argument as a raw string (not a format string). Carapac
 compquote '' 2>/dev/null && _example_completion
 ```
 
-`compquote` is a zsh builtin that only succeeds when called from within the completion system. This line conditionally executes the completion function immediately — needed to initialize the completion state on the first TAB press. The `2>/dev/null` suppresses errors when `compquote` is not available (e.g., in older zsh versions).
+`compquote` is a zsh builtin that only succeeds when called from within the completion system. This line conditionally executes the completion function immediately — needed to initialize the completion state on the first TAB press. The `2>/dev/null` suppresses errors when `compquote` is not available (e.g., in older zsh versions). Note: `compquote ''` passes an empty string (not a valid parameter name), so it likely always fails — but the `&&` short-circuits and the completion function runs regardless when sourced interactively. The `compdef` registration on the next line is the actual mechanism that makes completion work.
 
 ## The Zsh Snippet
 

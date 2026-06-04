@@ -30,7 +30,7 @@ _example_completion_ble() {
   if [[ ${BLE_ATTACHED-} ]]; then
     [[ :$comp_type: == *:auto:* ]] && return
 
-    compopt -o ble/no-default
+    compopt +o ble/default
     bleopt complete_menu_style=desc
 
     local compline="${COMP_LINE:0:${COMP_POINT}}"

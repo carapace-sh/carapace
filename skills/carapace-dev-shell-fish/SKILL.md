@@ -225,7 +225,7 @@ The `sed "s/ $/ ''/"` command handles the edge case where `commandline -cp` retu
 
 ### 3. Fish Doesn't Properly Erase Completions (fish-shell#6716)
 
-The `complete -e 'cmd'` in the snippet is meant to erase existing completions. Known issue: `complete -e` may not properly erase completions in all cases. The workaround used by carapace-bin is to create an **empty stub file** at `~/.config/fish/completions/{cmd}.fish`.
+The `complete -e 'cmd'` in the snippet is meant to erase existing completions. Known issue: `complete -e` may not properly erase completions in all cases. **This was fixed in fish 3.7.0** (released Jan 1, 2024). For fish versions prior to 3.7.0, the workaround used by carapace-bin is to create an **empty stub file** at `~/.config/fish/completions/{cmd}.fish`.
 
 ### 4. Special Characters in Values
 

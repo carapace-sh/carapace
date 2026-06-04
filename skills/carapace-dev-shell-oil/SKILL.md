@@ -23,7 +23,7 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s oil (OSH) co
 
 ## Oil Background
 
-Oil (OSH) is a Bash-compatible shell that uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash for programmable completion. However, it lacks some of the advanced features of bash completion (no `COMP_TYPE` successive-tab display, no `COMP_WORDBREAKS` handling, and no redirect patching in carapace).
+Oil (OSH) is a Bash-compatible shell that uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash for programmable completion. However, it lacks some of the advanced features of bash completion (no `COMP_TYPE` successive-tab display, and no redirect patching in carapace). Oil does support `COMP_WORDBREAKS` (documented in oil's `core/sh_init.py`), but the carapace snippet does not export it.
 
 ## The Oil Snippet
 
@@ -50,7 +50,7 @@ complete -F _example_completion example
 1. **Shebang**: `#!/bin/osh` instead of no shebang
 2. **Simpler retry**: Uses `sed -e "s/ $/ ''/" -e 's/"/\"/g'` instead of the 3-stage xargs retry
 3. **Nospace**: Hardcoded pattern `[/=@:.,$'\001']` instead of the boolean `true/false` flag
-4. **No COMP_TYPE/COMP_WORDBREAKS**: Doesn't export these variables
+4. **No COMP_TYPE/COMP_WORDBREAKS exported**: Doesn't export these variables. Oil supports `COMP_WORDBREAKS` at the shell level but the snippet doesn't export it. Oil does **not** support `COMP_TYPE`.
 5. **Single-entry nospace removal**: `COMPREPLY=(${COMPREPLY[@]%%$'\001'})` strips the `\001` indicator from all values
 
 ## Value Formatting: `ActionRawValues()`
@@ -78,7 +78,7 @@ Then strips it: `COMPREPLY=(${COMPREPLY[@]%%$'\001'})`
 
 ### Sanitizer
 
-Strips `\n` and `\t` (but not `\r` unlike bash).
+Strips `\n` and `\t` (but not `\r` unlike bash). This is likely a bug — since Oil uses the same COMPREPLY mechanism as bash, carriage returns in values would corrupt the output the same way they would in bash.
 
 ## Completion Dispatch Flow for Oil
 
@@ -102,7 +102,9 @@ User presses TAB
   → Oil displays completions
 ```
 
-## Edge Cases
+### sed No-Op
+
+The `sed -e 's/"/\\"/g'` in the snippet replaces `"` with `\"`. However, since the input comes from `echo "$compline"` where `$compline` is already a double-quoted string, the shell has already consumed the quotes — the `sed` command is effectively a no-op in the normal case. This is a harmless leftover from the bash snippet.
 
 ### No Redirect Patching
 
@@ -112,7 +114,7 @@ The TODO in `complete.go` notes:
 case "bash": // TODO what about oil and such?
 ```
 
-Oil uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash but doesn't receive redirect patching or COMP_WORDBREAKS handling. If oil suffers from the same redirect leaking problem as bash, completions may include redirect tokens as positional arguments.
+Oil uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash but doesn't receive redirect patching or COMP_WORDBREAKS handling. If oil suffers from the same redirect leaking problem as bash, completions may include redirect tokens as positional arguments. The snippet also does not export `COMP_WORDBREAKS`, though Oil supports it.
 
 ### Hardcoded Nospace Pattern
 

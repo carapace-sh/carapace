@@ -36,7 +36,7 @@ _example_completion_ble() {
   if [[ ${BLE_ATTACHED-} ]]; then
     [[ :$comp_type: == *:auto:* ]] && return
 
-    compopt -o ble/no-default
+    compopt +o ble/default
     bleopt complete_menu_style=desc
 
     local compline="${COMP_LINE:0:${COMP_POINT}}"
@@ -62,10 +62,11 @@ Plus the regular bash snippet is prepended (for fallback).
 ### Key Differences from Regular Bash
 
 1. **Auto-completion check**: `[[ :$comp_type: == *:auto:* ]] && return` — skips during auto-completion to avoid flickering
-2. **BLE-specific options**: `compopt -o ble/no-default` prevents BLE's default completer; `bleopt complete_menu_style=desc` enables description display
+2. **BLE-specific options**: `compopt +o ble/default` prevents BLE's default completer; `bleopt complete_menu_style=desc` enables description display
 3. **Tab-delimited format**: Uses `cand%%$'\t'*` and `cand##*$'\t'` to split value and description on tab
 4. **Fallback**: If BLE is not attached (`${BLE_ATTACHED-}`), falls back to the regular bash completer
 5. **No COMP_TYPE/COMP_WORDBREAKS**: The BLE snippet doesn't export these — it uses `sed` + `xargs` instead of the 3-stage retry
+6. **Snippet parsing mismatch**: The snippet splits each candidate on tab (`${cand%%$'\t'*}` for value, `${cand##*$'\t'}` for description), but `ActionRawValues` outputs a more complex format with `\x1c` separators (`value\tdisplay\x1c\x1csuffix\x1cdescription`). The tab-based splitting means the `display` field is captured as part of the tab-split, but the `\x1c`-delimited suffix and style fields within the second tab field are passed through to `ble/complete/cand/yield` as a single string, which parses them internally.
 
 ## BLE Value Format
 
@@ -111,7 +112,7 @@ User presses TAB
   → Snippet checks BLE_ATTACHED
   → If BLE attached:
       1. Skip if auto-completion (comp_type check)
-      2. Set ble/no-default and desc menu style
+      2. Set +o ble/default and desc menu style
       3. Build compline and call: echo "$compline" | sed | xargs cmd _carapace bash-ble
       4. Parse tab-separated output with \x1c fields
       5. Yield each candidate via ble/complete/cand/yield

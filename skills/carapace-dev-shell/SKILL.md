@@ -59,7 +59,7 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 |---------|------|----------|-----|-----|------|--------|---------|-------|------------|
 | **Argument acquisition** | `COMP_LINE`/`COMP_POINT` env vars | `COMP_LINE`/`COMP_POINT` env vars | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var + `words` array | `commandline -cp` + `xargs` | `(all $arg)` rest param | `...$spans` spread | `CommandContext.args` + `sub_proc_get_output` | `$commandAst.CommandElements` |
 | **Registration** | `complete -o noquote -F func cmd` | `complete -F func_ble cmd` | `complete -F func cmd` | `compdef func cmd` + `compquote` guard | `complete -c 'cmd' -f -a '(func)' -r` | `edit:completion:arg-completer[cmd]` | Closure `let cmd_completer = {\|spans\| ...}` | `@contextual_command_completer` + `add_one_completer` | `Register-ArgumentCompleter -Native` |
-| **Output format** | `\001`-delimited nospace+values | Tab-delimited value/display with `\x1c` separators | Values with `\001` nospace indicator | `\001`-delimited zstyle+message+tag groups | Tab-separated `value\tdesc\n` | JSON `completion` with `complexCandidate` array | JSON `{value,display,description,style}` | JSON `{Value,Display,Description,Style}` | JSON `CompletionResult` array |
+| **Output format** | `\001`-delimited nospace+values | Tab-delimited value/display with `\x1c` separators | Values with `\001` nospace indicator | `\001`-delimited zstyle+message+tag groups | Tab-separated `value\tdesc\n` | JSON `completion` with `complexCandidate` array | JSON `{value,display_override,description,style}` | JSON `{Value,Display,Description,Style}` | JSON `CompletionResult` array |
 | **Nospace** | Global `compopt -o nospace` | Per-candidate suffix field | Inline `\001` indicator | Per-candidate space suffix in `_describe` values | **Not supported** | Per-candidate `CodeSuffix` | Trailing space in `value` field | Space baked into `Value` field | Trailing space in `CompletionText` |
 | **Style/color** | Not supported | Not supported | Not supported | `zstyle list-colors` with `(#b)` patterns | Not supported | `styled` builtin via `ParseStyling` | Full 256-color + attr `{fg,bg,attr}` record | `bg:/fg:` format with `ansi` prefix | SGR escape codes in `ListItemText` |
 | **Messages** | Integrated as styled values | Integrated as values | Integrated as values | Native `_message -r` | Integrated as `ERR` values | Native `edit:notify` | Integrated as `ERR` values | Integrated as styled values | Integrated as styled `ListItemText` |
@@ -69,7 +69,7 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 | **Tag grouping** | Not supported | Not supported | Not supported | Native via `_describe -t` | Not supported | Not supported | Not supported | Not supported | Not supported |
 | **Flag merging** | Explicit only (`CARAPACE_MERGEFLAGS`) | Explicit only | Explicit only | **Implicit** (always merges) | Explicit only | Explicit only | Explicit only | Explicit only | Explicit only |
 | **Named directories** | Not supported | Not supported | Not supported | Supported via `hash -d` | Not supported | Not supported | Not supported | Not supported | Not supported |
-| **Extra env vars** | `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` | Same as bash | `COMP_LINE`, `COMP_POINT` | `CARAPACE_COMPLINE`, `CARAPACE_ZSH_HASH_DIRS` | None | None | None | None | None |
+| **Extra env vars** | `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` | Same as bash | `COMP_LINE`, `COMP_POINT` (Oil supports `COMP_WORDBREAKS` at shell level but snippet doesn't export it; Oil does not support `COMP_TYPE`) | `CARAPACE_COMPLINE`, `CARAPACE_ZSH_HASH_DIRS` | None | None | None | None | None |
 
 ### Secondary Shells
 
@@ -93,7 +93,7 @@ Each shell handles "no trailing space" differently:
 | Zsh | Space suffix in `_describe` values (empty = no space) | Yes |
 | Fish | **Not supported** — tab-separated format has no nospace mechanism | N/A |
 | Elvish | `CodeSuffix` in `complexCandidate` (empty = no space) | Yes |
-| Nushell | Trailing space in `value` field (absent = no space) | Yes |
+| Nushell | Trailing space in `value` field (absent = no space); `append_whitespace` defaults to `false` for external completers and is not controllable via JSON; `display_override` field for display text | Yes |
 | PowerShell | Trailing space in `CompletionText` (absent = no space) | Yes |
 | Xonsh | Space baked into `Value` field (absent = no space) | Yes |
 | Tcsh | Built-in nospace support | Yes |

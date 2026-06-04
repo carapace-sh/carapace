@@ -246,7 +246,7 @@ def fix_prefix(s):
     return s.translate(str.maketrans('', '', '\'"'))
 ```
 
-**Why this is needed**: When the user types a partially quoted argument like `'prefix` and presses TAB, `context.prefix` may include the opening quote character. Carapace's traversal engine doesn't expect quote characters in the completion prefix — it needs the raw prefix without quotes to match against completion values. `fix_prefix` strips both single and double quote characters from the prefix.
+**Why this is needed**: When the user types a partially quoted argument like `'partial` and presses TAB, `context.prefix` may include the opening quote character. Carapace's traversal engine matches completion values against the raw prefix without quotes, so the quote character causes no matches. However, `context.prefix` in xonsh's `CommandContext` typically already excludes quotes — the `value` field of `CommandArg` is unquoted. The `fix_prefix` helper is therefore defensive: it handles edge cases where quotes might leak through, particularly when `context.prefix` contains a partial quote that xonsh's parser couldn't fully resolve.
 
 **4. Invoke carapace as a subprocess**
 
@@ -362,6 +362,8 @@ The sanitizer strips characters that would break the JSON output or xonsh's comp
 - `\n` → empty — newlines would break the JSON structure
 - `\t` → empty — tabs would corrupt display formatting
 - `'` → `\'` — escapes single quotes for Python string literals (since values containing special chars are wrapped in single quotes)
+
+**Edge case**: The sanitizer's `\'` replacement is applied before quoting, but if a value contains both single quotes and backslashes (e.g., `it's\path`), the sanitizer would produce `it\'s\\path` which, when wrapped in `r'...'` (triggered by the backslash), becomes `r'it\'s\\path'`. The raw string's `\'` does not close the string because `r'...'` doesn't interpret `\'` as an escape — but the `'` at the end of `\'` does close the raw string prematurely. This is a known limitation; values containing both `'` and `\` are rare in practice.
 
 ### Step 2: Quote Special Characters
 

@@ -62,13 +62,15 @@ Nushell's completion system (via Reedline's `Suggestion` struct) accepts records
 | Field | Type | Purpose |
 |-------|------|---------|
 | `value` | string | Text inserted into the command line |
-| `display` | string | Text shown in the completion menu (overrides `value`) |
+| `display_override` | string | Text shown in the completion menu (overrides `value`) |
 | `description` | string | Help text shown alongside the suggestion |
 | `style` | string or record | Styling — color name, hex code, or `{fg, bg, attr}` record |
 | `span` | record | `{start: int, end: int}` byte range to replace |
 | `append_whitespace` | bool | Whether to auto-append trailing space after insertion |
 
-Carapace uses a subset of these fields: `value`, `display`, `description`, and `style`. It does **not** use `span` (letting nushell compute it) or `append_whitespace` (encoding nospace directly in the `value` field via trailing space).
+Carapace uses a subset of these fields: `value`, `display_override`, `description`, and `style`. It does **not** use `span` (letting nushell compute it) or `append_whitespace` (see below).
+
+Although nushell's `Suggestion` struct has an `append_whitespace` field, it defaults to `false` for `Suggestion::default()` (which is what `map_value_completions` uses for external completers — the `DynamicSuggestion::default()` path uses `true`, but that's not the path taken). Furthermore, `map_value_completions` does **not** process `"append_whitespace"` from JSON records, so carapace cannot control it through the JSON pipeline. Instead, carapace encodes nospace directly in the `value` field via trailing space — values that should have a trailing space get `" "` appended, values that should not get no trailing space.
 
 ### Nushell String Types and Quoting
 
@@ -228,9 +230,9 @@ Backtick-quoted strings are handled separately with `strings.Trim` because nushe
 
 ```json
 [
-  {"value": "branch ", "display": "branch", "description": "Switch branches", "style": {"fg": "green"}},
-  {"value": "checkout ", "display": "checkout", "description": "Switch working tree"},
-  {"value": "main", "display": "main", "description": "Default branch", "style": {"fg": "red"}}
+  {"value": "branch ", "display_override": "branch", "description": "Switch branches", "style": {"fg": "green"}},
+  {"value": "checkout ", "display_override": "checkout", "description": "Switch working tree"},
+  {"value": "main", "display_override": "main", "description": "Default branch", "style": {"fg": "red"}}
 ]
 ```
 
@@ -239,9 +241,11 @@ Each record has:
 | Field | Always present | Source |
 |-------|---------------|--------|
 | `value` | Yes | `RawValue.Value` — with quoting applied and trailing space for nospace |
-| `display` | Yes | `RawValue.Display` — the human-readable display text |
+| `display_override` | Yes | `RawValue.Display` — the human-readable display text |
 | `description` | Only when non-empty | `RawValue.TrimmedDescription()` |
 | `style` | Only when non-empty | `RawValue.Style` — converted to nushell format via `convertStyle()` |
+
+**Note**: Carapace uses `"display_override"` as the JSON key, matching nushell's `map_value_completions` (in `custom_completions.rs`) which looks for `"display_override"` to override the display text. Previously, carapace used `"display"` which was silently ignored by nushell — display overrides (e.g., showing a short name while inserting a long path) did not work.
 
 The `omitempty` JSON tags mean `description` and `style` are omitted when empty, keeping the output compact.
 
@@ -250,7 +254,7 @@ The `omitempty` JSON tags mean `description` and `style` are omitted when empty,
 ```go
 type record struct {
     Value       string        `json:"value"`
-    Display     string        `json:"display"`
+    Display     string        `json:"display_override"`  // matches nushell's map_value_completions field name
     Description string        `json:"description,omitempty"`
     Style       *nushellStyle `json:"style,omitempty"`
 }
@@ -326,7 +330,7 @@ Carapace encodes the nospace signal as a **trailing space** in the `value` field
 - **`nospace = true`** — value ends with no trailing space (nushell won't add one either)
 - **`nospace = false`** — value ends with a space character, so nushell inserts the value **with** the trailing space
 
-This is a clever use of nushell's JSON format — since the `value` field is the exact text inserted into the command line, a trailing space in the value becomes a trailing space after insertion. Nushell's `append_whitespace` field defaults to `false`, so carapace controls spacing entirely through the `value` field.
+This is a clever use of nushell's JSON format — since the `value` field is the exact text inserted into the command line, a trailing space in the value becomes a trailing space after insertion. Nushell's `Suggestion.append_whitespace` defaults to `false` for external completers (via `Suggestion::default()` in `map_value_completions`), and carapace cannot control it through the JSON pipeline (the `map_value_completions` function doesn't process `"append_whitespace"` from records), so carapace controls spacing entirely through the `value` field instead.
 
 This approach means:
 - Values like `--flag=` (with `NoSpace('=')`) are inserted without trailing space

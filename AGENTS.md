@@ -142,6 +142,23 @@ cobra command invoked with _carapace subcommand
     references/shell-zsh.md      Zsh deep dive
     references/pflag.md          carapace-pflag extensions (from carapace-pflag repo)
     references/bridge.md         carapace-bridge internals (from carapace-bridge repo)
+  bash/                      Bash shell in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       Bash programmable completion
+    references/readline.md         GNU Readline library
+    references/quoting-expansion.md Quoting and expansion rules
+    references/execution.md        Execution model and signals
+    references/startup.md          Startup files and configuration
+  cmd-clink/                 Clink/cmd.exe in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/argmatcher.md       Clink argmatcher Lua API
+    references/completion.md       Clink completion system
+    references/line-editing.md     Readline integration and key bindings
+    references/cmd-integration.md  cmd.exe integration and prompt
+    references/coloring.md         Input line coloring and classification
+    references/suggestions.md      Auto-suggestions
+    references/history.md          History system
+    references/scripting.md        Lua scripting system
 ```
 
 ## Conventions
@@ -290,7 +307,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, cmd-clink, export) are covered only in `references/shell.md`.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink has its own composite skill (`skills/cmd-clink/`) for in-depth clink/cmd.exe knowledge.
 
 ### Structure
 

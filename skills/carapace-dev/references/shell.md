@@ -9,7 +9,7 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 | Bash | `bash` | `internal/shell/bash/` | `references/shell-bash.md` |
 | Bash BLE | `bash-ble` | `internal/shell/bash_ble/` | `references/shell-bash-ble.md` |
 | Oil | `oil` | `internal/shell/oil/` | `references/shell-oil.md` |
-| Cmd (Clink) | `cmd-clink` | `internal/shell/cmd_clink/` | — |
+| Cmd (Clink) | `cmd-clink` | `internal/shell/cmd_clink/` | **cmd-clink** skill |
 | Elvish | `elvish` | `internal/shell/elvish/` | `references/shell-elvish.md` |
 | Fish | `fish` | `internal/shell/fish/` | `references/shell-fish.md` |
 | Ion | `ion` | `internal/shell/ion/` | — |

@@ -58,7 +58,7 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 
 - **Format**: `\001` separates nospace flag from completion data. Values are shell-escaped.
 - **Quoting**: Two modes — `escapingReplacer` (unquoted) and `escapingQuotedReplacer` (double-quoted) with auto-detection via `requiresQuoting()`.
-- **COMP_TYPE handling**: On successive tabs (`COMP_TYPE_LIST_SUCCESSIVE_TABS`), shows display+description instead of values.
+- **COMP TYPE handling**: On successive tabs (`COMP_TYPE_LIST_SUCCESSIVE_TABS`), shows display+description instead of values.
 - **Partial completion workaround**: When all displays share a prefix, bash inserts it losing formatting. Workaround collapses to common prefix.
 - **Snippet**: `complete -F` function, exports `COMP_LINE`/`COMP_POINT`/`COMP_TYPE`/`COMP_WORDBREAKS`.
 
@@ -74,7 +74,8 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 
 - **Format**: Simplest — `value\tdescription` tab-separated, newline-delimited.
 - **Snippet**: `complete -c 'cmd' -f -a '(_completion)' -r` with `(commandline -cp)` and open-quote retry.
-- **Optarg detection**: If `--flag=value`, styles only the `value` part via `style.ForPath`.
+- **Nospace**: Not supported — fish's tab-separated format has no mechanism for per-candidate nospace.
+- **Messages**: Integrated as synthetic `ERR` values (fish has no native message API).
 
 ### Elvish
 
@@ -134,7 +135,7 @@ Each shell handles "no trailing space" differently:
 |-------|-----------|
 | bash | `compopt -o nospace` when nospace matches |
 | zsh | `CodeSuffix` in completion entry (empty = no space) |
-| fish | Natively handles via tab-separated format |
+| fish | **Not supported** — tab-separated format has no nospace mechanism |
 | elvish | `CodeSuffix` in `complexCandidate` (empty = no space) |
 | nushell | Omits trailing space in JSON output |
 | powershell | Strips trailing space from `CompletionText` |
@@ -142,8 +143,32 @@ Each shell handles "no trailing space" differently:
 | xonsh | `append_closing_quote=False` in `RichCompletion` |
 | tcsh | Built-in nospace support |
 
+## Shell Comparison
+
+| Feature | Fish | Bash | Zsh | Elvish | Nushell |
+|---------|------|------|-----|--------|---------|
+| Argument acquisition | `commandline -cp` + `xargs` | `COMP_LINE`/`COMP_POINT` env vars | `CARAPACE_COMPLINE` env var | JSON via `from-json` | JSON via `from json` |
+| Open-quote handling | Snippet retry (`''`, `'"'`, `'"`) | Snippet retry (`''`, `'"'`, `"`) | zsh handles natively | JSON parsing | JSON parsing |
+| Output format | Tab-separated `value\tdesc\n` | `\001`-delimited nospace+values | `\001`-delimited groups | JSON `complexCandidate` | JSON `{value,display,description,style}` |
+| Nospace | **Not supported** | Global `compopt -o nospace` | Per-candidate `CodeSuffix` | Per-candidate `CodeSuffix` | Per-candidate (omit space) |
+| Style/color | Not supported | Not supported | zstyle patterns | JSON `styled` | Full style mapping |
+| Messages | Integrated as `ERR` values | Integrated as values | Native `_message` | Native `edit:notify` | JSON `description` |
+| Redirect patching | Not needed | Required (`bash.Patch`) | Not needed | Not needed | Not needed |
+| Wordbreak patching | Not needed | Required (COMP_WORDBREAKS) | Not needed | Not needed | Not needed |
+| Description display | Pager column | COMP_TYPE=63 only | Right column | Right column | Right column |
+| Tag grouping | Not supported | Not supported | `_describe` groups | Not supported | Not supported |
+| Go-side patching | None | `bash.Patch()` | None | None | `nushell.Patch()` |
+
+| Feature | Oil | PowerShell | Xonsh | Tcsh | Ion | Clink | Export |
+|---------|-----|------------|-------|------|-----|-------|--------|
+| Output format | Values + `\001` nospace | JSON `CompletionResult` | JSON `{Value,Display,Description,Style}` | Values on lines | Simple values | Lua via `CARAPACE_COMPLINE` | JSON `{"Version","Meta","Values"}` |
+| Nospace | `\001` suffix | Strip trailing space | `append_closing_quote=False` | Built-in | N/A | N/A | N/A |
+| Style/color | Not supported | SGR in `ListItemText` | Full 256-color mapping | Not supported | Not supported | Not supported | JSON styles |
+
 ## Related Skills
 
 - **carapace-setup** — installation and shell integration (user-facing)
 - **carapace-dev-traverse** — the completion engine that produces Actions before formatting
 - **carapace-dev-style** — how styles are resolved before shell rendering
+- **carapace-dev-shell-bash** — bash integration deep dive
+- **carapace-dev-shell-fish** — fish integration deep dive

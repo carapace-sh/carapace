@@ -554,6 +554,22 @@ The `wordbreakPrefix` and `compType` globals set by `Patch()` are acknowledged a
 | Open-quote retry | 3-stage (`''`, `'"`, `"`) | `sed` + xargs | `sed` + xargs |
 | Style support | None | None | None |
 
+## References
+
+### Documentation
+
+- [Bash Manual: Programmable Completion](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html) — official reference for `complete`, `compgen`, `compopt`
+- [Bash Manual: Programmable Completion Builtins](https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html) — `complete`, `compgen`, `compopt` syntax
+- [Bash Manual: Completion Variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html) — `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS`, `COMPREPLY`
+- [ble.sh Documentation](https://github.com/akinomyoga/ble.sh/wiki) — Bash Line Editor (BLE) documentation
+
+### Tutorials & Blog Posts
+
+- [The Bash Programmable Completion Guide](https://devdocs.io/bash/programmable-completion) — devdocs reference
+- [An Introduction to Programmable Completion](https://linuxcommand.org/lc3_man_pages/compgen.html) — compgen and complete tutorial
+- [Writing your own Bash Completion Function](https://germaniumhome.wordpress.com/2013/06/18/writing-your-own-bash-completion-function/) — step-by-step guide
+- [Deeper into Bash Completion](https://bash.cyberciti.biz/guide/Chapter_24:_Advanced_Command_Shell) — Bash Guide for Beginners, Chapter 24
+
 ## Related Skills
 
 - **carapace-dev-shell** — overview of all 12 shell formatters

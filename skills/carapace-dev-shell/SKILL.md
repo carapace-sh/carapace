@@ -172,3 +172,4 @@ Each shell handles "no trailing space" differently:
 - **carapace-dev-style** — how styles are resolved before shell rendering
 - **carapace-dev-shell-bash** — bash integration deep dive
 - **carapace-dev-shell-fish** — fish integration deep dive
+- **carapace-dev-shell-zsh** — zsh integration deep dive

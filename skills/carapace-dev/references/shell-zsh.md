@@ -1,19 +1,6 @@
----
-name: carapace-dev-shell-zsh
-description: >
-  Use when implementing or debugging carapace's zsh shell integration — the completion
-  snippet, output formatting, quoting/escaping state machine, _describe integration,
-  zstyle color rendering, named directory expansion, _message display, per-candidate
-  nospace, and the CARAPACE_COMPLINE quoting context. Covers the zsh formatter in
-  internal/shell/zsh/. Triggers on: "zsh completion", "zsh snippet", "zsh shell",
-  "zstyle", "_describe", "CARAPACE_COMPLINE", "zsh quoting", "named directory",
-  "zsh nospace", "carapace zsh integration".
-user-invocable: true
----
-
 # Carapace Library: Zsh Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s zsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles zsh-specific edge cases including the quoting state machine, zstyle coloring, named directories, and the `_describe` tag-grouping protocol. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s zsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles zsh-specific edge cases including the quoting state machine, zstyle coloring, named directories, and the `_describe` tag-grouping protocol. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -763,7 +750,7 @@ This disables zsh's default tag-based grouping headers. Carapace's `_describe -t
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved and converted to SGR sequences
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved and converted to SGR sequences
 - **carapace-setup** — user-facing shell integration setup

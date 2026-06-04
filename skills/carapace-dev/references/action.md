@@ -1,14 +1,3 @@
----
-name: carapace-dev-action
-description: >
-  Use when implementing or debugging the carapace library's core Action API internals.
-  Covers the Action type, InvokedAction, Batch, Context, all modifier methods, built-in
-  action constructors, the two-phase invocation model, and the suffix naming conventions (F/P/E/N).
-  Triggers on: "carapace Action type", "Action modifier", "InvokedAction", "carapace Action API",
-  "Action callback", "CompletionCallback", "carapace Context", "Action internals".
-user-invocable: true
----
-
 # Carapace Library: Action API Internals
 
 Reference for the [carapace](https://github.com/carapace-sh/carapace) library's core completion API — the `Action` type, its modifiers, and the invocation model.
@@ -266,4 +255,4 @@ type Meta struct {
 
 - **carapace-action** — creating/modifying shared actions in carapace-bin (Opts, Uid/QueryF, caching, macro exposure)
 - **carapace-integrate** — integrating carapace library into cobra CLIs (PreRun, PreInvoke, bridge, spec)
-- **carapace-dev-traverse** — how the completion engine resolves what to complete
+- **references/traverse.md** — how the completion engine resolves what to complete

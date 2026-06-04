@@ -1,15 +1,3 @@
----
-name: carapace-dev-style
-description: >
-  Use when implementing or debugging the carapace library's styling system internals.
-  Covers string-based composable styles, XTerm256/TrueColor, semantic style resolution
-  (ForKeyword, ForPath, ForPathExt, ForLogLevel), LS_COLORS integration, the Carapace
-  config struct, runtime configuration via Register/Set, and styles.json persistence.
-  Triggers on: "carapace style system", "style internals", "LS_COLORS carapace",
-  "style config", "style.Carapace", "semantic style", "style.ForPath", "style.ForKeyword".
-user-invocable: true
----
-
 # Carapace Library: Styling System Internals
 
 Reference for [carapace](https://github.com/carapace-sh/carapace)'s styling system — how styles are represented, resolved, configured, and rendered across shells.
@@ -178,6 +166,6 @@ Persists style overrides to `$XDG_CONFIG_HOME/carapace/styles.json`. Key format 
 
 ## Related Skills
 
-- **carapace-dev-action** — how `.Style()`/`.StyleF()`/`.StyleR()` apply styles to Actions
-- **carapace-dev-shell** — per-shell style rendering details
+- **references/action.md** — how `.Style()`/`.StyleF()`/`.StyleR()` apply styles to Actions
+- **references/shell.md** — per-shell style rendering details
 - **carapace-action** — using styles in carapace-bin shared actions

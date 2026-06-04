@@ -1,17 +1,6 @@
----
-name: carapace-dev-shell-bash-ble
-description: >
-  Use when implementing or debugging carapace's bash BLE (Bash Line Editor) shell integration —
-  the BLE-specific snippet, tab-delimited value format with per-candidate suffix, ble/complete/cand/yield
-  registration, and fallback to regular bash. Covers the bash_ble formatter in
-  internal/shell/bash_ble/. Triggers on: "bash-ble completion", "bash-ble snippet", "bash ble",
-  "ble.sh", "BLE completion", "carapace bash-ble integration".
-user-invocable: true
----
-
 # Carapace Library: Bash BLE Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash BLE (Bash Line Editor) completion integration — how the BLE snippet works, how completion output is formatted, and how it differs from regular bash completion. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash BLE (Bash Line Editor) completion integration — how the BLE snippet works, how completion output is formatted, and how it differs from regular bash completion. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -97,7 +86,7 @@ if meta.Nospace.Matches(val.Value) {
 }
 ```
 
-For a cross-shell comparison of nospace handling, see the **carapace-dev-shell** skill.
+For a cross-shell comparison of nospace handling, see the **references/shell.md**.
 
 ## Patching
 
@@ -137,6 +126,6 @@ User presses TAB
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-shell-bash** — bash integration deep dive (shared patching, COMP_TYPE, COMP_WORDBREAKS)
-- **carapace-dev-shell-oil** — oil integration deep dive (similar snippet approach)
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/shell-bash.md** — bash integration deep dive (shared patching, COMP_TYPE, COMP_WORDBREAKS)
+- **references/shell-oil.md** — oil integration deep dive (similar snippet approach)

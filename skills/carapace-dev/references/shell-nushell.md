@@ -1,18 +1,6 @@
----
-name: carapace-dev-shell-nushell
-description: >
-  Use when implementing or debugging carapace's nushell shell integration — the completion
-  snippet, output formatting, JSON record structure, quoting/escaping, open-quote patching via
-  nushell.Patch, nospace handling via trailing space, style/color conversion (256-color + attributes
-  to nushell format), and the completer closure with `from json`. Covers the nushell formatter in
-  internal/shell/nushell/. Triggers on: "nushell completion", "nushell snippet", "nushell shell",
-  "from json", "nushell quoting", "nushell style", "nushell patch", "carapace nushell integration".
-user-invocable: true
----
-
 # Carapace Library: Nushell Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s nushell completion integration — how the snippet works, how completion output is formatted, and how carapace handles nushell-specific edge cases including open-quote patching, JSON output, style conversion, and nospace via trailing space. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s nushell completion integration — how the snippet works, how completion output is formatted, and how carapace handles nushell-specific edge cases including open-quote patching, JSON output, style conversion, and nospace via trailing space. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -656,6 +644,6 @@ User presses TAB
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved before nushell style conversion
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved before nushell style conversion

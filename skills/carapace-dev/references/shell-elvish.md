@@ -1,19 +1,6 @@
----
-name: carapace-dev-shell-elvish
-description: >
-  Use when implementing or debugging carapace's elvish shell integration — the completion
-  snippet, output formatting, JSON complexCandidate structure, CodeSuffix for nospace,
-  styled builtin integration, edit:notify for messages, ParseStyling validation, usage
-  suppression, and the from-json pipeline. Covers the elvish formatter in
-  internal/shell/elvish/. Triggers on: "elvish completion", "elvish snippet", "elvish shell",
-  "complex-candidate", "CodeSuffix", "edit:notify", "elvish styled", "from-json",
-  "ParseStyling", "carapace elvish integration".
-user-invocable: true
----
-
 # Carapace Library: Elvish Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s elvish completion integration — how the snippet works, how completion output is formatted, and how carapace handles elvish-specific edge cases including JSON output via `from-json`, `edit:complex-candidate` with `CodeSuffix` for nospace, `styled` for per-candidate colors, and `edit:notify` for error messages. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s elvish completion integration — how the snippet works, how completion output is formatted, and how carapace handles elvish-specific edge cases including JSON output via `from-json`, `edit:complex-candidate` with `CodeSuffix` for nospace, `styled` for per-candidate colors, and `edit:notify` for error messages. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -743,11 +730,11 @@ User presses TAB
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell comparison table and per-shell feature matrix
-- **carapace-dev-shell-bash** — bash integration deep dive
-- **carapace-dev-shell-fish** — fish integration deep dive
-- **carapace-dev-shell-zsh** — zsh integration deep dive
-- **carapace-dev-shell-nushell** — nushell integration deep dive
-- **carapace-dev-shell-xonsh** — xonsh integration deep dive
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved before shell rendering
+- **references/shell.md** — cross-shell comparison table and per-shell feature matrix
+- **references/shell-bash.md** — bash integration deep dive
+- **references/shell-fish.md** — fish integration deep dive
+- **references/shell-zsh.md** — zsh integration deep dive
+- **references/shell-nushell.md** — nushell integration deep dive
+- **references/shell-xonsh.md** — xonsh integration deep dive
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved before shell rendering

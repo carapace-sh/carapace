@@ -1,19 +1,6 @@
----
-name: carapace-dev-shell-xonsh
-description: >
-  Use when implementing or debugging carapace's xonsh shell integration — the completion
-  snippet, output formatting, quoting/escaping, RichCompletion mapping, prefix_len handling,
-  append_closing_quote and nospace behavior, style/color conversion, the contextual_command_completer
-  decorator, sub_proc_get_output invocation, and partially quoted prefix completion.
-  Covers the xonsh formatter in internal/shell/xonsh/. Triggers on: "xonsh completion", "xonsh snippet",
-  "xonsh shell", "RichCompletion", "append_closing_quote", "prefix_len", "xonsh quoting",
-  "xonsh style", "contextual_command_completer", "sub_proc_get_output", "carapace xonsh integration".
-user-invocable: true
----
-
 # Carapace Library: Xonsh Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles xonsh-specific edge cases including quoting, RichCompletion construction, and style conversion. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh completion integration — how the snippet works, how completion output is formatted, and how carapace handles xonsh-specific edge cases including quoting, RichCompletion construction, and style conversion. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -581,6 +568,6 @@ The style string is always prefixed with `"bg-default fg-default "` to ensure bo
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved before shell rendering
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved before shell rendering

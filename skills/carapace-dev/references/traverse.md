@@ -1,16 +1,3 @@
----
-name: carapace-dev-traverse
-description: >
-  Use when implementing or debugging the carapace library's completion engine —
-  how arguments are classified, traversed, and resolved to completion actions.
-  Covers the traverse() state machine, pflagfork Flag/FlagSet wrappers, shell-specific
-  patching (bash redirects, nushell quotes, cmd-clink), the complete() dispatch flow,
-  and completion decision logic.
-  Triggers on: "carapace traverse", "completion engine", "argument traversal", "pflagfork",
-  "shell patching", "completion dispatch", "carapace complete", "flag lookup", "shorthand series".
-user-invocable: true
----
-
 # Carapace Library: Completion Engine & Traversal
 
 Reference for [carapace](https://github.com/carapace-sh/carapace)'s core completion engine — how CLI arguments are classified, traversed, and resolved to completion actions.
@@ -197,6 +184,6 @@ After traversal and invocation, `shell.Value()` applies post-processing before f
 
 ## Related Skills
 
-- **carapace-dev-pflag** — the flag extensions (Mode, Nargs, OptargDelimiter) that pflagfork reads
-- **carapace-dev-action** — the Action API that traverse() returns
-- **carapace-dev-shell** — the per-shell formatting that `shell.Value()` dispatches to
+- **references/pflag.md** — the flag extensions (Mode, Nargs, OptargDelimiter) that pflagfork reads
+- **references/action.md** — the Action API that traverse() returns
+- **references/shell.md** — the per-shell formatting that `shell.Value()` dispatches to

@@ -1,17 +1,6 @@
----
-name: carapace-dev-shell-oil
-description: >
-  Use when implementing or debugging carapace's oil shell integration — the completion
-  snippet, output format with inline \001 nospace indicator, value/description formatting,
-  and the simpler approach compared to bash. Covers the oil formatter in
-  internal/shell/oil/. Triggers on: "oil completion", "oil snippet", "oil shell",
-  "oil nospace", "carapace oil integration".
-user-invocable: true
----
-
 # Carapace Library: Oil Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s oil (OSH) completion integration — how the snippet works, how completion output is formatted, and how it differs from bash. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s oil (OSH) completion integration — how the snippet works, how completion output is formatted, and how it differs from bash. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -124,6 +113,6 @@ The nospace check in the snippet uses a hardcoded pattern `[/=@:.,$'\001']` rath
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-shell-bash** — bash integration deep dive (shares COMP_LINE/COMP_POINT mechanism)
-- **carapace-dev-shell-bash-ble** — bash BLE integration deep dive
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/shell-bash.md** — bash integration deep dive (shares COMP_LINE/COMP_POINT mechanism)
+- **references/shell-bash-ble.md** — bash BLE integration deep dive

@@ -124,17 +124,24 @@ cobra command invoked with _carapace subcommand
 /example/                    Integration test app (posix mode)
 /example-nonposix/           Integration test app (non-posix mode, go.work module)
 /third_party/                Vendored code (elvish UI, gotextdiff, envsubst, stripansi, etc.)
-/skills/                     Crush skill definitions for carapace development
-  carapace-dev-shell/           Generic shell overview + cross-shell comparisons
-  carapace-dev-shell-bash/      Bash deep dive (COMP_TYPE, COMP_WORDBREAKS, redirect patching)
-  carapace-dev-shell-bash-ble/  Bash BLE deep dive (per-candidate suffix, ble/complete/cand/yield)
-  carapace-dev-shell-oil/       Oil deep dive (inline nospace indicator, simpler snippet)
-  carapace-dev-shell-elvish/    Elvish deep dive (JSON complexCandidate, CodeSuffix, styled builtin)
-  carapace-dev-shell-fish/      Fish deep dive (tab-separated format, no nospace support)
-  carapace-dev-shell-nushell/   Nushell deep dive (JSON format, style mapping, open-quote patching)
-  carapace-dev-shell-powershell/ PowerShell deep dive (AST parsing, CompletionResult, SGR colors)
-  carapace-dev-shell-xonsh/    Xonsh deep dive (RichCompletion, prefix_len, contextual_command_completer)
-  carapace-dev-shell-zsh/       Zsh deep dive (5-state quoting machine, zstyle, named directories)
+/skills/                     Agent skill definitions
+  carapace-dev/                 Composite skill for carapace library development
+    SKILL.md                      Entry point with routing table
+    references/action.md          Action API internals
+    references/traverse.md        Completion engine & traversal
+    references/style.md           Styling system internals
+    references/shell.md           Per-shell overview & cross-shell comparisons
+    references/shell-bash.md     Bash deep dive
+    references/shell-bash-ble.md Bash BLE deep dive
+    references/shell-oil.md      Oil deep dive
+    references/shell-elvish.md   Elvish deep dive
+    references/shell-fish.md    Fish deep dive
+    references/shell-nushell.md  Nushell deep dive
+    references/shell-powershell.md PowerShell deep dive
+    references/shell-xonsh.md    Xonsh deep dive
+    references/shell-zsh.md      Zsh deep dive
+    references/pflag.md          carapace-pflag extensions (from carapace-pflag repo)
+    references/bridge.md         carapace-bridge internals (from carapace-bridge repo)
 ```
 
 ## Conventions
@@ -283,12 +290,12 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-The shell integration documentation is split into a **generic skill** (`carapace-dev-shell`) and **per-shell deep-dive skills** (`carapace-dev-shell-{bash,bash-ble,oil,zsh,fish,elvish,nushell,xonsh,powershell}`). Minor shells (tcsh, ion, cmd-clink, export) are covered only in the generic skill.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, cmd-clink, export) are covered only in `references/shell.md`.
 
 ### Structure
 
-- **`carapace-dev-shell`** — Generic overview, shared dispatch pipeline, and cross-shell comparison tables. Does NOT contain shell-specific implementation details (quoting rules, snippet walkthroughs, etc.). Contains comparison tables for nospace handling, message handling, Go-side patching, and quoting complexity.
-- **`carapace-dev-shell-{shell}`** — Shell-specific deep dive. Contains ONLY information unique to that shell. Does NOT repeat cross-shell comparisons or duplicate information from the generic skill. Each specific skill follows a consistent section order:
+- **`references/shell.md`** — Generic overview, shared dispatch pipeline, and cross-shell comparison tables. Does NOT contain shell-specific implementation details (quoting rules, snippet walkthroughs, etc.).
+- **`references/shell-{shell}.md`** — Shell-specific deep dive. Contains ONLY information unique to that shell. Follows a consistent section order:
   1. Source Files
   2. Shell Background
   3. The Snippet (with walkthrough)
@@ -303,20 +310,21 @@ The shell integration documentation is split into a **generic skill** (`carapace
 
 ### Bash Family
 
-The bash skill covers regular bash (`internal/shell/bash/`). Bash BLE (`internal/shell/bash_ble/`) and Oil (`internal/shell/oil/`) have their own separate skills because they have different output formats and snippet logic:
-- **`carapace-dev-shell-bash`** — bash only (COMP_TYPE, COMP_WORDBREAKS, redirect patching, quoting, partial completion workaround)
-- **`carapace-dev-shell-bash-ble`** — bash BLE (tab-delimited format, per-candidate suffix, ble/complete/cand/yield)
-- **`carapace-dev-shell-oil`** — oil (simpler snippet, inline `\001` nospace indicator, no patching)
+`references/shell-bash.md` covers regular bash. Bash BLE and Oil have their own deep dives:
+- **`references/shell-bash.md`** — bash only (COMP_TYPE, COMP_WORDBREAKS, redirect patching, quoting, partial completion workaround)
+- **`references/shell-bash-ble.md`** — bash BLE (tab-delimited format, per-candidate suffix, ble/complete/cand/yield)
+- **`references/shell-oil.md`** — oil (simpler snippet, inline `\001` nospace indicator, no patching)
 
 ### When Adding a New Shell Skill
 
-1. Create `skills/carapace-dev-shell-{name}/SKILL.md` following the section order above
-2. Include shell-specific details only — link to the generic skill for cross-shell comparisons
-3. Add the shell to the "Supported Shells" table in the generic skill
+1. Add `references/shell-{name}.md` to `skills/carapace-dev/` following the section order above
+2. Include shell-specific details only — link to `references/shell.md` for cross-shell comparisons
+3. Add the shell to the "Supported Shells" table in `references/shell.md`
 4. Add any new comparison rows if the shell introduces a new mechanism
+5. Update the routing table in `skills/carapace-dev/SKILL.md`
 
 ### When Updating Shell Skills
 
-- **Generic skill** (`carapace-dev-shell`): Update when adding/removing shells, or when a cross-shell mechanism changes (nospace, message handling, patching, etc.)
-- **Specific skill** (`carapace-dev-shell-{shell}`): Update when the shell's formatter, snippet, or patch logic changes
-- **Avoid duplication**: If information appears in the generic skill (comparison tables, shared dispatch), link to it rather than repeating it in the specific skill
+- **`references/shell.md`**: Update when adding/removing shells, or when a cross-shell mechanism changes
+- **`references/shell-{shell}.md`**: Update when the shell's formatter, snippet, or patch logic changes
+- **Avoid duplication**: Link to `references/shell.md` rather than repeating cross-shell comparisons

@@ -1,18 +1,6 @@
----
-name: carapace-dev-shell-bash
-description: >
-  Use when implementing or debugging carapace's bash shell integration — the completion
-  snippet, output formatting, quoting/escaping, COMP_TYPE handling, COMP_WORDBREAKS
-  word-splitting, redirect patching, open-quote retry, nospace, and the partial completion
-  workaround. Covers the bash formatter in internal/shell/bash/. Triggers on: "bash completion",
-  "bash snippet", "bash shell", "COMP_TYPE", "COMP_WORDBREAKS", "bash quoting", "bash redirect",
-  "bash nospace", "carapace bash integration".
-user-invocable: true
----
-
 # Carapace Library: Bash Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash completion integration — how the snippet works, how completion output is formatted, and how carapace handles bash-specific edge cases. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s bash completion integration — how the snippet works, how completion output is formatted, and how carapace handles bash-specific edge cases. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -223,7 +211,7 @@ Bash handles "no trailing space" as an all-or-nothing setting:
 - If ANY candidate matches the nospace suffix matcher, `compopt -o nospace` is applied globally
 - This contrasts with shells that support per-candidate nospace (zsh, elvish, nushell, etc.)
 
-For a cross-shell comparison of nospace handling, see the **carapace-dev-shell** skill.
+For a cross-shell comparison of nospace handling, see the **references/shell.md**.
 
 ## Edge Cases and Known Issues
 
@@ -282,8 +270,8 @@ User presses TAB
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-shell-bash-ble** — bash BLE integration deep dive
-- **carapace-dev-shell-oil** — oil integration deep dive
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved (bash doesn't support per-candidate styles)
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/shell-bash-ble.md** — bash BLE integration deep dive
+- **references/shell-oil.md** — oil integration deep dive
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved (bash doesn't support per-candidate styles)

@@ -1,18 +1,6 @@
----
-name: carapace-dev-shell-fish
-description: >
-  Use when implementing or debugging carapace's fish shell integration — the completion
-  snippet, output formatting, quoting/escaping, commandline built-in usage, open-quote retry,
-  tab-separated value format, nospace limitations, description display, and the fish pager.
-  Covers the fish formatter in internal/shell/fish/. Triggers on: "fish completion", "fish snippet",
-  "fish shell", "commandline -cp", "fish quoting", "fish open quote", "fish tab format",
-  "fish nospace", "fish pager", "carapace fish integration".
-user-invocable: true
----
-
 # Carapace Library: Fish Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s fish completion integration — how the snippet works, how completion output is formatted, and how carapace handles fish-specific edge cases. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s fish completion integration — how the snippet works, how completion output is formatted, and how carapace handles fish-specific edge cases. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -284,7 +272,7 @@ User presses TAB
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved (fish doesn't support per-candidate styles)
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved (fish doesn't support per-candidate styles)
 - **carapace-setup** — user-facing shell integration setup

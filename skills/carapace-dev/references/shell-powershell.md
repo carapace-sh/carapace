@@ -1,20 +1,6 @@
----
-name: carapace-dev-shell-powershell
-description: >
-  Use when implementing or debugging carapace's PowerShell shell integration — the completion
-  snippet, output formatting, JSON CompletionResult structure, quoting/escaping of special
-  characters, single-quote stripping, Comma escaping, empty string handling, nospace via
-  trailing space, SGR color rendering via `e[, tooltip mode, and Register-ArgumentCompleter
-  registration. Covers the PowerShell formatter in internal/shell/powershell/. Triggers on:
-  "powershell completion", "powershell snippet", "powershell shell", "CompletionResult",
-  "Register-ArgumentCompleter", "commandAst", "wordToComplete", "powershell quoting",
-  "powershell nospace", "powershell SGR", "carapace powershell integration".
-user-invocable: true
----
-
 # Carapace Library: PowerShell Shell Integration Deep Dive
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s PowerShell completion integration — how the snippet works, how completion output is formatted, and how carapace handles PowerShell-specific edge cases including the AST-based argument parsing, CompletionResult construction, single-quote stripping, empty string rejection, SGR color rendering, and nospace handling. For cross-shell comparisons, see the **carapace-dev-shell** skill.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s PowerShell completion integration — how the snippet works, how completion output is formatted, and how carapace handles PowerShell-specific edge cases including the AST-based argument parsing, CompletionResult construction, single-quote stripping, empty string rejection, SGR color rendering, and nospace handling. For cross-shell comparisons, see the **references/shell.md**.
 
 ## Source Files
 
@@ -485,6 +471,6 @@ This calculates the portion of the token before the cursor and passes only that 
 
 ## Related Skills
 
-- **carapace-dev-shell** — cross-shell feature comparison and shared dispatch
-- **carapace-dev-traverse** — the completion engine that produces Actions before shell formatting
-- **carapace-dev-style** — how styles are resolved before SGR rendering
+- **references/shell.md** — cross-shell feature comparison and shared dispatch
+- **references/traverse.md** — the completion engine that produces Actions before shell formatting
+- **references/style.md** — how styles are resolved before SGR rendering

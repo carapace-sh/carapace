@@ -1,15 +1,3 @@
----
-name: carapace-dev-shell
-description: >
-  Use when implementing or debugging carapace's per-shell output formatting and snippet
-  generation. Covers the 12 supported shells, shared dispatch pipeline, cross-shell feature
-  comparison, and per-shell differences. For shell-specific deep dives, use the
-  carapace-dev-shell-* skills. Triggers on: "carapace shell output", "shell formatting",
-  "shell snippet", "shell quoting", "per-shell formatting", "shell internals",
-  "shell comparison", "shell difference".
-user-invocable: true
----
-
 # Carapace Library: Per-Shell Output Formatting
 
 Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specific completion output — how `RawValues` and `Meta` are formatted for each of the 12 supported shells, and how the shells differ.
@@ -18,18 +6,18 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 
 | Shell | Snippet name | Package | Deep-dive skill |
 |-------|-------------|---------|-----------------|
-| Bash | `bash` | `internal/shell/bash/` | `carapace-dev-shell-bash` |
-| Bash BLE | `bash-ble` | `internal/shell/bash_ble/` | `carapace-dev-shell-bash-ble` |
-| Oil | `oil` | `internal/shell/oil/` | `carapace-dev-shell-oil` |
+| Bash | `bash` | `internal/shell/bash/` | `references/shell-bash.md` |
+| Bash BLE | `bash-ble` | `internal/shell/bash_ble/` | `references/shell-bash-ble.md` |
+| Oil | `oil` | `internal/shell/oil/` | `references/shell-oil.md` |
 | Cmd (Clink) | `cmd-clink` | `internal/shell/cmd_clink/` | — |
-| Elvish | `elvish` | `internal/shell/elvish/` | `carapace-dev-shell-elvish` |
-| Fish | `fish` | `internal/shell/fish/` | `carapace-dev-shell-fish` |
+| Elvish | `elvish` | `internal/shell/elvish/` | `references/shell-elvish.md` |
+| Fish | `fish` | `internal/shell/fish/` | `references/shell-fish.md` |
 | Ion | `ion` | `internal/shell/ion/` | — |
-| Nushell | `nushell` | `internal/shell/nushell/` | `carapace-dev-shell-nushell` |
-| PowerShell | `powershell` | `internal/shell/powershell/` | `carapace-dev-shell-powershell` |
+| Nushell | `nushell` | `internal/shell/nushell/` | `references/shell-nushell.md` |
+| PowerShell | `powershell` | `internal/shell/powershell/` | `references/shell-powershell.md` |
 | Tcsh | `tcsh` | `internal/shell/tcsh/` | — |
-| Xonsh | `xonsh` | `internal/shell/xonsh/` | `carapace-dev-shell-xonsh` |
-| Zsh | `zsh` | `internal/shell/zsh/` | `carapace-dev-shell-zsh` |
+| Xonsh | `xonsh` | `internal/shell/xonsh/` | `references/shell-xonsh.md` |
+| Zsh | `zsh` | `internal/shell/zsh/` | `references/shell-zsh.md` |
 | Export (JSON) | `export` | `internal/shell/export/` | — |
 
 ## Shared Dispatch: `shell.Value()`
@@ -136,15 +124,15 @@ All other shells pass arguments directly to `traverse()` without patching.
 
 ## Related Skills
 
-- **carapace-dev-shell-bash** — bash integration deep dive
-- **carapace-dev-shell-bash-ble** — bash BLE integration deep dive
-- **carapace-dev-shell-oil** — oil integration deep dive
-- **carapace-dev-shell-elvish** — elvish integration deep dive
-- **carapace-dev-shell-fish** — fish integration deep dive
-- **carapace-dev-shell-nushell** — nushell integration deep dive
-- **carapace-dev-shell-powershell** — PowerShell integration deep dive
-- **carapace-dev-shell-xonsh** — xonsh integration deep dive
-- **carapace-dev-shell-zsh** — zsh integration deep dive
+- **references/shell-bash.md** — bash integration deep dive
+- **references/shell-bash-ble.md** — bash BLE integration deep dive
+- **references/shell-oil.md** — oil integration deep dive
+- **references/shell-elvish.md** — elvish integration deep dive
+- **references/shell-fish.md** — fish integration deep dive
+- **references/shell-nushell.md** — nushell integration deep dive
+- **references/shell-powershell.md** — PowerShell integration deep dive
+- **references/shell-xonsh.md** — xonsh integration deep dive
+- **references/shell-zsh.md** — zsh integration deep dive
 - **carapace-setup** — installation and shell integration (user-facing)
-- **carapace-dev-traverse** — the completion engine that produces Actions before formatting
-- **carapace-dev-style** — how styles are resolved before shell rendering
+- **references/traverse.md** — the completion engine that produces Actions before formatting
+- **references/style.md** — how styles are resolved before shell rendering

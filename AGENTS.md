@@ -172,6 +172,13 @@ cobra command invoked with _carapace subcommand
     references/prompt-toolkit.md   Prompt-toolkit integration
     references/language-execution.md Python/shell hybrid model and execution
     references/startup-config.md   Startup, configuration, and events
+  fish/                      Fish shell in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       Fish completion system
+    references/editor.md           Editor, key bindings, autosuggestions, pager
+    references/language.md         Language fundamentals, quoting, variables, builtins
+    references/execution.md        Execution model, job control, threading
+    references/startup-config.md   Startup, configuration, XDG paths
 ```
 
 ## Conventions
@@ -320,7 +327,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Cmd-clink, elvish, and xonsh have their own composite skills (`skills/cmd-clink/`, `skills/elvish/`, and `skills/xonsh/`) for in-depth shell knowledge beyond carapace integration.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Bash, cmd-clink, elvish, xonsh, and fish have their own composite skills (`skills/bash/`, `skills/cmd-clink/`, `skills/elvish/`, `skills/xonsh/`, `skills/fish/`) for in-depth shell knowledge beyond carapace integration.
 
 ### Structure
 

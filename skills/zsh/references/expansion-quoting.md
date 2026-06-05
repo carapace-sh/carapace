@@ -39,24 +39,24 @@ echo $'\u0041'               # Unicode A
 echo $'\''                   # literal single quote
 ```
 
-|| Escape | Meaning |
-||--------|---------|
-|| `\a` | Alert/bell |
-|| `\b` | Backspace |
-|| `\e` | Escape |
-|| `\f` | Form feed |
-|| `\n` | Newline |
-|| `\r` | Carriage return |
-|| `\t` | Tab |
-|| `\v` | Vertical tab |
-|| `\\` | Backslash |
-|| `\'` | Single quote |
-|| `\"` | Double quote |
-|| `\NNN` | Octal character (1-3 digits) |
-|| `\xNN` | Hex character |
-|| `\uXXXX` | Unicode (4 hex digits) |
-|| `\UXXXXXXXX` | Unicode (8 hex digits) |
-|| `\cX` | Control character |
+| Escape | Meaning |
+|--------|---------|
+| `\a` | Alert/bell |
+| `\b` | Backspace |
+| `\e` | Escape |
+| `\f` | Form feed |
+| `\n` | Newline |
+| `\r` | Carriage return |
+| `\t` | Tab |
+| `\v` | Vertical tab |
+| `\\` | Backslash |
+| `\'` | Single quote |
+| `\"` | Double quote |
+| `\NNN` | Octal character (1-3 digits) |
+| `\xNN` | Hex character |
+| `\uXXXX` | Unicode (4 hex digits) |
+| `\UXXXXXXXX` | Unicode (8 hex digits) |
+| `\cX` | Control character |
 
 ### Backslash Escaping
 
@@ -85,62 +85,62 @@ External completion tools must detect the quoting state to properly escape candi
 
 ### Basic Forms
 
-|| Syntax | Description |
-||--------|-------------|
-|| `${name}` | Substitute value of parameter |
-|| `${+name}` | 1 if parameter is set, 0 otherwise |
-|| `${name:-word}` | Use default if unset or null |
-|| `${name-word}` | Use default if unset |
-|| `${name:=word}` | Set default if unset or null |
-|| `${name=word}` | Set default if unset |
-|| `${name::=word}` | Unconditional assignment |
-|| `${name:+word}` | Use alternate if set and non-null |
-|| `${name+word}` | Use alternate if set |
-|| `${name:?word}` | Error if unset or null |
-|| `${name?word}` | Error if unset |
+| Syntax | Description |
+|--------|-------------|
+| `${name}` | Substitute value of parameter |
+| `${+name}` | 1 if parameter is set, 0 otherwise |
+| `${name:-word}` | Use default if unset or null |
+| `${name-word}` | Use default if unset |
+| `${name:=word}` | Set default if unset or null |
+| `${name=word}` | Set default if unset |
+| `${name::=word}` | Unconditional assignment |
+| `${name:+word}` | Use alternate if set and non-null |
+| `${name+word}` | Use alternate if set |
+| `${name:?word}` | Error if unset or null |
+| `${name?word}` | Error if unset |
 
 ### Length and Pattern Removal
 
-|| Syntax | Description |
-||--------|-------------|
-|| `${#name}` | Length of value (or element count for arrays) |
-|| `${name#pattern}` | Remove shortest match from beginning |
-|| `${name##pattern}` | Remove longest match from beginning |
-|| `${name%pattern}` | Remove shortest match from end |
-|| `${name%%pattern}` | Remove longest match from end |
-|| `${name:#pattern}` | Remove array elements matching pattern |
-|| `${name/pattern/repl}` | Replace first match |
-|| `${name//pattern/repl}` | Replace all matches |
+| Syntax | Description |
+|--------|-------------|
+| `${#name}` | Length of value (or element count for arrays) |
+| `${name#pattern}` | Remove shortest match from beginning |
+| `${name##pattern}` | Remove longest match from beginning |
+| `${name%pattern}` | Remove shortest match from end |
+| `${name%%pattern}` | Remove longest match from end |
+| `${name:#pattern}` | Remove array elements matching pattern |
+| `${name/pattern/repl}` | Replace first match |
+| `${name//pattern/repl}` | Replace all matches |
 
 ### Parameter Expansion Flags
 
 Flags are applied as `${(flags)name}`:
 
-|| Flag | Description |
-||------|-------------|
-|| `@` | In double quotes, array elements become separate words |
-|| `A` | Create array parameter (`AA` for associative) |
-|| `C` | Capitalize resulting words |
-|| `f` | Split result into lines |
-|| `F` | Join array words with newlines |
-|| `i` | Sort case-insensitively |
-|| `k` | Substitute keys of associative array |
-|| `L` | Convert to lowercase |
-|| `n` | Sort numerically |
-|| `o` | Sort ascending |
-|| `O` | Sort descending |
-|| `P` | Indirect reference (value is parameter name) |
-|| `q` | Quote words with backslashes |
-|| `Q` | Remove one level of quotes |
-|| `U` | Convert to uppercase |
-|| `u` | Expand only first occurrence of unique words |
-|| `z` | Split into words using shell parsing |
-|| `0` | Split on null bytes |
-|| `~` | Force pattern interpretation |
-|| `j:string:` | Join array with string |
-|| `s:string:` | Field split on string |
-|| `l:expr::str1::str2:` | Pad left |
-|| `r:expr::str1::str2:` | Pad right |
+| Flag | Description |
+|------|-------------|
+| `@` | In double quotes, array elements become separate words |
+| `A` | Create array parameter (`AA` for associative) |
+| `C` | Capitalize resulting words |
+| `f` | Split result into lines |
+| `F` | Join array words with newlines |
+| `i` | Sort case-insensitively |
+| `k` | Substitute keys of associative array |
+| `L` | Convert to lowercase |
+| `n` | Sort numerically |
+| `o` | Sort ascending |
+| `O` | Sort descending |
+| `P` | Indirect reference (value is parameter name) |
+| `q` | Quote words with backslashes |
+| `Q` | Remove one level of quotes |
+| `U` | Convert to uppercase |
+| `u` | Expand only first occurrence of unique words |
+| `z` | Split into words using shell parsing |
+| `0` | Split on null bytes |
+| `~` | Force pattern interpretation |
+| `j:string:` | Join array with string |
+| `s:string:` | Field split on string |
+| `l:expr::str1::str2:` | Pad left |
+| `r:expr::str1::str2:` | Pad right |
 
 ### Common Completion-Related Expansions
 
@@ -155,27 +155,27 @@ ${(q)value}             # Quote value for safe insertion
 
 ### Basic Glob Operators
 
-|| Pattern | Description |
-||---------|-------------|
-|| `*` | Match any string (including null) |
-|| `?` | Match any single character |
-|| `[...]` | Match any character in set |
-|| `[^...]` / `[!...]` | Match any character NOT in set |
-|| `<x-y>` | Match any number from x to y |
-|| `(pat)` | Group pattern |
-|| `x\|y` | Match x OR y (requires `EXTENDED_GLOB`) |
-|| `x#` | Zero or more of x (`EXTENDED_GLOB`) |
-|| `x##` | One or more of x (`EXTENDED_GLOB`) |
-|| `^x` | Match anything except x (`EXTENDED_GLOB`) |
-|| `x~y` | Match x but NOT y (`EXTENDED_GLOB`) |
+| Pattern | Description |
+|---------|-------------|
+| `*` | Match any string (including null) |
+| `?` | Match any single character |
+| `[...]` | Match any character in set |
+| `[^...]` / `[!...]` | Match any character NOT in set |
+| `<x-y>` | Match any number from x to y |
+| `(pat)` | Group pattern |
+| `x\|y` | Match x OR y (requires `EXTENDED_GLOB`) |
+| `x#` | Zero or more of x (`EXTENDED_GLOB`) |
+| `x##` | One or more of x (`EXTENDED_GLOB`) |
+| `^x` | Match anything except x (`EXTENDED_GLOB`) |
+| `x~y` | Match x but NOT y (`EXTENDED_GLOB`) |
 
 ### Recursive Globbing
 
-|| Pattern | Description |
-||---------|-------------|
-|| `**/` | Zero or more directories (recursive) |
-|| `***/` | Like `**/` but follows symlinks |
-|| `(*/)#` | Zero or more directory matches |
+| Pattern | Description |
+|---------|-------------|
+| `**/` | Zero or more directories (recursive) |
+| `***/` | Like `**/` but follows symlinks |
+| `(*/)#` | Zero or more directory matches |
 
 ### Glob Qualifiers (trailing parentheses)
 
@@ -189,72 +189,72 @@ ls *(om[1,5])   # 5 most recently modified files
 ls *(^@)        # everything except symlinks
 ```
 
-|| Qualifier | Description |
-||-----------|-------------|
-|| `/` | Directories |
-|| `.` | Plain files |
-|| `@` | Symbolic links |
-|| `=` | Sockets |
-|| `p` | Named pipes (FIFOs) |
-|| `*` | Executable files |
-|| `%` | Device files |
-|| `r`/`w`/`x` | Owner read/write/execute |
-|| `A`/`I`/`E` | Group read/write/execute |
-|| `R`/`W`/`X` | World read/write/execute |
-|| `s` | Setuid files |
-|| `S` | Setgid files |
-|| `t` | Sticky bit |
-|| `U` | Owned by effective user |
-|| `G` | Owned by effective group |
-|| `u:id:` | Owned by user |
-|| `g:id:` | Owned by group |
-|| `a[Mwhms][-/+]n` | Accessed n days ago |
-|| `m[Mwhms][-/+]n` | Modified n days ago |
-|| `c[Mwhms][-/+]n` | Changed n days ago |
-|| `L[+/-]n` | Size comparison (bytes) |
-|| `^` | Negate following qualifiers |
-|| `-` | Toggle symlink following |
-|| `M` | Mark directories |
-|| `T` | Append type mark |
-|| `N` | Null glob for this pattern |
-|| `D` | Glob dots (include hidden files) |
-|| `n` | Numeric sort |
-|| `o:c:` | Sort by criteria |
-|| `O:c:` | Sort descending |
-|| `[beg,end]` | Range of results |
-|| `:modifier` | Apply history modifier |
+| Qualifier | Description |
+|-----------|-------------|
+| `/` | Directories |
+| `.` | Plain files |
+| `@` | Symbolic links |
+| `=` | Sockets |
+| `p` | Named pipes (FIFOs) |
+| `*` | Executable files |
+| `%` | Device files |
+| `r`/`w`/`x` | Owner read/write/execute |
+| `A`/`I`/`E` | Group read/write/execute |
+| `R`/`W`/`X` | World read/write/execute |
+| `s` | Setuid files |
+| `S` | Setgid files |
+| `t` | Sticky bit |
+| `U` | Owned by effective user |
+| `G` | Owned by effective group |
+| `u:id:` | Owned by user |
+| `g:id:` | Owned by group |
+| `a[Mwhms][-/+]n` | Accessed n days ago |
+| `m[Mwhms][-/+]n` | Modified n days ago |
+| `c[Mwhms][-/+]n` | Changed n days ago |
+| `L[+/-]n` | Size comparison (bytes) |
+| `^` | Negate following qualifiers |
+| `-` | Toggle symlink following |
+| `M` | Mark directories |
+| `T` | Append type mark |
+| `N` | Null glob for this pattern |
+| `D` | Glob dots (include hidden files) |
+| `n` | Numeric sort |
+| `o:c:` | Sort by criteria |
+| `O:c:` | Sort descending |
+| `[beg,end]` | Range of results |
+| `:modifier` | Apply history modifier |
 
 ### Globbing Flags (Extended Glob)
 
 Flags appear before the pattern in `(#flag)` syntax:
 
-|| Flag | Description |
-||------|-------------|
-|| `(#i)` | Case insensitive |
-|| `(#l)` | Lowercase matches both cases |
-|| `(#I)` | Case sensitive (negate i/l) |
-|| `(#b)` | Activate backreferences (capture groups) |
-|| `(#B)` | Deactivate backreferences |
-|| `(#cN,M)` | Repeat N to M times |
-|| `(#m)` | Set `$MATCH`, `$MBEGIN`, `$MEND` |
-|| `(#aN)` | Approximate matching (N errors) |
-|| `(#s)` | Match at start of string |
-|| `(#e)` | Match at end of string |
-|| `(#q)` | Ignore for pattern matching (use qualifiers only) |
-|| `(#u)` | Respect locale for multibyte |
-|| `(#U)` | Single byte mode |
+| Flag | Description |
+|------|-------------|
+| `(#i)` | Case insensitive |
+| `(#l)` | Lowercase matches both cases |
+| `(#I)` | Case sensitive (negate i/l) |
+| `(#b)` | Activate backreferences (capture groups) |
+| `(#B)` | Deactivate backreferences |
+| `(#cN,M)` | Repeat N to M times |
+| `(#m)` | Set `$MATCH`, `$MBEGIN`, `$MEND` |
+| `(#aN)` | Approximate matching (N errors) |
+| `(#s)` | Match at start of string |
+| `(#e)` | Match at end of string |
+| `(#q)` | Ignore for pattern matching (use qualifiers only) |
+| `(#u)` | Respect locale for multibyte |
+| `(#U)` | Single byte mode |
 
 The `(#b)` flag is particularly important for completion — it enables capture groups in `zstyle list-colors` patterns, allowing different parts of a completion display to be colored differently.
 
 ### ksh-like Glob Operators (with `KSH_GLOB`)
 
-|| Pattern | Description |
-||---------|-------------|
-|| `@(pat)` | Match pattern exactly once |
-|| `*(pat)` | Match zero or more times |
-|| `+(pat)` | Match one or more times |
-|| `?(pat)` | Match zero or one time |
-|| `!(pat)` | Match anything except |
+| Pattern | Description |
+|---------|-------------|
+| `@(pat)` | Match pattern exactly once |
+| `*(pat)` | Match zero or more times |
+| `+(pat)` | Match one or more times |
+| `?(pat)` | Match zero or one time |
+| `!(pat)` | Match anything except |
 
 ## Expansion Order
 

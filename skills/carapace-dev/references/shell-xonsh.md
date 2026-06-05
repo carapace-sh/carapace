@@ -4,8 +4,8 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh comple
 
 ## Source Files
 
-|| File | Purpose |
-||------|---------|
+| File | Purpose |
+|------|---------|
 | `internal/shell/xonsh/snippet.go` | Xonsh completion script generation (Python `@contextual_command_completer`) |
 | `internal/shell/xonsh/action.go` | Value formatting, JSON serialization, quoting/nospace logic |
 | `internal/shell/xonsh/style.go` | Style conversion from carapace format to xonsh `bg:/fg:` format |
@@ -94,8 +94,8 @@ class RichCompletion(str):
     ):
 ```
 
-|| Field | Type | Default | Purpose |
-||-------|------|---------|---------|
+| Field | Type | Default | Purpose |
+|-------|------|---------|---------|
 | `value` | `str` | (required) | The completion value (also the string value via `str.__new__`) |
 | `prefix_len` | `int \| None` | `None` | Length of prefix to replace; `None` = use default prefix len |
 | `display` | `str \| None` | `None` | Display text; if set, common prefix stripping is disabled |
@@ -131,8 +131,8 @@ add_one_completer(name, func, pos='start')
 
 Registers a completer in xonsh's `OrderedDict` of completers. The `pos` parameter controls insertion order:
 
-|| Position | Behavior |
-||----------|----------|
+| Position | Behavior |
+|----------|----------|
 | `'start'` | Insert at the beginning (highest priority) |
 | `'end'` | Insert at the end (lowest priority) |
 | Other string | Insert **after** the completer with that name |

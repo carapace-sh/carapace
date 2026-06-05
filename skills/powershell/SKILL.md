@@ -19,13 +19,13 @@ Comprehensive reference for PowerShell internals, with emphasis on the completio
 
 Load the reference that matches your task. When in doubt, load multiple references.
 
-|| Keywords | Reference |
-||----------|----------|
-|| Register-ArgumentCompleter, ArgumentCompleter, ArgumentCompletions, TabExpansion2, CommandCompletion, CompletionResult, CompletionResultType, CommandAst, CompletionAnalysis, CompletionCompleters, CompleteInput, native mode, parameter mode, NativeFallback, completion registration, completion routing, pseudo parameter binding, type inference, ValidateSet, ending keys, completion display, nospace, CompletionContext | [references/completion.md](references/completion.md) |
-|| PSReadLine, Set-PSReadLineKeyHandler, Set-PSReadLineOption, edit mode, emacs, vi, MenuComplete, TabCompleteNext, PossibleCompletions, completion menu, menu rendering, column layout, tooltip, selection color, prediction, IPredictor, Predictive IntelliSense, InlineView, ListView, CommandPrediction, prediction plugin, PSConsoleReadLine, key binding, custom handler, rendering pipeline, token coloring, differential rendering | [references/editor.md](references/editor.md) |
-|| $PSStyle, ANSI escape, VT100, SGR, Write-Host, ForegroundColor, BackColor, virtual terminal, escape sequence, `` `e ``, CSI, true color, FromRgb, OutputRendering, StringDecorated, terminal rendering, console color, formatting color, FileInfo coloring, progress bar | [references/styling.md](references/styling.md) |
-|| quoting, single quotes, double quotes, here-strings, backtick, escape character, variable expansion, subexpression, argument passing, native command, stop-parsing, --%, PSNativeCommandArgumentPassing, Legacy, Standard, Windows mode, comma, pipeline, parameter binding, expression mode, argument mode | [references/language.md](references/language.md) |
-|| profile, $PROFILE, AllUsers, CurrentUser, startup, powershell.config.json, execution policy, $PSHOME, PSModulePath, experimental features, configuration, Group Policy, logging, transcription, script block logging, module logging | [references/startup-config.md](references/startup-config.md) |
+| Keywords | Reference |
+|----------|----------|
+| Register-ArgumentCompleter, ArgumentCompleter, ArgumentCompletions, TabExpansion2, CommandCompletion, CompletionResult, CompletionResultType, CommandAst, CompletionAnalysis, CompletionCompleters, CompleteInput, native mode, parameter mode, NativeFallback, completion registration, completion routing, pseudo parameter binding, type inference, ValidateSet, ending keys, completion display, nospace, CompletionContext | [references/completion.md](references/completion.md) |
+| PSReadLine, Set-PSReadLineKeyHandler, Set-PSReadLineOption, edit mode, emacs, vi, MenuComplete, TabCompleteNext, PossibleCompletions, completion menu, menu rendering, column layout, tooltip, selection color, prediction, IPredictor, Predictive IntelliSense, InlineView, ListView, CommandPrediction, prediction plugin, PSConsoleReadLine, key binding, custom handler, rendering pipeline, token coloring, differential rendering | [references/editor.md](references/editor.md) |
+| $PSStyle, ANSI escape, VT100, SGR, Write-Host, ForegroundColor, BackColor, virtual terminal, escape sequence, `` `e ``, CSI, true color, FromRgb, OutputRendering, StringDecorated, terminal rendering, console color, formatting color, FileInfo coloring, progress bar | [references/styling.md](references/styling.md) |
+| quoting, single quotes, double quotes, here-strings, backtick, escape character, variable expansion, subexpression, argument passing, native command, stop-parsing, --%, PSNativeCommandArgumentPassing, Legacy, Standard, Windows mode, comma, pipeline, parameter binding, expression mode, argument mode | [references/language.md](references/language.md) |
+| profile, $PROFILE, AllUsers, CurrentUser, startup, powershell.config.json, execution policy, $PSHOME, PSModulePath, experimental features, configuration, Group Policy, logging, transcription, script block logging, module logging | [references/startup-config.md](references/startup-config.md) |
 
 ## Quick Guide
 

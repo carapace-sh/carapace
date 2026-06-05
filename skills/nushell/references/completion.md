@@ -103,14 +103,14 @@ The closure can return:
 ]
 ```
 
-|| Field | Type | Required | Purpose |
-||-------|------|----------|---------|
-|| `value` | string | Yes | Text inserted into the command line |
-|| `display` | string | No | Text shown in the completion menu (defaults to `value`) |
-|| `description` | string | No | Help text shown alongside the suggestion |
-|| `style` | string or record | No | Styling — color name, hex code, or `{fg, bg, attr}` record |
-|| `span` | record | No | `{start: int, end: int}` byte range to replace (nushell computes if omitted) |
-|| `append_whitespace` | bool | No | Whether to auto-append trailing space after insertion (defaults to `false`) |
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `value` | string | Yes | Text inserted into the command line |
+| `display` | string | No | Text shown in the completion menu (defaults to `value`) |
+| `description` | string | No | Help text shown alongside the suggestion |
+| `style` | string or record | No | Styling — color name, hex code, or `{fg, bg, attr}` record |
+| `span` | record | No | `{start: int, end: int}` byte range to replace (nushell computes if omitted) |
+| `append_whitespace` | bool | No | Whether to auto-append trailing space after insertion (defaults to `false`) |
 
 ### Carapace Integration
 

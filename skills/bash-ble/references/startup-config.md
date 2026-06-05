@@ -52,11 +52,11 @@ The `--attach=none` flag defers attachment, which is completed by calling `ble-a
 
 ### Attachment Strategies
 
-|| Strategy | Description |
-||----------|-------------|
-|| `attach` | Immediately after sourcing |
-|| `prompt` | Deferred via PROMPT_COMMAND |
-|| `none` | Manual `ble-attach` required |
+| Strategy | Description |
+|----------|-------------|
+| `attach` | Immediately after sourcing |
+| `prompt` | Deferred via PROMPT_COMMAND |
+| `none` | Manual `ble-attach` required |
 
 ## Initialization Sequence
 
@@ -76,22 +76,22 @@ The `--attach=none` flag defers attachment, which is completed by calling `ble-a
 
 ## XDG Directory Layout
 
-|| Variable | Path | Purpose |
-||----------|------|---------|
-|| `_ble_base` | `~/.local/share/blesh` | Installation directory |
-|| `_ble_base_run` | `${XDG_RUNTIME_DIR:-/tmp}/blesh/$UID` | Ephemeral runtime |
-|| `_ble_base_cache` | `${XDG_CACHE_HOME:-$HOME/.cache}/blesh` | Persistent cache |
-|| `_ble_base_state` | `${XDG_STATE_HOME:-$HOME/.local/state}/blesh` | Persistent state |
+| Variable | Path | Purpose |
+|----------|------|---------|
+| `_ble_base` | `~/.local/share/blesh` | Installation directory |
+| `_ble_base_run` | `${XDG_RUNTIME_DIR:-/tmp}/blesh/$UID` | Ephemeral runtime |
+| `_ble_base_cache` | `${XDG_CACHE_HOME:-$HOME/.cache}/blesh` | Persistent cache |
+| `_ble_base_state` | `${XDG_STATE_HOME:-$HOME/.local/state}/blesh` | Persistent state |
 
 ## Configuration Files
 
 ### Search Order
 
-|| Priority | Path | Description |
-||----------|------|-------------|
-|| 1 | `--rcfile FILE` argument | Explicit config file |
-|| 2 | `~/.blerc` | User config in home directory |
-|| 3 | `${XDG_CONFIG_HOME:-$HOME/.config}/blesh/init.sh` | XDG-compliant path |
+| Priority | Path | Description |
+|----------|------|-------------|
+| 1 | `--rcfile FILE` argument | Explicit config file |
+| 2 | `~/.blerc` | User config in home directory |
+| 3 | `${XDG_CONFIG_HOME:-$HOME/.config}/blesh/init.sh` | XDG-compliant path |
 
 ### blerc Template
 
@@ -151,20 +151,20 @@ bleopt opt-=value              # Remove from colon-separated list
 
 ### Common Options
 
-|| Category | Option | Default | Description |
-||----------|--------|---------|-------------|
-|| Input | `input_encoding` | `UTF-8` | Character encoding |
-|| Highlight | `highlight_syntax` | `1` | Enable syntax highlighting |
-|| Highlight | `highlight_filename` | `1` | Highlight filenames |
-|| Highlight | `highlight_variable` | `1` | Highlight variable types |
-|| Complete | `complete_auto_complete` | `1` | Enable auto-completion |
-|| Complete | `complete_menu_complete` | `1` | Enable TAB menu completion |
-|| Complete | `complete_menu_style` | `align-nowrap` | Menu rendering style |
-|| Edit | `edit_line_type` | `graphical` | Line type for beginning/end |
-|| Edit | `edit_vim_mode` | `emacs` | Default editing mode |
-|| History | `history_share` | `''` | Share history between sessions |
-|| Display | `prompt_eol_mark` | `↵` | End-of-line marker |
-|| Display | `exec_errexit_mark` | (set) | Error exit marker |
+| Category | Option | Default | Description |
+|----------|--------|---------|-------------|
+| Input | `input_encoding` | `UTF-8` | Character encoding |
+| Highlight | `highlight_syntax` | `1` | Enable syntax highlighting |
+| Highlight | `highlight_filename` | `1` | Highlight filenames |
+| Highlight | `highlight_variable` | `1` | Highlight variable types |
+| Complete | `complete_auto_complete` | `1` | Enable auto-completion |
+| Complete | `complete_menu_complete` | `1` | Enable TAB menu completion |
+| Complete | `complete_menu_style` | `align-nowrap` | Menu rendering style |
+| Edit | `edit_line_type` | `graphical` | Line type for beginning/end |
+| Edit | `edit_vim_mode` | `emacs` | Default editing mode |
+| History | `history_share` | `''` | Share history between sessions |
+| Display | `prompt_eol_mark` | `↵` | End-of-line marker |
+| Display | `exec_errexit_mark` | (set) | Error exit marker |
 
 ### Disabling Features
 
@@ -194,17 +194,17 @@ blehook/eval-after-load MODULE FN     # Deferred registration
 
 ### Core Hooks
 
-|| Hook | When Triggered |
-||------|----------------|
-|| `PRECMD` | Before each prompt |
-|| `PREEXEC` | Before command execution |
-|| `POSTEXEC` | After command execution |
-|| `complete_load` | When completion system loads |
-|| `keymap_emacs` | When Emacs keymap loads |
-|| `keymap_vi` | When Vi keymap loads |
-|| `EDIT_BEFORE_HOOK` | Before editing operations |
-|| `EDIT_AFTER_HOOK` | After editing operations |
-|| `DECODE_HOOK` | During key decoding |
+| Hook | When Triggered |
+|------|----------------|
+| `PRECMD` | Before each prompt |
+| `PREEXEC` | Before command execution |
+| `POSTEXEC` | After command execution |
+| `complete_load` | When completion system loads |
+| `keymap_emacs` | When Emacs keymap loads |
+| `keymap_vi` | When Vi keymap loads |
+| `EDIT_BEFORE_HOOK` | Before editing operations |
+| `EDIT_AFTER_HOOK` | After editing operations |
+| `DECODE_HOOK` | During key decoding |
 
 ### Usage Patterns
 
@@ -240,16 +240,16 @@ ble-import -C 'code' module_name # Run code after module loads
 
 ### Available Modules
 
-|| Module | Description |
-||--------|-------------|
-|| `core-complete` | Core completion definitions |
-|| `core-syntax` | Core syntax parsing |
-|| `config/readline` | Readline compatibility layer |
-|| `integration/fzf-completion` | fzf fuzzy finder completion |
-|| `integration/fzf-key-bindings` | fzf key bindings |
-|| `vim-surround` | Vim surround plugin |
-|| `vim-arpeggio` | Vim arpeggio plugin |
-|| `vim-airline` | Vim airline plugin |
+| Module | Description |
+|--------|-------------|
+| `core-complete` | Core completion definitions |
+| `core-syntax` | Core syntax parsing |
+| `config/readline` | Readline compatibility layer |
+| `integration/fzf-completion` | fzf fuzzy finder completion |
+| `integration/fzf-key-bindings` | fzf key bindings |
+| `vim-surround` | Vim surround plugin |
+| `vim-arpeggio` | Vim arpeggio plugin |
+| `vim-airline` | Vim airline plugin |
 
 ### Custom Import Paths
 
@@ -259,25 +259,25 @@ bleopt import_path="${XDG_DATA_HOME:-$HOME/.local/share}/blesh/local"
 
 ## Module Organization
 
-|| Directory | Purpose | Key Files |
-||-----------|---------|-----------|
-|| `ble.pp` | Bootstrap/preproc | Main entry with module includes |
-|| `src/` | Core runtime | `util.sh`, `decode.sh`, `edit.sh`, `color.sh`, `canvas.sh`, `history.sh` |
-|| `lib/` | Feature modules | `core-syntax.sh`, `core-complete.sh`, `keymap.vi.sh`, `keymap.emacs.sh` |
-|| `contrib/` | Optional integrations | Third-party tool integrations |
+| Directory | Purpose | Key Files |
+|-----------|---------|-----------|
+| `ble.pp` | Bootstrap/preproc | Main entry with module includes |
+| `src/` | Core runtime | `util.sh`, `decode.sh`, `edit.sh`, `color.sh`, `canvas.sh`, `history.sh` |
+| `lib/` | Feature modules | `core-syntax.sh`, `core-complete.sh`, `keymap.vi.sh`, `keymap.emacs.sh` |
+| `contrib/` | Optional integrations | Third-party tool integrations |
 
 ## Integration with External Tools
 
 ble.sh integrates with several external tools:
 
-|| Tool | Integration |
-||------|-------------|
-|| **bash-completion** | Loads completion specs via `_comp_load` |
-|| **fzf** | `ble-import integration/fzf-completion` |
-|| **carapace** | Uses `ble/complete/cand/yield` with `mandb` action for descriptions |
-|| **zoxide** | Smart directory jumping |
-|| **atuin** | Shell history database |
-|| **Readline** | `ble-import config/readline` for `.inputrc` compatibility |
+| Tool | Integration |
+|------|-------------|
+| **bash-completion** | Loads completion specs via `_comp_load` |
+| **fzf** | `ble-import integration/fzf-completion` |
+| **carapace** | Uses `ble/complete/cand/yield` with `mandb` action for descriptions |
+| **zoxide** | Smart directory jumping |
+| **atuin** | Shell history database |
+| **Readline** | `ble-import config/readline` for `.inputrc` compatibility |
 
 ## Version Differences
 

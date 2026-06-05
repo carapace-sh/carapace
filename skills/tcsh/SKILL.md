@@ -17,13 +17,13 @@ Comprehensive reference for tcsh shell internals, with emphasis on the completio
 
 Load the reference that matches your task. When in doubt, load multiple references.
 
-|| Keywords | Reference |
-||----------|----------|
-|| complete, uncomplete, COMMAND_LINE, p/c/n/N word spec, list types, select pattern, suffix, addsuffix, autolist, fignore, complete enhance, recexact, listmax, listmaxrows, tenematch, tw_complete, tw_result, complete-word, list-choices, complete-word-raw, complete-word-fwd, complete-word-back, external command completion, backtick completion, COMP_WORDBREAKS, wordchars, spelling correction, autocorrect, correct variable | [references/completion.md](references/completion.md) |
-|| bindkey, editor, emacs mode, vi mode, vimode, key binding, editing commands, wordchars, complete-word, list-choices, history-search, i-search, dabbrev-expand, expand-history, expand-glob, normalize-command, which-command, run-help, prompt, rprompt, prompt2, prompt3, visiblebell, color, ls-F | [references/editor.md](references/editor.md) |
-|| quoting, single quotes, double quotes, backslash, backtick, backslash_quote, variable expansion, $name, ${name}, command substitution, history expansion, !, alias expansion, globbing, filename substitution, *, ?, [...], brace expansion, tilde expansion, globstar, nonomatch, noglob, fignore, csubstnonl | [references/quoting-expansion.md](references/quoting-expansion.md) |
-|| execution, pipeline, job control, background, foreground, suspend, stop, notify, nohup, hup, onintr, signal, trap, autologout, exit, exec, source, repeat, foreach, while, if, switch, goto, cdpath, hash, rehash, noclobber, redirect, pipefail | [references/execution.md](references/execution.md) |
-|| startup, .tcshrc, .cshrc, .login, .logout, /etc/csh.cshrc, /etc/csh.login, /etc/csh.logout, login shell, interactive shell, set, setenv, unset, unsetenv, shell variables, environment variables, path, cwd, home, history, savehist, histfile, prompt, term, tcsh version, -f flag, -l flag, -m flag | [references/startup-config.md](references/startup-config.md) |
+| Keywords | Reference |
+|----------|----------|
+| complete, uncomplete, COMMAND_LINE, p/c/n/N word spec, list types, select pattern, suffix, addsuffix, autolist, fignore, complete enhance, recexact, listmax, listmaxrows, tenematch, tw_complete, tw_result, complete-word, list-choices, complete-word-raw, complete-word-fwd, complete-word-back, external command completion, backtick completion, COMP_WORDBREAKS, wordchars, spelling correction, autocorrect, correct variable | [references/completion.md](references/completion.md) |
+| bindkey, editor, emacs mode, vi mode, vimode, key binding, editing commands, wordchars, complete-word, list-choices, history-search, i-search, dabbrev-expand, expand-history, expand-glob, normalize-command, which-command, run-help, prompt, rprompt, prompt2, prompt3, visiblebell, color, ls-F | [references/editor.md](references/editor.md) |
+| quoting, single quotes, double quotes, backslash, backtick, backslash_quote, variable expansion, $name, ${name}, command substitution, history expansion, !, alias expansion, globbing, filename substitution, *, ?, [...], brace expansion, tilde expansion, globstar, nonomatch, noglob, fignore, csubstnonl | [references/quoting-expansion.md](references/quoting-expansion.md) |
+| execution, pipeline, job control, background, foreground, suspend, stop, notify, nohup, hup, onintr, signal, trap, autologout, exit, exec, source, repeat, foreach, while, if, switch, goto, cdpath, hash, rehash, noclobber, redirect, pipefail | [references/execution.md](references/execution.md) |
+| startup, .tcshrc, .cshrc, .login, .logout, /etc/csh.cshrc, /etc/csh.login, /etc/csh.logout, login shell, interactive shell, set, setenv, unset, unsetenv, shell variables, environment variables, path, cwd, home, history, savehist, histfile, prompt, term, tcsh version, -f flag, -l flag, -m flag | [references/startup-config.md](references/startup-config.md) |
 
 ## Quick Guide
 

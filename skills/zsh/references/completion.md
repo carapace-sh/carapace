@@ -22,22 +22,22 @@ The `completer` zstyle determines which strategies are tried, in order:
 zstyle ':completion:*' completer _complete _ignored _approximate
 ```
 
-|| Completer | Purpose |
-||----------|---------|
-|| `_complete` | Normal contextual completion |
-|| `_approximate` | Allow corrections (controlled by `max-errors` style) |
-|| `_correct` | Generate corrections only (spell-check) |
-|| `_expand` | Expand word (variables, braces, etc.) |
-|| `_expand_alias` | Expand aliases |
-|| `_history` | Complete from command history |
-|| `_ignored` | Restore matches suppressed by `ignored-patterns` |
-|| `_list` | Delay insertion until second completion attempt |
-|| `_match` | Pattern matching completion |
-|| `_menu` | Enable menu completion |
-|| `_oldlist` | Use existing completion list with new completions |
-|| `_prefix` | Complete ignoring suffix |
-|| `_user_expand` | User-defined expansions |
-|| `_all_matches` | Add string with all matches |
+| Completer | Purpose |
+|----------|---------|
+| `_complete` | Normal contextual completion |
+| `_approximate` | Allow corrections (controlled by `max-errors` style) |
+| `_correct` | Generate corrections only (spell-check) |
+| `_expand` | Expand word (variables, braces, etc.) |
+| `_expand_alias` | Expand aliases |
+| `_history` | Complete from command history |
+| `_ignored` | Restore matches suppressed by `ignored-patterns` |
+| `_list` | Delay insertion until second completion attempt |
+| `_match` | Pattern matching completion |
+| `_menu` | Enable menu completion |
+| `_oldlist` | Use existing completion list with new completions |
+| `_prefix` | Complete ignoring suffix |
+| `_user_expand` | User-defined expansions |
+| `_all_matches` | Add string with all matches |
 
 Each completer is tried in sequence; if one produces matches, later completers may still be tried depending on configuration.
 
@@ -59,14 +59,14 @@ autoload -U compinit && compinit
 
 ### compinit Options
 
-|| Option | Description |
-||--------|-------------|
-|| `-D` | Disable dump file creation |
-|| `-d dumpfile` | Specify dump file location (default: `$ZDOTDIR/.zshcompdump` or `~/.zcompdump`) |
-|| `-C` | Skip security checks, use cached dump if it exists (fastest) |
-|| `-u` | Use insecure files without asking |
-|| `-i` | Silently ignore insecure files |
-|| `-n` | Skip function check (don't check if functions exist) |
+| Option | Description |
+|--------|-------------|
+| `-D` | Disable dump file creation |
+| `-d dumpfile` | Specify dump file location (default: `$ZDOTDIR/.zshcompdump` or `~/.zcompdump`) |
+| `-C` | Skip security checks, use cached dump if it exists (fastest) |
+| `-u` | Use insecure files without asking |
+| `-i` | Silently ignore insecure files |
+| `-n` | Skip function check (don't check if functions exist) |
 
 ### Security Model
 
@@ -139,26 +139,26 @@ This is the primary lookup table used during completion dispatch.
 
 When a completion function is invoked, zsh sets these parameters:
 
-|| Parameter | Type | Description |
-||-----------|------|-------------|
-|| `words` | Array | All words on the command line (1-based indexing) |
-|| `CURRENT` | Integer | 1-based index of the word being completed in `words` |
-|| `PREFIX` | String | Text before cursor in the current word |
-|| `SUFFIX` | String | Text after cursor in the current word |
-|| `IPREFIX` | String | Initial prefix (ignored for matching but inserted) |
-|| `ISUFFIX` | String | Initial suffix (ignored for matching but inserted) |
-|| `QIPREFIX` | String | Quoted version of IPREFIX |
-|| `QISUFFIX` | String | Quoted version of ISUFFIX |
-|| `curcontext` | String | Current context string (e.g., `:complete:git:`) |
-|| `NORMARG` | Integer | Position of first normal (non-option) argument |
-|| `opt_args` | Assoc Array | Parsed option arguments (key: option name, value: argument) |
-|| `line` | Array | Command and arguments array (set by `_arguments`) |
-|| `state` | Array | State strings from `->state` actions in `_arguments` |
-|| `state_descr` | Assoc Array | Descriptions for each state |
-|| `context` | Array | Context strings for state processing |
-|| `service` | String | Current service being completed |
-|| `_compskip` | String | Set to skip further completion (`-`, `*`, `patterns`) |
-|| `expl` | Array | Explanation options array (by convention, set by `_description`) |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `words` | Array | All words on the command line (1-based indexing) |
+| `CURRENT` | Integer | 1-based index of the word being completed in `words` |
+| `PREFIX` | String | Text before cursor in the current word |
+| `SUFFIX` | String | Text after cursor in the current word |
+| `IPREFIX` | String | Initial prefix (ignored for matching but inserted) |
+| `ISUFFIX` | String | Initial suffix (ignored for matching but inserted) |
+| `QIPREFIX` | String | Quoted version of IPREFIX |
+| `QISUFFIX` | String | Quoted version of ISUFFIX |
+| `curcontext` | String | Current context string (e.g., `:complete:git:`) |
+| `NORMARG` | Integer | Position of first normal (non-option) argument |
+| `opt_args` | Assoc Array | Parsed option arguments (key: option name, value: argument) |
+| `line` | Array | Command and arguments array (set by `_arguments`) |
+| `state` | Array | State strings from `->state` actions in `_arguments` |
+| `state_descr` | Assoc Array | Descriptions for each state |
+| `context` | Array | Context strings for state processing |
+| `service` | String | Current service being completed |
+| `_compskip` | String | Set to skip further completion (`-`, `*`, `patterns`) |
+| `expl` | Array | Explanation options array (by convention, set by `_description`) |
 
 ### Key Differences from Bash
 
@@ -189,56 +189,56 @@ compadd [ -akqQfenUl12C ] [ -F array ]
 
 ### Display and Insertion Control
 
-|| Option | Description |
-||--------|-------------|
-|| `-P prefix` | String inserted before each match; not part of match, metacharacters not quoted |
-|| `-S suffix` | String inserted after each match (e.g., `-S '='` for `--flag=`) |
-|| `-p hidden-prefix` | Inserted before match but not shown in listings; must be matched unless `-U` given |
-|| `-s hidden-suffix` | Inserted after match but hidden from listings |
-|| `-i ignored-prefix` | Inserted before `-P` string; part of match but not shown |
-|| `-I ignored-suffix` | Like `-i`, but for suffix |
-|| `-d array` | Per-match display strings; shows array element instead of word |
-|| `-l` | With `-d`: display strings listed one per line, not in columns |
-|| `-o` | With `-d`: order output by match strings (not display strings) |
-|| `-q` | Suffix from `-S` auto-removed if next char is blank, inserts nothing, or same char |
-|| `-r remove-chars` | Suffix removed if next char inserts one of these characters (character class syntax) |
-|| `-R remove-func` | Function called after suffix accepted; passed suffix length as argument |
-|| `-Q` | Don't quote metacharacters when inserting (completer handles its own quoting) |
-|| `-n` | Words are matches but don't appear in listings (hidden matches) |
+| Option | Description |
+|--------|-------------|
+| `-P prefix` | String inserted before each match; not part of match, metacharacters not quoted |
+| `-S suffix` | String inserted after each match (e.g., `-S '='` for `--flag=`) |
+| `-p hidden-prefix` | Inserted before match but not shown in listings; must be matched unless `-U` given |
+| `-s hidden-suffix` | Inserted after match but hidden from listings |
+| `-i ignored-prefix` | Inserted before `-P` string; part of match but not shown |
+| `-I ignored-suffix` | Like `-i`, but for suffix |
+| `-d array` | Per-match display strings; shows array element instead of word |
+| `-l` | With `-d`: display strings listed one per line, not in columns |
+| `-o` | With `-d`: order output by match strings (not display strings) |
+| `-q` | Suffix from `-S` auto-removed if next char is blank, inserts nothing, or same char |
+| `-r remove-chars` | Suffix removed if next char inserts one of these characters (character class syntax) |
+| `-R remove-func` | Function called after suffix accepted; passed suffix length as argument |
+| `-Q` | Don't quote metacharacters when inserting (completer handles its own quoting) |
+| `-n` | Words are matches but don't appear in listings (hidden matches) |
 
 ### Grouping and Explanation
 
-|| Option | Description |
-||--------|-------------|
-|| `-J name` | Name of sorted group for matches |
-|| `-V name` | Like `-J` but for unsorted group (preserves insertion order) |
-|| `-1` | With `-V`: only remove consecutive duplicates |
-|| `-2` | With `-J` or `-V`: keep all duplicates |
-|| `-X explanation` | String printed above matches listing |
-|| `-x message` | Like `-X` but printed even if no matches |
+| Option | Description |
+|--------|-------------|
+| `-J name` | Name of sorted group for matches |
+| `-V name` | Like `-J` but for unsorted group (preserves insertion order) |
+| `-1` | With `-V`: only remove consecutive duplicates |
+| `-2` | With `-J` or `-V`: keep all duplicates |
+| `-X explanation` | String printed above matches listing |
+| `-x message` | Like `-X` but printed even if no matches |
 
 ### Match Generation
 
-|| Option | Description |
-||--------|-------------|
-|| `-a` | Words are array names; matches are their values |
-|| `-k` | Words are associative array names; matches are their keys |
-|| `-f` | Matches marked as filenames; adds slashes for directories if `LIST_TYPES` set |
-|| `-e` | Matches are parameter names for parameter expansion |
-|| `-F array` | Patterns; words matching are ignored |
-|| `-M match-spec` | Local match specification (overrides `matcher` style) |
-|| `-U` | All words accepted; no matching performed against PREFIX |
-|| `-W file-prefix` | Prepended to matches with `-p` to form complete filename |
+| Option | Description |
+|--------|-------------|
+| `-a` | Words are array names; matches are their values |
+| `-k` | Words are associative array names; matches are their keys |
+| `-f` | Matches marked as filenames; adds slashes for directories if `LIST_TYPES` set |
+| `-e` | Matches are parameter names for parameter expansion |
+| `-F array` | Patterns; words matching are ignored |
+| `-M match-spec` | Local match specification (overrides `matcher` style) |
+| `-U` | All words accepted; no matching performed against PREFIX |
+| `-W file-prefix` | Prepended to matches with `-p` to form complete filename |
 
 ### Array Manipulation
 
-|| Option | Description |
-||--------|-------------|
-|| `-O array` | Words NOT added to completions; matching words stored in array |
-|| `-A array` | Like `-O` but stores strings generated by completion code (after match specs) |
-|| `-D array` | Words NOT added; non-matching words removed from array |
-|| `-C` | Adds special match expanding to all other matches when inserted |
-|| `-E number` | Adds `number` empty matches; implies `-V` and `-2` |
+| Option | Description |
+|--------|-------------|
+| `-O array` | Words NOT added to completions; matching words stored in array |
+| `-A array` | Like `-O` but stores strings generated by completion code (after match specs) |
+| `-D array` | Words NOT added; non-matching words removed from array |
+| `-C` | Adds special match expanding to all other matches when inserted |
+| `-E number` | Adds `number` empty matches; implies `-V` and `-2` |
 
 ### Suffix Removal Examples
 
@@ -268,15 +268,15 @@ compset -N beg-pat [ end-pat ]
 compset -q
 ```
 
-|| Option | Description |
-||--------|-------------|
-|| `-p number` | If `PREFIX` > `number` chars, first `number` chars moved to `IPREFIX` |
-|| `-P [number] pattern` | Match `PREFIX` with pattern; matched portion moved to `IPREFIX`. Without `number`, longest match taken. With negative `number`, `number`'th longest match moved |
-|| `-s number` | Transfer last `number` chars from `SUFFIX` to `ISUFFIX` |
-|| `-S [number] pattern` | Match last portion of `SUFFIX`; transfer to `ISUFFIX` |
-|| `-n begin [end]` | If `CURRENT` >= `begin`, remove words up to `begin`'th; decrement `CURRENT`. If `end` given, also remove words from position `end` onwards |
-|| `-N beg-pat [end-pat]` | Remove words up to matching `beg-pat` if before `CURRENT`. With `end-pat`, also remove from that word onwards if after cursor |
-|| `-q` | Split current word on spaces respecting quoting; store in `words` array; update `CURRENT`, `PREFIX`, `SUFFIX`, `QIPREFIX`, `QISUFFIX` |
+| Option | Description |
+|--------|-------------|
+| `-p number` | If `PREFIX` > `number` chars, first `number` chars moved to `IPREFIX` |
+| `-P [number] pattern` | Match `PREFIX` with pattern; matched portion moved to `IPREFIX`. Without `number`, longest match taken. With negative `number`, `number`'th longest match moved |
+| `-s number` | Transfer last `number` chars from `SUFFIX` to `ISUFFIX` |
+| `-S [number] pattern` | Match last portion of `SUFFIX`; transfer to `ISUFFIX` |
+| `-n begin [end]` | If `CURRENT` >= `begin`, remove words up to `begin`'th; decrement `CURRENT`. If `end` given, also remove words from position `end` onwards |
+| `-N beg-pat [end-pat]` | Remove words up to matching `beg-pat` if before `CURRENT`. With `end-pat`, also remove from that word onwards if after cursor |
+| `-q` | Split current word on spaces respecting quoting; store in `words` array; update `CURRENT`, `PREFIX`, `SUFFIX`, `QIPREFIX`, `QISUFFIX` |
 
 ### Common Pattern: Stripping Option Prefix
 
@@ -325,16 +325,16 @@ _describe [-12JVx] [ -oO | -t tag ] descr name1 [ name2 ] [ opt ... ] [ -- name1
 
 ### Options
 
-|| Option | Description |
-||--------|-------------|
-|| `-t tag` | Specify tag name (default: `values` or `options` with `-o`) |
-|| `-o` | Complete as command options (handles `prefix-hidden`, `prefix-needed`, `verbose` styles) |
-|| `-O` | Like `-o` but doesn't handle `prefix-needed` style |
-|| `-V name` | Unsorted group (passed to `compadd -V`) |
-|| `-J name` | Named sorted group (passed to `compadd -J`) |
-|| `-1` | Only remove consecutive duplicates (with `-V`) |
-|| `-2` | Keep all duplicates |
-|| `-x` | Description shown even if no matches |
+| Option | Description |
+|--------|-------------|
+| `-t tag` | Specify tag name (default: `values` or `options` with `-o`) |
+| `-o` | Complete as command options (handles `prefix-hidden`, `prefix-needed`, `verbose` styles) |
+| `-O` | Like `-o` but doesn't handle `prefix-needed` style |
+| `-V name` | Unsorted group (passed to `compadd -V`) |
+| `-J name` | Named sorted group (passed to `compadd -J`) |
+| `-1` | Only remove consecutive duplicates (with `-V`) |
+| `-2` | Keep all duplicates |
+| `-x` | Description shown even if no matches |
 
 ### Display Array Format
 
@@ -401,18 +401,18 @@ _arguments [ -nswWCRS ] [ -A pat ] [ -O name ] [ -M matchspec ] spec ...
 
 ### Global Options
 
-|| Option | Description |
-||--------|-------------|
-|| `-n` | Set `NORMARG` to position of first normal argument |
-|| `-s` | Enable option stacking for single-letter options (e.g., `-xy` for `-x -y`) |
-|| `-w` | Allow option stacking even when options take arguments |
-|| `-W` | Allow option stacking after an argument in the same word |
-|| `-S` | Do not complete options after `--` on the line |
-|| `-A pat` | Stop completing options after first non-option argument matching `pat` |
-|| `-C` | Modify `curcontext` for `->state` actions |
-|| `-R` | Return status 300 for `->state` actions |
-|| `-O name` | Pass array elements as arguments to action functions |
-|| `-M matchspec` | Match specification for option names and values |
+| Option | Description |
+|--------|-------------|
+| `-n` | Set `NORMARG` to position of first normal argument |
+| `-s` | Enable option stacking for single-letter options (e.g., `-xy` for `-x -y`) |
+| `-w` | Allow option stacking even when options take arguments |
+| `-W` | Allow option stacking after an argument in the same word |
+| `-S` | Do not complete options after `--` on the line |
+| `-A pat` | Stop completing options after first non-option argument matching `pat` |
+| `-C` | Modify `curcontext` for `->state` actions |
+| `-R` | Return status 300 for `->state` actions |
+| `-O name` | Pass array elements as arguments to action functions |
+| `-M matchspec` | Match specification for option names and values |
 
 ### Option Spec Formats
 
@@ -456,26 +456,26 @@ The exclusion list in parentheses specifies which other options/arguments are in
 
 ### Positional Argument Specs
 
-|| Format | Meaning |
-||--------|---------|
-|| `1:message:action` | 1st argument (required) |
-|| `2::message:action` | 2nd argument (optional) |
-|| `*:message:action` | All remaining arguments |
-|| `*::message:action` | All remaining (words modified to normal args) |
-|| `*:::message:action` | Covered words only |
+| Format | Meaning |
+|--------|---------|
+| `1:message:action` | 1st argument (required) |
+| `2::message:action` | 2nd argument (optional) |
+| `*:message:action` | All remaining arguments |
+| `*::message:action` | All remaining (words modified to normal args) |
+| `*:::message:action` | Covered words only |
 
 ### Action Types
 
-|| Action | Description |
-||--------|-------------|
-|| `(item1 item2)` | Literal list of matches |
-|| `((item1\:'desc1' item2\:'desc2'))` | List with descriptions (colons escaped) |
-|| `->state` | Set `$state` for case-statement dispatch |
-|| `function_name` | Call completion function |
-|| `{eval-string}` | Evaluate shell code to generate matches |
-|| `= action` | Insert dummy word for parsing; adds to `$words` |
-|| `( )` | Required but no matches (message only) |
-|| ` ` (single space) | No completions, display message only |
+| Action | Description |
+|--------|-------------|
+| `(item1 item2)` | Literal list of matches |
+| `((item1\:'desc1' item2\:'desc2'))` | List with descriptions (colons escaped) |
+| `->state` | Set `$state` for case-statement dispatch |
+| `function_name` | Call completion function |
+| `{eval-string}` | Evaluate shell code to generate matches |
+| `= action` | Insert dummy word for parsing; adds to `$words` |
+| `( )` | Required but no matches (message only) |
+| ` ` (single space) | No completions, display message only |
 
 ### State Machine Pattern
 
@@ -508,13 +508,13 @@ esac
 
 ### _arguments Sets These Variables
 
-|| Variable | Description |
-||----------|-------------|
-|| `$state` | Array of state strings from `->state` actions |
-|| `$state_descr` | Associative array of descriptions for each state |
-|| `$line` | Command and arguments array |
-|| `$opt_args` | Associative array of parsed option arguments (key: option, value: argument) |
-|| `$context` | Context array for state processing |
+| Variable | Description |
+|----------|-------------|
+| `$state` | Array of state strings from `->state` actions |
+| `$state_descr` | Associative array of descriptions for each state |
+| `$line` | Command and arguments array |
+| `$opt_args` | Associative array of parsed option arguments (key: option, value: argument) |
+| `$context` | Context array for state processing |
 
 ## Other Utility Functions
 
@@ -647,31 +647,31 @@ _message -r "No matches found"
 :completion:function:completer:command:argument:tag
 ```
 
-|| Component | Description |
-||-----------|-------------|
-|| `:completion:` | Fixed literal string identifying the completion system |
-|| `function` | Calling widget name (often empty for normal completion) |
-|| `completer` | Active completer name (without underscore, e.g., `complete`, `approximate`) |
-|| `command` | Command name or special context (e.g., `-default-`, `-command-`) |
-|| `argument` | Argument position (`argument-N` or `option-opt-N`) |
-|| `tag` | Classification tag (`files`, `options`, `hosts`, etc.) |
+| Component | Description |
+|-----------|-------------|
+| `:completion:` | Fixed literal string identifying the completion system |
+| `function` | Calling widget name (often empty for normal completion) |
+| `completer` | Active completer name (without underscore, e.g., `complete`, `approximate`) |
+| `command` | Command name or special context (e.g., `-default-`, `-command-`) |
+| `argument` | Argument position (`argument-N` or `option-opt-N`) |
+| `tag` | Classification tag (`files`, `options`, `hosts`, etc.) |
 
 ### Special Contexts
 
-|| Context | When Used |
-||---------|-----------|
-|| `-command-` | Command position (first word) |
-|| `-default-` | Commands with no specific completion |
-|| `-value-` | Parameter value assignment |
-|| `-array-value-` | Array parameter value |
-|| `-assign-parameter-` | Parameter name in assignment |
-|| `-brace-parameter-` | Parameter name in `${...}` |
-|| `-condition-` | Inside `[[...]]` conditional |
-|| `-math-` | Inside `((...))` arithmetic |
-|| `-parameter-` | Parameter name after `$` |
-|| `-redirect-` | After redirection operator |
-|| `-subscript-` | Inside parameter subscript |
-|| `-tilde-` | After `~` |
+| Context | When Used |
+|---------|-----------|
+| `-command-` | Command position (first word) |
+| `-default-` | Commands with no specific completion |
+| `-value-` | Parameter value assignment |
+| `-array-value-` | Array parameter value |
+| `-assign-parameter-` | Parameter name in assignment |
+| `-brace-parameter-` | Parameter name in `${...}` |
+| `-condition-` | Inside `[[...]]` conditional |
+| `-math-` | Inside `((...))` arithmetic |
+| `-parameter-` | Parameter name after `$` |
+| `-redirect-` | After redirection operator |
+| `-subscript-` | Inside parameter subscript |
+| `-tilde-` | After `~` |
 
 ### Lookup Rules
 
@@ -698,82 +698,82 @@ zstyle -L                         # List definitions in reusable form
 
 **Display and formatting:**
 
-|| Style | Description |
-||-------|-------------|
-|| `list-colors` | Color specifications for completion list (uses `(#b)` extended glob patterns) |
-|| `list-packed` | Compact listing (boolean) |
-|| `list-rows-first` | Row-first listing (boolean) |
-|| `list-dirs-first` | List directories before files (boolean) |
-|| `list-prompt` | Prompt for scrolling long completion lists |
-|| `list-separator` | Separator between match and description |
-|| `max-matches-width` | Trade-off between match/description column width |
-|| `format` | Format string for group headers and descriptions |
-|| `group-name` | Name for completion group (empty string = merge all groups) |
-|| `group-order` | Display order for groups |
-|| `extra-verbose` | More verbose completion listing |
-|| `verbose` | Verbose completion listing (boolean) |
-|| `description` | Show descriptions (boolean) |
-|| `auto-description` | Auto-generate option descriptions |
+| Style | Description |
+|-------|-------------|
+| `list-colors` | Color specifications for completion list (uses `(#b)` extended glob patterns) |
+| `list-packed` | Compact listing (boolean) |
+| `list-rows-first` | Row-first listing (boolean) |
+| `list-dirs-first` | List directories before files (boolean) |
+| `list-prompt` | Prompt for scrolling long completion lists |
+| `list-separator` | Separator between match and description |
+| `max-matches-width` | Trade-off between match/description column width |
+| `format` | Format string for group headers and descriptions |
+| `group-name` | Name for completion group (empty string = merge all groups) |
+| `group-order` | Display order for groups |
+| `extra-verbose` | More verbose completion listing |
+| `verbose` | Verbose completion listing (boolean) |
+| `description` | Show descriptions (boolean) |
+| `auto-description` | Auto-generate option descriptions |
 
 **Matching and filtering:**
 
-|| Style | Description |
-||-------|-------------|
-|| `matcher` | Match specification per tag |
-|| `matcher-list` | Global match specifications (tried in sequence) |
-|| `ignored-patterns` | Patterns to exclude from completion |
-|| `ignore-line` | Ignore words already on command line |
-|| `sort` | Sort matches (boolean or `yes`/`no`/`menu`) |
-|| `file-sort` | Sort order for files (`size`, `links`, `time`, `modification`, `access`, `change`, `name`) |
-|| `file-patterns` | Custom file pattern tags |
-|| `special-dirs` | Include `.` and `..` directories (boolean) |
-|| `squeeze-slashes` | Treat `//` as single `/` (boolean) |
+| Style | Description |
+|-------|-------------|
+| `matcher` | Match specification per tag |
+| `matcher-list` | Global match specifications (tried in sequence) |
+| `ignored-patterns` | Patterns to exclude from completion |
+| `ignore-line` | Ignore words already on command line |
+| `sort` | Sort matches (boolean or `yes`/`no`/`menu`) |
+| `file-sort` | Sort order for files (`size`, `links`, `time`, `modification`, `access`, `change`, `name`) |
+| `file-patterns` | Custom file pattern tags |
+| `special-dirs` | Include `.` and `..` directories (boolean) |
+| `squeeze-slashes` | Treat `//` as single `/` (boolean) |
 
 **Insertion behavior:**
 
-|| Style | Description |
-||-------|-------------|
-|| `add-space` | Add space after expansion (boolean or `true`/`false`/`auto`) |
-|| `insert` | Insert all matches unconditionally (boolean) |
-|| `insert-unambiguous` | Start menu only on unambiguous prefix (boolean) |
-|| `insert-tab` | Insert TAB when no char left of cursor (boolean) |
-|| `menu` | Menu completion control (boolean, `select`, `select=N`) |
-|| `accept-exact` | Accept exact match immediately (boolean) |
-|| `accept-exact-dirs` | Accept directory without checking contents (boolean) |
-|| `suffix` | Expand tilde/parameter without suffix (boolean) |
-|| `keep-prefix` | Keep tilde/parameter prefix during expansion (boolean) |
+| Style | Description |
+|-------|-------------|
+| `add-space` | Add space after expansion (boolean or `true`/`false`/`auto`) |
+| `insert` | Insert all matches unconditionally (boolean) |
+| `insert-unambiguous` | Start menu only on unambiguous prefix (boolean) |
+| `insert-tab` | Insert TAB when no char left of cursor (boolean) |
+| `menu` | Menu completion control (boolean, `select`, `select=N`) |
+| `accept-exact` | Accept exact match immediately (boolean) |
+| `accept-exact-dirs` | Accept directory without checking contents (boolean) |
+| `suffix` | Expand tilde/parameter without suffix (boolean) |
+| `keep-prefix` | Keep tilde/parameter prefix during expansion (boolean) |
 
 **Completer control:**
 
-|| Style | Description |
-||-------|-------------|
-|| `completer` | List of completer functions to try |
-|| `max-errors` | Max errors for approximate completion |
-|| `condition` | Delay insertion unconditionally |
-|| `old-list` | Use existing completion list |
-|| `old-menu` | Continue with old list on standard key |
-|| `original` | Add original string to corrections |
-|| `force-list` | Always show completion list (boolean) |
-|| `stop` | Stop at history boundaries |
+| Style | Description |
+|-------|-------------|
+| `completer` | List of completer functions to try |
+| `max-errors` | Max errors for approximate completion |
+| `condition` | Delay insertion unconditionally |
+| `old-list` | Use existing completion list |
+| `old-menu` | Continue with old list on standard key |
+| `original` | Add original string to corrections |
+| `force-list` | Always show completion list (boolean) |
+| `stop` | Stop at history boundaries |
 
 **Caching:**
 
-|| Style | Description |
-||-------|-------------|
-|| `use-cache` | Enable completion caching (boolean) |
-|| `cache-path` | Cache directory (default: `~/.zcompcache`) |
-|| `cache-policy` | Function to determine cache validity |
+| Style | Description |
+|-------|-------------|
+| `use-cache` | Enable completion caching (boolean) |
+| `cache-path` | Cache directory (default: `~/.zcompcache`) |
+| `cache-policy` | Function to determine cache validity |
 
 **Tag control:**
 
-|| Style | Description |
-||-------|-------------|
-|| `tag-order` | Order for trying tags |
-|| `tag-label` | Label for tag (for display) |
-|| `hidden` | Hide matches from listing (boolean) |
-|| `host-names` | Hostname list |
-|| `users` | Username list |
-|| `groups` | Group name list |
+| Style | Description |
+|-------|-------------|
+| `tag-order` | Order for trying tags |
+| `tag-label` | Label for tag (for display) |
+| `hidden` | Hide matches from listing (boolean) |
+| `host-names` | Hostname list |
+| `users` | Username list |
+| `groups` | Group name list |
 
 ### The list-colors Style
 
@@ -808,15 +808,15 @@ zstyle ':completion:*:options' format '%F{yellow}-- %d --%f'
 
 Prompt escape sequences:
 
-|| Sequence | Meaning |
-||----------|---------|
-|| `%F{color}` / `%f` | Foreground color on/off |
-|| `%K{color}` / `%k` | Background color on/off |
-|| `%B` / `%b` | Bold on/off |
-|| `%U` / `%u` | Underline on/off |
-|| `%S` / `%s` | Standout on/off |
-|| `%d` | Description text |
-|| `%n` | Number of matches |
+| Sequence | Meaning |
+|----------|---------|
+| `%F{color}` / `%f` | Foreground color on/off |
+| `%K{color}` / `%k` | Background color on/off |
+| `%B` / `%b` | Bold on/off |
+| `%U` / `%u` | Underline on/off |
+| `%S` / `%s` | Standout on/off |
+| `%d` | Description text |
+| `%n` | Number of matches |
 
 ## The Tag System
 
@@ -893,13 +893,13 @@ Each spec is tried in sequence; the first that produces matches wins.
 
 ### Specification Codes
 
-|| Code | Type | Description |
-||------|------|-------------|
-|| `m:` | Match | Case-insensitive or character mapping |
-|| `l:` | Left | Match at beginning of word |
-|| `r:` | Right | Match at end of word |
-|| `b:` | Boundary | Left-anchored partial word |
-|| `e:` | End | Right-anchored partial word |
+| Code | Type | Description |
+|------|------|-------------|
+| `m:` | Match | Case-insensitive or character mapping |
+| `l:` | Left | Match at beginning of word |
+| `r:` | Right | Match at end of word |
+| `b:` | Boundary | Left-anchored partial word |
+| `e:` | End | Right-anchored partial word |
 
 Uppercase variants (`M:`, `L:`, `R:`) apply to the entire line rather than individual words.
 
@@ -1004,18 +1004,18 @@ _myapp_completion() {
 
 ### Key Integration Points
 
-|| Mechanism | Purpose |
-||-----------|---------|
-|| `compdef` / `#compdef` | Register completion function for a command |
-|| `words` / `CURRENT` | Access command-line words and cursor position |
-|| `compadd` | Add raw completion candidates |
-|| `_describe` | Add candidates with display/value separation and descriptions |
-|| `zstyle list-colors` | Per-candidate coloring via `(#b)` patterns |
-|| `zstyle group-name ''` | Merge all tag groups into single display |
-|| `_message -r` | Display error/usage messages in completion area |
-|| `compquote` guard | Prevent execution outside completion context |
-|| `CARAPACE_COMPLINE` | Environment variable for raw command line (carapace-specific) |
-|| `CARAPACE_ZSH_HASH_DIRS` | Named directory mappings (carapace-specific) |
+| Mechanism | Purpose |
+|-----------|---------|
+| `compdef` / `#compdef` | Register completion function for a command |
+| `words` / `CURRENT` | Access command-line words and cursor position |
+| `compadd` | Add raw completion candidates |
+| `_describe` | Add candidates with display/value separation and descriptions |
+| `zstyle list-colors` | Per-candidate coloring via `(#b)` patterns |
+| `zstyle group-name ''` | Merge all tag groups into single display |
+| `_message -r` | Display error/usage messages in completion area |
+| `compquote` guard | Prevent execution outside completion context |
+| `CARAPACE_COMPLINE` | Environment variable for raw command line (carapace-specific) |
+| `CARAPACE_ZSH_HASH_DIRS` | Named directory mappings (carapace-specific) |
 
 ### The compquote Guard Pattern
 
@@ -1038,25 +1038,25 @@ Setting `group-name` to an empty string merges all tag groups into a single disp
 
 ### Choosing the Right Utility
 
-|| Scenario | Utility |
-||----------|---------|
-|| Simple static list with descriptions | `_describe` |
-|| Unix-style options and positional arguments | `_arguments` |
-|| Mixed completion types at one position | `_alternative` |
-|| Comma-separated or keyword values | `_values` |
-|| Path-like completion with separator | `_multi_parts` |
-|| Different separators at different parts | `_sep_parts` |
-|| Complex keyword-based command structure | `_regex_arguments` |
-|| File completion | `_files` / `_path_files` |
-|| Commands with `--help` | `_gnu_generic` |
+| Scenario | Utility |
+|----------|---------|
+| Simple static list with descriptions | `_describe` |
+| Unix-style options and positional arguments | `_arguments` |
+| Mixed completion types at one position | `_alternative` |
+| Comma-separated or keyword values | `_values` |
+| Path-like completion with separator | `_multi_parts` |
+| Different separators at different parts | `_sep_parts` |
+| Complex keyword-based command structure | `_regex_arguments` |
+| File completion | `_files` / `_path_files` |
+| Commands with `--help` | `_gnu_generic` |
 
 ### Debugging Completions
 
-|| Key Binding | Action |
-||-------------|--------|
-|| `Ctrl+X H` | Show context names, tags, and functions (`_complete_help`) |
-|| `Ctrl+X ?` | Capture trace in temporary file (`_complete_debug`) |
-|| `Alt+2 Ctrl+X` | Even more detailed information |
+| Key Binding | Action |
+|-------------|--------|
+| `Ctrl+X H` | Show context names, tags, and functions (`_complete_help`) |
+| `Ctrl+X ?` | Capture trace in temporary file (`_complete_debug`) |
+| `Alt+2 Ctrl+X` | Even more detailed information |
 
 Reload a completion function after editing:
 

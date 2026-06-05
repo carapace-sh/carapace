@@ -21,7 +21,7 @@ Comprehensive reference for [xonsh](https://xon.sh/) shell internals, with empha
 
 Load the reference that matches your task. When in doubt, load multiple references.
 
-|| Keywords | Reference |
+| Keywords | Reference |
 |----------|----------|
 | RichCompletion, CommandContext, CommandArg, CompletionContext, contextual_command_completer, contextual_command_completer_for, non_exclusive_completer, add_one_completer, Completer class, completer pipeline, exclusive vs non-exclusive, deduplication, sorting tiers, filter function, prefix_len, append_closing_quote, append_space, display, description, style, provider, tag_provider, apply_lprefix, complete_from_sub_proc, comp_based_completer, on_completer_filter, XONSH_COMPLETER_MODE, XONSH_COMPLETER_TRACE, COMPLETION_QUERY_LIMIT, XONSH_COMPLETER_DIRS, CommandCompleter, xompletions, bash completion bridge, path completer, command completer, python completer, base completer | [references/completion.md](references/completion.md) |
 | PromptToolkitShell, PromptToolkitCompleter, PromptSession, Completion, CompleteStyle, key bindings, on_ptk_create, COMPLETIONS_DISPLAY, COMPLETION_MODE, COMPLETIONS_CONFIRM, COMPLETIONS_MENU_ROWS, UPDATE_COMPLETIONS_ON_KEYPRESS, COMPLETION_IN_THREAD, AUTO_SUGGEST_IN_COMPLETIONS, XONSH_PROMPT_AUTO_SUGGEST, auto-suggest, menu-complete, display_meta, _highlight_match, unquote, ptk shell, vi mode, emacs mode, XONSH_AUTOPAIR | [references/prompt-toolkit.md](references/prompt-toolkit.md) |

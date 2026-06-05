@@ -34,12 +34,12 @@ In-depth reference for zsh's startup file order, the `fpath` mechanism, function
 
 ### Mode Combinations
 
-|| Mode | .zshenv | .zprofile | .zshrc | .zlogin |
-||------|---------|-----------|--------|---------|
-|| Login + Interactive | ✓ | ✓ | ✓ | ✓ |
-|| Login + Non-interactive | ✓ | ✓ | ✗ | ✓ |
-|| Non-login + Interactive | ✓ | ✗ | ✓ | ✗ |
-|| Non-login + Non-interactive | ✓ | ✗ | ✗ | ✗ |
+| Mode | .zshenv | .zprofile | .zshrc | .zlogin |
+|------|---------|-----------|--------|---------|
+| Login + Interactive | ✓ | ✓ | ✓ | ✓ |
+| Login + Non-interactive | ✓ | ✓ | ✗ | ✓ |
+| Non-login + Interactive | ✓ | ✗ | ✓ | ✗ |
+| Non-login + Non-interactive | ✓ | ✗ | ✗ | ✗ |
 
 **Key insight**: `.zshenv` is executed for ALL shell invocations. Only set essential environment variables there — avoid expensive operations.
 
@@ -90,17 +90,17 @@ typeset -U fpath
 
 Zsh's built-in completion functions are organized in subdirectories:
 
-|| Directory | Contents |
-||-----------|----------|
-|| `Base/` | Core functions and widgets |
-|| `Base/Core/` | Essential completion functions |
-|| `Base/Utility/` | Utility functions (`_describe`, `_arguments`, etc.) |
-|| `Base/Completion/` | Completer functions (`_complete`, `_approximate`, etc.) |
-|| `Zsh/` | Shell builtin completions |
-|| `Unix/` | External command completions |
-|| `Unix/Command/` | Specific command completions |
-|| `X/` | X11-related completions |
-|| `Linux/`, `BSD/`, `AIX/`, etc. | Platform-specific completions |
+| Directory | Contents |
+|-----------|----------|
+| `Base/` | Core functions and widgets |
+| `Base/Core/` | Essential completion functions |
+| `Base/Utility/` | Utility functions (`_describe`, `_arguments`, etc.) |
+| `Base/Completion/` | Completer functions (`_complete`, `_approximate`, etc.) |
+| `Zsh/` | Shell builtin completions |
+| `Unix/` | External command completions |
+| `Unix/Command/` | Specific command completions |
+| `X/` | X11-related completions |
+| `Linux/`, `BSD/`, `AIX/`, etc. | Platform-specific completions |
 
 ## Function Autoloading
 
@@ -112,13 +112,13 @@ autoload -Uz fn       # Recommended: suppress alias expansion, zsh-style
 autoload +X fn        # Load function definition without calling it
 ```
 
-|| Option | Description |
-||--------|-------------|
-|| `-U` | Suppress alias expansion when loading (recommended) |
-|| `-z` | Force zsh-style loading (default) |
-|| `-k` / `-KSH_AUTOLOAD` | ksh-style: file content executed directly |
-|| `+X` | Load definition without executing |
-|| `-X` | Define as autoloaded stub |
+| Option | Description |
+|--------|-------------|
+| `-U` | Suppress alias expansion when loading (recommended) |
+| `-z` | Force zsh-style loading (default) |
+| `-k` / `-KSH_AUTOLOAD` | ksh-style: file content executed directly |
+| `+X` | Load definition without executing |
+| `-X` | Define as autoloaded stub |
 
 ### How Autoloading Works
 
@@ -153,14 +153,14 @@ autoload -Uz compinit && compinit
 
 ### compinit Options
 
-|| Option | Description |
-||--------|-------------|
-|| `-D` | Disable dump file creation |
-|| `-d file` | Specify dump file location |
-|| `-C` | Skip security checks, use cached dump (fastest) |
-|| `-u` | Use insecure files without asking |
-|| `-i` | Silently ignore insecure files |
-|| `-n` | Skip function existence check |
+| Option | Description |
+|--------|-------------|
+| `-D` | Disable dump file creation |
+| `-d file` | Specify dump file location |
+| `-C` | Skip security checks, use cached dump (fastest) |
+| `-u` | Use insecure files without asking |
+| `-i` | Silently ignore insecure files |
+| `-n` | Skip function existence check |
 
 ### Security Model
 

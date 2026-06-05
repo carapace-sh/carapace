@@ -15,17 +15,17 @@ ble.sh **replaces** GNU Readline entirely rather than augmenting it. Key mechani
 
 ## Core Editor State
 
-|| Variable | Purpose |
-||----------|---------|
-|| `_ble_edit_str` | Current command line content |
-|| `_ble_edit_ind` | Cursor position index |
-|| `_ble_edit_mark` | Selection mark position |
-|| `_ble_edit_overwrite_mode` | Insert/overwrite mode flag |
-|| `_ble_edit_arg` | Numeric prefix argument |
-|| `_ble_edit_kill_ring` | Circular buffer of killed/copied text |
-|| `_ble_edit_kill_ring_index` | Current position for yank |
-|| `_ble_edit_undo` | Stack of undo records |
-|| `_ble_edit_undo_index` | Current position in undo history |
+| Variable | Purpose |
+|----------|---------|
+| `_ble_edit_str` | Current command line content |
+| `_ble_edit_ind` | Cursor position index |
+| `_ble_edit_mark` | Selection mark position |
+| `_ble_edit_overwrite_mode` | Insert/overwrite mode flag |
+| `_ble_edit_arg` | Numeric prefix argument |
+| `_ble_edit_kill_ring` | Circular buffer of killed/copied text |
+| `_ble_edit_kill_ring_index` | Current position for yank |
+| `_ble_edit_undo` | Stack of undo records |
+| `_ble_edit_undo_index` | Current position in undo history |
 
 ### Buffer Manipulation
 
@@ -41,17 +41,17 @@ Every user input is handled by executing a **widget**. Each widget is a shell fu
 
 ### Widget Categories
 
-|| Category | Examples |
-||----------|---------|
-|| Character | `self-insert`, `delete-char`, `delete-char-backward` |
-|| Word movement | `forward-cword`, `backward-cword`, `kill-word` |
-|| Line movement | `beginning-of-line`, `end-of-line` |
-|| Kill/Yank | `kill-region`, `yank`, `yank-pop`, `kill-line` |
-|| History | `history-search-backward`, `history-search-forward` |
-|| Completion | `complete`, `menu-complete`, `dabbrev-expand` |
-|| Sabbrev | `sabbrev-expand`, `magic-space` |
-|| Undo | `undo`, `redo` |
-|| Mark | `set-mark`, `exchange-point-and-mark` |
+| Category | Examples |
+|----------|---------|
+| Character | `self-insert`, `delete-char`, `delete-char-backward` |
+| Word movement | `forward-cword`, `backward-cword`, `kill-word` |
+| Line movement | `beginning-of-line`, `end-of-line` |
+| Kill/Yank | `kill-region`, `yank`, `yank-pop`, `kill-line` |
+| History | `history-search-backward`, `history-search-forward` |
+| Completion | `complete`, `menu-complete`, `dabbrev-expand` |
+| Sabbrev | `sabbrev-expand`, `magic-space` |
+| Undo | `undo`, `redo` |
+| Mark | `set-mark`, `exchange-point-and-mark` |
 
 ### Widget Dispatch Flow
 
@@ -74,36 +74,36 @@ ble-bind -f C-t my/example1
 
 ### Special Binding Names
 
-|| Name | Purpose |
-||------|---------|
-|| `__default__` | Fallback handler for unbound keys |
-|| `__defchar__` | Printable character handler |
-|| `__batch_char__` | Batch character input handler |
-|| `__before_widget__` | Hook before widget execution |
-|| `__after_widget__` | Hook after widget execution |
-|| `__attach__` | Keymap activation hook |
-|| `__detach__` | Keymap deactivation hook |
+| Name | Purpose |
+|------|---------|
+| `__default__` | Fallback handler for unbound keys |
+| `__defchar__` | Printable character handler |
+| `__batch_char__` | Batch character input handler |
+| `__before_widget__` | Hook before widget execution |
+| `__after_widget__` | Hook after widget execution |
+| `__attach__` | Keymap activation hook |
+| `__detach__` | Keymap deactivation hook |
 
 ## Keymaps
 
 ### Available Keymaps
 
-|| Keymap | Description |
-||--------|-------------|
-|| `emacs` | Emacs editing mode (default) |
-|| `vi_imap` | Vim Insert mode |
-|| `vi_nmap` | Vim Normal mode |
-|| `vi_omap` | Vim Operator-pending mode |
-|| `vi_xmap` | Vim Visual mode |
-|| `vi_smap` | Vim Select mode |
-|| `vi_cmap` | Vim Command-line mode |
-|| `vi_digraph` | Vim digraph input |
-|| `safe` | Emergency base keymap |
-|| `isearch` | Incremental search mode |
-|| `nsearch` | Non-incremental search mode |
-|| `read` | For `read -e` builtins |
-|| `auto_complete` | Auto-completion mode |
-|| `menu_complete` | Menu completion mode |
+| Keymap | Description |
+|--------|-------------|
+| `emacs` | Emacs editing mode (default) |
+| `vi_imap` | Vim Insert mode |
+| `vi_nmap` | Vim Normal mode |
+| `vi_omap` | Vim Operator-pending mode |
+| `vi_xmap` | Vim Visual mode |
+| `vi_smap` | Vim Select mode |
+| `vi_cmap` | Vim Command-line mode |
+| `vi_digraph` | Vim digraph input |
+| `safe` | Emergency base keymap |
+| `isearch` | Incremental search mode |
+| `nsearch` | Non-incremental search mode |
+| `read` | For `read -e` builtins |
+| `auto_complete` | Auto-completion mode |
+| `menu_complete` | Menu completion mode |
 
 ### Keymap Stack
 
@@ -128,25 +128,25 @@ ble-bind --csi seq                      # Register CSI sequences
 
 ### Key Notation
 
-|| Format | Meaning |
-||--------|---------|
-|| `C-x` | Control + X |
-|| `M-x` | Meta/Alt + X |
-|| `S-x` | Shift + X |
-|| `A-x` | AltGr + X |
-|| `s-x` | Super + X |
-|| `H-x` | Hyper + X |
-|| `f1`, `home`, `up` | Special keys |
-|| `\xHH` | Hex byte |
-|| `C-x C-c` | Key sequence (chord) |
+| Format | Meaning |
+|--------|---------|
+| `C-x` | Control + X |
+| `M-x` | Meta/Alt + X |
+| `S-x` | Shift + X |
+| `A-x` | AltGr + X |
+| `s-x` | Super + X |
+| `H-x` | Hyper + X |
+| `f1`, `home`, `up` | Special keys |
+| `\xHH` | Hex byte |
+| `C-x C-c` | Key sequence (chord) |
 
 ### Binding Types
 
-|| Type | Flag | Description |
-||------|------|-------------|
-|| Direct widget | `1:widget` | Immediately dispatches to widget |
-|| Prefix | `_:widget` | May continue with more keys |
-|| Timeout prefix | `_TIMEOUT:widget` | Prefix with timeout |
+| Type | Flag | Description |
+|------|------|-------------|
+| Direct widget | `1:widget` | Immediately dispatches to widget |
+| Prefix | `_:widget` | May continue with more keys |
+| Timeout prefix | `_TIMEOUT:widget` | Prefix with timeout |
 
 ### Examples
 
@@ -185,13 +185,13 @@ Raw bytes → Byte Processing → Character Decoding → Key Processing → Widg
 
 32-bit integers with bit layout:
 
-|| Bits | Content |
-||------|---------|
-|| 0-20 | Character code |
-|| 21 | Unused |
-|| 22-28 | Modifier flags (Meta, Ctrl, Shift, Hyper, Super, AltGr) |
-|| 29 | Macro flag |
-|| 30 | Error flag |
+| Bits | Content |
+|------|---------|
+| 0-20 | Character code |
+| 21 | Unused |
+| 22-28 | Modifier flags (Meta, Ctrl, Shift, Hyper, Super, AltGr) |
+| 29 | Macro flag |
+| 30 | Error flag |
 
 ## Editing Modes
 
@@ -201,23 +201,23 @@ Standard Emacs-style key bindings. Control keys operate on characters, Meta keys
 
 **Essential commands:**
 
-|| Key | Widget |
-||-----|--------|
-|| `C-a` | `beginning-of-line` |
-|| `C-e` | `end-of-line` |
-|| `C-f` | `forward-char` |
-|| `C-b` | `backward-char` |
-|| `M-f` | `forward-cword` |
-|| `M-b` | `backward-cword` |
-|| `C-l` | `clear-screen` |
-|| `C-k` | `kill-line` |
-|| `M-d` | `kill-word` |
-|| `M-DEL` | `backward-kill-word` |
-|| `C-w` | `backward-kill-word` |
-|| `C-y` | `yank` |
-|| `M-y` | `yank-pop` |
-|| `C-_` | `undo` |
-|| `C-x C-r` | Re-read init file |
+| Key | Widget |
+|-----|--------|
+| `C-a` | `beginning-of-line` |
+| `C-e` | `end-of-line` |
+| `C-f` | `forward-char` |
+| `C-b` | `backward-char` |
+| `M-f` | `forward-cword` |
+| `M-b` | `backward-cword` |
+| `C-l` | `clear-screen` |
+| `C-k` | `kill-line` |
+| `M-d` | `kill-word` |
+| `M-DEL` | `backward-kill-word` |
+| `C-w` | `backward-kill-word` |
+| `C-y` | `yank` |
+| `M-y` | `yank-pop` |
+| `C-_` | `undo` |
+| `C-x C-r` | Re-read init file |
 
 ### Vi Mode
 
@@ -257,23 +257,23 @@ bleopt edit_vim_mode=vi
 
 ### Canvas Configuration
 
-|| Option | Default | Description |
-||--------|---------|-------------|
-|| `tab_width` | 8 | Displayed width of tabs |
-|| `char_width_version` | auto | Unicode version for char width |
-|| `emoji_width` | 2 | Emoji display width |
-|| `emoji_version` | 14.0 | Unicode Emoji version |
-|| `grapheme_cluster` | extended | Grapheme cluster type (extended/legacy) |
-|| `canvas_winch_action` | `redraw-safe` | SIGWINCH behavior |
+| Option | Default | Description |
+|--------|---------|-------------|
+| `tab_width` | 8 | Displayed width of tabs |
+| `char_width_version` | auto | Unicode version for char width |
+| `emoji_width` | 2 | Emoji display width |
+| `emoji_version` | 14.0 | Unicode Emoji version |
+| `grapheme_cluster` | extended | Grapheme cluster type (extended/legacy) |
+| `canvas_winch_action` | `redraw-safe` | SIGWINCH behavior |
 
 ### SIGWINCH Actions
 
-|| Value | Description |
-||-------|-------------|
-|| `redraw-safe` | Redraw if safe (default) |
-|| `redraw-prev` | Redraw previous content |
-|| `redraw-here` | Redraw at current position |
-|| `clear` | Clear and redraw |
+| Value | Description |
+|-------|-------------|
+| `redraw-safe` | Redraw if safe (default) |
+| `redraw-prev` | Redraw previous content |
+| `redraw-here` | Redraw at current position |
+| `clear` | Clear and redraw |
 
 ### Terminal Requirements
 

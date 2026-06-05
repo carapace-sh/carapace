@@ -149,6 +149,12 @@ cobra command invoked with _carapace subcommand
     references/quoting-expansion.md Quoting and expansion rules
     references/execution.md        Execution model and signals
     references/startup.md          Startup files and configuration
+  bash-ble/                  Bash BLE (ble.sh) in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       BLE completion system (cand/yield, sources, actions, progcomp, menu styles, menu-filter, auto-complete, sabbrev, dabbrev)
+    references/syntax-highlighting.md Syntax parser, faces, gspec colors
+    references/editor.md           Editor architecture, widgets, keymaps, key binding, terminal rendering
+    references/startup-config.md   Installation, blerc, bleopt, blehook, ble-import, XDG paths
   cmd-clink/                 Clink/cmd.exe in-depth reference
     SKILL.md                      Entry point with routing table
     references/argmatcher.md       Clink argmatcher Lua API

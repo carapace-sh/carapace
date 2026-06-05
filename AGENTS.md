@@ -179,6 +179,13 @@ cobra command invoked with _carapace subcommand
     references/language.md         Language fundamentals, quoting, variables, builtins
     references/execution.md        Execution model, job control, threading
     references/startup-config.md   Startup, configuration, XDG paths
+  powershell/                PowerShell shell in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       PowerShell tab completion system
+    references/editor.md           PSReadLine, key bindings, menu completion, prediction
+    references/styling.md          ANSI escape sequences, $PSStyle, terminal rendering
+    references/language.md         Quoting rules, argument passing, language fundamentals
+    references/startup-config.md   Profiles, configuration, execution policy
 ```
 
 ## Conventions
@@ -327,7 +334,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Bash, cmd-clink, elvish, xonsh, and fish have their own composite skills (`skills/bash/`, `skills/cmd-clink/`, `skills/elvish/`, `skills/xonsh/`, `skills/fish/`) for in-depth shell knowledge beyond carapace integration.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (tcsh, ion, export) are covered only in `references/shell.md`. Bash, cmd-clink, elvish, xonsh, fish, and powershell have their own composite skills (`skills/bash/`, `skills/cmd-clink/`, `skills/elvish/`, `skills/xonsh/`, `skills/fish/`, `skills/powershell/`) for in-depth shell knowledge beyond carapace integration.
 
 ### Structure
 

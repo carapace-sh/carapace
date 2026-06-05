@@ -15,7 +15,7 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 | Ion | `ion` | `internal/shell/ion/` | — |
 | Nushell | `nushell` | `internal/shell/nushell/` | `references/shell-nushell.md` |
 | PowerShell | `powershell` | `internal/shell/powershell/` | `references/shell-powershell.md` |
-| Tcsh | `tcsh` | `internal/shell/tcsh/` | — |
+| Tcsh | `tcsh` | `internal/shell/tcsh/` | **tcsh** skill |
 | Xonsh | `xonsh` | `internal/shell/xonsh/` | `references/shell-xonsh.md` |
 | Zsh | `zsh` | `internal/shell/zsh/` | `references/shell-zsh.md` |
 | Export (JSON) | `export` | `internal/shell/export/` | — |

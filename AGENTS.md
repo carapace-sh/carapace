@@ -199,6 +199,13 @@ cobra command invoked with _carapace subcommand
     references/quoting-expansion.md Quoting, variable expansion, history expansion, globbing
     references/execution.md        Execution model, job control, signals, control flow
     references/startup-config.md   Startup files, shell variables, environment variables
+  oil/                       Oil shell (OSH/YSH) in-depth reference
+    SKILL.md                      Entry point with routing table
+    references/completion.md       Oil programmable completion, COMP_ARGV, compadjust, compexport, OILS_COMP_UI
+    references/line-editing.md     Readline, NiceDisplay, prompt, history, alias handling
+    references/quoting-expansion.md Quoting, word splitting, simple word evaluation, globbing
+    references/execution.md        Execution model, lastpipe, signals, traps, xtrace_rich
+    references/startup-config.md   Startup files, shell options, strict:all, ysh:all
 ```
 
 ## Conventions
@@ -347,7 +354,7 @@ Key env vars (see `internal/env/env.go`):
 
 ## Shell Skill Maintenance
 
-Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (ion, export) are covered only in `references/shell.md`. Bash, cmd-clink, elvish, xonsh, fish, powershell, and tcsh have their own composite skills (`skills/bash/`, `skills/cmd-clink/`, `skills/elvish/`, `skills/xonsh/`, `skills/fish/`, `skills/powershell/`, `skills/tcsh/`) for in-depth shell knowledge beyond carapace integration.
+Shell integration documentation lives in the `carapace-dev` composite skill (`skills/carapace-dev/`). The generic overview is `references/shell.md` and per-shell deep dives are `references/shell-{name}.md` (bash, bash-ble, oil, zsh, fish, elvish, nushell, xonsh, powershell). Minor shells (ion, export) are covered only in `references/shell.md`. Bash, cmd-clink, elvish, xonsh, fish, powershell, tcsh, and oil have their own composite skills (`skills/bash/`, `skills/cmd-clink/`, `skills/elvish/`, `skills/xonsh/`, `skills/fish/`, `skills/powershell/`, `skills/tcsh/`, `skills/oil/`) for in-depth shell knowledge beyond carapace integration.
 
 ### Structure
 

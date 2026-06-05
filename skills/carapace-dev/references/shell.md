@@ -49,7 +49,7 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 | **Registration** | `complete -o noquote -F func cmd` | `complete -F func_ble cmd` | `complete -F func cmd` | `compdef func cmd` + `compquote` guard | `complete -c 'cmd' -f -a '(func)' -r` | `edit:completion:arg-completer[cmd]` | Closure `let cmd_completer = {\|spans\| ...}` | `@contextual_command_completer` + `add_one_completer` | `Register-ArgumentCompleter -Native` |
 | **Output format** | `\001`-delimited nospace+values | Tab-delimited value/display with `\x1c` separators | Values with `\001` nospace indicator | `\001`-delimited zstyle+message+tag groups | Tab-separated `value\tdesc\n` | JSON `completion` with `complexCandidate` array | JSON `{value,display,description,style}` | JSON `{Value,Display,Description,Style}` | JSON `CompletionResult` array |
 | **Nospace** | Global `compopt -o nospace` | Per-candidate suffix field | Inline `\001` indicator | Per-candidate space suffix in `_describe` values | **Not supported** | Per-candidate `CodeSuffix` | Trailing space in `value` field | Space baked into `Value` field | Trailing space in `CompletionText` |
-| **Style/color** | Not supported | Not supported | Not supported | `zstyle list-colors` with `(#b)` patterns | Not supported | `styled` builtin via `ParseStyling` | Full 256-color + attr `{fg,bg,attr}` record | `bg:/fg:` format with `ansi` prefix | SGR escape codes in `ListItemText` |
+| **Style/color** | Not supported | Not supported (carapace doesn't emit styles) | Not supported | `zstyle list-colors` with `(#b)` patterns | Not supported | `styled` builtin via `ParseStyling` | Full 256-color + attr `{fg,bg,attr}` record | `bg: fg:` format with `ansi` prefix | SGR escape codes in `ListItemText` |
 | **Messages** | Integrated as styled values | Integrated as values | Integrated as values | Native `_message -r` | Integrated as `ERR` values | Native `edit:notify` | Integrated as `ERR` values | Integrated as styled values | Integrated as styled `ListItemText` |
 | **Go-side patching** | `bash.Patch()` (redirects + wordbreaks) | None | None | None | None | None | `nushell.Patch()` (open quotes) | None | None |
 | **Open-quote retry** | 3-stage snippet retry (`''`, `'"`, `"`) | `sed` + xargs | `sed` + xargs | 3-stage snippet retry (`''`, `'"`, `"`) | 3-stage snippet retry (`''`, `'"`, `"`) | Not needed (parser handles) | Not needed (parser handles) | `fix_prefix` strips quotes | Not needed (AST handles) |
@@ -133,6 +133,6 @@ All other shells pass arguments directly to `traverse()` without patching.
 - **references/shell-powershell.md** — PowerShell integration deep dive
 - **references/shell-xonsh.md** — xonsh integration deep dive
 - **references/shell-zsh.md** — zsh integration deep dive
-- **carapace-setup** — installation and shell integration (user-facing)
+- **carapace-bin skill** (carapace-bin repo) — installation and shell integration (user-facing)
 - **references/traverse.md** — the completion engine that produces Actions before formatting
 - **references/style.md** — how styles are resolved before shell rendering

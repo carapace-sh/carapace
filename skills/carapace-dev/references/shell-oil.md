@@ -12,7 +12,7 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s oil (OSH) co
 
 ## Oil Background
 
-Oil (OSH) is a Bash-compatible shell that uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash for programmable completion. However, it lacks some of the advanced features of bash completion (no `COMP_TYPE` successive-tab display, no `COMP_WORDBREAKS` handling, and no redirect patching in carapace).
+Oil (OSH) is a Bash-compatible shell that uses the same `COMP_LINE`/`COMP_POINT` mechanism as bash for programmable completion. However, it lacks some of the advanced features of bash completion (no `COMP_TYPE` successive-tab display, no `COMP_WORDBREAKS` patching in carapace, and no redirect patching in carapace).
 
 ## The Oil Snippet
 

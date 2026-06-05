@@ -168,4 +168,4 @@ Persists style overrides to `$XDG_CONFIG_HOME/carapace/styles.json`. Key format 
 
 - **references/action.md** — how `.Style()`/`.StyleF()`/`.StyleR()` apply styles to Actions
 - **references/shell.md** — per-shell style rendering details
-- **carapace-action** — using styles in carapace-bin shared actions
+- **carapace-bin skill** (carapace-bin repo) — using styles in shared actions

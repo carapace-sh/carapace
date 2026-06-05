@@ -418,7 +418,7 @@ Enabled with `bleopt complete_auto_complete=1` (Bash 4.0+). Automatically shows 
 | Option | Default | Description |
 |--------|---------|-------------|
 | `complete_auto_complete` | `1` | Enable auto-completion |
-| `complete_auto_delay` | `1` | Delay in milliseconds before triggering |
+| `complete_auto_delay` | `100` | Delay in milliseconds before triggering |
 | `complete_auto_history` | `1` | Enable history-based suggestions |
 | `complete_auto_menu` | empty | Auto-display menu after delay |
 | `complete_auto_wordbreaks` | `$' \t\n'` | Word break characters |

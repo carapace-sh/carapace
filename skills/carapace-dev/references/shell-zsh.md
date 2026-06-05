@@ -371,7 +371,7 @@ if !meta.Nospace.Matches(val.Value) {
 }
 ```
 
-Zsh is the only carapace shell with **per-candidate nospace support**. The `SuffixMatcher` checks if a value's last character matches a nospace suffix. If it matches (or `*` is in the set), no trailing space is added. Otherwise, a space is appended.
+Zsh is one of three carapace shells with **per-candidate nospace support** (alongside elvish and nushell). The `SuffixMatcher` checks if a value's last character matches a nospace suffix. If it matches (or `*` is in the set), no trailing space is added. Otherwise, a space is appended.
 
 The `FULL_QUOTING_*` states are excluded from space addition because zsh places the space inside the closing quote, which is incorrect. This is a known workaround — when the word is fully quoted, `_describe -S ''` ensures no trailing space, but if nospace matches, the value still doesn't get a space (which is correct).
 
@@ -753,4 +753,4 @@ This disables zsh's default tag-based grouping headers. Carapace's `_describe -t
 - **references/shell.md** — cross-shell feature comparison and shared dispatch
 - **references/traverse.md** — the completion engine that produces Actions before formatting
 - **references/style.md** — how styles are resolved and converted to SGR sequences
-- **carapace-setup** — user-facing shell integration setup
+- **carapace-bin skill** (carapace-bin repo) — user-facing shell integration setup

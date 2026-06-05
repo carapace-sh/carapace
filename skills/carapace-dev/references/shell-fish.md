@@ -275,4 +275,4 @@ User presses TAB
 - **references/shell.md** — cross-shell feature comparison and shared dispatch
 - **references/traverse.md** — the completion engine that produces Actions before formatting
 - **references/style.md** — how styles are resolved (fish doesn't support per-candidate styles)
-- **carapace-setup** — user-facing shell integration setup
+- **carapace-bin skill** (carapace-bin repo) — user-facing shell integration setup

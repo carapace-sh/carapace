@@ -169,5 +169,5 @@ No unit tests in carapace-bridge. Integration testing via Docker Compose in `.do
 
 ## Related Skills
 
-- **carapace skill** (references/choice.md) — resolution priority, choices, CARAPACE_BRIDGES (user-facing)
-- **carapace skill** (references/integrate.md) — using bridges in cobra CLIs (Split, SplitP, ActionCarapaceBin)
+- **carapace-bin skill** (carapace-bin repo) — resolution priority, choices, CARAPACE_BRIDGES (user-facing)
+- **carapace-bin skill** (carapace-bin repo) — using bridges in cobra CLIs (Split, SplitP, ActionCarapaceBin)

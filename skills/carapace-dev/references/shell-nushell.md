@@ -314,7 +314,7 @@ Carapace encodes the nospace signal as a **trailing space** in the `value` field
 - **`nospace = true`** — value ends with no trailing space (nushell won't add one either)
 - **`nospace = false`** — value ends with a space character, so nushell inserts the value **with** the trailing space
 
-This is a clever use of nushell's JSON format — since the `value` field is the exact text inserted into the command line, a trailing space in the value becomes a trailing space after insertion. Nushell's `append_whitespace` field defaults to `false`, so carapace controls spacing entirely through the `value` field.
+This is a clever use of nushell's JSON format — since the `value` field is the exact text inserted into the command line, a trailing space in the value becomes a trailing space after insertion. Nushell's `append_whitespace` field defaults to `true`, but carapace sets it to `false` in its completer closure so that spacing is controlled entirely through the `value` field.
 
 This approach means:
 - Values like `--flag=` (with `NoSpace('=')`) are inserted without trailing space

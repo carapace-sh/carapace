@@ -138,4 +138,4 @@ The `carapace-spec` library's `internal/pflagfork` has a separate, slim read-onl
 ## Related Skills
 
 - **references/traverse.md** — how pflagfork is used during argument traversal
-- **carapace-integrate** — user-facing non-POSIX flag setup (from the integration perspective)
+- **carapace-bin skill** (carapace-bin repo) — user-facing non-POSIX flag setup (from the integration perspective)

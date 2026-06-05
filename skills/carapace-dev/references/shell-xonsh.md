@@ -8,7 +8,7 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s xonsh comple
 |------|---------|
 | `internal/shell/xonsh/snippet.go` | Xonsh completion script generation (Python `@contextual_command_completer`) |
 | `internal/shell/xonsh/action.go` | Value formatting, JSON serialization, quoting/nospace logic |
-| `internal/shell/xonsh/style.go` | Style conversion from carapace format to xonsh `bg:/fg:` format |
+| `internal/shell/xonsh/style.go` | Style conversion from carapace format to xonsh `bg: fg:` format |
 | `internal/shell/shell.go` | Shared dispatch — message integration, nospace propagation, filtering |
 | `complete.go` | Entry point — no xonsh-specific patching (unlike bash/nushell/cmd-clink) |
 

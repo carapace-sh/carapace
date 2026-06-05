@@ -65,7 +65,7 @@ The `--attach=none` flag defers attachment, which is completed by calling `ble-a
    - `POSIXLY_CORRECT` — saved and unset
    - `FUNCNEST` — saved and unset
    - `set -e`, `set -u`, `set -x` — disabled
-   - `expand_aliases` — disabled
+   - `expand_aliases` — enabled (needed for alias expansion)
    - `LC_COLLATE=C` — consistent pattern matching
    - `IFS=$' \t\n'` — consistent word splitting
 3. **Directory Initialization** — Set up XDG paths

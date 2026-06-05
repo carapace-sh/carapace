@@ -253,6 +253,6 @@ type Meta struct {
 
 ## Related Skills
 
-- **carapace-action** — creating/modifying shared actions in carapace-bin (Opts, Uid/QueryF, caching, macro exposure)
-- **carapace-integrate** — integrating carapace library into cobra CLIs (PreRun, PreInvoke, bridge, spec)
+- **carapace-bin skill** (carapace-bin repo) — creating/modifying shared actions (Opts, Uid/QueryF, caching, macro exposure)
+- **carapace-bin skill** (carapace-bin repo) — integrating carapace library into cobra CLIs (PreRun, PreInvoke, bridge, spec)
 - **references/traverse.md** — how the completion engine resolves what to complete

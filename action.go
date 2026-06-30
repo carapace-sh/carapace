@@ -308,7 +308,7 @@ func (a Action) split(pipelines bool) Action {
 		}
 
 		originalValue := c.Value
-		prefix := originalValue[:tokens.Words().CurrentToken().Index]
+		prefix := originalValue[:tokens.Words().CurrentToken().Span.Start]
 		c.Args = context.Args
 		c.Parts = []string{}
 		c.Value = context.Value
@@ -316,7 +316,7 @@ func (a Action) split(pipelines bool) Action {
 		if pipelines { // support redirects
 			if len(tokens) > 1 && tokens[len(tokens)-2].WordbreakType.IsRedirect() {
 				LOG.Printf("completing files for redirect arg %#v", tokens.Words().CurrentToken().Value)
-				prefix = originalValue[:tokens.CurrentToken().Index]
+				prefix = originalValue[:tokens.CurrentToken().Span.Start]
 				c.Value = tokens.CurrentToken().Value
 				a = ActionFiles()
 			}

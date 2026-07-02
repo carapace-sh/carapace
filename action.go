@@ -208,7 +208,16 @@ func (a Action) MultiPartsP(delimiter string, pattern string, f func(placeholder
 						return invoked.ToA()
 					}))
 				} else {
-					actions = append(actions, ActionStyledValuesDescribed(key, value.Description, value.Style)) // TODO tag,..
+					actions = append(actions, ActionCallback(func(c Context) Action {
+						return Action{rawValues: []common.RawValue{{
+							Value:       key,
+							Display:     key,
+							Description: value.Description,
+							Style:       value.Style,
+							Tag:         value.Tag,
+							Uid:         value.Uid,
+						}}}
+					}))
 				}
 			}
 

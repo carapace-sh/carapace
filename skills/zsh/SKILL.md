@@ -11,7 +11,8 @@ description: >
   "zsh expansion", "zsh globbing", "zsh startup", "zsh fpath", "zsh autoload",
   "zsh compinstall", "zsh list-colors", "zsh tag-order", "zsh group-name",
   "zsh menu-select", "zsh menu-complete", "curcontext", "words", "CURRENT",
-  "PREFIX", "SUFFIX", "compquote", "comptilde", "compset".
+  "PREFIX", "SUFFIX", "compquote", "comptilde", "compset",
+  "zpty", "capture completion", "compadd override", "compprefuncs", "comppostfuncs".
 user-invocable: true
 ---
 
@@ -29,6 +30,7 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 | ZLE, zle builtin, widget, keymap, bindkey, emacs, viins, vicmd, main, .safe, isearch, complete-word, menu-complete, menu-select, reverse-menu-complete, delete-char-or-list, list-choices, expand-or-complete, accept-and-menu-complete, compstate, compwidget, compquote, comptilde, compset, compcall, BUFFER, CURSOR, LBUFFER, RBUFFER, KEYMAP, WIDGET, KEYS, NUMERIC, CONTEXT, vared, zle_highlight, KEYTIMEOUT, user-defined widget, completion widget, zle -C, zle -N | [references/zle.md](references/zle.md) |
 | quoting, single quotes, double quotes, $'...' ANSI-C quoting, backslash escaping, RC_QUOTES, parameter expansion, ${name}, ${name:-word}, ${name:=word}, ${name:+word}, ${name:?word}, ${#name}, ${name#pattern}, ${name##pattern}, ${name%pattern}, ${name%%pattern}, ${(flags)name}, expansion flags, globbing, filename generation, *, ?, [...], <m-n>, **/, glob qualifiers, extended glob, (#b), (#i), ksh glob, expansion order, tilde expansion, brace expansion, process substitution, command substitution, arithmetic expansion, WORDCHARS, FIGNORE, nullglob, nomatch | [references/expansion-quoting.md](references/expansion-quoting.md) |
 | startup, .zshenv, .zshprofile, .zshrc, .zlogin, .zlogout, ZDOTDIR, login shell, interactive shell, fpath, FPATH, autoload, compinit security, compaudit, zcompdump, compinit -C, compinit -D, compinit -u, compinit -i, compinstall, RCS, GLOBAL_RCS, completion function discovery, #compdef, _compdir, completion directories, Base, Zsh, Unix, X, platform-specific completions | [references/startup-config.md](references/startup-config.md) |
+| zpty, capture completion, compadd override, compprefuncs, comppostfuncs, compadd -A, compadd -D, zparseopts, headless zsh, pty completion capture, carapace-bridge, Valodim, capture.zsh, completion capture consumer, null-byte framing | [references/capture-completion.md](references/capture-completion.md) |
 
 ## Quick Guide
 
@@ -52,6 +54,7 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 - **Which startup files does zsh read?** → [references/startup-config.md](references/startup-config.md)
 - **How does compinit work?** → [references/startup-config.md](references/startup-config.md)
 - **How do I add custom completion functions?** → [references/startup-config.md](references/startup-config.md)
+- **How do I capture zsh completions externally (zpty/pty)?** → [references/capture-completion.md](references/capture-completion.md)
 
 ## Cross-Project References
 

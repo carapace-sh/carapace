@@ -158,6 +158,9 @@ type run struct {
 func (r run) invoke(a carapace.Action) string {
 	meta, rawValues := common.FromInvokedAction(a.Invoke(r.context))
 	rawValues = rawValues.FilterPrefix(r.context.Value)
+	for i := range rawValues {
+		rawValues[i].Uid = "" // ignore Uids in comparisons so that actions built from base functions match those roundtripped through Invoke().ToA()
+	}
 	sort.Sort(common.ByValue(rawValues))
 
 	m, err := json.MarshalIndent(export.Export{

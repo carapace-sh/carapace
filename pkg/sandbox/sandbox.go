@@ -155,11 +155,13 @@ type run struct {
 }
 
 // TODO rename
-func (r run) invoke(a carapace.Action) string {
+func (r run) invoke(a carapace.Action, strict bool) string {
 	meta, rawValues := common.FromInvokedAction(a.Invoke(r.context))
 	rawValues = rawValues.FilterPrefix(r.context.Value)
-	for i := range rawValues {
-		rawValues[i].Uid = "" // ignore Uids in comparisons so that actions built from base functions match those roundtripped through Invoke().ToA()
+	if !strict {
+		for i := range rawValues {
+			rawValues[i].Uid = "" // ignore Uids in comparisons so that actions built from base functions match those roundtripped through Invoke().ToA()
+		}
 	}
 	sort.Sort(common.ByValue(rawValues))
 
@@ -174,18 +176,26 @@ func (r run) invoke(a carapace.Action) string {
 	return string(m)
 }
 
-// Expects validates output of Run with given Action.
+// Expect validates output of Run with given Action.
 func (r run) Expect(expected carapace.Action) {
 	r.t.Run(r.id, func(t *testing.T) {
 		// t.Parallel() TODO prevent concurrent map write for this (storage.go)
-		assert.Equal(r.t, r.invoke(expected), r.invoke(r.actual))
+		assert.Equal(r.t, r.invoke(expected, false), r.invoke(r.actual, false))
+	})
+}
+
+// ExpectStrict validates output of Run with given Action including Uids.
+func (r run) ExpectStrict(expected carapace.Action) {
+	r.t.Run(r.id, func(t *testing.T) {
+		// t.Parallel() TODO prevent concurrent map write for this (storage.go)
+		assert.Equal(r.t, r.invoke(expected, true), r.invoke(r.actual, true))
 	})
 }
 
 func (r run) ExpectNot(unexpected carapace.Action) {
 	r.t.Run(r.id, func(t *testing.T) {
 		// t.Parallel() TODO prevent concurrent map write for this (storage.go)
-		if r.invoke(unexpected) == r.invoke(r.actual) {
+		if r.invoke(unexpected, false) == r.invoke(r.actual, false) {
 			t.Fatal("output should differ") // TODO yuck - print the action?
 		}
 	})

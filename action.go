@@ -283,23 +283,50 @@ func (a Action) Shift(n int) Action {
 }
 
 // Split splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
-func (a Action) Split() Action {
-	return a.split(false)
+func (a Action) Split(format string) Action {
+	return a.split(format, false)
 }
 
 // SplitP is like Split but supports pipelines.
-func (a Action) SplitP() Action {
-	return a.split(true)
+func (a Action) SplitP(format string) Action {
+	return a.split(format, true)
 }
 
-func (a Action) split(pipelines bool) Action {
+func (a Action) split(format string, pipelines bool) Action {
 	return ActionCallback(func(c Context) Action {
 		tokens, err := shlex.Split(c.Value)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
-		ctx := shlex.SplitForCompletion(c.Value, shlex.BashFormat())
+		// TODO should be in shlex
+		var f shlex.Format
+		switch format {
+		case "", "bash":
+			f = shlex.BashFormat()
+		case "cmd":
+			f = shlex.CmdFormat()
+		case "fish":
+			f = shlex.FishFormat()
+		case "elvish":
+			f = shlex.ElvishFormat()
+		case "nushell":
+			f = shlex.NushellFormat()
+		case "oil":
+			f = shlex.OilFormat()
+		case "powershell":
+			f = shlex.PowershellFormat()
+		case "tcsh":
+			f = shlex.TcshFormat()
+		case "xonsh":
+			f = shlex.XonshFormat()
+		case "zsh":
+			f = shlex.ZshFormat()
+		default:
+			return ActionMessage("unknown format: %q", format)
+		}
+
+		ctx := shlex.SplitForCompletion(c.Value, f)
 
 		var context Context
 		if pipelines {

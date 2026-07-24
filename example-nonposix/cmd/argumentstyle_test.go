@@ -69,6 +69,6 @@ func TestAcceptAttached(t *testing.T) {
 				Usage("Accept attached only"))
 
 		s.Run("argumentstyle", "-3", "").
-			Expect(carapace.ActionMessage("flag needs an argument: '3' in -3"))
+			Expect(carapace.ActionValues())
 	})
 }

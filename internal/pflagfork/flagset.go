@@ -94,7 +94,8 @@ func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "--"+f.Name {
-			// Check ArgumentStyle constraints
+			// AcceptAttached does not apply to longhand flags (--flagvalue is not valid);
+			// only AcceptDelimited (--flag=value) and AcceptNext (--flag value) are checked here.
 			if len(splitted) > 1 && !f.AcceptsDelimited() {
 				return // flag doesn't accept delimited style (--flag=value)
 			}
@@ -124,27 +125,22 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 			return flag
 		}
 
-		// Check if there's a delimiter (=)
-		hasDelimiter := index < len(arg)-1 && arg[index+1] == byte(flag.OptargDelimiter())
-		// Check if value is attached (e.g., -fvalue)
-		hasAttached := index < len(arg)-1 && !hasDelimiter
-		// Check if value is in next position
-		hasNext := index == len(arg)-1 || hasDelimiter || hasAttached
+		atEnd := len(arg) == index+1
+		hasDelimiter := !atEnd && arg[index+1] == byte(flag.OptargDelimiter())
+		hasAttached := !atEnd && !hasDelimiter
 
+		// Reject argument styles the flag does not accept
 		switch {
 		case hasDelimiter && !flag.AcceptsDelimited():
-			// Flag doesn't accept delimited style
 			continue
 		case hasAttached && !flag.AcceptsAttached():
-			// Flag doesn't accept attached style
 			continue
-		case hasNext && len(arg) == index+1 && !flag.AcceptsNext() && !flag.AcceptsAttached():
-			// Flag doesn't accept next style and has no default, and doesn't accept attached for completion
+		case atEnd && !flag.AcceptsNext() && !flag.AcceptsAttached():
 			continue
 		}
 
 		switch {
-		case len(arg) == index+1:
+		case atEnd:
 			flag.Prefix = arg
 			return flag
 		case hasDelimiter && len(arg) > index+2:

@@ -32,16 +32,25 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
+// ArgumentStyle bit values mirror github.com/carapace-sh/carapace-pflag
+// ArgumentStyle constants (accessed via reflection since pflagfork
+// cannot import carapace-pflag).
+const (
+	argStyleNext      uint = 1 << iota // AcceptNext: -f arg
+	argStyleDelimited                  // AcceptDelimited: -f=arg
+	argStyleAttached                   // AcceptAttached: -farg (POSIX shorthand only)
+)
+
 func (f Flag) AcceptsNext() bool {
-	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&1 != 0
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleNext != 0
 }
 
 func (f Flag) AcceptsDelimited() bool {
-	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&2 != 0
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleDelimited != 0
 }
 
 func (f Flag) AcceptsAttached() bool {
-	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&4 != 0
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleAttached != 0
 }
 
 func (f Flag) OptargDelimiter() rune {

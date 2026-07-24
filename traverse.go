@@ -102,8 +102,9 @@ loop:
 			LOG.Printf("removing suffix %#v since it is a flag missing its argument\n", suffix)
 			toParse = append(toParse, strings.TrimSuffix(localInFlag.Prefix, suffix))
 		} else if localInFlag == nil {
-			// shorthand lookup failed due to argument style restriction
-			// Don't add to toParse - will show flag completions instead
+			// shorthand lookup failed (e.g. due to ArgumentStyle restriction)
+			// context.Value is not a valid flag form; skip adding it to toParse
+			// so that flag completions are shown instead
 		} else {
 			LOG.Printf("adding shorthand flag %#v", context.Value)
 			toParse = append(toParse, context.Value)
@@ -132,8 +133,8 @@ loop:
 
 		return storage.getPositional(cmd, len(context.Args)), context
 
-	// flag argument
-	case inFlag != nil && inFlag.Consumes(context.Value):
+	// flag argument (only when the flag accepts the next-arg style)
+	case inFlag != nil && inFlag.Consumes(context.Value) && inFlag.AcceptsNext():
 		LOG.Printf("completing flag argument of %#v for arg %#v\n", inFlag.Name, context.Value)
 		context.Parts = inFlag.Args
 		return storage.getFlag(cmd, inFlag.Name), context

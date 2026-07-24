@@ -41,7 +41,11 @@ func TestRoot(t *testing.T) {
 				Usage("OptargDelimiter ':'"))
 
 		s.Run("-delim-colon", "").
-			Expect(carapace.ActionValues("p1", "positional1"))
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
+					Tag("commands"),
+				carapace.ActionValues("p1", "positional1"),
+			).ToA())
 
 		s.Run("-delim-slash/").
 			Expect(carapace.ActionValues("d1", "d2", "d3").
@@ -99,7 +103,11 @@ func TestNargs(t *testing.T) {
 				Usage("Nargs"))
 
 		s.Run("--nargs-two", "nt1", "nt4", "").
-			Expect(carapace.ActionValues("p1", "positional1"))
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
+					Tag("commands"),
+				carapace.ActionValues("p1", "positional1"),
+			).ToA())
 
 		s.Run("--nargs-two", "nt1", "nt4", "--nargs-").
 			Expect(carapace.ActionValuesDescribed(

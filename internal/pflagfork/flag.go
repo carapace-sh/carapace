@@ -32,11 +32,25 @@ func (f Flag) Nargs() int {
 	return 0
 }
 
-func (f Flag) Mode() mode {
-	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Mode"); field.IsValid() && field.Kind() == reflect.Int {
-		return mode(field.Int())
-	}
-	return Default
+// ArgumentStyle bit values mirror github.com/carapace-sh/carapace-pflag
+// ArgumentStyle constants (accessed via reflection since pflagfork
+// cannot import carapace-pflag).
+const (
+	argStyleNext      uint = 1 << iota // AcceptNext: -f arg
+	argStyleDelimited                  // AcceptDelimited: -f=arg
+	argStyleAttached                   // AcceptAttached: -farg (POSIX shorthand only)
+)
+
+func (f Flag) AcceptsNext() bool {
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleNext != 0
+}
+
+func (f Flag) AcceptsDelimited() bool {
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleDelimited != 0
+}
+
+func (f Flag) AcceptsAttached() bool {
+	return f.ArgumentStyle() == 0 || f.ArgumentStyle()&argStyleAttached != 0
 }
 
 func (f Flag) OptargDelimiter() rune {
@@ -44,6 +58,20 @@ func (f Flag) OptargDelimiter() rune {
 		return (rune(field.Int()))
 	}
 	return '='
+}
+
+func (f Flag) ArgumentStyle() uint {
+	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("ArgumentStyle"); field.IsValid() && field.Kind() == reflect.Uint {
+		return uint(field.Uint())
+	}
+	return 0 // 0 means accept all variants (backward compatible)
+}
+
+func (f Flag) GetMode() mode {
+	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("Mode"); field.IsValid() && field.Kind() == reflect.Int {
+		return mode(field.Int())
+	}
+	return Default
 }
 
 func (f Flag) IsRepeatable() bool {
@@ -90,7 +118,7 @@ func (f Flag) Required() bool {
 
 func (f Flag) Definition() string {
 	var definition string
-	switch f.Mode() {
+	switch f.GetMode() {
 	case ShorthandOnly:
 		definition = fmt.Sprintf("-%v", f.Shorthand)
 	case NameAsShorthand:

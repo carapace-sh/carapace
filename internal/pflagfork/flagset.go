@@ -88,12 +88,20 @@ func (fs FlagSet) lookupPosixLonghandArg(arg string) (flag *Flag) {
 	}
 
 	fs.VisitAll(func(f *Flag) { // TODO needs to be sorted to try longest matching first
-		if flag != nil || f.Mode() != Default {
+		if flag != nil || f.GetMode() != Default {
 			return
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "--"+f.Name {
+			// AcceptAttached does not apply to longhand flags (--flagvalue is not valid);
+			// only AcceptDelimited (--flag=value) and AcceptNext (--flag value) are checked here.
+			if len(splitted) > 1 && !f.AcceptsDelimited() {
+				return // flag doesn't accept delimited style (--flag=value)
+			}
+			if len(splitted) == 1 && !f.AcceptsNext() && f.NoOptDefVal == "" {
+				return // flag doesn't accept next style and has no default
+			}
 			flag = f
 			flag.Prefix = splitted[0]
 			if len(splitted) > 1 {
@@ -113,17 +121,33 @@ func (fs FlagSet) lookupPosixShorthandArg(arg string) *Flag {
 		index += 1
 		flag := fs.ShorthandLookup(string(r))
 
-		switch {
-		case flag == nil:
+		if flag == nil {
 			return flag
-		case len(arg) == index+1:
+		}
+
+		atEnd := len(arg) == index+1
+		hasDelimiter := !atEnd && arg[index+1] == byte(flag.OptargDelimiter())
+		hasAttached := !atEnd && !hasDelimiter
+
+		// Reject argument styles the flag does not accept
+		switch {
+		case hasDelimiter && !flag.AcceptsDelimited():
+			continue
+		case hasAttached && !flag.AcceptsAttached():
+			continue
+		case atEnd && !flag.AcceptsNext() && !flag.AcceptsAttached():
+			continue
+		}
+
+		switch {
+		case atEnd:
 			flag.Prefix = arg
 			return flag
-		case arg[index+1] == byte(flag.OptargDelimiter()) && len(arg) > index+2:
+		case hasDelimiter && len(arg) > index+2:
 			flag.Prefix = arg[:index+2]
 			flag.Args = []string{arg[index+2:]}
 			return flag
-		case arg[index+1] == byte(flag.OptargDelimiter()):
+		case hasDelimiter:
 			flag.Prefix = arg[:index+2]
 			flag.Args = []string{""}
 			return flag
@@ -147,7 +171,14 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
-		if strings.TrimSuffix(splitted[0], string(f.OptargDelimiter())) == "-"+f.Shorthand {
+		baseArg := strings.TrimSuffix(splitted[0], string(f.OptargDelimiter()))
+
+		// Check ArgumentStyle constraints
+		if len(splitted) > 1 && !f.AcceptsDelimited() {
+			return // flag doesn't accept delimited style
+		}
+
+		if baseArg == "-"+f.Shorthand {
 			result = f
 			result.Prefix = splitted[0]
 			if len(splitted) > 1 {

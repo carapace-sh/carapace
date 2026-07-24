@@ -16,13 +16,14 @@ type mode int
 const (
 	Default         mode = iota // default behaviour
 	ShorthandOnly               // only the shorthand should be used
-	NameAsShorthand             // non-posix mode where the name is also added as shorthand (single `-` prefix)
+	NameAsShorthand             // non-posix mode where the name is also added as shorthand (single prefix)
 )
 
 type Flag struct {
 	*pflag.Flag
-	Prefix string
-	Args   []string
+	ArgPrefix  string   // e.g., "--verbose=" when completing --verbose=foo
+	FlagPrefix rune     // flag prefix character from parent FlagSet (e.g. '-', '&')
+	Args       []string // already-consumed flag arguments
 }
 
 func (f Flag) Nargs() int {
@@ -116,19 +117,20 @@ func (f Flag) Required() bool {
 	return false
 }
 
-func (f Flag) Definition() string {
+func (f Flag) Definition(prefix rune) string {
+	p := string(prefix)
 	var definition string
 	switch f.GetMode() {
 	case ShorthandOnly:
-		definition = fmt.Sprintf("-%v", f.Shorthand)
+		definition = fmt.Sprintf("%v%v", p, f.Shorthand)
 	case NameAsShorthand:
-		definition = fmt.Sprintf("-%v, -%v", f.Shorthand, f.Name)
+		definition = fmt.Sprintf("%v%v, %v%v", p, f.Shorthand, p, f.Name)
 	default:
 		switch f.Shorthand {
 		case "":
-			definition = fmt.Sprintf("--%v", f.Name)
+			definition = fmt.Sprintf("%v%v%v", p, p, f.Name)
 		default:
-			definition = fmt.Sprintf("-%v, --%v", f.Shorthand, f.Name)
+			definition = fmt.Sprintf("%v%v, %v%v%v", p, f.Shorthand, p, p, f.Name)
 		}
 	}
 
@@ -170,7 +172,7 @@ func (f Flag) Consumes(arg string) bool {
 		return true
 	case f.Nargs() > 1 && len(f.Args) < f.Nargs():
 		return true
-	case f.Nargs() < 0 && !strings.HasPrefix(arg, "-"):
+	case f.Nargs() < 0 && !strings.HasPrefix(arg, string(f.FlagPrefix)):
 		return true
 	default:
 		return false

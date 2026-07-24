@@ -44,6 +44,8 @@ func TestRoot(t *testing.T) {
 			Expect(carapace.Batch(
 				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
 					Tag("commands"),
+				carapace.ActionValuesDescribed("customprefix", "test custom flag prefix (e.g. '&')").
+					Tag("commands"),
 				carapace.ActionValues("p1", "positional1"),
 			).ToA())
 
@@ -105,6 +107,8 @@ func TestNargs(t *testing.T) {
 		s.Run("--nargs-two", "nt1", "nt4", "").
 			Expect(carapace.Batch(
 				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
+					Tag("commands"),
+				carapace.ActionValuesDescribed("customprefix", "test custom flag prefix (e.g. '&')").
 					Tag("commands"),
 				carapace.ActionValues("p1", "positional1"),
 			).ToA())

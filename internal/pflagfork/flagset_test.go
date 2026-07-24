@@ -25,8 +25,8 @@ func TestLookupPosixShorthandArg(t *testing.T) {
 				t.Fatal("should be " + name)
 			}
 
-			if f.Prefix != prefix {
-				t.Fatalf("prefix doesnt match actual: %#v, expected: %#v", f.Prefix, prefix)
+			if f.ArgPrefix != prefix {
+				t.Fatalf("prefix doesnt match actual: %#v, expected: %#v", f.ArgPrefix, prefix)
 			}
 
 			if !reflect.DeepEqual(f.Args, args) {

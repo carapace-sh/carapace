@@ -2,6 +2,18 @@
 
 Reference for [carapace-pflag](https://github.com/carapace-sh/carapace-pflag) — the carapace fork of [spf13/pflag](https://github.com/spf13/pflag) with non-POSIX flag support and structured errors. Module path remains `github.com/spf13/pflag` for drop-in compatibility.
 
+## Flag Prefix
+
+Carapace-pflag supports custom flag prefix characters via `FlagSet.SetPrefix()`. The default is `'-'` (standard `-`/`--` syntax), but applications can set a different prefix — for example, elvish uses `'&'` so flags appear as `&&flag`, `&f`, and `&&` (dash).
+
+The carapace library's `pflagfork.FlagSet.Prefix()` method reads this via reflection (defaulting to `'-'` when the method is absent). All prefix checks in `traverse.go`, `flagset.go`, `internalActions.go`, and `spec.go` use the dynamic prefix rather than hardcoding `'-'`/`'--'`.
+
+| Method | Returns | Purpose |
+|--------|---------|---------|
+| `FlagSet.Prefix()` | `rune` | Flag prefix char (default `'-'`; `'&'` when customized) |
+| `Flag.FlagPrefix` | `rune` | Per-flag copy of the parent FlagSet prefix |
+| `Flag.ArgPrefix` | `string` | The consumed prefix portion (e.g. `"--verbose="`) |
+
 ## Flag Modes
 
 The `Mode` field on `Flag` controls how a flag is accessed on the command line:
@@ -11,6 +23,8 @@ The `Mode` field on `Flag` controls how a flag is accessed on the command line:
 | `Default` | `0` | Standard POSIX: `--name` and `-shorthand` | `--verbose`, `-v` |
 | `ShorthandOnly` | `1` | Only `-shorthand` works; `--name` is treated as unknown | `-STOP` |
 | `NameAsShorthand` | `2` | `-name` works alongside `--name` (single-dash longhand) | `-help`, `--help` |
+
+> **Note**: carapace's `pflagfork` reads the `Mode` field via reflection through `Flag.GetMode()` (renamed from `Mode()` to avoid conflict with the embedded `pflag.Flag.Mode` field).
 
 ### Effects of Mode
 
@@ -73,11 +87,29 @@ The `ArgumentStyle` bitmask on `Flag` controls which binding forms a flag accept
 |-----|----------|------|---------|
 | `1 << 0` | `AcceptNext` | `-f arg` (next positional) | `--output file.txt` |
 | `1 << 1` | `AcceptDelimited` | `-f=arg` (delimiter-attached) | `--output=file.txt` |
-| `1 << 2` | `AcceptAttached` | `-farg` (POSIX attached) | `-ooutput` |
+| `1 << 2` | `AcceptAttached` | `-farg` (POSIX attached, shorthand only) | `-ooutput` |
 
 Zero value (`0`) accepts all three forms (backward compatible). Combine with OR: `AcceptDelimited | AcceptNext` allows only `--flag=val` and `--flag val`.
 
 When a form is not accepted, parsing returns `ValueRequiredError`.
+
+### pflagfork Integration
+
+Carapace's `pflagfork` reads `ArgumentStyle` via reflection and exposes three helper methods:
+
+| Method | Returns true when |
+|--------|------------------|
+| `Flag.AcceptsNext()` | Style is `0` (accept all) OR `AcceptNext` bit is set |
+| `Flag.AcceptsDelimited()` | Style is `0` (accept all) OR `AcceptDelimited` bit is set |
+| `Flag.AcceptsAttached()` | Style is `0` (accept all) OR `AcceptAttached` bit is set |
+
+These are checked during `LookupArg` dispatch in all four lookup paths:
+- `lookupPosixLonghandArg` — checks `AcceptsDelimited` and `AcceptsNext` (attached form not valid for longhand)
+- `lookupPosixShorthandArg` — checks `AcceptsDelimited`, `AcceptsAttached`, and `AcceptsNext` |
+- `lookupNonPosixShorthandArg` — checks `AcceptsDelimited` |
+- `LookupNonPosixLonghandArg` — checks `AcceptsDelimited` and `AcceptsNext` |
+
+During traversal (`traverse.go`), `AcceptsAttached()` gates whether to complete an attached shorthand argument, and `AcceptsNext()` gates whether to complete a flag argument in the next-arg position.
 
 ## IsPosix()
 
@@ -85,7 +117,7 @@ When a form is not accepted, parsing returns `ValueRequiredError`.
 
 When non-POSIX:
 - Shorthand chaining is disabled (`-abc` is a single shorthand, not `-a -b -c`)
-- `parseSingleShortArg` treats the entire string after `-` as one shorthand name
+- `parseSingleShortArg` treats the entire string after the prefix char as one shorthand name
 - Different error messages for unknown shorthands
 
 ## ParseErrorsAllowlist
@@ -123,17 +155,40 @@ Error messages adapt to flag `Mode` — e.g., `InvalidValueError` shows `-s, --n
 | `ArgumentStyle` | `ArgumentStyle (uint)` | `0` (accept all) | Which binding forms accepted |
 | `NoOptDefVal` | `string` | `""` | Optional-arg sentinel (from upstream) |
 
+Additionally, `FlagSet` supports a custom prefix character (see [Flag Prefix](#flag-prefix) above).
+
 ## Integration with carapace
 
 The carapace library's `internal/pflagfork` package reads these unexported fields via reflection:
 
-- `Flag.Mode()` — reads `Mode` field
+- `Flag.GetMode()` — reads `Mode` field (renamed from `Mode()` to avoid conflict with embedded `pflag.Flag.Mode`)
 - `Flag.Nargs()` — reads `Nargs` field
 - `Flag.OptargDelimiter()` — reads `OptargDelimiter` field
+- `Flag.ArgumentStyle()` — reads `ArgumentStyle` field (returns `0` when absent, meaning accept all)
+- `Flag.AcceptsNext()` / `AcceptsDelimited()` / `AcceptsAttached()` — derived helpers checking `ArgumentStyle` bitmask
 - `FlagSet.IsPosix()` — calls unexported `IsPosix()` method
 - `FlagSet.IsInterspersed()` — reads unexported `interspersed` field
+- `FlagSet.Prefix()` — calls unexported `Prefix()` method (returns `'-'` when absent; supports custom prefixes like `'&'` for elvish)
+- `Flag.Definition(prefix rune)` — generates flag definition string using the dynamic prefix char
 
 The `carapace-spec` library's `internal/pflagfork` has a separate, slim read-only version for code generation (no `FlagSet` wrapper, no parsing logic).
+
+## Definition(prefix rune)
+
+The `Definition()` method now takes a prefix rune parameter to generate the flag string using the dynamic prefix rather than hardcoded `-`/`--`:
+
+```go
+f.Definition(prefix) // e.g., "-v, --verbose!*?" or "&f, &&flag!*?"
+```
+
+Format: `<p>shorthand, <p><p>name<suffixes>` where `<p>` is the prefix char. Suffixes (in order):
+- `&` = hidden flag
+- `!` = required (cobra `BashCompOneRequiredFlag` annotation)
+- `*` = repeatable (Slice/Array/count type)
+- `?` = optarg (`NoOptDefVal != ""`, non-bool types only)
+- `=` = takes value (non-bool, non-optarg)
+
+Called from `internal/spec/spec.go` with the prefix obtained from `FlagSet.Prefix()`.
 
 ## Related Skills
 

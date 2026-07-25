@@ -58,12 +58,14 @@ func command(cmd *cobra.Command) Command {
             return
         }
         f := pflagfork.Flag{Flag: flag}
-        c.Flags[f.Definition()] = f.Usage
+        prefix := pflagfork.FlagSet{FlagSet: cmd.Flags()}.Prefix()
+        c.Flags[f.Definition(prefix)] = f.Usage
     })
 
     cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
         f := pflagfork.Flag{Flag: flag}
-        c.PersistentFlags[f.Definition()] = f.Usage
+        prefix := pflagfork.FlagSet{FlagSet: cmd.Flags()}.Prefix()
+        c.PersistentFlags[f.Definition(prefix)] = f.Usage
     })
 
     for _, subcmd := range cmd.Commands() {
@@ -81,16 +83,18 @@ Recursively processes the command tree, skipping:
 
 ## pflagfork.Flag.Definition
 
-The `Definition()` method produces a human-readable flag string used as the map key in the YAML:
+The `Definition(prefix rune)` method produces a human-readable flag string used as the map key in the YAML. It now takes a prefix rune parameter (obtained from `FlagSet.Prefix()`) to support custom flag prefixes:
 
 ```
-f.Definition() // e.g., "-v, --verbose!*?" or "-f, --file"
+f.Definition(prefix) // e.g., "-v, --verbose!*?" or "&f, &&flag!*?"
 ```
 
-Format: `-shorthand, --name<optarg>?` where:
-- `!` = required (no `NoOptDefVal`)
-- `*` = optarg (`NoOptDefVal != ""`)
-- `?` = hidden flag
+Format: `<p>shorthand, <p><p>name<suffixes>` where `<p>` is the prefix char. Suffixes (in order):
+- `&` = hidden flag
+- `!` = required (cobra `BashCompOneRequiredFlag` annotation)
+- `*` = repeatable (Slice/Array/count type)
+- `?` = optarg (`NoOptDefVal != ""`, non-bool types only)
+- `=` = takes value (non-bool, non-optarg)
 
 ## Flag Field Extraction
 
@@ -98,10 +102,11 @@ Uses `pflagfork.Flag` to wrap the raw `*pflag.Flag` and read unexported fields v
 
 ```go
 f := pflagfork.Flag{Flag: flag}
-c.Flags[f.Definition()] = f.Usage
+prefix := pflagfork.FlagSet{FlagSet: cmd.Flags()}.Prefix()
+c.Flags[f.Definition(prefix)] = f.Usage
 ```
 
-The `pflagfork.Flag` wrapper is the same type used by `traverse()` — it provides `Mode()`, `Nargs()`, `OptargDelimiter()`, `Definition()`, and other methods that read unexported pflag fields.
+The `pflagfork.Flag` wrapper is the same type used by `traverse()` — it provides `GetMode()`, `Nargs()`, `OptargDelimiter()`, `ArgumentStyle()`, `Definition(prefix)`, and other methods that read unexported pflag fields.
 
 ## Usage in command.go
 
@@ -131,7 +136,7 @@ The generated YAML conforms to the JSON schema at `https://carapace.sh/schemas/c
 
 - **Completion fields are empty**: The `Completion` struct in the YAML type is for carapace-bin spec files, not for generated specs from running commands. Generated specs only include `Name`, `Aliases`, `Description`, `Group`, `Hidden`, `Flags`, `PersistentFlags`, and `Commands`.
 - **ExclusiveFlags not populated**: The `ExclusiveFlags` field exists in the struct but is always empty in the generated output (TODO).
-- **Hidden flags via `?`**: The `Definition()` suffix `?` indicates a hidden flag. Not all flag types support hidden.
+- **Hidden flags via `&`**: The `Definition()` suffix `&` indicates a hidden flag.
 - **Skip _carapace**: The spec command itself is excluded from the tree to avoid polluting the generated spec.
 - **No annotation of completion actions**: The generated YAML does not include completion actions — it's a structural skeleton only. carapace-bin uses this as a starting point for manual spec authoring.
 

@@ -53,10 +53,10 @@ State variables:
 Each arg in the main loop is classified into one of 5 categories:
 
 | Priority | Category | Condition |
-|----------|----------|-----------|
+|----------|----------|------------|
 | 1 | **Flag argument** | `inFlag != nil && inFlag.Consumes(arg)` |
-| 2 | **Dash** | `arg == "--"` |
-| 3 | **Flag** | Starts with `-`, flag parsing enabled, interspersed or no positionals yet |
+| 2 | **Dash** | `arg == prefix+prefix` (e.g. `--` for `-`, `&&` for `&`) |
+| 3 | **Flag** | Starts with prefix char, flag parsing enabled, interspersed or no positionals yet |
 | 4 | **Subcommand** | Matches a subcommand name → **recurse** |
 | 5 | **Positional** | Default |
 
@@ -83,11 +83,11 @@ After parsing flags, `traverse()` decides what to complete:
 
 | Case | Returns |
 |------|---------|
-| Dash argument (`--` encountered) | `storage.getPositional(cmd, len(dashPositionals))` |
+| Dash argument (prefix+prefix encountered) | `storage.getPositional(cmd, len(dashPositionals))` |
 | Flag argument (`inFlag.Consumes(context.Value)`) | `storage.getFlag(cmd, inFlag.Name)` with `context.Parts = inFlag.Args` |
-| Optional flag arg (`NoOptDefVal` or attached `=`) | `storage.getFlag(cmd, f.Name).Prefix(f.Prefix)` or `ActionValues("true","false")` for bool |
-| Attached flag arg (POSIX shorthand) | `storage.getFlag(cmd, f.Name).Prefix(f.Prefix)` |
-| Flag name (starts with `-`) | `actionFlags(cmd)` — all available flags |
+| Optional flag arg (`NoOptDefVal` or attached delimiter) | `storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix)` or `ActionValues("true","false")` for bool |
+| Attached flag arg (POSIX shorthand, `AcceptsAttached`) | `storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix)` |
+| Flag name (starts with prefix char) | `actionFlags(cmd)` — all available flags |
 | Positional + subcommands | `Batch(getPositional) + ActionCommands(cmd)` if subcommands exist and no positionals consumed |
 
 ## pflagfork: Flag & FlagSet Wrappers
@@ -99,23 +99,28 @@ After parsing flags, `traverse()` decides what to complete:
 ```go
 type Flag struct {
     *pflag.Flag
-    Prefix string   // e.g., "--verbose=" when completing --verbose=foo
-    Args   []string // already-consumed flag arguments
+    ArgPrefix  string   // e.g., "--verbose=" when completing --verbose=foo
+    FlagPrefix rune     // flag prefix char from parent FlagSet (e.g. '-', '&')
+    Args       []string // already-consumed flag arguments
 }
 ```
 
 | Method | What it reads | Purpose |
 |--------|-------------|---------|
 | `Nargs()` | Unexported `Nargs` field | Multi-arg flag consumption |
-| `Mode()` | Unexported `Mode` field | Default/ShorthandOnly/NameAsShorthand |
+| `GetMode()` | Unexported `Mode` field | Default/ShorthandOnly/NameAsShorthand |
+| `ArgumentStyle()` | Unexported `ArgumentStyle` field | Bitmask controlling which binding forms accepted |
+| `AcceptsNext()` | Derived from `ArgumentStyle` | Accepts `-f arg` (next positional) |
+| `AcceptsDelimited()` | Derived from `ArgumentStyle` | Accepts `-f=arg` (delimiter-attached) |
+| `AcceptsAttached()` | Derived from `ArgumentStyle` | Accepts `-farg` (POSIX attached) |
 | `OptargDelimiter()` | Unexported `OptargDelimiter` field | Delimiter for `--flag=val` vs `--flag:val` |
 | `IsRepeatable()` | Value type string | True for Slice/Array/count |
 | `TakesValue()` | Value type | False for bool/boolSlice/count |
 | `IsOptarg()` | `NoOptDefVal != ""` | Flag arg is optional |
-| `Consumes(arg)` | Nargs + Args + TakesValue | Does this flag still need more args? |
+| `Consumes(arg)` | Nargs + Args + TakesValue + FlagPrefix | Does this flag still need more args? |
 | `Style()` | Type + Optarg | Style constant based on flag kind |
 | `Required()` | Cobra annotation | `BashCompOneRequiredFlag` |
-| `Definition()` | All metadata | Human-readable: `-v, --verbose!*?` |
+| `Definition(prefix rune)` | All metadata | Human-readable: `-v, --verbose!*?` |
 
 ### Consumes() Logic
 
@@ -127,7 +132,7 @@ Consumes(arg) == true when:
   - Flag is not optarg (optarg never consumes the next positional)
   - No args consumed yet, OR
   - Nargs > 1 and fewer args consumed than Nargs, OR
-  - Nargs < 0 and arg doesn't look like a flag (doesn't start with "-")
+  - Nargs < 0 and arg doesn't look like a flag (doesn't start with the FlagPrefix char)
 ```
 
 ### FlagSet Wrapper
@@ -142,30 +147,38 @@ type FlagSet struct {
 |--------|---------|
 | `IsInterspersed()` | Reads unexported `interspersed` field |
 | `IsPosix()` | Calls unexported `IsPosix()` method — controls shorthand chaining |
-| `IsShorthandSeries(arg)` | Regex `^-(?P<shorthand>[^-].*)` + IsPosix |
+| `Prefix()` | Calls unexported `Prefix()` method — returns flag prefix char (default `'-'`; custom prefixes like `'&'` for elvish supported via `FlagSet.SetPrefix()`) |
+| `IsShorthandSeries(arg)` | Regex `^<prefix>(?P<shorthand>[^<prefix>].*)` + IsPosix — dynamically uses `Prefix()` |
 | `IsMutuallyExclusive(flag)` | Checks `cobra_annotation_mutually_exclusive` annotations |
 | `LookupArg(arg)` | **Critical dispatcher** — routes to correct lookup method |
-| `ShorthandLookup(name)` | Wraps pflag's ShorthandLookup with `Args: []string{}` |
-| `VisitAll(fn)` | Iterates flags, initializing `Args: []string{}` |
+| `ShorthandLookup(name)` | Wraps pflag's ShorthandLookup with `FlagPrefix` and `Args: []string{}` |
+| `VisitAll(fn)` | Iterates flags, initializing `FlagPrefix` and `Args: []string{}` |
 
 ### LookupArg Dispatch
 
-`LookupArg(arg)` routes based on prefix and POSIX mode:
+`LookupArg(arg)` routes based on prefix (obtained from `Prefix()`) and POSIX mode:
 
 ```
-arg starts with "--" → lookupPosixLonghandArg
+arg starts with double prefix (e.g. "--" or "&&") → lookupPosixLonghandArg
   - Splits on flag's OptargDelimiter
-  - Sets Prefix and Args on the returned Flag
+  - Checks ArgumentStyle constraints (AcceptsDelimited, AcceptsNext)
+  - Sets ArgPrefix and Args on the returned Flag
 
-arg starts with "-" and IsPosix → lookupPosixShorthandArg
+arg starts with single prefix and IsPosix → lookupPosixShorthandArg
   - Iterates each character of the shorthand series
   - Handles attached values, optarg delimiters
-  - Sets Prefix and Args
+  - Checks ArgumentStyle constraints (AcceptsDelimited, AcceptsAttached, AcceptsNext)
+  - Sets ArgPrefix and Args
 
-arg starts with "-" and !IsPosix → two-phase lookup:
-  1. LookupNonPosixLonghandArg (single-dash longhand: -name)
-  2. Fallback: lookupNonPosixShorthandArg (single-dash shorthand: -n)
+arg starts with single prefix and !IsPosix → two-phase lookup:
+  1. LookupNonPosixLonghandArg (single-prefix longhand: <prefix>name)
+     - Only matches flags with Mode == NameAsShorthand
+     - Checks ArgumentStyle constraints (AcceptsDelimited, AcceptsNext)
+  2. Fallback: lookupNonPosixShorthandArg (single-prefix shorthand: <prefix>n)
+     - Checks ArgumentStyle constraints (AcceptsDelimited)
 ```
+
+All prefix checks use the dynamic prefix from `Prefix()` rather than hardcoded `'-'`/`'--'`. This enables custom flag prefixes like `'&'` for elvish (`&&flag`, `&f`, `&&`).
 
 ## Lenient Mode
 
@@ -184,6 +197,6 @@ After traversal and invocation, `shell.Value()` applies post-processing before f
 
 ## Related Skills
 
-- **references/pflag.md** — the flag extensions (Mode, Nargs, OptargDelimiter) that pflagfork reads
+- **references/pflag.md** — the flag extensions (Mode, Nargs, OptargDelimiter, ArgumentStyle, Prefix) that pflagfork reads
 - **references/action.md** — the Action API that traverse() returns
 - **references/shell.md** — the per-shell formatting that `shell.Value()` dispatches to

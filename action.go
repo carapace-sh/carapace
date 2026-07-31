@@ -294,11 +294,6 @@ func (a Action) SplitP(format string) Action {
 
 func (a Action) split(format string, pipelines bool) Action {
 	return ActionCallback(func(c Context) Action {
-		tokens, err := shlex.Split(c.Value)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
-
 		// TODO should be in shlex
 		var f shlex.Format
 		switch format {
@@ -326,6 +321,11 @@ func (a Action) split(format string, pipelines bool) Action {
 			return ActionMessage("unknown format: %q", format)
 		}
 
+		tokens, err := shlex.SplitWith(c.Value, f)
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
 		ctx := shlex.SplitForCompletion(c.Value, f)
 
 		var context Context
@@ -336,7 +336,7 @@ func (a Action) split(format string, pipelines bool) Action {
 		}
 
 		originalValue := c.Value
-		pipelineTokens := tokens.CurrentPipeline()
+		pipelineTokens := ctx.Pipeline
 		prefix := originalValue[:pipelineTokens.Words().CurrentToken().Span.Start]
 		c.Args = context.Args
 		c.Parts = []string{}

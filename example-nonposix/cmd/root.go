@@ -40,9 +40,9 @@ func init() {
 	rootCmd.Flag("nargs-any").Nargs = -1
 	rootCmd.Flag("nargs-two").Nargs = 2
 
-	rootCmd.Flags().StringS("no-delim", "no-delim", "", "OptargDelimiter -1 (attached)")
+	rootCmd.Flags().StringS("no-delim", "no-delim", "", "OptargDelimiter disabled (attached)")
 	rootCmd.Flag("no-delim").NoOptDefVal = " "
-	rootCmd.Flag("no-delim").OptargDelimiter = -1
+	rootCmd.Flag("no-delim").OptargDelimiter = -1 // pflag.DelimiterDisabled (until published)
 
 	rootCmd.Flags().SetInterspersed(false)
 

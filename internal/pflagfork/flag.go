@@ -61,6 +61,13 @@ func (f Flag) OptargDelimiter() rune {
 	return '='
 }
 
+// DelimiterDisabled reports whether OptargDelimiter is set to a value
+// that disables delimiter-based argument parsing (e.g. -1), meaning
+// attached values are parsed directly: -rvalue instead of -r=value.
+func (f Flag) DelimiterDisabled() bool {
+	return f.OptargDelimiter() < 0x20
+}
+
 func (f Flag) ArgumentStyle() uint {
 	if field := reflect.ValueOf(f.Flag).Elem().FieldByName("ArgumentStyle"); field.IsValid() && field.Kind() == reflect.Uint {
 		return uint(field.Uint())

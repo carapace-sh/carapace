@@ -207,7 +207,7 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 
 		// optarg flags with a non-standard delimiter (e.g. -1) accept
 		// directly attached values: -rvalue matches flag "r" with arg "value"
-		if f.IsOptarg() && f.OptargDelimiter() < 0x20 && f.AcceptsAttached() &&
+		if f.IsOptarg() && f.DelimiterDisabled() && f.AcceptsAttached() &&
 			strings.HasPrefix(arg, prefix+f.Shorthand) && len(arg) > len(prefix+f.Shorthand) {
 			result = f
 			result.ArgPrefix = prefix + f.Shorthand

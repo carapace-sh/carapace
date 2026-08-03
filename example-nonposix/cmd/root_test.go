@@ -137,17 +137,17 @@ func TestNoDelim(t *testing.T) {
 		s.Run("-no-delim").
 			Expect(carapace.ActionValues("a", "b", "c").
 				Prefix("-no-delim").
-				Usage("OptargDelimiter -1 (attached)"))
+				Usage("OptargDelimiter disabled (attached)"))
 
 		s.Run("-no-delima").
 			Expect(carapace.ActionValues("a", "b", "c").
 				Prefix("-no-delim").
-				Usage("OptargDelimiter -1 (attached)"))
+				Usage("OptargDelimiter disabled (attached)"))
 
 		s.Run("-no-delimb").
 			Expect(carapace.ActionValues("b", "c").
 				Prefix("-no-delim").
-				Usage("OptargDelimiter -1 (attached)"))
+				Usage("OptargDelimiter disabled (attached)"))
 	})
 }
 

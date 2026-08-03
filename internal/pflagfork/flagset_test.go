@@ -178,9 +178,9 @@ func TestLookupNonPosixShorthandArgOptargNoDelim(t *testing.T) {
 			fs.StringS("r", "r", "", "recurse")
 			fs.StringS("ai", "ai", "", "include archive filenames")
 			fs.Lookup("r").NoOptDefVal = " "
-			fs.Lookup("r").OptargDelimiter = -1
+			fs.Lookup("r").OptargDelimiter = -1 // pflag.DelimiterDisabled (until published)
 			fs.Lookup("ai").NoOptDefVal = " "
-			fs.Lookup("ai").OptargDelimiter = -1
+			fs.Lookup("ai").OptargDelimiter = -1 // pflag.DelimiterDisabled (until published)
 
 			f := fs.lookupNonPosixShorthandArg(arg)
 			if f == nil || f.Name != name {

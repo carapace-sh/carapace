@@ -151,6 +151,52 @@ func TestNoDelim(t *testing.T) {
 	})
 }
 
+func TestNoDelimLong(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		// bare flag (no attached value) — should show flag completions + positionals
+		s.Run("-no-delim-long", "").
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
+					Tag("commands"),
+				carapace.ActionValuesDescribed("customprefix", "test custom flag prefix (e.g. '&')").
+					Tag("commands"),
+				carapace.ActionValues("p1", "positional1"),
+			).ToA())
+
+		// attached value via longhand path (-no-delim-longvalue)
+		s.Run("-no-delim-long").
+			Expect(carapace.ActionValues("x", "y", "z").
+				Prefix("-no-delim-long").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+
+		s.Run("-no-delim-longx").
+			Expect(carapace.ActionValues("x", "y", "z").
+				Prefix("-no-delim-long").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+
+		s.Run("-no-delim-longy").
+			Expect(carapace.ActionValues("y", "z").
+				Prefix("-no-delim-long").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+
+		// attached value via shorthand path (-lvalue)
+		s.Run("-l").
+			Expect(carapace.ActionValues("x", "y", "z").
+				Prefix("-l").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+
+		s.Run("-lx").
+			Expect(carapace.ActionValues("x", "y", "z").
+				Prefix("-l").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+
+		s.Run("-ly").
+			Expect(carapace.ActionValues("y", "z").
+				Prefix("-l").
+				Usage("OptargDelimiter disabled (NameAsShorthand)"))
+	})
+}
+
 func TestOverlapping(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-o").

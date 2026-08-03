@@ -1,7 +1,7 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
-$_example-multi_completer = {
+$_example__multi_completer = {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
     param($wordToComplete, $commandAst, $cursorPosition)
     $commandElements = $commandAst.CommandElements
@@ -43,7 +43,7 @@ $_example-multi_completer = {
     $completions
 }
 
-Register-ArgumentCompleter -Native -ScriptBlock $_example-multi_completer -CommandName 'example-multi' # 'example-multi.exe'
-Register-ArgumentCompleter -Native -ScriptBlock $_example-multi_completer -CommandName 'identify' # 'identify.exe'
-Register-ArgumentCompleter -Native -ScriptBlock $_example-multi_completer -CommandName 'convert' # 'convert.exe'
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'example-multi' # 'example-multi.exe'
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'identify' # 'identify.exe'
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'convert' # 'convert.exe'
 

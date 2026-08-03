@@ -166,3 +166,43 @@ func TestArgumentStyleAcceptance(t *testing.T) {
 		}
 	})
 }
+
+func TestLookupNonPosixShorthandArgOptargNoDelim(t *testing.T) {
+	_test := func(arg, name, prefix string, args ...string) {
+		t.Run(arg, func(t *testing.T) {
+			if args == nil {
+				args = []string{}
+			}
+
+			fs := &FlagSet{pflag.NewFlagSet("test", pflag.PanicOnError)}
+			fs.StringS("r", "r", "", "recurse")
+			fs.StringS("ai", "ai", "", "include archive filenames")
+			fs.Lookup("r").NoOptDefVal = " "
+			fs.Lookup("r").OptargDelimiter = -1
+			fs.Lookup("ai").NoOptDefVal = " "
+			fs.Lookup("ai").OptargDelimiter = -1
+
+			f := fs.lookupNonPosixShorthandArg(arg)
+			if f == nil || f.Name != name {
+				t.Fatal("should be " + name)
+			}
+
+			if f.ArgPrefix != prefix {
+				t.Fatalf("prefix doesnt match actual: %#v, expected: %#v", f.ArgPrefix, prefix)
+			}
+
+			if !reflect.DeepEqual(f.Args, args) {
+				t.Fatalf("args dont match %v: actual: %#v expected: %#v", arg, f.Args, args)
+			}
+		})
+	}
+
+	// single-char shorthand with attached value
+	_test("-r-", "r", "-r", "-")
+	_test("-r0", "r", "-r", "0")
+	_test("-r", "r", "-r")
+
+	// multi-char shorthand with attached value
+	_test("-aifoo", "ai", "-ai", "foo")
+	_test("-ai", "ai", "-ai")
+}

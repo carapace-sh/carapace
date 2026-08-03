@@ -123,6 +123,34 @@ func TestNargs(t *testing.T) {
 	})
 }
 
+func TestNoDelim(t *testing.T) {
+	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
+		s.Run("-no-delim", "").
+			Expect(carapace.Batch(
+				carapace.ActionValuesDescribed("argumentstyle", "test ArgumentStyle configurations").
+					Tag("commands"),
+				carapace.ActionValuesDescribed("customprefix", "test custom flag prefix (e.g. '&')").
+					Tag("commands"),
+				carapace.ActionValues("p1", "positional1"),
+			).ToA())
+
+		s.Run("-no-delim").
+			Expect(carapace.ActionValues("a", "b", "c").
+				Prefix("-no-delim").
+				Usage("OptargDelimiter -1 (attached)"))
+
+		s.Run("-no-delima").
+			Expect(carapace.ActionValues("a", "b", "c").
+				Prefix("-no-delim").
+				Usage("OptargDelimiter -1 (attached)"))
+
+		s.Run("-no-delimb").
+			Expect(carapace.ActionValues("b", "c").
+				Prefix("-no-delim").
+				Usage("OptargDelimiter -1 (attached)"))
+	})
+}
+
 func TestOverlapping(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example-nonposix")(func(s *sandbox.Sandbox) {
 		s.Run("-o").

@@ -40,11 +40,21 @@ func init() {
 	rootCmd.Flag("nargs-any").Nargs = -1
 	rootCmd.Flag("nargs-two").Nargs = 2
 
+	rootCmd.Flags().StringS("no-delim", "no-delim", "", "OptargDelimiter disabled (attached)")
+	rootCmd.Flag("no-delim").NoOptDefVal = " "
+	rootCmd.Flag("no-delim").OptargDelimiter = -1 // pflag.DelimiterDisabled (until published)
+
+	rootCmd.Flags().StringN("no-delim-long", "l", "", "OptargDelimiter disabled (NameAsShorthand)")
+	rootCmd.Flag("no-delim-long").NoOptDefVal = " "
+	rootCmd.Flag("no-delim-long").OptargDelimiter = -1 // pflag.DelimiterDisabled (until published)
+
 	rootCmd.Flags().SetInterspersed(false)
 
 	carapace.Gen(rootCmd).FlagCompletion(carapace.ActionMap{
-		"delim-colon": carapace.ActionValues("d1", "d2", "d3"),
-		"delim-slash": carapace.ActionValues("d1", "d2", "d3"),
+		"delim-colon":   carapace.ActionValues("d1", "d2", "d3"),
+		"delim-slash":   carapace.ActionValues("d1", "d2", "d3"),
+		"no-delim":      carapace.ActionValues("a", "b", "c"),
+		"no-delim-long": carapace.ActionValues("x", "y", "z"),
 		"nargs-any": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			return carapace.ActionValues("na1", "na2", "na3").Invoke(c).Filter(c.Parts...).ToA() // only filters current occurrence
 		}),

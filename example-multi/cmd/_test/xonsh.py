@@ -2,7 +2,7 @@ from xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
 
 @contextual_command_completer
-def _example-multi_completer(context):
+def _example__multi_completer(context):
     """carapace multi-completer"""
     if context.command not in ['example-multi', 'identify', 'convert']:
         return
@@ -26,5 +26,5 @@ def _example-multi_completer(context):
         result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
     return result
 
-add_one_completer('example-multi', _example-multi_completer, 'start')
+add_one_completer('example__multi', _example__multi_completer, 'start')
 

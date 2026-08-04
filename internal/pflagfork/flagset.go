@@ -183,11 +183,7 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		return nil
 	}
 
-	fs.VisitAll(func(f *Flag) { // TODO needs to be sorted to try longest matching first
-		if result != nil {
-			return
-		}
-
+	fs.VisitAll(func(f *Flag) {
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		baseArg := strings.TrimSuffix(splitted[0], string(f.OptargDelimiter()))
 
@@ -197,10 +193,26 @@ func (fs FlagSet) lookupNonPosixShorthandArg(arg string) (result *Flag) { // TOD
 		}
 
 		if baseArg == prefix+f.Shorthand {
-			result = f
-			result.ArgPrefix = splitted[0]
+			candidate := f
+			candidate.ArgPrefix = splitted[0]
 			if len(splitted) > 1 {
-				result.Args = splitted[1:]
+				candidate.Args = splitted[1:]
+			}
+			if result == nil || len(candidate.ArgPrefix) > len(result.ArgPrefix) {
+				result = candidate
+			}
+			return
+		}
+
+		// optarg flags with a non-standard delimiter (e.g. -1) accept
+		// directly attached values: -rvalue matches flag "r" with arg "value"
+		if f.IsOptarg() && f.DelimiterDisabled() && f.AcceptsAttached() &&
+			strings.HasPrefix(arg, prefix+f.Shorthand) && len(arg) > len(prefix+f.Shorthand) {
+			candidate := f
+			candidate.ArgPrefix = prefix + f.Shorthand
+			candidate.Args = []string{arg[len(prefix+f.Shorthand):]}
+			if result == nil || len(candidate.ArgPrefix) > len(result.ArgPrefix) {
+				result = candidate
 			}
 		}
 	})
@@ -216,29 +228,41 @@ func (fs FlagSet) LookupNonPosixLonghandArg(arg string) (result *Flag) {
 	}
 
 	fs.VisitAll(func(f *Flag) {
-		if result != nil || f.GetMode() != NameAsShorthand {
+		if f.GetMode() != NameAsShorthand {
 			return
 		}
 
 		splitted := strings.SplitAfterN(arg, string(f.OptargDelimiter()), 2)
 		baseArg := strings.TrimSuffix(splitted[0], string(f.OptargDelimiter()))
 
-		if baseArg != prefix+f.Name {
-			return
-		}
-
 		// Check ArgumentStyle constraints
 		if len(splitted) > 1 && !f.AcceptsDelimited() {
-			return
+			return // flag doesn't accept delimited style
 		}
-		if len(splitted) == 1 && !f.AcceptsNext() && f.NoOptDefVal == "" {
+
+		if baseArg == prefix+f.Name {
+			if len(splitted) == 1 && !f.AcceptsNext() && f.NoOptDefVal == "" {
+				return // flag doesn't accept next style and has no default
+			}
+
+			result = f
+			result.ArgPrefix = splitted[0]
+			if len(splitted) > 1 {
+				result.Args = splitted[1:]
+			}
 			return
 		}
 
-		result = f
-		result.ArgPrefix = splitted[0]
-		if len(splitted) > 1 {
-			result.Args = splitted[1:]
+		// optarg flags with a non-standard delimiter (e.g. -1) accept
+		// directly attached values: -namevalue matches flag "name" with arg "value"
+		if f.IsOptarg() && f.DelimiterDisabled() && f.AcceptsAttached() &&
+			strings.HasPrefix(arg, prefix+f.Name) && len(arg) > len(prefix+f.Name) {
+			candidate := f
+			candidate.ArgPrefix = prefix + f.Name
+			candidate.Args = []string{arg[len(prefix+f.Name):]}
+			if result == nil || len(candidate.ArgPrefix) > len(result.ArgPrefix) {
+				result = candidate
+			}
 		}
 	})
 	return

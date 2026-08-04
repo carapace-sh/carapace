@@ -154,6 +154,9 @@ loop:
 		} else if f != nil && fs.IsPosix() && !strings.HasPrefix(context.Value, string(fs.Prefix())+string(fs.Prefix())) && !f.IsOptarg() && f.ArgPrefix == context.Value && f.AcceptsAttached() {
 			LOG.Printf("completing attached flag argument for arg %#v with prefix %#v\n", context.Value, f.ArgPrefix)
 			return storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix), context
+		} else if f != nil && !fs.IsPosix() && f.IsOptarg() && f.DelimiterDisabled() && f.ArgPrefix == context.Value && f.AcceptsAttached() {
+			LOG.Printf("completing attached flag argument (non-posix optarg) for arg %#v with prefix %#v\n", context.Value, f.ArgPrefix)
+			return storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix), context
 		}
 		LOG.Printf("completing flags for arg %#v\n", context.Value)
 		return actionFlags(cmd), context

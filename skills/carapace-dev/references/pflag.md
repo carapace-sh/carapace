@@ -75,9 +75,55 @@ The `OptargDelimiter` field on `Flag` controls the character that separates a fl
 flag.OptargDelimiter = ':'  // enables -agentlib:jdwp instead of -agentlib=jdwp
 ```
 
-Default is `'='`. Set to a different rune for Java-style (`:`), path-style (`/`), or other conventions. Set to `-1` to disable delimiter-based argument attachment entirely.
+Default is `'='`. Set to a different rune for Java-style (`:`), path-style (`/`), or other conventions. Set to a control character (< `0x20`, e.g. `-1`) to disable delimiter-based argument attachment entirely — this enables **directly attached values** for optarg flags (see [Delimiter-Disabled Attached Values](#delimiter-disabled-attached-values) below).
 
 Affects both longhand (`--flag:val`) and shorthand (`-f:val`) parsing. Each flag can have its own delimiter — they coexist in the same `FlagSet`.
+
+## Delimiter-Disabled Attached Values
+
+When `OptargDelimiter` is set to a control character below `0x20` (e.g. `-1`, matching the `pflag.DelimiterDisabled` constant in carapace-pflag), optarg flags accept **directly attached values** with no separator character at all:
+
+```
+-rvalue     # shorthand "r" with arg "value" (instead of -r=value)
+-namevalue  # NameAsShorthand longhand "name" with arg "value"
+```
+
+This is distinct from POSIX attached shorthand values (`-ooutput`, gated by `AcceptsAttached`) — delimiter-disabled attachment works for **optarg** flags in **non-POSIX** mode and produces the flag's value completions with the flag name as prefix.
+
+### pflagfork Integration
+
+Carapace's `pflagfork` exposes a predicate encapsulating the `< 0x20` threshold check:
+
+| Method | Returns true when |
+|--------|------------------|
+| `Flag.DelimiterDisabled()` | `OptargDelimiter()` is a control char (< `0x20`) — delimiter parsing is disabled and attached values are parsed directly |
+
+### Lookup Paths Affected
+
+Delimiter-disabled attached matching is performed in two non-POSIX lookup paths, with **longest `ArgPrefix` preference** when multiple optarg flags have overlapping shorthands (e.g. `r` and `recurse`):
+
+| Lookup path | Condition | Example |
+|-------------|-----------|---------|
+| `lookupNonPosixShorthandArg` | `IsOptarg() && DelimiterDisabled() && AcceptsAttached()` and arg starts with `<prefix>+Shorthand` | `-rvalue` |
+| `LookupNonPosixLonghandArg` | `IsOptarg() && DelimiterDisabled() && AcceptsAttached()` and arg starts with `<prefix>+Name` (Mode == NameAsShorthand) | `-namevalue` |
+
+### Traverse Integration
+
+During `traverse()`, a dedicated branch handles completion at the end position when the flag is a non-POSIX optarg with a disabled delimiter:
+
+```go
+// traverse.go (simplified)
+if f != nil && !fs.IsPosix() && f.IsOptarg() && f.DelimiterDisabled() &&
+   f.ArgPrefix == context.Value && f.AcceptsAttached() {
+    return storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix), context
+}
+```
+
+At the end position (`-r<TAB>`) only the flag's value completions are shown (the prefix is the bare flag name), matching the existing POSIX attached-value behavior.
+
+### ArgumentStyle Interaction
+
+Delimiter-disabled attachment still respects the `ArgumentStyle` bitmask — the `AcceptsAttached()` bit must be set (or `ArgumentStyle` must be `0` to accept all). Setting `ArgumentStyle` to `AcceptNext` only will reject attached values even when the delimiter is disabled.
 
 ## ArgumentStyle
 
@@ -151,11 +197,11 @@ Error messages adapt to flag `Mode` — e.g., `InvalidValueError` shows `-s, --n
 |-------|------|---------|---------|
 | `Mode` | `mode (int)` | `Default` | Flag access mode |
 | `Nargs` | `int` | `0` | Number of args consumed |
-| `OptargDelimiter` | `rune` | `'='` | Delimiter for attached args |
+| `OptargDelimiter` | `rune` | `'='` | Delimiter for attached args; set to a control char (`< 0x20`, e.g. `-1` / `pflag.DelimiterDisabled`) to disable the delimiter and parse attached values directly (`-rvalue`) |
 | `ArgumentStyle` | `ArgumentStyle (uint)` | `0` (accept all) | Which binding forms accepted |
 | `NoOptDefVal` | `string` | `""` | Optional-arg sentinel (from upstream) |
 
-Additionally, `FlagSet` supports a custom prefix character (see [Flag Prefix](#flag-prefix) above).
+Additionally, `FlagSet` supports a custom prefix character (see [Flag Prefix](#flag-prefix) above). The `DelimiterDisabled` predicate (see [Delimiter-Disabled Attached Values](#delimiter-disabled-attached-values)) derives from `OptargDelimiter`.
 
 ## Integration with carapace
 
@@ -164,6 +210,7 @@ The carapace library's `internal/pflagfork` package reads these unexported field
 - `Flag.GetMode()` — reads `Mode` field (renamed from `Mode()` to avoid conflict with embedded `pflag.Flag.Mode`)
 - `Flag.Nargs()` — reads `Nargs` field
 - `Flag.OptargDelimiter()` — reads `OptargDelimiter` field
+- `Flag.DelimiterDisabled()` — derived helper: true when `OptargDelimiter` is a control char (< `0x20`), enabling directly attached optarg values
 - `Flag.ArgumentStyle()` — reads `ArgumentStyle` field (returns `0` when absent, meaning accept all)
 - `Flag.AcceptsNext()` / `AcceptsDelimited()` / `AcceptsAttached()` — derived helpers checking `ArgumentStyle` bitmask
 - `FlagSet.IsPosix()` — calls unexported `IsPosix()` method

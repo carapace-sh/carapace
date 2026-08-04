@@ -87,6 +87,7 @@ After parsing flags, `traverse()` decides what to complete:
 | Flag argument (`inFlag.Consumes(context.Value)`) | `storage.getFlag(cmd, inFlag.Name)` with `context.Parts = inFlag.Args` |
 | Optional flag arg (`NoOptDefVal` or attached delimiter) | `storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix)` or `ActionValues("true","false")` for bool |
 | Attached flag arg (POSIX shorthand, `AcceptsAttached`) | `storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix)` |
+| Non-POSIX optarg with disabled delimiter (`DelimiterDisabled() && AcceptsAttached`) | `storage.getFlag(cmd, f.Name).Prefix(f.ArgPrefix)` |
 | Flag name (starts with prefix char) | `actionFlags(cmd)` — all available flags |
 | Positional + subcommands | `Batch(getPositional) + ActionCommands(cmd)` if subcommands exist and no positionals consumed |
 
@@ -113,7 +114,8 @@ type Flag struct {
 | `AcceptsNext()` | Derived from `ArgumentStyle` | Accepts `-f arg` (next positional) |
 | `AcceptsDelimited()` | Derived from `ArgumentStyle` | Accepts `-f=arg` (delimiter-attached) |
 | `AcceptsAttached()` | Derived from `ArgumentStyle` | Accepts `-farg` (POSIX attached) |
-| `OptargDelimiter()` | Unexported `OptargDelimiter` field | Delimiter for `--flag=val` vs `--flag:val` |
+| `OptargDelimiter()` | Unexported `OptargDelimiter` field | Delimiter for `--flag=val` vs `--flag:val`; control char disables delimiter |
+| `DelimiterDisabled()` | Derived from `OptargDelimiter` | True when delimiter is a control char (< `0x20`), enabling directly attached optarg values (`-rvalue`) |
 | `IsRepeatable()` | Value type string | True for Slice/Array/count |
 | `TakesValue()` | Value type | False for bool/boolSlice/count |
 | `IsOptarg()` | `NoOptDefVal != ""` | Flag arg is optional |
@@ -174,8 +176,12 @@ arg starts with single prefix and !IsPosix → two-phase lookup:
   1. LookupNonPosixLonghandArg (single-prefix longhand: <prefix>name)
      - Only matches flags with Mode == NameAsShorthand
      - Checks ArgumentStyle constraints (AcceptsDelimited, AcceptsNext)
+     - Delimiter-disabled optarg path: when `IsOptarg() && DelimiterDisabled() && AcceptsAttached()`, matches directly attached values (`-namevalue`)
+     - Longest `ArgPrefix` wins on overlap with other matching flags
   2. Fallback: lookupNonPosixShorthandArg (single-prefix shorthand: <prefix>n)
      - Checks ArgumentStyle constraints (AcceptsDelimited)
+     - Delimiter-disabled optarg path: when `IsOptarg() && DelimiterDisabled() && AcceptsAttached()`, matches directly attached values (`-rvalue`)
+     - Longest `ArgPrefix` wins on overlap (resolves `r` vs `recurse`)
 ```
 
 All prefix checks use the dynamic prefix from `Prefix()` rather than hardcoded `'-'`/`'--'`. This enables custom flag prefixes like `'&'` for elvish (`&&flag`, `&f`, `&&`).

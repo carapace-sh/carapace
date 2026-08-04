@@ -19,8 +19,8 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 | Keywords | Reference |
 |----------|----------|
 | Action type, modifier, InvokedAction, Context, callback, Batch, rawValues, suffix naming | [references/action.md](references/action.md) |
-| traverse, completion engine, argument classification, pflagfork, shell patching, complete(), dispatch, LookupArg, FlagPrefix, ArgPrefix | [references/traverse.md](references/traverse.md) |
-| pflag, flag mode, NameAsShorthand, ShorthandOnly, Nargs, OptargDelimiter, ArgumentStyle, AcceptsNext, AcceptsDelimited, AcceptsAttached, FlagPrefix, custom flag prefix, non-POSIX flags | [references/pflag.md](references/pflag.md) |
+| traverse, completion engine, argument classification, pflagfork, shell patching, complete(), dispatch, LookupArg, FlagPrefix, ArgPrefix, DelimiterDisabled, non-POSIX optarg attached values | [references/traverse.md](references/traverse.md) |
+| pflag, flag mode, NameAsShorthand, ShorthandOnly, Nargs, OptargDelimiter, ArgumentStyle, AcceptsNext, AcceptsDelimited, AcceptsAttached, FlagPrefix, custom flag prefix, non-POSIX flags, DelimiterDisabled, delimiter-disabled attached values | [references/pflag.md](references/pflag.md) |
 | Shell overview, cross-shell comparison, dispatch pipeline, supported shells, nospace/message/quoting comparison | [references/shell.md](references/shell.md) |
 | Bash, COMP_TYPE, COMP_WORDBREAKS, redirect patching, partial completion, bash quoting | [references/shell-bash.md](references/shell-bash.md) |
 | Bash BLE, ble.sh, tab-delimited format, per-candidate suffix, ble/complete/cand/yield | [references/shell-bash-ble.md](references/shell-bash-ble.md) |

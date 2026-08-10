@@ -24,6 +24,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 		)
 	}
 	return fmt.Sprintf(`%[4]vfunction _%[1]v_completer
+  set --local --export CARAPACE_SHELL fish
   set --local data
   IFS='' set data (echo (commandline -cp)'' | sed "s/ \$/ ''/" | xargs %[2]v $argv[1] _carapace fish 2>/dev/null)
   if [ $status -eq 1 ]
@@ -50,6 +51,7 @@ func SnippetSingle(command string, explicitCommand bool) string {
 	}
 
 	return fmt.Sprintf(`function _%[1]v_completion
+  set --local --export CARAPACE_SHELL fish
   set --local data
   IFS='' set data (echo (commandline -cp)'' | sed "s/ \$/ ''/" | xargs %[2]v 2>/dev/null)
   if [ $status -eq 1 ]

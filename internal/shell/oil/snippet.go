@@ -21,6 +21,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 	}
 	return fmt.Sprintf(`#!/bin/osh
 %[4]v_%[1]v_completer() {
+  export CARAPACE_SHELL=oil
   local command="${COMP_WORDS[0]}"
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'
@@ -47,6 +48,7 @@ func SnippetSingle(command string, explicitCommand bool) string {
 
 	return fmt.Sprintf(`#!/bin/osh
 _%v_completion() {
+  export CARAPACE_SHELL=oil
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'
   mapfile -t COMPREPLY < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs %v)

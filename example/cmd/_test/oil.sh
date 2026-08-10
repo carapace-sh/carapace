@@ -1,5 +1,6 @@
 #!/bin/osh
 _example_completion() {
+  export CARAPACE_SHELL=oil
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'
   mapfile -t COMPREPLY < <(echo "$compline" | sed -e "s/ \$/ ''/" -e 's/"/\"/g' | xargs example _carapace oil)

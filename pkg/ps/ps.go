@@ -9,7 +9,12 @@ import (
 )
 
 // DetermineShell determines shell by parent process name.
+// It checks the CARAPACE_SHELL environment variable first to avoid
+// an expensive process table scan on platforms like macOS (KERN_PROC_ALL).
 func DetermineShell() string {
+	if shell := os.Getenv("CARAPACE_SHELL"); shell != "" {
+		return shell
+	}
 	process, err := ps.FindProcess(os.Getpid())
 	if err != nil {
 		return ""

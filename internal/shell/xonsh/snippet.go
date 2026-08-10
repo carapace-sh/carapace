@@ -21,10 +21,12 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 	}
 	return fmt.Sprintf(`%[5]vfrom xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
+import os
 
 @contextual_command_completer
 def _%[1]v_completer(context):
     """carapace multi-completer"""
+    os.environ['CARAPACE_SHELL'] = 'xonsh'
     if context.command not in [%[3]v]:
         return
 
@@ -65,10 +67,12 @@ func SnippetSingle(command string, explicitCommand bool) string {
 
 	return fmt.Sprintf(`from xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
+import os
 
 @contextual_command_completer
 def _%v_completer(context):
     """carapace completer for %v"""
+    os.environ['CARAPACE_SHELL'] = 'xonsh'
     if context.completing_command('%v'):
         from json import loads
         from xonsh.completers.tools import sub_proc_get_output, RichCompletion

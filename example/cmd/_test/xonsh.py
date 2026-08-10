@@ -1,9 +1,11 @@
 from xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
+import os
 
 @contextual_command_completer
 def _example_completer(context):
     """carapace completer for example"""
+    os.environ['CARAPACE_SHELL'] = 'xonsh'
     if context.completing_command('example'):
         from json import loads
         from xonsh.completers.tools import sub_proc_get_output, RichCompletion

@@ -20,6 +20,7 @@ func Snippet(cmd *cobra.Command) string {
 // SnippetMulti creates a multi-completer nushell completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
 	return fmt.Sprintf(`%[4]vlet %[1]v_completer = {|spans|
+    load-env { CARAPACE_SHELL: 'nushell' }
     %[2]v $spans.0 _carapace nushell ...$spans | from json
 }
 
@@ -41,6 +42,7 @@ $env.config = $current
 func SnippetSingle(command string, explicitCommand bool) string {
 	if explicitCommand {
 		return fmt.Sprintf(`let %[2]v_completer = {|spans|
+    load-env { CARAPACE_SHELL: 'nushell' }
     %[1]v %[3]v _carapace nushell ...$spans | from json
 }
 
@@ -56,6 +58,7 @@ $env.config = $current
 	}
 
 	return fmt.Sprintf(`let %v_completer = {|spans| 
+    load-env { CARAPACE_SHELL: 'nushell' }
     %v _carapace nushell ...$spans | from json
 }`, sanitizeName(command), uid.Executable())
 }

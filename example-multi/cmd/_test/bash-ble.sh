@@ -5,6 +5,8 @@ _example-multi_completer() {
   export COMP_TYPE
   export COMP_WORDBREAKS
 
+  declare -x CARAPACE_SHELL=bash
+
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
   local command="${COMP_WORDS[0]}"
 
@@ -33,6 +35,8 @@ _example-multi_completer_ble() {
 
     compopt -o ble/no-default
     bleopt complete_menu_style=desc
+
+    declare -x CARAPACE_SHELL=bash-ble
 
     local command="${COMP_WORDS[0]}"
     local compline="${COMP_LINE:0:${COMP_POINT}}"

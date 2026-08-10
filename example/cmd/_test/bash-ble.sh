@@ -5,6 +5,8 @@ _example_completion() {
   export COMP_TYPE
   export COMP_WORDBREAKS
 
+  declare -x CARAPACE_SHELL=bash
+
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
 
   data=$(echo "${compline}''" | xargs example _carapace bash 2>/dev/null)
@@ -32,6 +34,8 @@ _example_completion_ble() {
 
     compopt -o ble/no-default
     bleopt complete_menu_style=desc
+
+    declare -x CARAPACE_SHELL=bash-ble
 
     local compline="${COMP_LINE:0:${COMP_POINT}}"
     local IFS=$'\n'

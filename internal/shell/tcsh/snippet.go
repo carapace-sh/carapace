@@ -17,7 +17,7 @@ func Snippet(cmd *cobra.Command) string {
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
 	lines := make([]string, len(names))
 	for i, name := range names {
-		lines[i] = fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v \"%v\" _carapace tcsh `@@' ;", name, uid.Executable(), name)
+		lines[i] = fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs env CARAPACE_SHELL=tcsh %v \"%v\" _carapace tcsh `@@' ;", name, uid.Executable(), name)
 	}
 	return strings.Join(lines, "\n")
 }
@@ -33,5 +33,5 @@ func SnippetSingle(command string, explicitCommand bool) string {
 		invocation = fmt.Sprintf("%v \"%v\" _carapace tcsh", uid.Executable(), command)
 	}
 
-	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v `@@' ;", command, invocation)
+	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs env CARAPACE_SHELL=tcsh %v `@@' ;", command, invocation)
 }

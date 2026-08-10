@@ -5,6 +5,8 @@ _example-multi_completer() {
   export COMP_TYPE
   export COMP_WORDBREAKS
 
+  declare -x CARAPACE_SHELL=bash
+
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
   local command="${COMP_WORDS[0]}"
 

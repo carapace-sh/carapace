@@ -1,9 +1,11 @@
 from xonsh.completers.completer import add_one_completer
 from xonsh.completers.tools import contextual_command_completer
+import os
 
 @contextual_command_completer
 def _example__multi_completer(context):
     """carapace multi-completer"""
+    os.environ['CARAPACE_SHELL'] = 'xonsh'
     if context.command not in ['example-multi', 'identify', 'convert']:
         return
 

@@ -15,6 +15,7 @@ using namespace System.Management.Automation.Language
 Function _%v_completer {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
     param($wordToComplete, $commandAst, $cursorPosition)
+    $env:CARAPACE_SHELL = "powershell"
     $commandElements = $commandAst.CommandElements
 
     # double quoted value works but seems single quoted needs some fixing (e.g. "example 'acti" -> "example acti")
@@ -63,6 +64,7 @@ using namespace System.Management.Automation.Language
 $_%[2]v_completion = {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
     param($wordToComplete, $commandAst, $cursorPosition)
+    $env:CARAPACE_SHELL = "powershell"
     $commandElements = $commandAst.CommandElements
 
     # double quoted value works but seems single quoted needs some fixing (e.g. "example 'acti" -> "example acti")
@@ -112,6 +114,7 @@ using namespace System.Management.Automation.Language
 $_%[1]v_completer = {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
     param($wordToComplete, $commandAst, $cursorPosition)
+    $env:CARAPACE_SHELL = "powershell"
     $commandElements = $commandAst.CommandElements
 
     $elems = @()

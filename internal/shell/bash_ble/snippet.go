@@ -31,8 +31,6 @@ _%[2]v_completer_ble() {
     compopt -o ble/no-default
     bleopt complete_menu_style=desc
 
-    declare -x CARAPACE_SHELL=bash-ble
-
     local command="${COMP_WORDS[0]}"
     local compline="${COMP_LINE:0:${COMP_POINT}}"
     local IFS=$'\n'
@@ -77,8 +75,6 @@ _%[2]v_completion_ble() {
 
     compopt -o ble/no-default
     bleopt complete_menu_style=desc
-
-    declare -x CARAPACE_SHELL=bash-ble
 
     local compline="${COMP_LINE:0:${COMP_POINT}}"
     local IFS=$'\n'

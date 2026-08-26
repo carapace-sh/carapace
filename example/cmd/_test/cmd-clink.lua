@@ -1,7 +1,6 @@
 local function example_completion(word, word_index, line_state, match_builder)
     match_builder:setnosort()
     match_builder:setvolatile()
-    os.setenv('CARAPACE_SHELL', 'cmd-clink')
     os.setenv('CARAPACE_COMPLINE', line_state:getline():sub(1, line_state:getcursor()))
 
     local file, pclose = io.popenyield('example _carapace cmd-clink example')

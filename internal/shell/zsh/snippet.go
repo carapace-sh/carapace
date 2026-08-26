@@ -23,8 +23,6 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
   local IFS=$'\n'
   local lines
 
-  # shellcheck disable=SC2086,SC2154,SC2155
-  declare -x CARAPACE_SHELL=zsh
   lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v "${command}" _carapace zsh 2>/dev/null)"
   if [ $? -eq 1 ]; then
     lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v "${command}" _carapace zsh 2>/dev/null)"
@@ -72,8 +70,6 @@ function _%[1]v_completion {
   local IFS=$'\n'
   local lines
 
-  # shellcheck disable=SC2086,SC2154,SC2155
-  declare -x CARAPACE_SHELL=zsh
   lines="$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v 2>/dev/null)"
   if [ $? -eq 1 ]; then
     lines="$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" CARAPACE_ZSH_HASH_DIRS="$(hash -d)" xargs %[2]v 2>/dev/null)"

@@ -4,7 +4,6 @@ using namespace System.Management.Automation.Language
 $_example__multi_completer = {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function", Target="*")]
     param($wordToComplete, $commandAst, $cursorPosition)
-    $env:CARAPACE_SHELL = "powershell"
     $commandElements = $commandAst.CommandElements
 
     $elems = @()

@@ -1,5 +1,4 @@
 let example__multi_completer = {|spans|
-    load-env { CARAPACE_SHELL: 'nushell' }
     example-multi $spans.0 _carapace nushell ...$spans | from json
 }
 

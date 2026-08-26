@@ -1,5 +1,4 @@
 function _example-multi_completer
-  set --local --export CARAPACE_SHELL fish
   set --local data
   IFS='' set data (echo (commandline -cp)'' | sed "s/ \$/ ''/" | xargs example-multi $argv[1] _carapace fish 2>/dev/null)
   if [ $status -eq 1 ]

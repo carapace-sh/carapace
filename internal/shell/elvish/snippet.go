@@ -27,7 +27,6 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 	}
 	return fmt.Sprintf(`%[5]vput %[3]v | each {|c|
     set edit:completion:arg-completer[$c] = {|@arg|
-        set E:CARAPACE_SHELL = 'elvish'
         %[2]v $c _carapace elvish (all $arg) | from-json | each {|completion|
     		put $completion[Messages] | all (one) | each {|m|
     			edit:notify (styled "error: " red)$m
@@ -64,7 +63,6 @@ func SnippetSingle(command string, explicitCommand bool) string {
 	}
 
 	return fmt.Sprintf(`set edit:completion:arg-completer[%[1]v] = {|@arg|
-    set E:CARAPACE_SHELL = 'elvish'
     %[2]v | from-json | each {|completion|
 		put $completion[Messages] | all (one) | each {|m|
 			edit:notify (styled "error: " red)$m

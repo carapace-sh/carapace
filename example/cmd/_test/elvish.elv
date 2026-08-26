@@ -1,5 +1,4 @@
 set edit:completion:arg-completer[example] = {|@arg|
-    set E:CARAPACE_SHELL = 'elvish'
     example _carapace elvish (all $arg) | from-json | each {|completion|
 		put $completion[Messages] | all (one) | each {|m|
 			edit:notify (styled "error: " red)$m

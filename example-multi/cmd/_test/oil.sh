@@ -1,6 +1,5 @@
 #!/bin/osh
 _example-multi_completer() {
-  export CARAPACE_SHELL=oil
   local command="${COMP_WORDS[0]}"
   local compline="${COMP_LINE:0:${COMP_POINT}}"
   local IFS=$'\n'

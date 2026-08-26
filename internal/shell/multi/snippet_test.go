@@ -195,18 +195,18 @@ func TestSnippetExport(t *testing.T) {
 func TestSnippetFuncs(t *testing.T) {
 	names := []string{"carapace-test", "sub1"}
 	funcs := map[string][]string{
-		"bash": {"declare -x CARAPACE_SHELL=bash"},
-		"zsh":  {"declare -x CARAPACE_SHELL=zsh"},
+		"bash": {"# bash-enrichment"},
+		"zsh":  {"# zsh-enrichment"},
 	}
 	s, err := Snippet("bash", names, "sub1", funcs)
 	if err != nil {
 		t.Error(err)
 	}
-	if !strings.Contains(s, "declare -x CARAPACE_SHELL=bash") {
+	if !strings.Contains(s, "# bash-enrichment") {
 		t.Error("bash snippet missing enrichment code")
 	}
 	// zsh enrichment should not appear in bash snippet
-	if strings.Contains(s, "CARAPACE_SHELL=zsh") {
+	if strings.Contains(s, "# zsh-enrichment") {
 		t.Error("bash snippet should not contain zsh enrichment")
 	}
 }

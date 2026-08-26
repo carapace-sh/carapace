@@ -23,7 +23,6 @@ const (
 	CARAPACE_MERGEFLAGS         = "CARAPACE_MERGEFLAGS"         // merge flags to single tag group
 	CARAPACE_NOSPACE            = "CARAPACE_NOSPACE"            // nospace suffixes
 	CARAPACE_SANDBOX            = "CARAPACE_SANDBOX"            // mock context for sandbox tests
-	CARAPACE_SHELL              = "CARAPACE_SHELL"              // explicit shell override (avoids process table scan)
 	CARAPACE_TOOLTIP            = "CARAPACE_TOOLTIP"            // enable tooltip style
 	CARAPACE_UNFILTERED         = "CARAPACE_UNFILTERED"         // skip the final filtering step
 	CARAPACE_ZSH_HASH_DIRS      = "CARAPACE_ZSH_HASH_DIRS"      // zsh hash directories

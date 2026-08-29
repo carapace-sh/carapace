@@ -28,9 +28,11 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 1. **Color disable**: if `env.ColorDisabled()`, strips styles and sets fallback styles
 2. **Prefix filtering**: `values.FilterPrefix(value)` unless `CARAPACE_UNFILTERED` is set
 3. **Flag merging**: merges "shorthand flags"/"longhand flags" tags into "flags" — implicit for zsh, explicit via `CARAPACE_MERGEFLAGS`
-4. **Message integration**: for shells without native message support (not elvish/zsh), messages are injected as synthetic `RawValue` entries (styled with `style.Carapace.Error`). The `export` format also carries messages natively in its JSON `Messages` field.
-5. **Nospace propagation**: if messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set
-6. **Sort + dedup**: `sort.Sort(ByDisplay(values))` → clear UIDs → `values.Unique()`
+4. **Message integration**: for shells without native message support (not elvish/export/zsh), messages are injected as synthetic `RawValue` entries (styled with `style.Carapace.Error`). The `export` format also carries messages natively in its JSON `Messages` field.
+5. **Nospace propagation**: if messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set (skipped for `export`)
+6. **Sort**: `sort.Sort(ByDisplay(values))`
+7. **Experimental tabdance**: if `CARAPACE_EXPERIMENTAL` is set and `tabdance` binary is found in PATH, returns early with the per-shell formatter (skipping UID clearing and dedup)
+8. **Clear UIDs + dedup + clear queries**: `values[index].Uid = ""` → `values.Unique()` → `meta.Queries = make(common.Queries, 0)`
 
 ## Snippet Generation
 

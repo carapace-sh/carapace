@@ -106,15 +106,12 @@ carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 
 ```go
 func (ia InvokedAction) Merge(others ...InvokedAction) InvokedAction {
-    merged := InvokedAction{
-        action: ia.action,
+    for _, other := range append([]InvokedAction{ia}, others...) {
+        ia.action.rawValues = append(ia.action.rawValues, other.action.rawValues...)
+        ia.action.meta.Merge(other.action.meta)
     }
-    for _, o := range others {
-        merged.action.rawValues = append(merged.action.rawValues, o.action.rawValues...)
-        merged.action.meta.Merge(o.action.meta)
-    }
-    merged.action.rawValues.Unique() // dedup by (Value, Uid)
-    return merged
+    ia.action.rawValues = ia.action.rawValues.Unique() // dedup by (Value, Uid)
+    return ia
 }
 ```
 

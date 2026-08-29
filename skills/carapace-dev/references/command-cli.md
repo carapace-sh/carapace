@@ -91,14 +91,16 @@ styleSetCmd := &cobra.Command{
     Use:  "set",
     Args: cobra.MinimumNArgs(1),
     Run: func(cmd *cobra.Command, args []string) {
-        for _, arg := range args {
-            if splitted := strings.SplitN(arg, "=", 2); len(splitted) == 2 {
-                if err := style.Set(splitted[0], splitted[1]); err != nil {
-                    fmt.Fprint(cmd.ErrOrStderr(), err.Error())
+                for _, arg := range args {
+                    if splitted := strings.SplitN(arg, "=", 2); len(splitted) == 2 {
+                        if err := style.Set(splitted[0], splitted[1]); err != nil {
+                            fmt.Fprint(cmd.ErrOrStderr(), err.Error())
+                        }
+                    } else {
+                        fmt.Fprintf(cmd.ErrOrStderr(), "invalid format: '%v'", arg)
+                    }
                 }
-            }
-        }
-    },
+            },
 }
 styleCmd.AddCommand(styleSetCmd)
 Carapace{styleSetCmd}.PositionalAnyCompletion(

@@ -58,6 +58,7 @@ All defined in `internal/env/env.go`:
 | `CARAPACE_TOOLTIP` | `CARAPACE_TOOLTIP` | Enable tooltip style |
 | `CARAPACE_UNFILTERED` | `CARAPACE_UNFILTERED` | Skip prefix filtering |
 | `CARAPACE_ZSH_HASH_DIRS` | `CARAPACE_ZSH_HASH_DIRS` | Zsh hash directories |
+| `CARAPACE_ZSH_STYLE_LIMIT` | `CARAPACE_ZSH_STYLE_LIMIT` | Max values to style in zsh (default 300) |
 | `CLICOLOR` | `CLICOLOR` | Disable color (standard CLI convention) |
 | `NO_COLOR` | `NO_COLOR` | Disable color (standard NO_COLOR convention) |
 

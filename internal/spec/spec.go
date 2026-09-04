@@ -84,6 +84,11 @@ func toFlag(flag *pflag.Flag) command.Flag {
 		longhand = f.Name
 	}
 
+	var defaultVal string
+	if !isZeroDefault(flag) {
+		defaultVal = flag.DefValue
+	}
+
 	return command.Flag{
 		Longhand:        longhand,
 		Shorthand:       shorthand,
@@ -95,7 +100,32 @@ func toFlag(flag *pflag.Flag) command.Flag {
 		Hidden:          f.Hidden,
 		Required:        f.Required(),
 		Nargs:           f.Nargs(),
-		Default:         flag.DefValue,
+		Default:         defaultVal,
+	}
+}
+
+func isZeroDefault(flag *pflag.Flag) bool {
+	switch flag.Value.Type() {
+	case "bool", "count":
+		return flag.DefValue == "false" || flag.DefValue == "0"
+	case "int", "int8", "int16", "int32", "int64",
+		"uint", "uint8", "uint16", "uint32", "uint64",
+		"float32", "float64":
+		return flag.DefValue == "0"
+	case "string":
+		return flag.DefValue == ""
+	case "stringSlice", "intSlice", "int32Slice", "int64Slice",
+		"uintSlice", "float32Slice", "float64Slice",
+		"boolSlice", "durationSlice", "stringArray",
+		"ipSlice", "ipNetSlice",
+		"stringToInt", "stringToInt64", "stringToString":
+		return flag.DefValue == "[]"
+	case "duration":
+		return flag.DefValue == "0s"
+	case "ip", "ipNet", "ipMask":
+		return flag.DefValue == "<nil>"
+	default:
+		return flag.DefValue == ""
 	}
 }
 

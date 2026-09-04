@@ -2,7 +2,6 @@ package zsh
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	shlex "github.com/carapace-sh/carapace-shlex"
@@ -92,19 +91,23 @@ const (
 
 // ActionRawValues formats values for zsh
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
-	splitted, err := shlex.Split(env.Compline())
+	ctx := shlex.SplitForCompletion(env.Compline(), shlex.ZshFormat())
 	state := DEFAULT_STATE
-	if err == nil {
-		rawValue := splitted.CurrentToken().RawValue
-		// TODO use token state to determine actual state (might have mixture).
-		switch {
-		case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
-			state = QUOTING_STATE
-		case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
-			state = QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
+	switch ctx.QuotingState {
+	case shlex.QUOTING_STATE:
+		state = QUOTING_STATE
+	case shlex.QUOTING_ESCAPING_STATE:
+		// Distinguish full quoting (word starts and ends with ") from open quoting
+		raw := ctx.RawCurrentWord
+		if strings.HasPrefix(raw, `"`) && strings.HasSuffix(raw, `"`) {
 			state = FULL_QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
+		} else {
+			state = QUOTING_ESCAPING_STATE
+		}
+	default:
+		// Check for full single-quote (word starts and ends with ')
+		raw := ctx.RawCurrentWord
+		if strings.HasPrefix(raw, `'`) && strings.HasSuffix(raw, `'`) {
 			state = FULL_QUOTING_STATE
 		}
 	}

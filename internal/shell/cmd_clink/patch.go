@@ -17,10 +17,7 @@ func Patch(args []string) ([]string, error) {
 		return args, nil
 	}
 
-	tokens, err := shlex.Split(compline)
-	if err != nil {
-		return nil, err
-	}
-	args = append(args[:1], tokens.CurrentPipeline().FilterRedirects().Words().Strings()...)
+	ctx := shlex.SplitForCompletion(compline, shlex.BashFormat())
+	args = append(args[:1], ctx.Words...)
 	return args, nil
 }

@@ -5,6 +5,7 @@ import (
 	"bytes"
 
 	"github.com/carapace-sh/carapace/internal/pflagfork"
+	"github.com/carapace-sh/carapace/pkg/command"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
@@ -15,84 +16,20 @@ func Spec(cmd *cobra.Command) string {
 	m := &bytes.Buffer{}
 	enc := yaml.NewEncoder(m)
 	enc.SetIndent(2)
-	_ = enc.Encode(command(cmd))
+	_ = enc.Encode(commandLine(cmd))
 	return "# yaml-language-server: $schema=https://carapace.sh/schemas/command.json\n" + m.String()
 }
 
-// Flag holds metadata for a single flag.
-type Flag struct {
-	Description string
-	Nargs       int
-	Default     string
-}
-
-// Extended is used for flags that have additional metadata beyond a description.
-type Extended struct {
-	Description string `yaml:"description,omitempty"`
-	Nargs       int    `yaml:"nargs,omitempty"`
-	Default     string `yaml:"default,omitempty"`
-}
-
-// FlagSet is a map of flag definitions to their metadata.
-type FlagSet map[string]Flag
-
-func (fs FlagSet) MarshalYAML() (any, error) {
-	m := make(map[string]any)
-	for k, f := range fs {
-		if f.Nargs != 0 || f.Default != "" {
-			m[k] = Extended{
-				Description: f.Description,
-				Nargs:       f.Nargs,
-				Default:     f.Default,
-			}
-		} else {
-			m[k] = f.Description
-		}
-	}
-	return m, nil
-}
-
-// Command represents a command with its flags, subcommands, and metadata.
-type Command struct {
-	Name            string            `yaml:"name"`
-	Aliases         []string          `yaml:"aliases,omitempty"`
-	Description     string            `yaml:"description,omitempty"`
-	Group           string            `yaml:"group,omitempty"`
-	Hidden          bool              `yaml:"hidden,omitempty"`
-	Parsing         string            `yaml:"parsing,omitempty"`
-	Flags           FlagSet           `yaml:"flags,omitempty"`
-	PersistentFlags FlagSet           `yaml:"persistentflags,omitempty"`
-	ExclusiveFlags  [][]string        `yaml:"exclusiveflags,omitempty"`
-	Run             string            `yaml:"run,omitempty"`
-	Completion      struct {
-		Flag          map[string][]string `yaml:"flag,omitempty"`
-		Positional    [][]string          `yaml:"positional,omitempty"`
-		PositionalAny []string            `yaml:"positionalany,omitempty"`
-		Dash          [][]string          `yaml:"dash,omitempty"`
-		DashAny       []string            `yaml:"dashany,omitempty"`
-	} `yaml:"completion,omitempty"`
-	Commands      []Command `yaml:"commands,omitempty"`
-	Documentation struct {
-		Command       string            `yaml:"command,omitempty"`
-		Flag          map[string]string `yaml:"flag,omitempty"`
-		Positional    []string          `yaml:"positional,omitempty"`
-		PositionalAny string            `yaml:"positionalany,omitempty"`
-		Dash          []string          `yaml:"dash,omitempty"`
-		DashAny       string            `yaml:"dashany,omitempty"`
-	} `yaml:"documentation,omitempty"`
-	Examples map[string]string `yaml:"examples,omitempty"`
-}
-
-func command(cmd *cobra.Command) Command {
-	c := Command{
+func commandLine(cmd *cobra.Command) command.Command {
+	c := command.Command{
 		Name:            cmd.Use,
 		Description:     cmd.Short,
 		Aliases:         cmd.Aliases,
 		Group:           cmd.GroupID,
 		Hidden:          cmd.Hidden,
-		Flags:           make(FlagSet),
-		PersistentFlags: make(FlagSet),
-		Commands:        make([]Command, 0),
+		Flags:           make(command.FlagSet),
+		PersistentFlags: make(command.FlagSet),
+		Commands:        make([]command.Command, 0),
 	}
 
 	if cmd.Long != "" {
@@ -105,31 +42,57 @@ func command(cmd *cobra.Command) Command {
 		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
 			return
 		}
-
-		f := pflagfork.Flag{Flag: flag}
-		prefix := pflagfork.FlagSet{FlagSet: cmd.Flags()}.Prefix()
-		c.Flags[f.Definition(prefix)] = Flag{
-			Description: f.Usage,
-			Nargs:       f.Nargs(),
-			Default:     flag.DefValue,
-		}
+		c.Flags[flagDefinition(flag, cmd.Flags())] = toFlag(flag)
 	})
 
 	cmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
-		f := pflagfork.Flag{Flag: flag}
-		prefix := pflagfork.FlagSet{FlagSet: cmd.Flags()}.Prefix()
-		c.PersistentFlags[f.Definition(prefix)] = Flag{
-			Description: f.Usage,
-			Nargs:       f.Nargs(),
-			Default:     flag.DefValue,
-		}
+		c.PersistentFlags[flagDefinition(flag, cmd.Flags())] = toFlag(flag)
 	})
 
 	for _, subcmd := range cmd.Commands() {
 		if subcmd.Name() != "_carapace" && subcmd.Deprecated == "" {
-			c.Commands = append(c.Commands, command(subcmd))
+			c.Commands = append(c.Commands, commandLine(subcmd))
 		}
 	}
 
 	return c
+}
+
+func flagDefinition(flag *pflag.Flag, flagSet *pflag.FlagSet) string {
+	f := pflagfork.Flag{Flag: flag}
+	prefix := pflagfork.FlagSet{FlagSet: flagSet}.Prefix()
+	return f.Definition(prefix)
+}
+
+func toFlag(flag *pflag.Flag) command.Flag {
+	f := pflagfork.Flag{Flag: flag}
+	mode := f.GetMode()
+
+	var shorthand, longhand string
+	switch mode {
+	case pflagfork.ShorthandOnly:
+		shorthand = f.Shorthand
+	case pflagfork.NameAsShorthand:
+		shorthand = f.Shorthand
+		longhand = f.Name
+	default:
+		if f.Shorthand != "" {
+			shorthand = f.Shorthand
+		}
+		longhand = f.Name
+	}
+
+	return command.Flag{
+		Longhand:        longhand,
+		Shorthand:       shorthand,
+		Description:     f.Usage,
+		NameAsShorthand: mode == pflagfork.NameAsShorthand,
+		Repeatable:      f.IsRepeatable(),
+		Optarg:          f.IsOptarg() && f.TakesValue(),
+		Value:           f.TakesValue(),
+		Hidden:          f.Hidden,
+		Required:        f.Required(),
+		Nargs:           f.Nargs(),
+		Default:         flag.DefValue,
+	}
 }

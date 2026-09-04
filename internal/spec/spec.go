@@ -3,6 +3,8 @@ package spec
 
 import (
 	"bytes"
+	"sort"
+	"strings"
 
 	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/carapace-sh/carapace/pkg/command"
@@ -36,7 +38,7 @@ func commandLine(cmd *cobra.Command) command.Command {
 		c.Documentation.Command = cmd.Long
 	}
 
-	// TODO mutually exclusive flags
+	c.ExclusiveFlags = exclusiveFlags(cmd)
 
 	cmd.LocalFlags().VisitAll(func(flag *pflag.Flag) {
 		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
@@ -95,4 +97,31 @@ func toFlag(flag *pflag.Flag) command.Flag {
 		Nargs:           f.Nargs(),
 		Default:         flag.DefValue,
 	}
+}
+
+func exclusiveFlags(cmd *cobra.Command) [][]string {
+	groups := make(map[string]bool)
+	var result [][]string
+
+	collect := func(flag *pflag.Flag) {
+		for _, entry := range flag.Annotations["cobra_annotation_mutually_exclusive"] {
+			members := strings.Fields(entry)
+			sort.Strings(members)
+			key := strings.Join(members, "\x00")
+			if !groups[key] {
+				groups[key] = true
+				result = append(result, members)
+			}
+		}
+	}
+
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
+			return
+		}
+		collect(flag)
+	})
+	cmd.PersistentFlags().VisitAll(collect)
+
+	return result
 }

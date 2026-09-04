@@ -2,6 +2,8 @@
 package spec
 
 import (
+	"bytes"
+
 	"github.com/carapace-sh/carapace/internal/pflagfork"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -10,8 +12,11 @@ import (
 
 // Spec generates the spec file.
 func Spec(cmd *cobra.Command) string {
-	m, _ := yaml.Marshal(command(cmd))
-	return "# yaml-language-server: $schema=https://carapace.sh/schemas/command.json\n" + string(m)
+	m := &bytes.Buffer{}
+	enc := yaml.NewEncoder(m)
+	enc.SetIndent(2)
+	_ = enc.Encode(command(cmd))
+	return "# yaml-language-server: $schema=https://carapace.sh/schemas/command.json\n" + m.String()
 }
 
 func command(cmd *cobra.Command) Command {

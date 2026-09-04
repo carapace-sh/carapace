@@ -145,13 +145,7 @@ func exclusiveFlags(cmd *cobra.Command) [][]string {
 		}
 	}
 
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if cmd.PersistentFlags().Lookup(flag.Name) != nil {
-			return
-		}
-		collect(flag)
-	})
+	cmd.LocalFlags().VisitAll(collect)
 	cmd.PersistentFlags().VisitAll(collect)
-
 	return result
 }

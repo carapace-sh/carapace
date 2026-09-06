@@ -77,6 +77,25 @@ func TestFilterPrefix(t *testing.T) {
 	}
 }
 
+func TestSanitized(t *testing.T) {
+	v := RawValues{
+		{Value: "ty-pug-cli", Display: "ty-pug-cli", Description: "- install it\r    1. npm i ty-pug-cli -g\r"},
+		{Value: "multi\nline", Display: "multi\nline", Description: "first\n\nsecond\tthird"},
+		{Value: "trailing\r\n", Display: " clean ", Description: ""},
+	}.Sanitized()
+	if v[0].Value != "ty-pug-cli" || v[0].Display != "ty-pug-cli" || v[0].Description != "- install it     1. npm i ty-pug-cli -g " {
+		t.Errorf("unexpected sanitization: %#v", v[0])
+	}
+
+	if v[1].Value != "multi line" || v[1].Display != "multi line" || v[1].Description != "first second third" {
+		t.Errorf("unexpected sanitization: %#v", v[1])
+	}
+
+	if v[2].Value != "trailing " || v[2].Display != " clean " {
+		t.Errorf("unexpected sanitization: %#v", v[2])
+	}
+}
+
 func equalRawValues(a, b RawValue) bool {
 	return a.Value == b.Value && a.Display == b.Display && a.Description == b.Description
 }

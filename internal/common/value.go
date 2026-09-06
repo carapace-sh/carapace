@@ -2,6 +2,7 @@
 package common
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 
@@ -41,6 +42,27 @@ func (r RawValue) TrimmedDescription() string {
 
 // RawValues is an alias for []RawValue.
 type RawValues []RawValue
+
+// Sanitized returns values with control characters (\r, \n, \t) in value,
+// display and description replaced by a single space, as those break shell
+// completion output and TUI rendering (e.g. registry descriptions containing
+// raw carriage returns). Other whitespace is preserved.
+func (r RawValues) Sanitized() RawValues {
+	rawValues := make(RawValues, len(r))
+	for index, value := range r {
+		value.Value = sanitizeControlChars(value.Value)
+		value.Display = sanitizeControlChars(value.Display)
+		value.Description = sanitizeControlChars(value.Description)
+		rawValues[index] = value
+	}
+	return rawValues
+}
+
+var controlChars = regexp.MustCompile(`[\r\n\t]+`)
+
+func sanitizeControlChars(s string) string {
+	return controlChars.ReplaceAllString(s, " ")
+}
 
 // RawValuesFrom creates RawValues from given values.
 func RawValuesFrom(values ...string) RawValues {

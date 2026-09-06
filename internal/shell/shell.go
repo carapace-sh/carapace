@@ -75,6 +75,8 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		"zsh":        zsh.ActionRawValues,
 	}
 	if f, ok := shellFuncs[shell]; ok {
+		values = values.Sanitized()
+
 		if env.ColorDisabled() {
 			style.Carapace.Value = style.Default
 			style.Carapace.Description = style.Default

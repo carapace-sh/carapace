@@ -30,6 +30,20 @@ func TestActionCallback(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestInvokeSanitizesControlCharacters(t *testing.T) {
+	a := ActionCallback(func(c Context) Action {
+		return ActionValuesDescribed("ty-pug-cli", "- install it\r    1. npm i ty-pug-cli -g\r")
+	})
+	invoked := a.Invoke(Context{})
+	if len(invoked.action.rawValues) != 1 {
+		t.Fatalf("expected 1 value, got %v", len(invoked.action.rawValues))
+	}
+	value := invoked.action.rawValues[0]
+	if value.Value != "ty-pug-cli" || value.Description != "- install it     1. npm i ty-pug-cli -g " {
+		t.Errorf("unexpected values: %#v", value)
+	}
+}
+
 func TestCache(t *testing.T) {
 	f := func() Action {
 		return ActionCallback(func(c Context) Action {

@@ -127,6 +127,9 @@ func (a Action) Invoke(c Context) InvokedAction {
 		result.action.meta.Merge(a.meta)
 		return result
 	}
+	if a.rawValues != nil {
+		a.rawValues = a.rawValues.Sanitized()
+	}
 	return InvokedAction{a}
 }
 

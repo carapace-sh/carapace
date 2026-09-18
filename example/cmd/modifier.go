@@ -196,7 +196,7 @@ func init() {
 			)
 
 			return carapace.ActionExecute(cmd)
-		}).Split(),
+		}).Split(""),
 		"splitp": carapace.ActionCallback(func(c carapace.Context) carapace.Action {
 			cmd := &cobra.Command{}
 			carapace.Gen(cmd).Standalone()
@@ -213,7 +213,7 @@ func init() {
 			)
 
 			return carapace.ActionExecute(cmd)
-		}).SplitP(),
+		}).SplitP(""),
 		"style": carapace.ActionValues(
 			"one",
 			"two",

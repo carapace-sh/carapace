@@ -53,7 +53,7 @@ func init() {
 		"cobra": carapace.ActionCobra(func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return []string{"one", "two"}, cobra.ShellCompDirectiveNoSpace
 		}),
-		"commands":    carapace.ActionCommands(rootCmd).Split(),
+		"commands":    carapace.ActionCommands(rootCmd).Split(""),
 		"directories": carapace.ActionDirectories(),
 		"execcommand": carapace.ActionExecCommand("git", "remote")(func(output []byte) carapace.Action {
 			lines := strings.Split(string(output), "\n")

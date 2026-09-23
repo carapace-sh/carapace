@@ -1,0 +1,48 @@
+> >
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example _carapace nushell | save --force /tmp/example.nu
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example _carapace nushell | save --force /tmp/example.nu
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> | example
+action         action example
+alias          action example
+chain          shorthand chain
+compat
+completion     Generate the autocompletion script for the specified shell
+flag           flag example
+────────────────────────────────────────────────────────────────────────────────
+> > example action
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example action
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────

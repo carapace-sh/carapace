@@ -125,3 +125,102 @@ func TestEnvsubst(t *testing.T) {
 		})
 	}
 }
+
+func TestLookPathAbsolute(t *testing.T) {
+	c := Context{Dir: "/tmp"}
+	path, err := c.LookPath("/bin/sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if path != "/bin/sh" {
+		t.Fatalf("expected /bin/sh, got %v", path)
+	}
+}
+
+func TestLookPathFromPATH(t *testing.T) {
+	c := Context{Dir: "/tmp"}
+	c.Setenv("PATH", "/usr/local/bin:/usr/bin:/bin")
+	_, err := c.LookPath("sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestLookPathCustomPATH(t *testing.T) {
+	tmpDir := t.TempDir()
+	binPath := filepath.Join(tmpDir, "myapp")
+	if err := os.WriteFile(binPath, []byte("#!/bin/sh"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	c := Context{Dir: "/tmp"}
+	c.Setenv("PATH", tmpDir)
+	path, err := c.LookPath("myapp")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if path != binPath {
+		t.Fatalf("expected %v, got %v", binPath, path)
+	}
+}
+
+func TestLookPathNotFound(t *testing.T) {
+	c := Context{Dir: "/tmp"}
+	c.Setenv("PATH", "/nonexistent")
+	_, err := c.LookPath("doesnotexist")
+	if err == nil {
+		t.Fatal("expected error for nonexistent executable")
+	}
+}
+
+func TestLookPathEmptyPATH(t *testing.T) {
+	c := Context{Dir: "/tmp"}
+	c.Setenv("PATH", "")
+	_, err := c.LookPath("sh")
+	if err == nil {
+		t.Fatal("expected error when PATH is empty")
+	}
+}
+
+func TestLookPathRelativeWithSlash(t *testing.T) {
+	tmpDir := t.TempDir()
+	binPath := filepath.Join(tmpDir, "mybin")
+	if err := os.WriteFile(binPath, []byte("#!/bin/sh"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	c := Context{Dir: tmpDir}
+	path, err := c.LookPath("./mybin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if path != "./mybin" {
+		t.Fatalf("expected ./mybin, got %v", path)
+	}
+}
+
+func TestLookPathUsesContextEnv(t *testing.T) {
+	c := Context{Dir: "/tmp"}
+	c.Env = []string{"PATH=/custom/bin:/bin"}
+	path, err := c.LookPath("sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if path != "/bin/sh" {
+		t.Fatalf("expected /bin/sh, got %v", path)
+	}
+}
+
+func TestLookPathRespectsDir(t *testing.T) {
+	tmpDir := t.TempDir()
+	localBin := filepath.Join(tmpDir, "localbin")
+	if err := os.WriteFile(localBin, []byte("#!/bin/sh"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	c := Context{Dir: tmpDir, Env: []string{"PATH=."}}
+	path, err := c.LookPath("localbin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if path != localBin {
+		t.Fatalf("expected %v, got %v", localBin, path)
+	}
+}

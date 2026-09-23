@@ -292,49 +292,76 @@ func (a Action) Shift(n int) Action {
 }
 
 // Split splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
-func (a Action) Split() Action {
-	return a.split(false)
+func (a Action) Split(format string) Action {
+	return a.split(format, false)
 }
 
 // SplitP is like Split but supports pipelines.
-func (a Action) SplitP() Action {
-	return a.split(true)
+func (a Action) SplitP(format string) Action {
+	return a.split(format, true)
 }
 
-func (a Action) split(pipelines bool) Action {
+func (a Action) split(format string, pipelines bool) Action {
 	return ActionCallback(func(c Context) Action {
-		tokens, err := shlex.Split(c.Value)
+		// TODO should be in shlex
+		var f shlex.Format
+		switch format {
+		case "", "bash":
+			f = shlex.BashFormat()
+		case "cmd":
+			f = shlex.CmdFormat()
+		case "fish":
+			f = shlex.FishFormat()
+		case "elvish":
+			f = shlex.ElvishFormat()
+		case "nushell":
+			f = shlex.NushellFormat()
+		case "oil":
+			f = shlex.OilFormat()
+		case "powershell":
+			f = shlex.PowershellFormat()
+		case "tcsh":
+			f = shlex.TcshFormat()
+		case "xonsh":
+			f = shlex.XonshFormat()
+		case "zsh":
+			f = shlex.ZshFormat()
+		default:
+			return ActionMessage("unknown format: %q", format)
+		}
+
+		tokens, err := shlex.SplitWith(c.Value, f)
 		if err != nil {
 			return ActionMessage(err.Error())
 		}
 
+		ctx := shlex.SplitForCompletion(c.Value, f)
+
 		var context Context
 		if pipelines {
-			tokens = tokens.CurrentPipeline()
-			context = NewContext(tokens.FilterRedirects().Words().Strings()...)
+			context = NewContext(ctx.Words...)
 		} else {
 			context = NewContext(tokens.Words().Strings()...)
 		}
 
 		originalValue := c.Value
-		prefix := originalValue[:tokens.Words().CurrentToken().Index]
+		pipelineTokens := ctx.Pipeline
+		prefix := originalValue[:pipelineTokens.Words().CurrentToken().Span.Start]
 		c.Args = context.Args
 		c.Parts = []string{}
 		c.Value = context.Value
 
-		if pipelines { // support redirects
-			if len(tokens) > 1 && tokens[len(tokens)-2].WordbreakType.IsRedirect() {
-				LOG.Printf("completing files for redirect arg %#v", tokens.Words().CurrentToken().Value)
-				prefix = originalValue[:tokens.CurrentToken().Index]
-				c.Value = tokens.CurrentToken().Value
-				a = ActionFiles()
-			}
+		if pipelines && ctx.IsRedirect {
+			LOG.Printf("completing files for redirect arg %#v", ctx.CurrentWord)
+			prefix = originalValue[:pipelineTokens.CurrentToken().Span.Start]
+			c.Value = ctx.CurrentWord
+			a = ActionFiles()
 		}
 
 		invoked := a.Invoke(c)
 		for index, value := range invoked.action.rawValues {
 			if !invoked.action.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
-				switch tokens.CurrentToken().State {
+				switch ctx.QuotingState {
 				case shlex.QUOTING_ESCAPING_STATE:
 					invoked.action.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.ReplaceAll(value.Value, `"`, `\"`))
 				case shlex.QUOTING_STATE:

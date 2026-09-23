@@ -2,7 +2,9 @@
 package ps
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/carapace-sh/carapace/third_party/github.com/mitchellh/go-ps"
@@ -19,7 +21,7 @@ func DetermineShell() string {
 			return ""
 		}
 
-		executable := process.Executable()
+		executable := resolveExecutable(process.Pid(), process.Executable())
 		switch strings.SplitN(strings.TrimSuffix(executable, ".exe"), "-", 2)[0] {
 		case "bash":
 			if isBLE() {
@@ -56,6 +58,25 @@ func DetermineShell() string {
 			}
 		}
 	}
+}
+
+// resolveExecutable returns the binary name for a process. On Termux (Android 10+),
+// execve is rewritten by termux-exec to run binaries through the system linker
+// (/system/bin/linker64) to bypass app data exec restrictions, so the kernel comm
+// shows "linker"/"linker64" instead of the binary name. The real binary path is
+// recoverable as the first entry of /proc/<pid>/cmdline.
+func resolveExecutable(pid int, executable string) string {
+	switch executable {
+	case "linker", "linker64":
+		data, err := os.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid))
+		if err != nil {
+			return executable
+		}
+		if name := strings.SplitN(string(data), "\x00", 2)[0]; name != "" {
+			return filepath.Base(name)
+		}
+	}
+	return executable
 }
 
 func isBLE() bool {

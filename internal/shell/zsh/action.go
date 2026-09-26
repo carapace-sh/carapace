@@ -53,7 +53,6 @@ var defaultReplacer = strings.NewReplacer(
 
 // additional replacement for use with `_describe` in shell script
 var describeReplacer = strings.NewReplacer(
-	`\`, `\\`,
 	`:`, `\:`,
 )
 

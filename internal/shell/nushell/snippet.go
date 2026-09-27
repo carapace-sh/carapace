@@ -19,7 +19,9 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer nushell completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	return fmt.Sprintf(`%[4]vlet %[1]v_completer = {|spans|
+	return fmt.Sprintf(`%[4]vlet %[1]v_completer = {|place|
+    # backwards compatible workaround for positional completer input, see nushell #18791
+    let spans = (if ($place | describe) =~ "record" { $place.command } else { $place })
     %[2]v $spans.0 _carapace nushell ...$spans | from json
 }
 
@@ -40,7 +42,9 @@ $env.config = $current
 // When false, only the minimal completer function is generated (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 	if explicitCommand {
-		return fmt.Sprintf(`let %[2]v_completer = {|spans|
+		return fmt.Sprintf(`let %[2]v_completer = {|place|
+    # backwards compatible workaround for positional completer input, see nushell #18791
+    let spans = (if ($place | describe) =~ "record" { $place.command } else { $place })
     %[1]v %[3]v _carapace nushell ...$spans | from json
 }
 
@@ -55,7 +59,9 @@ $env.config = $current
 `, uid.Executable(), sanitizeName(command), command)
 	}
 
-	return fmt.Sprintf(`let %v_completer = {|spans| 
+	return fmt.Sprintf(`let %v_completer = {|place| 
+    # backwards compatible workaround for positional completer input, see nushell #18791
+    let spans = (if ($place | describe) =~ "record" { $place.command } else { $place })
     %v _carapace nushell ...$spans | from json
 }`, sanitizeName(command), uid.Executable())
 }

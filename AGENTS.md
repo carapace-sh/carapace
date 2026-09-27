@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Carapace is a Go library that provides command argument completion for [spf13/cobra](https://github.com/spf13/cobra)-based CLI applications. It generates shell completion scripts and handles runtime completion callbacks for 11 shells: bash, bash-ble, cmd-clink, elvish, fish, ion, nushell, oil, powershell, tcsh, xonsh, and zsh.
+Carapace is a Go library that provides command argument completion for [spf13/cobra](https://github.com/spf13/cobra)-based CLI applications. It generates shell completion scripts and handles runtime completion callbacks for 12 shells: bash, bash-ble, cmd-clink, elvish, fish, ion, nushell, oil, powershell, tcsh, xonsh, and zsh.
 
 This is the **core library** (`github.com/carapace-sh/carapace`). Companion projects:
 - `carapace-bin` — pre-built completions for 500+ commands

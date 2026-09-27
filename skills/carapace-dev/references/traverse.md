@@ -198,8 +198,10 @@ After traversal and invocation, `shell.Value()` applies post-processing before f
 2. **Prefix filtering**: `values.FilterPrefix(value)` unless `CARAPACE_UNFILTERED`
 3. **Flag merging**: merge "shorthand flags"/"longhand flags" tags into "flags" — implicit for zsh, explicit via `CARAPACE_MERGEFLAGS`
 4. **Message integration**: For shells without native message support (not elvish/export/zsh), messages are integrated as synthetic completion values
-5. **Nospace propagation**: If messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set
-6. **Sort + dedup**: `sort.Sort(ByDisplay(values))` → clear UIDs → `values.Unique()`
+5. **Nospace propagation**: For non-`export` shells, if messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set
+6. **Sort**: `sort.Sort(ByDisplay(values))`
+7. **Experimental tabdance**: If `CARAPACE_EXPERIMENTAL` is set and the `tabdance` binary is on `PATH`, dispatch early with full meta (UIDs, queries intact)
+8. **UID clearance + dedup**: clear UIDs → `values.Unique()` → clear `meta.Queries`
 
 ## Related Skills
 

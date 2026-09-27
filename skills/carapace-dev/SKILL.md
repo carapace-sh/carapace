@@ -18,7 +18,7 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 
 | Keywords | Reference |
 |----------|----------|
-| Action type, modifier, InvokedAction, Context, callback, Batch, rawValues, suffix naming | [references/action.md](references/action.md) |
+| Action type, modifier, InvokedAction, Context, callback, Batch, rawValues, suffix naming, NoPrefix, PrefixMatcher | [references/action.md](references/action.md) |
 | traverse, completion engine, argument classification, pflagfork, shell patching, complete(), dispatch, LookupArg, FlagPrefix, ArgPrefix, DelimiterDisabled, non-POSIX optarg attached values | [references/traverse.md](references/traverse.md) |
 | pflag, flag mode, NameAsShorthand, ShorthandOnly, Nargs, OptargDelimiter, ArgumentStyle, AcceptsNext, AcceptsDelimited, AcceptsAttached, FlagPrefix, custom flag prefix, non-POSIX flags, DelimiterDisabled, delimiter-disabled attached values | [references/pflag.md](references/pflag.md) |
 | Shell overview, cross-shell comparison, dispatch pipeline, supported shells, nospace/message/quoting comparison | [references/shell.md](references/shell.md) |
@@ -42,7 +42,7 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 | Spec, spec.Spec, yaml.Marshal, Command struct, Flags, PersistentFlags, _carapace skip, pflagfork.Flag.Definition | [references/spec.md](references/spec.md) |
 | Export, Export struct, MarshalJSON, version, RawValue, Meta, cache format, sandbox invoke, ActionImport | [references/export.md](references/export.md) |
 | Conditionals, Arch, Os, Executable, File, CompletingPath, UnlessF, Context predicates, pkg/condition | [references/conditionals.md](references/conditionals.md) |
-| _carapace CLI, command.go, addCompletionCommand, spec, style set, export re-invocation, PositionalAnyCompletion | [references/command-cli.md](references/command-cli.md) |
+| _carapace CLI, command.go, addCompletionCommand, spec, style set, export re-invocation, PositionalAnyCompletion, multi-completer, WithSubcommands, WithDefault, WithSnippetFuncs, rewriteArgs, multi.Snippet | [references/command-cli.md](references/command-cli.md) |
 | Mock, Mock struct, NewMock, Dir, Replies, CacheDir, WorkDir, t interface, Reply mechanism, sandbox integration | [references/mock.md](references/mock.md) |
 
 ## Quick Guide
@@ -64,6 +64,7 @@ Load the reference that matches your task. When in doubt, load multiple referenc
 - **What is the JSON wire format?** → [references/export.md](references/export.md)
 - **What conditional helpers exist?** → [references/conditionals.md](references/conditionals.md)
 - **How does the _carapace CLI work?** → [references/command-cli.md](references/command-cli.md)
+- **How does multi-completer (one binary, many commands) work?** → [references/command-cli.md](references/command-cli.md)
 - **How does the mock system work?** → [references/mock.md](references/mock.md)
 
 ## Cross-Project References

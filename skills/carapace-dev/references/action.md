@@ -111,6 +111,7 @@ All return `Action` (chainable). Most wrap in `ActionCallback` for lazy evaluati
 | `Prefix` | `(prefix string)` | Add prefix to inserted values (not display) |
 | `Suffix` | `(suffix string)` | Add suffix to inserted values (not display) |
 | `NoSpace` | `(suffixes ...rune)` | Disable trailing space for chars (`'*'` = all) |
+| `NoPrefix` | `(prefixes ...rune)` | Disable common prefix insertion for given prefixes (`'*'` = all) |
 
 ### Multi-Part & Splitting
 
@@ -245,6 +246,7 @@ type RawValue struct {
 ```go
 type Meta struct {
     Messages Messages       // error/warning messages
+    NoPrefix PrefixMatcher  // prefixes where common prefix insertion is disabled
     Nospace  SuffixMatcher  // suffixes where no space is appended
     Usage    string         // contextual usage hint
     Queries  Queries        // deferred shell queries

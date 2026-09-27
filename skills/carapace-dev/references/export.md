@@ -142,6 +142,7 @@ type RawValue struct {
 ```go
 type Meta struct {
     Messages Messages
+    NoPrefix PrefixMatcher
     Nospace  SuffixMatcher
     Usage    string
     Queries  []string
@@ -149,6 +150,7 @@ type Meta struct {
 ```
 
 - **Messages**: info/warning messages to display
+- **NoPrefix**: prefixes where common prefix insertion is disabled
 - **Nospace**: characters after which the shell should NOT add a trailing space
 - **Usage**: usage hint string
 - **Queries**: query metadata for UID resolution

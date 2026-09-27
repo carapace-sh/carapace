@@ -149,6 +149,55 @@ if parentCmd.Annotations[annotation_standalone] == "true" {
 
 When a command is in standalone mode (`annotation_standalone = "true"`), the `_carapace` subcommand is removed from the command tree. This prevents completion of the hidden carapace command itself.
 
+## Multi-Completer Support
+
+A single binary can provide completions for multiple commands (e.g. `magick`, `identify`, `convert` in ImageMagick). This is configured via `Gen()` options defined in `carapace.go`:
+
+```go
+carapace.Gen(rootCmd,
+    carapace.WithSubcommands(identifyCmd, convertCmd),
+    carapace.WithDefault("magick"),
+    carapace.WithSnippetFuncs(map[string]string{
+        "bash": "_magick_custom_func() { ... }",
+    }),
+)
+```
+
+### Options
+
+| Option | Purpose |
+|--------|---------|
+| `WithSubcommands(cmds ...*cobra.Command)` | Register additional commands as independent completers. The binary name is automatically included as a pseudo-subcommand for self-completion. |
+| `WithDefault(name string)` | Set the shell completer function name (defaults to executable name). No-op without `WithSubcommands`. |
+| `WithSnippetFuncs(funcs map[string]string)` | Inject custom shell code into snippets (keyed by shell name). Multiple calls accumulate per shell in order. |
+
+### Snippet Generation
+
+When `WithSubcommands` is set, `Snippet()` delegates to `multi.Snippet()` (`internal/shell/multi/snippet.go`) instead of `shell.Snippet()`. The multi-completer snippet registers all subcommand completers at once in a single shell script.
+
+Multi-completer snippets are supported by all shells except `cmd-clink` and `ion`.
+
+### Execute() Arg Rewriting
+
+`Execute()` intercepts `os.Args` for multi-completer routing via `rewriteArgs()`. The rewriting handles three patterns:
+
+1. **Root `_carapace` invocation** — `binary _carapace <shell> <args...>` is rewritten to route to the correct subcommand based on the completion target. If the target is the binary itself (pseudo-subcommand), it's handled at root level.
+
+2. **Bridge re-invocation** — `binary _carapace export "" <subcommand> <args...>` (from `bridge.ActionCarapace`) is rewritten to `binary <subcommand> _carapace export "" <args...>` so the subcommand's own completion handles it.
+
+3. **Subcommand snippet request** — `binary <subcommand> _carapace <shell>` produces a single-command snippet via `multi.SingleSnippetOrEmpty()`.
+
+### Storage Entry Fields
+
+The `entry` struct in `storage.go` gains these fields when multi-completer options are applied:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `subcommands` | `[]*cobra.Command` | The registered subcommands |
+| `subcommandNames` | `[]string` | Binary name + subcommand names (for snippet generation) |
+| `defaultName` | `string` | Shell completer function name |
+| `snippetFuncs` | `map[string][]string` | Custom shell code per shell name |
+
 ## Annotation Constants
 
 Defined in `carapace.go`:

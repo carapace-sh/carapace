@@ -1,6 +1,6 @@
 # Carapace Library: Per-Shell Output Formatting
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specific completion output — how `RawValues` and `Meta` are formatted for each of the 11 supported shells, and how the shells differ.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specific completion output — how `RawValues` and `Meta` are formatted for each of the 12 supported shells, and how the shells differ.
 
 ## Supported Shells
 
@@ -29,8 +29,10 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 2. **Prefix filtering**: `values.FilterPrefix(value)` unless `CARAPACE_UNFILTERED` is set
 3. **Flag merging**: merges "shorthand flags"/"longhand flags" tags into "flags" — implicit for zsh, explicit via `CARAPACE_MERGEFLAGS`
 4. **Message integration**: for shells without native message support (not elvish/zsh), messages are injected as synthetic `RawValue` entries (styled with `style.Carapace.Error`). The `export` format also carries messages natively in its JSON `Messages` field.
-5. **Nospace propagation**: if messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set
-6. **Sort + dedup**: `sort.Sort(ByDisplay(values))` → clear UIDs → `values.Unique()`
+5. **Nospace propagation**: for non-`export` shells, if messages exist or `CARAPACE_NOSPACE` is set, add `*` to nospace set
+6. **Sort**: `sort.Sort(ByDisplay(values))`
+7. **Experimental tabdance**: if `CARAPACE_EXPERIMENTAL` is set and the `tabdance` binary is on `PATH`, dispatch early with full meta (UIDs, queries intact)
+8. **UID clearance + dedup**: clear UIDs → `values.Unique()` → clear `meta.Queries`
 
 ## Snippet Generation
 

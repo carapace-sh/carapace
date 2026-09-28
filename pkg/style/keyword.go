@@ -44,6 +44,9 @@ var keywords = map[string]*string{
 	"desc":       &Carapace.KeywordNegative,
 	"descending": &Carapace.KeywordNegative,
 
+	"up":   &Carapace.KeywordPositive,
+	"down": &Carapace.KeywordNegative,
+
 	"open":   &Carapace.KeywordPositive,
 	"opened": &Carapace.KeywordPositive,
 	"close":  &Carapace.KeywordNegative,
@@ -110,10 +113,19 @@ var keywords = map[string]*string{
 
 	"keep": &Carapace.KeywordPositive,
 
+	"continue": &Carapace.KeywordPositive,
+
+	"allow": &Carapace.KeywordPositive,
+	"deny":  &Carapace.KeywordNegative,
+
 	"ask": &Carapace.KeywordAmbiguous,
 
 	"hidden":  &Carapace.KeywordNegative,
 	"visible": &Carapace.KeywordPositive,
+
+	"tracked":   &Carapace.KeywordPositive,
+	"untracked": &Carapace.KeywordAmbiguous,
+	"dirty":     &Carapace.KeywordNegative,
 
 	"default": &Carapace.KeywordAmbiguous,
 

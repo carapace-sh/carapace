@@ -10,7 +10,7 @@ import (
 	"github.com/carapace-sh/carapace/pkg/command"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // Spec generates the spec file.

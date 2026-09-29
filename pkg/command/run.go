@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 type Run string

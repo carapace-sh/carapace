@@ -2,10 +2,9 @@ package zsh
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
-	shlex "github.com/carapace-sh/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
 )
@@ -92,20 +91,22 @@ const (
 
 // ActionRawValues formats values for zsh
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
-	splitted, err := shlex.Split(env.Compline())
+	ctx := shlex.Complete(env.Compline(), shlex.Zsh)
 	state := DEFAULT_STATE
-	if err == nil {
-		rawValue := splitted.CurrentToken().RawValue
-		// TODO use token state to determine actual state (might have mixture).
-		switch {
-		case regexp.MustCompile(`^'$|^'.*[^']$`).MatchString(rawValue):
-			state = QUOTING_STATE
-		case regexp.MustCompile(`^"$|^".*[^"]$`).MatchString(rawValue):
-			state = QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^".*"$`).MatchString(rawValue):
-			state = FULL_QUOTING_ESCAPING_STATE
-		case regexp.MustCompile(`^'.*'$`).MatchString(rawValue):
+	raw := ctx.RawCurrentWord
+	switch {
+	case strings.HasPrefix(raw, `'`):
+		// Word starts with `'` and either is a bare `'` or doesn't end with one.
+		state = QUOTING_STATE
+		if len(raw) > 1 && strings.HasSuffix(raw, `'`) {
 			state = FULL_QUOTING_STATE
+		}
+	case strings.HasPrefix(raw, `"`):
+		// Word starts with `"` and doesn't end with one.
+		// Weirdly regardless whether there are additional quotes within the word.
+		state = QUOTING_ESCAPING_STATE
+		if len(raw) > 1 && strings.HasSuffix(raw, `"`) {
+			state = FULL_QUOTING_ESCAPING_STATE
 		}
 	}
 

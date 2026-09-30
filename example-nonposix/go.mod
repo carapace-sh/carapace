@@ -1,6 +1,6 @@
 module github.com/carapace-sh/carapace/example-nonposix
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/carapace-sh/carapace v0.50.3-0.20240311124258-a5adf91d8b8f
@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/carapace-sh/carapace-shlex v1.1.1 // indirect
+	github.com/carapace-sh/carapace-shlex/v2 v2.0.0-alpha // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 )

@@ -303,3 +303,16 @@ func TestActionExecCommand(t *testing.T) {
 		ActionExecCommand("head", "-n1", "go.mod")(func(output []byte) Action { return ActionValues(string(output)) }).Invoke(Context{}),
 	)
 }
+
+func TestActionSplitMultibytePrefix(t *testing.T) {
+	// Span offsets are rune-based; the completion prefix must slice the
+	// line by runes, not bytes (café is 4 runes, 5 bytes).
+	a := ActionValues().Split("bash")
+	invoked := a.Invoke(Context{
+		Value: `echo café | grep $HO`,
+		Env:   []string{"HOME=/tmp"},
+	})
+	if len(invoked.action.rawValues) != 1 || invoked.action.rawValues[0].Value != "echo café | grep $HOME" {
+		t.Errorf("rawValues = %v, want [echo café | grep $HOME]", invoked.action.rawValues)
+	}
+}

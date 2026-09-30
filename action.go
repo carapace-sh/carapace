@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	shlex "github.com/carapace-sh/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/internal/cache"
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/pkg/cache/key"
@@ -292,59 +292,78 @@ func (a Action) Shift(n int) Action {
 }
 
 // Split splits `Context.Value` lexicographically and replaces `Context.Args` with the tokens.
-func (a Action) Split() Action {
-	return a.split(false)
+// The optional format is a shlex.Format name ("", "bash", "zsh", ...); omitting it uses the default.
+func (a Action) Split(formats ...shlex.Format) Action {
+	return a.split(false, formats...)
 }
 
 // SplitP is like Split but supports pipelines.
-func (a Action) SplitP() Action {
-	return a.split(true)
+func (a Action) SplitP(formats ...shlex.Format) Action {
+	return a.split(true, formats...)
 }
 
-func (a Action) split(pipelines bool) Action {
+func (a Action) split(pipelines bool, formats ...shlex.Format) Action {
+	if len(formats) > 1 {
+		return ActionMessage("expected at most one format, got %v", len(formats))
+	}
+
+	format := shlex.Default
+	if len(formats) == 1 {
+		format = formats[0]
+	}
+
 	return ActionCallback(func(c Context) Action {
-		tokens, err := shlex.Split(c.Value)
-		if err != nil {
-			return ActionMessage(err.Error())
-		}
+		ctx := shlex.Complete(c.Value, format)
 
 		var context Context
 		if pipelines {
-			tokens = tokens.CurrentPipeline()
-			context = NewContext(tokens.FilterRedirects().Words().Strings()...)
+			context = NewContext(ctx.Words...)
 		} else {
-			context = NewContext(tokens.Words().Strings()...)
+			context = NewContext(ctx.Tokens.Words().Strings()...)
 		}
 
 		originalValue := c.Value
-		prefix := originalValue[:tokens.Words().CurrentToken().Index]
+		runes := []rune(originalValue)
+		prefixOf := func(offset int) string { return string(runes[:offset]) } // Span offsets are rune-based
+		prefix := prefixOf(ctx.Span.Start)
 		c.Args = context.Args
 		c.Parts = []string{}
 		c.Value = context.Value
 
-		if pipelines { // support redirects
-			if len(tokens) > 1 && tokens[len(tokens)-2].WordbreakType.IsRedirect() {
-				LOG.Printf("completing files for redirect arg %#v", tokens.Words().CurrentToken().Value)
-				prefix = originalValue[:tokens.CurrentToken().Index]
-				c.Value = tokens.CurrentToken().Value
-				a = ActionFiles()
-			}
+		if pipelines && ctx.IsRedirect {
+			LOG.Printf("completing files for redirect arg %#v", ctx.CurrentWord)
+			c.Value = ctx.CurrentWord
+			a = ActionFiles()
+		}
+
+		var variable *shlex.Variable
+		if ctx.Variable != nil {
+			variable = ctx.Variable
+			LOG.Printf("completing variable %#v", variable.Name)
+			prefix = prefixOf(variable.Span().Start)
+			c.Value = variable.Name
+			a = ActionCallback(func(c Context) Action {
+				names := make([]string, 0)
+				for _, env := range c.Env {
+					if name := strings.SplitN(env, "=", 2)[0]; strings.HasPrefix(name, variable.Name) {
+						names = append(names, name)
+					}
+				}
+				return ActionValues(names...)
+			})
 		}
 
 		invoked := a.Invoke(c)
 		for index, value := range invoked.action.rawValues {
-			if !invoked.action.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") { // TODO special characters
-				switch tokens.CurrentToken().State {
-				case shlex.QUOTING_ESCAPING_STATE:
-					invoked.action.rawValues[index].Value = fmt.Sprintf(`"%v"`, strings.ReplaceAll(value.Value, `"`, `\"`))
-				case shlex.QUOTING_STATE:
-					invoked.action.rawValues[index].Value = fmt.Sprintf(`'%v'`, strings.ReplaceAll(value.Value, `'`, `'"'"'`))
-				default:
-					invoked.action.rawValues[index].Value = strings.ReplaceAll(value.Value, ` `, `\ `)
+			if variable != nil {
+				invoked.action.rawValues[index].Value = variable.Insert(value.Value)
+			} else {
+				if !invoked.action.meta.Nospace.Matches(value.Value) || strings.Contains(value.Value, " ") {
+					invoked.action.rawValues[index].Value = ctx.Quote(value.Value)
 				}
-			}
-			if !invoked.action.meta.Nospace.Matches(value.Value) {
-				invoked.action.rawValues[index].Value += " "
+				if !invoked.action.meta.Nospace.Matches(value.Value) {
+					invoked.action.rawValues[index].Value += " "
+				}
 			}
 		}
 		return invoked.Prefix(prefix).ToA().NoSpace()

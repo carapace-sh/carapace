@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	shlex "github.com/carapace-sh/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 )
 
 // RedirectError current position is a redirect like `echo test >[TAB]`.
@@ -63,20 +63,15 @@ func Patch(args []string) ([]string, error) { // TODO document and fix wordbreak
 		return args, nil
 	}
 
-	tokens, err := shlex.Split(compline)
-	if err != nil {
-		return nil, err
-	}
+	ctx := shlex.Complete(compline, shlex.Bash)
 
-	if len(tokens) > 1 {
-		if previous := tokens[len(tokens)-2]; previous.WordbreakType.IsRedirect() {
-			return append(args[:1], tokens[len(tokens)-1].Value), RedirectError{}
-		}
+	if ctx.IsRedirect {
+		return append(args[:1], ctx.CurrentWord), RedirectError{}
 	}
-	args = append(args[:1], tokens.CurrentPipeline().FilterRedirects().Words().Strings()...)
+	args = append(args[:1], ctx.Words...)
 
 	// TODO find a better solution to pass the wordbreakprefix to bash/action.go
-	wordbreakPrefix = tokens.CurrentPipeline().WordbreakPrefix()
+	wordbreakPrefix = ctx.Prefix
 	compType = os.Getenv("COMP_TYPE")
 	unsetBashCompEnv()
 

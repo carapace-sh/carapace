@@ -3,7 +3,7 @@ package nushell
 import (
 	"strings"
 
-	shlex "github.com/carapace-sh/carapace-shlex"
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 )
 
 // Patch uses the lexer to parse and patch given arguments which
@@ -19,7 +19,7 @@ func Patch(args []string) []string {
 
 		switch arg[0] {
 		case '"', "'"[0]:
-			if tokens, err := shlex.Split(arg); err == nil {
+			if tokens, err := shlex.Split(arg, shlex.Nushell); err == nil {
 				args[index] = tokens[0].Value
 			}
 		case '`':

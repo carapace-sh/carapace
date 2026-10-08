@@ -60,6 +60,48 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
+  build-windows:
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.24'
+
+      - name: Generate
+        run: go generate ./...
+
+      - name: Test
+        run: go test -v ./... ./example-nonposix/... ./example-multi/...
+
+      - name: Bench
+        run: go test -bench ./...
+
+
+  build-macos:
+    runs-on: macos-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.24'
+
+      - name: Generate
+        run: go generate ./...
+
+      - name: Test
+        run: go test -v ./... ./example-nonposix/... ./example-multi/...
+
+      - name: Bench
+        run: go test -bench ./...
+
+
   coveralls:
     runs-on: ubuntu-latest
     needs: build

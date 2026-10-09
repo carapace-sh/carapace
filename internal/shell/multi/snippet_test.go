@@ -89,8 +89,8 @@ func TestSnippetNushell(t *testing.T) {
 	if !strings.Contains(s, `sub1_completer`) {
 		t.Error("missing completer name")
 	}
-	if !strings.Contains(s, `$spans.0`) {
-		t.Error("missing spans.0")
+	if !strings.Contains(s, `$place.command.0`) {
+		t.Error("missing place.command.0")
 	}
 }
 

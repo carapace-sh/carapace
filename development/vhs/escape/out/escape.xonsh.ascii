@@ -1,0 +1,40 @@
+>
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+  escape.bash.tape        escape.nushell.tape     escape.xonsh.tape
+  escape.elvish.tape      escape.oil.tape         escape.zsh.tape
+  escape.fish.tape        escape.powershell.tape  out/
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> example action embeddedP1 embeddedP2\ with\
+  escape.bash.tape        escape.nushell.tape     escape.xonsh.tape
+  escape.elvish.tape      escape.oil.tape         escape.zsh.tape
+  escape.fish.tape        escape.powershell.tape  out/
+
+
+
+────────────────────────────────────────────────────────────────────────────────

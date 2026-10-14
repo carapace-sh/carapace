@@ -1,7 +1,7 @@
 github.com/carapace-sh/carapace-pflag v1.3.0 h1:RT1xJ+2p4c2WqYXPZZA7zu2jIi6Vt+pmalZf75yFzBM=
 github.com/carapace-sh/carapace-pflag v1.3.0/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
-github.com/carapace-sh/carapace-shlex/v2 v2.0.0-alpha h1:5KnsTgW/2tRZle1KCfBisRlq431Fe1uQ9q3iAVmO/Bg=
-github.com/carapace-sh/carapace-shlex/v2 v2.0.0-alpha/go.mod h1:07CXBqTrzzdZRgkFRpnDQ9zvIcGbKppjmaxNLyP+zgY=
+github.com/carapace-sh/carapace-shlex/v2 v2.0.0 h1:pVhuYf1n9VLDCLo5m9xzo1N1+NZENnArXSzCNUTtnY4=
+github.com/carapace-sh/carapace-shlex/v2 v2.0.0/go.mod h1:07CXBqTrzzdZRgkFRpnDQ9zvIcGbKppjmaxNLyP+zgY=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=

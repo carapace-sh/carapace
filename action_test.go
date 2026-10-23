@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -241,8 +243,15 @@ func TestActionFiles(t *testing.T) {
 func TestActionFilesChdir(t *testing.T) {
 	oldWd, _ := os.Getwd()
 
+	var expectedErrorMsg string
+	if runtime.GOOS == "windows" {
+		expectedErrorMsg = fmt.Sprintf("CreateFile %v: The system cannot find the file specified.", wd("nonexistent"))
+	} else {
+		expectedErrorMsg = fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))
+	}
+
 	assert.Equal(t,
-		ActionMessage(fmt.Sprintf("stat %v: no such file or directory", wd("nonexistent"))).Invoke(Context{}),
+		ActionMessage(expectedErrorMsg).Invoke(Context{}),
 		ActionFiles(".md").Chdir("nonexistent").Invoke(Context{}),
 	)
 
@@ -300,7 +309,9 @@ func TestActionExecCommand(t *testing.T) {
 
 	assert.Equal(t,
 		ActionValues("module github.com/carapace-sh/carapace\n").Invoke(Context{}),
-		ActionExecCommand("head", "-n1", "go.mod")(func(output []byte) Action { return ActionValues(string(output)) }).Invoke(Context{}),
+		ActionExecCommand("head", "-n1", "go.mod")(func(output []byte) Action {
+			return ActionValues(strings.ReplaceAll(string(output), "\r\n", "\n"))
+		}).Invoke(Context{}),
 	)
 }
 

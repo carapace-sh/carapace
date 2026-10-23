@@ -58,3 +58,36 @@ func ConfigDirs() (dirs []string, err error) {
 	}
 	return
 }
+
+// DataDirs returns the system data base directories, ordered by preference.
+// On unix this respects $XDG_DATA_DIRS and falls back to the XDG default.
+func DataDirs() (dirs []string, err error) {
+	switch runtime.GOOS {
+	case "windows":
+		dir, ok := os.LookupEnv("PROGRAMDATA")
+		if !ok {
+			return nil, errors.New("missing PROGRAMDATA environment variable")
+		}
+		dirs = append(dirs, dir)
+
+	case "darwin":
+		dirs = append(dirs, "/Library/Application Support")
+
+	default:
+		if v, ok := os.LookupEnv("XDG_DATA_DIRS"); ok {
+			for dir := range strings.SplitSeq(v, string(os.PathListSeparator)) {
+				if filepath.IsAbs(dir) {
+					dirs = append(dirs, dir)
+				}
+			}
+		}
+		if len(dirs) == 0 {
+			dirs = append(dirs, "/usr/local/share", "/usr/share")
+		}
+	}
+
+	for index, dir := range dirs {
+		dirs[index] = filepath.ToSlash(dir)
+	}
+	return
+}

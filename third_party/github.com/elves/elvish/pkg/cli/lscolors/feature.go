@@ -2,6 +2,7 @@ package lscolors
 
 import (
 	"os"
+	"runtime"
 )
 
 type feature int
@@ -80,6 +81,13 @@ func determineFeature(fname string, mh bool) (feature, error) {
 		// On Plan9, this in inaccurate.
 		return featureBlockDevice, nil
 	case is(m, os.ModeDir):
+		if runtime.GOOS == "windows" {
+			// Windows uses simulated UNIX style permission masks (0o666/0o444/0o777),
+			// unrelated to real permissions. Every directory reports the writable
+			// bit, so skip the permission based features (ow/tw/st) - consistent
+			// with how eza and the Rust lscolors crate handle windows.
+			return featureDirectory, nil
+		}
 		// Perm bits features for directory
 		perm := m.Perm()
 		switch {

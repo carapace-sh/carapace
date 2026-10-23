@@ -74,7 +74,7 @@ func TestParentSymlinkedDir(t *testing.T) {
 	}
 
 	expected := canonical(t, repoDir)
-	if result != expected {
+	if canonical(t, result) != expected {
 		t.Errorf("expected %q, got %q", expected, result)
 	}
 }
@@ -103,7 +103,7 @@ func TestParentNormalDir(t *testing.T) {
 	}
 
 	expected := canonical(t, repoDir)
-	if result != expected {
+	if canonical(t, result) != expected {
 		t.Errorf("expected %q, got %q", expected, result)
 	}
 }
@@ -137,7 +137,7 @@ func TestGitWorkTreeSymlinkedDir(t *testing.T) {
 	}
 
 	expected := canonical(t, repoDir)
-	if result != expected {
+	if canonical(t, result) != expected {
 		t.Errorf("expected %q, got %q", expected, result)
 	}
 }
@@ -171,7 +171,7 @@ func TestGitDirSymlinkedDir(t *testing.T) {
 	}
 
 	expected := canonical(t, filepath.Join(repoDir, ".git"))
-	if result != expected {
+	if canonical(t, result) != expected {
 		t.Errorf("expected %q, got %q", expected, result)
 	}
 }

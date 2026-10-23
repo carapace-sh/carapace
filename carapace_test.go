@@ -56,6 +56,12 @@ func execCompletion(args ...string) (context Context) {
 	return
 }
 
+// osGetwd returns the working directory as reported by NewContext (unmodified)
+func osGetwd() string {
+	wd, _ := os.Getwd()
+	return wd
+}
+
 func testContext(t *testing.T, expected Context, args ...string) {
 	t.Run(strings.Join(args, " "), func(t *testing.T) {
 		null, _ := os.Open(os.DevNull)
@@ -83,7 +89,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"")
 
@@ -92,7 +98,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{"pos1"},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"pos1", "")
 
@@ -101,7 +107,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{"pos1", "pos2"},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"pos1", "pos2", "po")
 
@@ -110,7 +116,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"--multiparts", "")
 
@@ -119,7 +125,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"--multiparts", "fir")
 
@@ -128,7 +134,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{"pos1"},
 		Parts: []string{"first"},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"pos1", "--multiparts", "first,seco")
 
@@ -137,7 +143,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"pos")
 
@@ -146,7 +152,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{},
 		Parts: []string{"first"},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"first:sec")
 
@@ -155,7 +161,7 @@ func TestContext(t *testing.T) {
 		Args:  []string{"first:second"},
 		Parts: []string{},
 		Env:   []string{},
-		Dir:   wd(""),
+		Dir:   osGetwd(),
 	},
 		"first:second", "thi")
 }

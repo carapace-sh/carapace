@@ -92,7 +92,7 @@ func (c Context) Command(name string, arg ...string) *execlog.Cmd {
 	if c.mockedReplies != nil {
 		if m, err := json.Marshal(append([]string{name}, arg...)); err == nil {
 			if reply, exists := c.mockedReplies[string(m)]; exists {
-				return execlog.Command("echo", reply) // TODO use mock
+				return execlog.Mock(reply)
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -99,7 +100,8 @@ func CoverDir() string {
 func isGoRun() bool {
 	// go 1.24+: /home/rsteube/.cache/go-build/a7/a7883331b606dc3250005f1abdf4d17dea05c9eccf4ece0df5518311a118d211-d/example
 	// go 1.23-: /tmp/go-build1035720725/b001/exe/example
-	return strings.Contains(os.Args[0], "/go-build")
+	// windows:  C:\Users\<user>\AppData\Local\Temp\go-build...\b001\exe\example.exe
+	return strings.Contains(filepath.ToSlash(os.Args[0]), "/go-build")
 }
 
 func Match() string { // see match.Match

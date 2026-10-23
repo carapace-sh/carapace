@@ -108,7 +108,9 @@ func Executable() string {
 	if err != nil {
 		return "echo" // safe fallback that should never happen
 	}
-	switch base := filepath.Base(executable); base {
+	// windows: strip .exe so the name matches the (extension-less) command name
+	base := strings.TrimSuffix(filepath.Base(executable), ".exe")
+	switch base {
 	case "cmd.test":
 		if callerModuleContains("example-multi") {
 			return "example-multi" // for `go test -v ./...` in example-multi

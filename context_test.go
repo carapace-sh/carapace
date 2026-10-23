@@ -3,31 +3,32 @@ package carapace
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 func wd(s string) string {
 	if wd, _ := os.Getwd(); s != "" {
-		return wd + "/" + s
+		return filepath.ToSlash(wd) + "/" + s
 	} else {
-		return wd
+		return filepath.ToSlash(wd)
 	}
 }
 
 func home(s string) string {
 	if hd, _ := os.UserHomeDir(); s != "" {
-		return hd + "/" + s
+		return filepath.ToSlash(hd) + "/" + s
 	} else {
-		return hd
+		return filepath.ToSlash(hd)
 	}
 }
 
 func parent(s string) string {
 	if s != "" {
-		return strings.TrimSuffix(filepath.Dir(wd("")), "/") + "/" + s
+		return strings.TrimSuffix(filepath.ToSlash(filepath.Dir(wd(""))), "/") + "/" + s
 	}
-	return strings.TrimSuffix(filepath.Dir(wd("")), "/") + "/"
+	return strings.TrimSuffix(filepath.ToSlash(filepath.Dir(wd(""))), "/") + "/"
 }
 
 func TestContextAbs(t *testing.T) {
@@ -58,6 +59,11 @@ func TestContextAbs(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		// windows resolves a POSIX root relative to the current drive (e.g. `/dir` -> `D:/dir`)
+		// so the UNIX-only expectations don't apply
+		if runtime.GOOS == "windows" && strings.HasPrefix(tc.Expected, "/") {
+			continue
+		}
 		actual, err := Context{Dir: tc.Dir}.Abs(tc.Path)
 		if err != nil {
 			t.Error(err.Error())

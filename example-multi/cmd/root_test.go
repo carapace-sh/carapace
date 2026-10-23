@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/carapace-sh/carapace"
@@ -16,7 +17,7 @@ func testScript(t *testing.T, shell string, file string) {
 	} else {
 		rootCmd.InitDefaultHelpCmd()
 		s, _ := carapace.Gen(rootCmd).Snippet(shell)
-		assert.Equal(t, string(content), s+"\n")
+		assert.Equal(t, strings.ReplaceAll(string(content), "\r\n", "\n"), s+"\n") // autocrlf on windows checkouts
 	}
 }
 

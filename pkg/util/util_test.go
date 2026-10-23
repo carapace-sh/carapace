@@ -6,6 +6,16 @@ import (
 	"testing"
 )
 
+// canonical resolves symlinks and short names (windows) and normalizes separators so that
+// paths built from tempdirs match paths reported by the filesystem (e.g. /var -> /private/var on macOS).
+func canonical(t *testing.T, path string) string {
+	t.Helper()
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		path = resolved
+	}
+	return filepath.ToSlash(filepath.Clean(path))
+}
+
 func TestFindReverseSymlinkedDir(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "carapace-util-test-*")
 	if err != nil {
@@ -32,8 +42,8 @@ func TestFindReverseSymlinkedDir(t *testing.T) {
 		t.Fatalf("FindReverse failed from symlinked dir: %v", err)
 	}
 
-	expected := filepath.Join(repoDir, ".git")
-	if found != expected {
+	expected := canonical(t, filepath.Join(repoDir, ".git"))
+	if canonical(t, found) != expected {
 		t.Errorf("expected %q, got %q", expected, found)
 	}
 }
@@ -59,8 +69,8 @@ func TestFindReverseNormalDir(t *testing.T) {
 		t.Fatalf("FindReverse failed from normal dir: %v", err)
 	}
 
-	expected := filepath.Join(repoDir, ".git")
-	if found != expected {
+	expected := canonical(t, filepath.Join(repoDir, ".git"))
+	if canonical(t, found) != expected {
 		t.Errorf("expected %q, got %q", expected, found)
 	}
 }

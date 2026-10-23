@@ -21,7 +21,7 @@ def _example_completer(context):
         except:
             result = {}
         if len(result) == 0:
-            result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+            raise StopIteration
         return result
 
 add_one_completer('example', _example_completer, 'start')

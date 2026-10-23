@@ -198,7 +198,7 @@ def _example_completer(context):
         except:
             result = {}
         if len(result) == 0:
-            result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+            raise StopIteration
         return result
 
 add_one_completer('example', _example_completer, 'start')
@@ -278,10 +278,12 @@ The `try/except` swallows any JSON parsing errors and falls back to an empty res
 
 ```python
 if len(result) == 0:
-    result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+    raise StopIteration
 ```
 
-When no completions are found, carapace returns a single candidate that is just the current prefix. This prevents xonsh from falling through to other completers that might produce irrelevant results.
+When no completions are found, the completer raises `StopIteration`, which xonsh treats as a request to stop collecting completions (`generate_completions` in `xonsh/completer.py` catches it and breaks out of the completer loop). This prevents xonsh from falling through to other completers that might produce irrelevant results.
+
+An earlier implementation returned the current prefix itself as a no-op candidate (`RichCompletion(context.prefix, ...)`), but newer xonsh versions skip blank candidates (xonsh#5810) and continue the pipeline when an exclusive completer yields nothing usable, so the default path completer would then append cwd files to the command line.
 
 **7. Register the completer**
 
@@ -517,15 +519,14 @@ The snippet does NOT use `RichCompletion.append_space=True`. This is because:
 
 **Problem**: When carapace returns no completions, xonsh falls through to other completers (path completer, alias completer, etc.). This can produce irrelevant results.
 
-**Solution**: The snippet provides a fallback:
+**Solution**: The snippet raises `StopIteration` when the result set is empty:
 
 ```python
 if len(result) == 0:
-    result = {RichCompletion(context.prefix, display=context.prefix, description='',
-                              prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+    raise StopIteration
 ```
 
-This single candidate just re-inserts the current prefix, effectively a no-op that prevents other completers from running (since the `@contextual_command_completer` decorator makes this an exclusive completer).
+`generate_completions` catches `StopIteration` as "completer requested to stop collecting completions" and stops the completer loop, so no fallback completer runs. The `@contextual_command_completer` wrapper is a plain function (not a generator), so the exception propagates to the catch site (PEP 479 only applies to escape from a generator frame). See the "Fallback on empty results" section above for why the previous no-op candidate approach no longer works.
 
 ### 5. Hyphenated Command Names
 

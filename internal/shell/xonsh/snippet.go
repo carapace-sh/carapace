@@ -44,7 +44,7 @@ def _%[1]v_completer(context):
     except:
         result = {}
     if len(result) == 0:
-        result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+        raise StopIteration
     return result
 
 add_one_completer('%[1]v', _%[1]v_completer, 'start')
@@ -86,7 +86,7 @@ def _%v_completer(context):
         except:
             result = {}
         if len(result) == 0:
-            result = {RichCompletion(context.prefix, display=context.prefix, description='', prefix_len=len(context.raw_prefix), append_closing_quote=False)}
+            raise StopIteration
         return result
 
 add_one_completer('%v', _%v_completer, 'start')

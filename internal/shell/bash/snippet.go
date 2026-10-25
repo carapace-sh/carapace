@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -15,9 +16,9 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer bash completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	quoted := make([]string, len(names))
-	for i, name := range names {
-		quoted[i] = fmt.Sprintf("%q", name)
+	quoted := make([]string, 0, len(names))
+	for _, name := range names {
+		quoted = append(quoted, shlex.Quote(name, shlex.Bash))
 	}
 	return fmt.Sprintf(`#!/bin/bash
 %[4]v_%[1]v_completer() {
@@ -55,9 +56,10 @@ complete -o noquote -F _%[1]v_completer %[3]v
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	invocation := fmt.Sprintf("%v _carapace bash", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace bash", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v %v _carapace bash", uid.Executable(), shlex.Quote(command, shlex.Bash))
 	}
 
 	return fmt.Sprintf(`#!/bin/bash
@@ -86,6 +88,6 @@ _%[1]v_completion() {
   [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
 }
 
-complete -o noquote -F _%[1]v_completion %[1]v
-`, command, invocation)
+complete -o noquote -F _%[1]v_completion %[3]v
+`, command, invocation, shlex.Quote(command, shlex.Bash))
 }

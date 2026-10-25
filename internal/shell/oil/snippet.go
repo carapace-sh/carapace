@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -15,9 +16,9 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer oil completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	quoted := make([]string, len(names))
-	for i, name := range names {
-		quoted[i] = fmt.Sprintf("%q", name)
+	quoted := make([]string, 0, len(names))
+	for _, name := range names {
+		quoted = append(quoted, shlex.Quote(name, shlex.Bash))
 	}
 	return fmt.Sprintf(`#!/bin/osh
 %[4]v_%[1]v_completer() {
@@ -40,9 +41,10 @@ complete -F _%[1]v_completer %[3]v
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	invocation := fmt.Sprintf("%v _carapace oil", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace oil", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v %v _carapace oil", uid.Executable(), shlex.Quote(command, shlex.Bash))
 	}
 
 	return fmt.Sprintf(`#!/bin/osh
@@ -58,5 +60,5 @@ _%v_completion() {
 }
 
 complete -F _%v_completion %v
-`, command, invocation, command, command)
+`, command, invocation, shlex.Quote(command, shlex.Bash), command)
 }

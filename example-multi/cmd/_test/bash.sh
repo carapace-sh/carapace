@@ -25,5 +25,5 @@ _example-multi_completer() {
   [[ "${COMPREPLY[*]}" == "" ]] && COMPREPLY=() # fix for mapfile creating a non-empty array from empty command output
 }
 
-complete -o noquote -F _example-multi_completer "example-multi" "identify" "convert"
+complete -o noquote -F _example-multi_completer example-multi identify convert
 

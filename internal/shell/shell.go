@@ -6,8 +6,10 @@ import (
 	"sort"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/internal/common"
 	"github.com/carapace-sh/carapace/internal/env"
+	"github.com/carapace-sh/carapace/internal/log"
 	"github.com/carapace-sh/carapace/internal/shell/bash"
 	"github.com/carapace-sh/carapace/internal/shell/bash_ble"
 	"github.com/carapace-sh/carapace/internal/shell/cmd_clink"
@@ -47,6 +49,10 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 		"zsh":        zsh.Snippet,
 	}
 	if s, ok := shellSnippets[shell]; ok {
+		if name := cmd.Root().Name(); !shlex.IsBareWord(name, shlex.Format(shell)) {
+			log.LOG.Printf("skipped invalid completer name %q", name)
+			return "", nil
+		}
 		return s(cmd.Root()), nil
 	}
 

@@ -192,37 +192,16 @@ func TestIsCallback(t *testing.T) {
 }
 
 func TestSnippet(t *testing.T) {
+	// snippets need a completer name; an unnamed command yields none
 	cmd := &cobra.Command{}
-	if s, _ := Gen(cmd).Snippet("bash"); !strings.Contains(s, "#!/bin/bash") {
-		t.Error("bash failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("elvish"); !strings.Contains(s, "edit:completion") {
-		t.Error("elvish failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("fish"); !strings.Contains(s, "commandline") {
-		t.Error("fish failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("oil"); !strings.Contains(s, "#!/bin/osh") {
-		t.Error("oil failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("powershell"); !strings.Contains(s, "System.Management.Automation") {
-		t.Error("powershell failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("xonsh"); !strings.Contains(s, "@contextual_command_completer") {
-		t.Error("xonsh failed")
-	}
-
-	if s, _ := Gen(cmd).Snippet("zsh"); !strings.Contains(s, "compdef") {
-		t.Error("zsh")
+	for _, shell := range []string{"bash", "elvish", "fish", "oil", "powershell", "xonsh", "zsh"} {
+		if s, err := Gen(cmd).Snippet(shell); s != "" || err != nil {
+			t.Errorf("expected empty snippet for unnamed command (%v)", shell)
+		}
 	}
 
 	if _, err := Gen(cmd).Snippet("unknown"); err == nil {
-		t.Error("zsh")
+		t.Error("unknown shell should fail")
 	}
 }
 

@@ -10,6 +10,6 @@ function _example_completion
   echo $data
 end
 
-complete -e 'example'
-complete -c 'example' -f -a '(_example_completion)' -r
+complete -e example
+complete -c example -f -a '(_example_completion)' -r
 

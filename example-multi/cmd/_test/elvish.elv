@@ -1,4 +1,4 @@
-put "example-multi" "identify" "convert" | each {|c|
+put example-multi identify convert | each {|c|
     set edit:completion:arg-completer[$c] = {|@arg|
         example-multi $c _carapace elvish (all $arg) | from-json | each {|completion|
     		put $completion[Messages] | all (one) | each {|m|

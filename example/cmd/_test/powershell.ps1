@@ -42,5 +42,5 @@ Function _example_completer {
 
     $completions
 }
-Register-ArgumentCompleter -Native -ScriptBlock (Get-Item "Function:_example_completer").ScriptBlock -CommandName 'example' # ,'example.exe'
+Register-ArgumentCompleter -Native -ScriptBlock (Get-Item "Function:_example_completer").ScriptBlock -CommandName 'example' # ,example.exe
 

@@ -10,5 +10,5 @@ _example-multi_completer() {
   [[ ${#COMPREPLY[@]} -eq 1 ]] && COMPREPLY=(${COMPREPLY[@]%$'\001'})
 }
 
-complete -F _example-multi_completer "example-multi" "identify" "convert"
+complete -F _example-multi_completer example-multi identify convert
 

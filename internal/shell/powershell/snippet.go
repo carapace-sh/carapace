@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -54,7 +55,7 @@ Function _%v_completer {
 
     $completions
 }
-Register-ArgumentCompleter -Native -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock -CommandName '%v'%v,'%v.exe'
+Register-ArgumentCompleter -Native -ScriptBlock (Get-Item "Function:_%v_completer").ScriptBlock -CommandName '%v'%v,%v
 `
 
 const snippetMultiSingle = `using namespace System.Management.Automation
@@ -165,13 +166,13 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer powershell completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	complete := make([]string, len(names))
-	for i, name := range names {
+	complete := make([]string, 0, len(names))
+	for _, name := range names {
 		prefix := " # "
 		if runtime.GOOS == "windows" {
 			prefix = ""
 		}
-		complete[i] = fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completer -CommandName '%v'%v'%v.exe'`, sanitize(defaultName), name, prefix, name)
+		complete = append(complete, fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completer -CommandName %v%v%v`, sanitize(defaultName), shlex.Quote(name, shlex.Powershell), prefix, shlex.Quote(name+".exe", shlex.Powershell)))
 	}
 	return fmt.Sprintf(snippetMulti, sanitize(defaultName), uid.Executable(), strings.Join(complete, "\n"), snippetFuncs)
 }
@@ -181,14 +182,15 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	prefix := " # "
 	if runtime.GOOS == "windows" {
 		prefix = ""
 	}
 
 	if explicitCommand {
-		complete := fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completion -CommandName '%v'%v'%v.exe'`, sanitize(command), command, prefix, command)
-		return fmt.Sprintf(snippetMultiSingle, uid.Executable(), sanitize(command), command, complete)
+		complete := fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completion -CommandName %v%v%v`, sanitize(command), shlex.Quote(command, shlex.Powershell), prefix, shlex.Quote(command+".exe", shlex.Powershell))
+		return fmt.Sprintf(snippetMultiSingle, uid.Executable(), sanitize(command), shlex.Quote(command, shlex.Powershell), complete)
 	}
 
 	return fmt.Sprintf(snippetOriginal,
@@ -196,7 +198,7 @@ func SnippetSingle(command string, explicitCommand bool) string {
 		uid.Executable(),
 		uid.Executable(),
 		sanitize(command),
-		command,
+		shlex.Escape(command, shlex.Powershell),
 		prefix,
-		command)
+		shlex.Escape(command+".exe", shlex.Powershell))
 }

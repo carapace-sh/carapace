@@ -46,9 +46,9 @@ _example-multi_completer_ble() {
       [ ! -z "$cand" ] && ble/complete/cand/yield mandb "${cand%$'\t'*}" "${cand##*$'\t'}"
     done
   else
-    complete -F _example-multi_completer "example-multi" "identify" "convert"
+    complete -F _example-multi_completer example-multi identify convert
   fi
 }
 
-complete -F _example-multi_completer_ble "example-multi" "identify" "convert"
+complete -F _example-multi_completer_ble example-multi identify convert
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -59,9 +60,10 @@ compdef _%[1]v_completer %[3]v
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	invocation := fmt.Sprintf("%v _carapace zsh", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace zsh", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v %v _carapace zsh", uid.Executable(), shlex.Quote(command, shlex.Zsh))
 	}
 
 	return fmt.Sprintf(`#compdef %[1]v
@@ -97,5 +99,5 @@ function _%[1]v_completion {
   done <<<"${data}"
 }
 compquote '' 2>/dev/null && _%[1]v_completion
-compdef _%[1]v_completion %[1]v`, command, invocation)
+compdef _%[1]v_completion %[1]v`, command, invocation, shlex.Quote(command, shlex.Zsh))
 }

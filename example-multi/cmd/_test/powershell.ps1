@@ -43,7 +43,7 @@ $_example__multi_completer = {
     $completions
 }
 
-Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'example-multi' # 'example-multi.exe'
-Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'identify' # 'identify.exe'
-Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName 'convert' # 'convert.exe'
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName example-multi # example-multi.exe
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName identify # identify.exe
+Register-ArgumentCompleter -Native -ScriptBlock $_example__multi_completer -CommandName convert # convert.exe
 

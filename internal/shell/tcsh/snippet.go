@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -15,9 +16,9 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer tcsh completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	lines := make([]string, len(names))
-	for i, name := range names {
-		lines[i] = fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v \"%v\" _carapace tcsh `@@' ;", name, uid.Executable(), name)
+	lines := make([]string, 0, len(names))
+	for _, name := range names {
+		lines = append(lines, fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v \"%v\" _carapace tcsh `@@' ;", name, uid.Executable(), shlex.Quote(name, shlex.Tcsh)))
 	}
 	return strings.Join(lines, "\n")
 }
@@ -28,10 +29,11 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 	// TODO initial version - needs to handle open quotes
+
 	invocation := fmt.Sprintf("%v _carapace tcsh", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v \"%v\" _carapace tcsh", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v \"%v\" _carapace tcsh", uid.Executable(), shlex.Quote(command, shlex.Tcsh))
 	}
 
-	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v `@@' ;", command, invocation)
+	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v `@@' ;", shlex.Quote(command, shlex.Tcsh), invocation)
 }

@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
+	"github.com/carapace-sh/carapace/internal/log"
 	"github.com/carapace-sh/carapace/internal/shell/bash"
 	"github.com/carapace-sh/carapace/internal/shell/bash_ble"
 	"github.com/carapace-sh/carapace/internal/shell/elvish"
@@ -24,6 +26,21 @@ func Snippet(shell string, names []string, defaultName string, snippetFuncs map[
 	if shell == "" {
 		shell = ps.DetermineShell()
 	}
+
+	if !shlex.IsBareWord(defaultName, shlex.Format(shell)) {
+		log.LOG.Printf("skipped invalid completer name %q", defaultName)
+		defaultName = ""
+	}
+	valid := make([]string, 0, len(names))
+	for _, name := range names {
+		if !shlex.IsBareWord(name, shlex.Format(shell)) {
+			log.LOG.Printf("skipped invalid completer name %q", name)
+			continue
+		}
+		valid = append(valid, name)
+	}
+	names = valid
+
 	snippetFuncsStr := snippetFuncsForShell(shell, snippetFuncs)
 	switch shell {
 	case "bash":
@@ -72,6 +89,10 @@ func SnippetOrEmpty(shell string, names []string, defaultName string, snippetFun
 func SingleSnippet(shell string, command string, names []string, defaultName string, snippetFuncs map[string][]string) (string, error) {
 	if shell == "" {
 		shell = ps.DetermineShell()
+	}
+	if !shlex.IsBareWord(command, shlex.Format(shell)) {
+		log.LOG.Printf("skipped invalid completer name %q", command)
+		return "", nil
 	}
 	switch shell {
 	case "bash":

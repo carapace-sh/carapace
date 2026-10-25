@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -17,9 +18,9 @@ func Snippet(cmd *cobra.Command) string {
 
 // SnippetMulti creates a multi-completer elvish completion script.
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
-	quoted := make([]string, len(names))
-	for i, name := range names {
-		quoted[i] = fmt.Sprintf("%q", name)
+	quoted := make([]string, 0, len(names))
+	for _, name := range names {
+		quoted = append(quoted, shlex.Quote(name, shlex.Elvish))
 	}
 	windowsSnippet := ""
 	if runtime.GOOS == "windows" {
@@ -52,14 +53,15 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	invocation := fmt.Sprintf("%v _carapace elvish (all $arg)", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace elvish (all $arg)", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v %v _carapace elvish (all $arg)", uid.Executable(), shlex.Quote(command, shlex.Elvish))
 	}
 
 	windowsSnippet := ""
 	if runtime.GOOS == "windows" {
-		windowsSnippet = fmt.Sprintf("\nset edit:completion:arg-completer[%v.exe] = $edit:completion:arg-completer[%v]\n", command, command)
+		windowsSnippet = fmt.Sprintf("\nset edit:completion:arg-completer[%v.exe] = $edit:completion:arg-completer[%v]\n", shlex.Quote(command+".exe", shlex.Elvish), shlex.Quote(command, shlex.Elvish))
 	}
 
 	return fmt.Sprintf(`set edit:completion:arg-completer[%[1]v] = {|@arg|
@@ -79,5 +81,5 @@ func SnippetSingle(command string, explicitCommand bool) string {
 		}
     }
 }%[3]v
-`, command, invocation, windowsSnippet)
+`, shlex.Quote(command, shlex.Elvish), invocation, windowsSnippet)
 }

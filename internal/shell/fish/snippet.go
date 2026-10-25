@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
 	"github.com/spf13/cobra"
 )
@@ -18,9 +19,10 @@ func Snippet(cmd *cobra.Command) string {
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
 	complete := make([]string, 0, len(names)*2)
 	for _, name := range names {
+		quoted := shlex.Quote(name, shlex.Fish)
 		complete = append(complete,
-			fmt.Sprintf(`complete -e %q`, name),
-			fmt.Sprintf(`complete -c %[2]q -f -a '(_%[1]v_completer %[2]q)' -r`, defaultName, name),
+			fmt.Sprintf(`complete -e %[2]v`, defaultName, quoted),
+			fmt.Sprintf(`complete -c %[2]v -f -a '(_%[1]v_completer %[2]v)' -r`, defaultName, quoted),
 		)
 	}
 	return fmt.Sprintf(`%[4]vfunction _%[1]v_completer
@@ -44,9 +46,10 @@ end
 // (for multi-completer subcommands). When false, the executable is invoked
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
+
 	invocation := fmt.Sprintf("%v _carapace fish", uid.Executable())
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace fish", uid.Executable(), command)
+		invocation = fmt.Sprintf("%v %v _carapace fish", uid.Executable(), shlex.Quote(command, shlex.Fish))
 	}
 
 	return fmt.Sprintf(`function _%[1]v_completion
@@ -61,7 +64,7 @@ func SnippetSingle(command string, explicitCommand bool) string {
   echo $data
 end
 
-complete -e '%[1]v'
-complete -c '%[1]v' -f -a '(_%[1]v_completion)' -r
-`, command, invocation)
+complete -e %[3]v
+complete -c %[4]v -f -a '(_%[1]v_completion)' -r
+`, command, invocation, shlex.Quote(command, shlex.Fish), shlex.Quote(command, shlex.Fish))
 }

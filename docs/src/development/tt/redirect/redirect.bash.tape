@@ -1,6 +1,11 @@
 Set Shell "bash"
 Source "../bash.tape"
-Type "example >/dev/null " Sleep 1 Tab@1 2
-Type "q" # exit `more`
-Type "ac" Sleep 1 Tab@1
+Type "example >/dev/null "
+Wait+Screen /dev.null/
+Sleep 1
+Tab@1 2
+Type "q"
+Type "ac"
+Sleep 1
+Tab@1
 Sleep 2

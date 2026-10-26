@@ -1,1 +1,6 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PowerShell/
+PowerShell 7.6.6
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
+PS> example action embeddedP1 "embeddedP2 w"i
+──────────────────────────────────────────────────────────────────────────────── final
 PS> example action embeddedP1 "embeddedP2 w"i

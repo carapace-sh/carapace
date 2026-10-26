@@ -1,6 +1,6 @@
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /(?m)example/
 $ example _carapace fish | source
-──────────────────────────────────────────────────────────────────────────────── final
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /subcommand\ \ \ \ \(subcommand\ example\)/
 $ example action
 action        (action example)
 alias         (action example)

@@ -5,3 +5,4 @@ Wait+Screen /embeddedP2/
 Sleep 1
 Tab@1
 Sleep 2
+Wait+Screen /NO\ RECORDS\ FOUND/

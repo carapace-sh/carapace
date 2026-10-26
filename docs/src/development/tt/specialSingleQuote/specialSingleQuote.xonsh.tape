@@ -6,3 +6,4 @@ Sleep 1
 Tab@1
 Enter
 Sleep 2
+Wait+Screen /\$\ example\ special\ 'p/

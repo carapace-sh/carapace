@@ -4,7 +4,7 @@ $ example "ac"
 $ example action
                action
                action example
-──────────────────────────────────────────────────────────────────────────────── final
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /action\ example/
 $ example action
                action
                action example

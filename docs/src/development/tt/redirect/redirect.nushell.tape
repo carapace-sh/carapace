@@ -4,3 +4,4 @@ Type "example o> /dev/null "
 Wait+Screen /dev.null/
 Sleep 1 Tab@1 Enter
 Sleep 2
+Wait+Screen /\$\ example\ o>\ \/dev\/null/

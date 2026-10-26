@@ -1,0 +1,16 @@
+$ example
+action (action example)
+alias (action example)
+chain (shorthand chain)
+compat
+completion (Generate the autocompletion script for the specified shell)
+flag (flag example)
+group (group example)
+help (Help about any command)
+interspersed (interspersed example)
+modifier (modifier example)
+multiparts (multiparts example)
+plugin (dynamic plugin command)
+special
+subcommand (subcommand example)
+$ example qac

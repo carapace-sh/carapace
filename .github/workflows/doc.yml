@@ -30,7 +30,7 @@ jobs:
       - name: build tt
         run: |
           cd $(mktemp -d)
-          go install github.com/tab-dance/tabdance-test/cmd/tt@e4e1ff4
+          go install github.com/tab-dance/tabdance-test/cmd/tt@e6b0855
           cp "$(go env GOPATH)/bin/tt" tt
 
       - uses: actions/upload-artifact@v7

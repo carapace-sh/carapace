@@ -1,3 +1,6 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /(?m)example/
+$ example _carapace fish | source
+──────────────────────────────────────────────────────────────────────────────── final
 $ example action
 action        (action example)
 alias         (action example)

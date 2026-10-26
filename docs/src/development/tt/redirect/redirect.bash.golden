@@ -1,3 +1,6 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /dev.null/
+$ example >/dev/null
+──────────────────────────────────────────────────────────────────────────────── final
 $ example >/dev/null
 action (action example)
 alias (action example)

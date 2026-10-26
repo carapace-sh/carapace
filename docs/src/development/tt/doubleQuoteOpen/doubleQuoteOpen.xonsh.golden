@@ -1,5 +1,5 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
+$ example action embeddedP1 "embeddedP2 with
+──────────────────────────────────────────────────────────────────────────────── final
 $ example action embeddedP1 'embeddedP2 with space'
                                               embeddedP2 with space
-
-
-

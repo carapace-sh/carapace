@@ -1,1 +1,4 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
+$ example action embeddedP1 'embeddedP2 w'i
+──────────────────────────────────────────────────────────────────────────────── final
 $ example action embeddedP1 'embeddedP2 w'ith\ space

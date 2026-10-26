@@ -15,8 +15,15 @@ VHS GIF tests in `../vhs/` (the docs GIFs there are still rendered by VHS).
   `Set Shell` and a quoted `Source` line), next to its `<name>.golden`
   file with the expected terminal content.
 
-Goldens capture carapace behavior for that shell — they are verified, not
-hand-written.
+## Intermediate state checks
+
+Beyond the final-state golden, every topic tape pins its intermediate
+states with `Wait+Screen /re/` anchors placed right after the command that
+produces the state (after `Type` snaps the typed echo, after `Tab` snaps
+the completion). Wait-based anchors guard against shell redraw races and
+work for shells that draw ghost suggestions (nu/pwsh/...); expect a loose
+pattern that survives trailing-whitespace trimming and shell-side
+escaping of the typed text.
 
 ## Usage
 

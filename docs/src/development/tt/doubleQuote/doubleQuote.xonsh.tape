@@ -6,3 +6,4 @@ Sleep 1
 Tab@1
 Wait+Screen /action example/
 Sleep 2
+Wait+Screen /action\ example/

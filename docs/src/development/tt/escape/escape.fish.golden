@@ -1,4 +1,4 @@
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
 $ example action embeddedP1 embeddedP2\ with\
-──────────────────────────────────────────────────────────────────────────────── final
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /\$\ example\ action\ embeddedP1\ embeddedP2\\\ with\\\ space/
 $ example action embeddedP1 embeddedP2\ with\ space

@@ -2,5 +2,5 @@
 PowerShell 7.6.6
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /(?m)example/
 PS> example _carapace powershell | Out-String | Invoke-Expression
-──────────────────────────────────────────────────────────────────────────────── final
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PS>\ example\ action\ ac/
 PS> example action ac

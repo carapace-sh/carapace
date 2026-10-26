@@ -19,17 +19,19 @@ VHS GIF tests in `../vhs/` (the docs GIFs there are still rendered by VHS).
 
 The golden file is a labeled-section document: every anchor
 (`Wait+Screen /re/`, `Expect /re/ +Screen`) contributes a section that
-starts with an 80-dash separator row naming the anchor, and the tape's
-end state closes the file as the `final` section. A diff therefore
-catches intermediate divergences (typed state, completion output) as
-well as the end state, and mismatch reports name the failing anchor:
+starts with an 80-dash separator row naming the anchor, and the last
+section is the explicit end anchor placed at the end of the tape
+(there is no implicit final snapshot: tapes without anchors are
+rejected). A diff therefore catches intermediate divergences (typed
+state, completion output) as well as the end state, and mismatch
+reports name the failing anchor:
 
 ```golden
 ──────────── Wait+Screen /example "ac"/ $(separator across 80 columns)
 $ example "ac"
 ──────────── Wait+Screen /example action/ $(separator across 80 columns)
 $ example action
-──────────── final $(separator across 80 columns)
+──────────── Wait+Screen /example action/ $(separator across 80 columns)
 $ example action
 ```
 

@@ -15,6 +15,28 @@ VHS GIF tests in `../vhs/` (the docs GIFs there are still rendered by VHS).
   `Set Shell` and a quoted `Source` line), next to its `<name>.golden`
   file with the expected terminal content.
 
+## Golden format: one section per anchor (checkpoint)
+
+The golden file is a labeled-section document: every anchor
+(`Wait+Screen /re/`, `Expect /re/ +Screen`) contributes a section that
+starts with an 80-dash separator row naming the anchor, and the tape's
+end state closes the file as the `final` section. A diff therefore
+catches intermediate divergences (typed state, completion output) as
+well as the end state, and mismatch reports name the failing anchor:
+
+```golden
+──────────── Wait+Screen /example "ac"/ $(separator across 80 columns)
+$ example "ac"
+──────────── Wait+Screen /example action/ $(separator across 80 columns)
+$ example action
+──────────── final $(separator across 80 columns)
+$ example action
+```
+
+Wait-based anchors (not bare `Expect`) guard against shell redraw
+races; they were already placed during tape conversion. Mismatch
+reports include a unit diff of the failing section only.
+
 ## Intermediate state checks
 
 Beyond the final-state golden, every topic tape pins its intermediate

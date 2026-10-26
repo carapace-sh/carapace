@@ -11,31 +11,22 @@ jobs:
   tt:
     runs-on: ubuntu-latest
     continue-on-error: true
+    container: ghcr.io/carapace-sh/vhs
     steps:
       - name: shallow clone
         uses: actions/checkout@v7
 
-      - name: Set up Go
-        uses: actions/setup-go@v7
+      - uses: actions/download-artifact@v8
         with:
-          go-version: '1.24'
+          name: example
+          path: /usr/local/bin/
 
-      - name: build example
-        run: |
-          cd example
-          go build
+      - uses: actions/download-artifact@v8
+        with:
+          name: tt
+          path: /usr/local/bin/
 
-      - name: install tt
-        run: go install github.com/tab-dance/tabdance-test/cmd/tt@latest
-
-      - name: install shells
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zsh fish osh # oil
-          sudo snap install --classic powershell pwsh 2>/dev/null || true
-          # elvish, nushell, xonsh available where pinned; missing shells are
-          # skipped by tt because no golden is committed for them.
-          go install golang.org/x/perf/cmd/... 2>/dev/null || true
+      - run: chmod +x /usr/local/bin/example /usr/local/bin/tt
 
       - name: run tape tests
         run: |

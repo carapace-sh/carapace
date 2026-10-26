@@ -27,6 +27,18 @@ jobs:
           path: example/example
           retention-days: 1
 
+      - name: build tt
+        run: |
+          cd $(mktemp -d)
+          go install github.com/tab-dance/tabdance-test/cmd/tt@e4e1ff4
+          cp "$(go env GOPATH)/bin/tt" tt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tt
+          path: tt
+          retention-days: 1
+
 
   doubleQuote:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
   doubleQuoteOpen:    {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}
@@ -42,6 +54,21 @@ jobs:
   special:            {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: special}}
   specialSingleQuote: {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: specialSingleQuote}}
   word:               {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: word}}
+
+  tt-doubleQuote:        {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: doubleQuote}}
+  tt-doubleQuoteOpen:    {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: doubleQuoteOpen}}
+  tt-doubleQuotePartial: {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: doubleQuotePartial}}
+  tt-escape:             {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: escape}}
+  tt-noPrefix:           {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: noPrefix}}
+  tt-nospace:            {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: nospace}}
+  tt-redirect:           {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: redirect}}
+  tt-singleQuote:        {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: singleQuote}}
+  tt-singleQuoteOpen:    {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: singleQuoteOpen}}
+  tt-singleQuotePartial: {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: singleQuotePartial}}
+  tt-specialDoubleQuote: {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: specialDoubleQuote}}
+  tt-special:            {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: special}}
+  tt-specialSingleQuote: {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: specialSingleQuote}}
+  tt-word:               {needs: build, uses: ./.github/workflows/tt-template.yml, with: {topic: word}}
 
   doc:
     needs:

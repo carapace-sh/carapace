@@ -48,7 +48,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 }
 
 complete -o noquote -F _%[1]v_completer %[3]v
-`, defaultName, uid.Executable(), strings.Join(quoted, " "), snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Bash), strings.Join(quoted, " "), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command bash completion script.
@@ -57,9 +57,9 @@ complete -o noquote -F _%[1]v_completer %[3]v
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 
-	invocation := fmt.Sprintf("%v _carapace bash", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace bash", shlex.Quote(uid.Executable(), shlex.Bash))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace bash", uid.Executable(), shlex.Quote(command, shlex.Bash))
+		invocation = fmt.Sprintf("%v %v _carapace bash", shlex.Quote(uid.Executable(), shlex.Bash), shlex.Quote(command, shlex.Bash))
 	}
 
 	return fmt.Sprintf(`#!/bin/bash

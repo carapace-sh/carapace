@@ -34,7 +34,7 @@ $current.completions.external = ($current.completions.external
     | upsert completer { if $in == null { $%[1]v_completer } else { $in } })
 
 $env.config = $current
-`, sanitizeName(defaultName), uid.Executable(), "", snippetFuncs)
+`, sanitizeName(defaultName), shlex.Quote(uid.Executable(), shlex.Nushell), "", snippetFuncs)
 }
 
 // SnippetSingle creates a single-command nushell completion script.
@@ -58,12 +58,12 @@ $current.completions.external = ($current.completions.external
     | upsert completer { if $in == null { $%[2]v_completer } else { $in } })
 
 $env.config = $current
-`, uid.Executable(), sanitizeName(command), shlex.Quote(command, shlex.Nushell))
+`, shlex.Quote(uid.Executable(), shlex.Nushell), sanitizeName(command), shlex.Quote(command, shlex.Nushell))
 	}
 
 	return fmt.Sprintf(`let %v_completer = {|place| 
     # backwards compatible workaround for positional completer input, see nushell #18791
     let spans = (if ($place | describe) =~ "record" { $place.command } else { $place })
     %v _carapace nushell ...$spans | from json
-}`, sanitizeName(command), uid.Executable())
+}`, sanitizeName(command), shlex.Quote(uid.Executable(), shlex.Nushell))
 }

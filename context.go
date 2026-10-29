@@ -2,6 +2,7 @@ package carapace
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -83,6 +84,68 @@ func (c *Context) Setenv(key, value string) {
 // Envsubst replaces ${var} in the string based on environment variables in current context.
 func (c Context) Envsubst(s string) (string, error) {
 	return envsubst.Eval(s, c.Getenv)
+}
+
+// LookPath searches for an executable named file in the directories named by
+// the PATH environment variable as set in the context. If file contains a slash,
+// it is tried directly. The result may be an absolute path or a relative path to
+// the current context's Dir.
+func (c Context) LookPath(file string) (string, error) {
+	if strings.Contains(file, "/") {
+		err := findExecutable(file, c.Dir)
+		if err == nil {
+			return file, nil
+		}
+		return "", &execError{file, err}
+	}
+	path := c.Getenv("PATH")
+	for _, dir := range filepath.SplitList(path) {
+		if dir == "" {
+			dir = "."
+		}
+		if !filepath.IsAbs(dir) {
+			dir = filepath.Join(c.Dir, dir)
+		}
+		path := filepath.Join(dir, file)
+		if err := findExecutable(path, ""); err == nil {
+			if !filepath.IsAbs(path) {
+				return path, nil
+			}
+			return path, nil
+		}
+	}
+	return "", &execError{file, errors.New("not found in PATH")}
+}
+
+type execError struct {
+	name string
+	err  error
+}
+
+func (e *execError) Error() string {
+	return fmt.Sprintf("executable %q not found: %v", e.name, e.err)
+}
+
+func (e *execError) Unwrap() error {
+	return e.err
+}
+
+// findExecutable checks if the file at the given path is executable.
+// When the path is relative and baseDir is non-empty, the check is performed
+// relative to baseDir.
+func findExecutable(file string, baseDir string) error {
+	p := file
+	if baseDir != "" && !filepath.IsAbs(file) {
+		p = filepath.Join(baseDir, file)
+	}
+	d, err := os.Stat(p)
+	if err != nil {
+		return err
+	}
+	if m := d.Mode(); !m.IsDir() && m&0o111 != 0 {
+		return nil
+	}
+	return os.ErrPermission
 }
 
 // Command returns the Cmd struct to execute the named program with the given arguments.

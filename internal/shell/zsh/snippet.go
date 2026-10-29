@@ -3,7 +3,6 @@ package zsh
 
 import (
 	"fmt"
-	"strings"
 
 	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
@@ -52,7 +51,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 }
 compquote '' 2>/dev/null && _%[1]v_completer
 compdef _%[1]v_completer %[3]v
-`, defaultName, shlex.Quote(uid.Executable(), shlex.Zsh), strings.Join(names, " "), snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Zsh), shlex.Join(names, shlex.Zsh), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command zsh completion script.

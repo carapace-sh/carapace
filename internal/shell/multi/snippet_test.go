@@ -145,10 +145,10 @@ func TestSnippetTcsh(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !strings.Contains(s, "complete \"carapace-test\"") {
+	if !strings.Contains(s, "complete carapace-test") {
 		t.Error("missing carapace-test registration")
 	}
-	if !strings.Contains(s, "complete \"sub1\"") {
+	if !strings.Contains(s, "complete sub1") {
 		t.Error("missing sub1 registration")
 	}
 }

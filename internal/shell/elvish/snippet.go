@@ -45,7 +45,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
         }
     }%[4]v
 }
-`, defaultName, uid.Executable(), strings.Join(quoted, " "), windowsSnippet, snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Elvish), strings.Join(quoted, " "), windowsSnippet, snippetFuncs)
 }
 
 // SnippetSingle creates a single-command elvish completion script.
@@ -54,9 +54,9 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 
-	invocation := fmt.Sprintf("%v _carapace elvish (all $arg)", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace elvish (all $arg)", shlex.Quote(uid.Executable(), shlex.Elvish))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace elvish (all $arg)", uid.Executable(), shlex.Quote(command, shlex.Elvish))
+		invocation = fmt.Sprintf("%v %v _carapace elvish (all $arg)", shlex.Quote(uid.Executable(), shlex.Elvish), shlex.Quote(command, shlex.Elvish))
 	}
 
 	windowsSnippet := ""

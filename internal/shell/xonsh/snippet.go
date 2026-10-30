@@ -49,7 +49,7 @@ def _%[1]v_completer(context):
     return result
 
 add_one_completer('%[1]v', _%[1]v_completer, 'start')
-`, strings.ReplaceAll(defaultName, "-", "__"), uid.Executable(), strings.Join(complete, ", "), "", snippetFuncs)
+`, strings.ReplaceAll(defaultName, "-", "__"), shlex.Escape(uid.Executable(), shlex.Xonsh), strings.Join(complete, ", "), "", snippetFuncs)
 }
 
 // SnippetSingle creates a single-command xonsh completion script.
@@ -60,9 +60,9 @@ func SnippetSingle(command string, explicitCommand bool) string {
 
 	functionName := strings.ReplaceAll(command, "-", "__")
 
-	invocation := fmt.Sprintf("'%v', '_carapace', 'xonsh'", uid.Executable())
+	invocation := fmt.Sprintf("'%v', '_carapace', 'xonsh'", shlex.Escape(uid.Executable(), shlex.Xonsh))
 	if explicitCommand {
-		invocation = fmt.Sprintf("'%v', '%v', '_carapace', 'xonsh'", uid.Executable(), shlex.Escape(command, shlex.Xonsh))
+		invocation = fmt.Sprintf("'%v', '%v', '_carapace', 'xonsh'", shlex.Escape(uid.Executable(), shlex.Xonsh), shlex.Escape(command, shlex.Xonsh))
 	}
 
 	return fmt.Sprintf(`from xonsh.completers.completer import add_one_completer

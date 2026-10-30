@@ -18,7 +18,7 @@ func Snippet(cmd *cobra.Command) string {
 func SnippetMulti(names []string, defaultName string, snippetFuncs string) string {
 	lines := make([]string, 0, len(names))
 	for _, name := range names {
-		lines = append(lines, fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v \"%v\" _carapace tcsh `@@' ;", name, uid.Executable(), shlex.Quote(name, shlex.Tcsh)))
+		lines = append(lines, fmt.Sprintf("complete %v 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v %v _carapace tcsh `@@' ;", shlex.Quote(name, shlex.Tcsh), shlex.Quote(uid.Executable(), shlex.Tcsh), shlex.Quote(name, shlex.Tcsh)))
 	}
 	return strings.Join(lines, "\n")
 }
@@ -30,10 +30,10 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 func SnippetSingle(command string, explicitCommand bool) string {
 	// TODO initial version - needs to handle open quotes
 
-	invocation := fmt.Sprintf("%v _carapace tcsh", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace tcsh", shlex.Quote(uid.Executable(), shlex.Tcsh))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v \"%v\" _carapace tcsh", uid.Executable(), shlex.Quote(command, shlex.Tcsh))
+		invocation = fmt.Sprintf("%v %v _carapace tcsh", shlex.Quote(uid.Executable(), shlex.Tcsh), shlex.Quote(command, shlex.Tcsh))
 	}
 
-	return fmt.Sprintf("complete \"%v\" 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v `@@' ;", shlex.Quote(command, shlex.Tcsh), invocation)
+	return fmt.Sprintf("complete %v 'p@*@`echo \"$COMMAND_LINE'\"''\"'\" | xargs %v `@@' ;", shlex.Quote(command, shlex.Tcsh), invocation)
 }

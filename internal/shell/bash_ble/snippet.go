@@ -49,7 +49,7 @@ _%[2]v_completer_ble() {
 }
 
 complete -F _%[2]v_completer_ble %[4]v
-`, bashSnip, defaultName, uid.Executable(), quotedJoined)
+`, bashSnip, defaultName, shlex.Quote(uid.Executable(), shlex.Bash), quotedJoined)
 }
 
 // SnippetSingle creates a single-command bash-ble completion script.
@@ -65,9 +65,9 @@ func SnippetSingle(command string, explicitCommand bool) string {
 		bashSnip = regexp.MustCompile(`complete -F [^\n]+`).ReplaceAllString(bashSnip, "")
 	}
 
-	invocation := fmt.Sprintf("%v _carapace bash-ble", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace bash-ble", shlex.Quote(uid.Executable(), shlex.Bash))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace bash-ble", uid.Executable(), shlex.Quote(command, shlex.Bash))
+		invocation = fmt.Sprintf("%v %v _carapace bash-ble", shlex.Quote(uid.Executable(), shlex.Bash), shlex.Quote(command, shlex.Bash))
 	}
 
 	return fmt.Sprintf(`%v

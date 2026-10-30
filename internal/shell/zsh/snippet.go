@@ -3,7 +3,6 @@ package zsh
 
 import (
 	"fmt"
-	"strings"
 
 	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/pkg/uid"
@@ -52,7 +51,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 }
 compquote '' 2>/dev/null && _%[1]v_completer
 compdef _%[1]v_completer %[3]v
-`, defaultName, uid.Executable(), strings.Join(names, " "), snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Zsh), shlex.Join(names, shlex.Zsh), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command zsh completion script.
@@ -61,9 +60,9 @@ compdef _%[1]v_completer %[3]v
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 
-	invocation := fmt.Sprintf("%v _carapace zsh", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace zsh", shlex.Quote(uid.Executable(), shlex.Zsh))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace zsh", uid.Executable(), shlex.Quote(command, shlex.Zsh))
+		invocation = fmt.Sprintf("%v %v _carapace zsh", shlex.Quote(uid.Executable(), shlex.Zsh), shlex.Quote(command, shlex.Zsh))
 	}
 
 	return fmt.Sprintf(`#compdef %[1]v

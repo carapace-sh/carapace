@@ -33,7 +33,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 }
 
 complete -F _%[1]v_completer %[3]v
-`, defaultName, uid.Executable(), strings.Join(quoted, " "), snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Bash), strings.Join(quoted, " "), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command oil completion script.
@@ -42,9 +42,9 @@ complete -F _%[1]v_completer %[3]v
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 
-	invocation := fmt.Sprintf("%v _carapace oil", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace oil", shlex.Quote(uid.Executable(), shlex.Bash))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace oil", uid.Executable(), shlex.Quote(command, shlex.Bash))
+		invocation = fmt.Sprintf("%v %v _carapace oil", shlex.Quote(uid.Executable(), shlex.Bash), shlex.Quote(command, shlex.Bash))
 	}
 
 	return fmt.Sprintf(`#!/bin/osh

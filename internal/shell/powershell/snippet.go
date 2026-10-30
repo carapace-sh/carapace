@@ -174,7 +174,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 		}
 		complete = append(complete, fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completer -CommandName %v%v%v`, sanitize(defaultName), shlex.Quote(name, shlex.Powershell), prefix, shlex.Quote(name+".exe", shlex.Powershell)))
 	}
-	return fmt.Sprintf(snippetMulti, sanitize(defaultName), uid.Executable(), strings.Join(complete, "\n"), snippetFuncs)
+	return fmt.Sprintf(snippetMulti, sanitize(defaultName), shlex.Quote(uid.Executable(), shlex.Powershell), strings.Join(complete, "\n"), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command powershell completion script.
@@ -190,13 +190,13 @@ func SnippetSingle(command string, explicitCommand bool) string {
 
 	if explicitCommand {
 		complete := fmt.Sprintf(`Register-ArgumentCompleter -Native -ScriptBlock $_%v_completion -CommandName %v%v%v`, sanitize(command), shlex.Quote(command, shlex.Powershell), prefix, shlex.Quote(command+".exe", shlex.Powershell))
-		return fmt.Sprintf(snippetMultiSingle, uid.Executable(), sanitize(command), shlex.Quote(command, shlex.Powershell), complete)
+		return fmt.Sprintf(snippetMultiSingle, shlex.Quote(uid.Executable(), shlex.Powershell), sanitize(command), shlex.Quote(command, shlex.Powershell), complete)
 	}
 
 	return fmt.Sprintf(snippetOriginal,
 		sanitize(command),
-		uid.Executable(),
-		uid.Executable(),
+		shlex.Quote(uid.Executable(), shlex.Powershell),
+		shlex.Quote(uid.Executable(), shlex.Powershell),
 		sanitize(command),
 		shlex.Escape(command, shlex.Powershell),
 		prefix,

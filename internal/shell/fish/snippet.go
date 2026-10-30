@@ -38,7 +38,7 @@ func SnippetMulti(names []string, defaultName string, snippetFuncs string) strin
 end
 
 %v
-`, defaultName, uid.Executable(), strings.Join(complete, "\n"), snippetFuncs)
+`, defaultName, shlex.Quote(uid.Executable(), shlex.Fish), strings.Join(complete, "\n"), snippetFuncs)
 }
 
 // SnippetSingle creates a single-command fish completion script.
@@ -47,9 +47,9 @@ end
 // without an explicit command (standalone mode).
 func SnippetSingle(command string, explicitCommand bool) string {
 
-	invocation := fmt.Sprintf("%v _carapace fish", uid.Executable())
+	invocation := fmt.Sprintf("%v _carapace fish", shlex.Quote(uid.Executable(), shlex.Fish))
 	if explicitCommand {
-		invocation = fmt.Sprintf("%v %v _carapace fish", uid.Executable(), shlex.Quote(command, shlex.Fish))
+		invocation = fmt.Sprintf("%v %v _carapace fish", shlex.Quote(uid.Executable(), shlex.Fish), shlex.Quote(command, shlex.Fish))
 	}
 
 	return fmt.Sprintf(`function _%[1]v_completion

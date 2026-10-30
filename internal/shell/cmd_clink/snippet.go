@@ -51,6 +51,6 @@ func Snippet(cmd *cobra.Command) string {
 end
 
 clink.argmatcher(50, '%[2]s', '%[3]s'):addarg({nowordbreakchars="'`+"`"+`=+;,", %[1]s_completion}):loop(1)
-`, sanitize(cmd.Name()), name, exe, uid.Executable())
+`, sanitize(cmd.Name()), name, exe, shlex.Escape(uid.Executable(), shlex.Lua))
 	return result
 }

@@ -6,6 +6,7 @@
 package myers
 
 import (
+	"math"
 	"strings"
 
 	diff "github.com/carapace-sh/carapace/third_party/github.com/hexops/gotextdiff"
@@ -150,6 +151,9 @@ func backtrack(trace [][]int, x, y, offset int) [][]int {
 // shortestEditSequence returns the shortest edit sequence that converts a into b.
 func shortestEditSequence(a, b []string) ([][]int, int) {
 	M, N := len(a), len(b)
+	if M > maxLineCount || N > maxLineCount {
+		return nil, 0
+	}
 	V := make([]int, 2*(N+M)+1)
 	offset := N + M
 	trace := make([][]int, N+M+1)
@@ -203,3 +207,5 @@ func splitLines(text string) []string {
 	}
 	return lines
 }
+
+const maxLineCount = math.MaxInt / 4

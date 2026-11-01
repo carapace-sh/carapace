@@ -175,7 +175,7 @@ carapace.Gen(rootCmd,
 
 When `WithSubcommands` is set, `Snippet()` delegates to `multi.Snippet()` (`internal/shell/multi/snippet.go`) instead of `shell.Snippet()`. The multi-completer snippet registers all subcommand completers at once in a single shell script.
 
-Multi-completer snippets are supported by all shells except `cmd-clink` and `ion`.
+Multi-completer snippets are supported by all shells except `cmd-clink`.
 
 ### Execute() Arg Rewriting
 

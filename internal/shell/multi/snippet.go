@@ -65,7 +65,7 @@ func Snippet(shell string, names []string, defaultName string, snippetFuncs map[
 		return tcsh.SnippetMulti(names, defaultName, snippetFuncsStr), nil
 	case "export":
 		return "", nil
-	case "cmd-clink", "ion":
+	case "cmd-clink":
 		return "", fmt.Errorf("unsupported shell for multi-completer: '%v'", shell)
 	default:
 		supported := []string{"bash", "bash-ble", "elvish", "fish", "nushell", "oil", "powershell", "tcsh", "xonsh", "zsh"}
@@ -117,7 +117,7 @@ func SingleSnippet(shell string, command string, names []string, defaultName str
 		return tcsh.SnippetSingle(command, true), nil
 	case "export":
 		return "", nil
-	case "cmd-clink", "ion":
+	case "cmd-clink":
 		return "", fmt.Errorf("unsupported shell for multi-completer: '%v'", shell)
 	default:
 		supported := []string{"bash", "bash-ble", "elvish", "fish", "nushell", "oil", "powershell", "tcsh", "xonsh", "zsh"}

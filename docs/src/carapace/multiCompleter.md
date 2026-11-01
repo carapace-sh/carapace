@@ -148,7 +148,7 @@ Multi-completer snippets are supported for:
 - xonsh
 - zsh
 
-`cmd-clink` and `ion` are not supported for multi-completer snippets.
+`cmd-clink` is not supported for multi-completer snippets.
 
 ## WithSnippetFuncs
 

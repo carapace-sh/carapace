@@ -1,6 +1,6 @@
 # Carapace Library: Per-Shell Output Formatting
 
-Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specific completion output — how `RawValues` and `Meta` are formatted for each of the 12 supported shells, and how the shells differ.
+Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specific completion output — how `RawValues` and `Meta` are formatted for each of the 11 supported shells, and how the shells differ.
 
 ## Supported Shells
 
@@ -12,7 +12,6 @@ Reference for [carapace](https://github.com/carapace-sh/carapace)'s shell-specif
 | Cmd (Clink) | `cmd-clink` | `internal/shell/cmd_clink/` | **cmd-clink** skill |
 | Elvish | `elvish` | `internal/shell/elvish/` | `references/shell-elvish.md` |
 | Fish | `fish` | `internal/shell/fish/` | `references/shell-fish.md` |
-| Ion | `ion` | `internal/shell/ion/` | **ion** skill |
 | Nushell | `nushell` | `internal/shell/nushell/` | `references/shell-nushell.md` |
 | PowerShell | `powershell` | `internal/shell/powershell/` | `references/shell-powershell.md` |
 | Tcsh | `tcsh` | `internal/shell/tcsh/` | **tcsh** skill |
@@ -64,13 +63,13 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 
 ### Secondary Shells
 
-| Feature | Tcsh | Ion | Clink |
+| Feature | Tcsh | Clink |
 |---------|------|-----|-------|
-| **Output format** | Values on lines, backslash-escaped | JSON `{Value, Display}` | Tab-delimited `value\tdisplay\tdesc\tsuffix` |
-| **Nospace** | Built-in support | Trailing space in `Value` | Per-candidate `appendchar` field |
-| **Style/color** | Not supported | Not supported | Not supported |
-| **Go-side patching** | None | None | `cmd_clink.Patch()` (redirects via CARAPACE_COMPLINE) |
-| **Snippet** | `complete` with `$COMMAND_LINE` | Empty (no snippet) | Lua function with `CARAPACE_COMPLINE` |
+| **Output format** | Values on lines, backslash-escaped | Tab-delimited `value\tdisplay\tdesc\tsuffix` |
+| **Nospace** | Built-in support | Per-candidate `appendchar` field |
+| **Style/color** | Not supported | Not supported |
+| **Go-side patching** | None | `cmd_clink.Patch()` (redirects via CARAPACE_COMPLINE) |
+| **Snippet** | `complete` with `$COMMAND_LINE` | Lua function with `CARAPACE_COMPLINE` |
 
 ### Export Format
 

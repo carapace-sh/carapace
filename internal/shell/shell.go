@@ -16,7 +16,6 @@ import (
 	"github.com/carapace-sh/carapace/internal/shell/elvish"
 	"github.com/carapace-sh/carapace/internal/shell/export"
 	"github.com/carapace-sh/carapace/internal/shell/fish"
-	"github.com/carapace-sh/carapace/internal/shell/ion"
 	"github.com/carapace-sh/carapace/internal/shell/nushell"
 	"github.com/carapace-sh/carapace/internal/shell/oil"
 	"github.com/carapace-sh/carapace/internal/shell/powershell"
@@ -40,7 +39,6 @@ func Snippet(cmd *cobra.Command, shell string) (string, error) {
 		"export":     export.Snippet,
 		"fish":       fish.Snippet,
 		"elvish":     elvish.Snippet,
-		"ion":        ion.Snippet,
 		"nushell":    nushell.Snippet,
 		"oil":        oil.Snippet,
 		"powershell": powershell.Snippet,
@@ -72,7 +70,6 @@ func Value(shell string, value string, meta common.Meta, values common.RawValues
 		"fish":       fish.ActionRawValues,
 		"elvish":     elvish.ActionRawValues,
 		"export":     export.ActionRawValues,
-		"ion":        ion.ActionRawValues,
 		"nushell":    nushell.ActionRawValues,
 		"oil":        oil.ActionRawValues,
 		"powershell": powershell.ActionRawValues,

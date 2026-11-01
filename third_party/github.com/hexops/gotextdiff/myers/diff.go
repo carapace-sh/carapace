@@ -150,10 +150,10 @@ func backtrack(trace [][]int, x, y, offset int) [][]int {
 
 // shortestEditSequence returns the shortest edit sequence that converts a into b.
 func shortestEditSequence(a, b []string) ([][]int, int) {
-	M, N := len(a), len(b)
-	if M > maxLineCount || N > maxLineCount {
+	if len(a) > maxLineCount || len(b) > maxLineCount {
 		return nil, 0
 	}
+	M, N := len(a), len(b)
 	V := make([]int, 2*(N+M)+1)
 	offset := N + M
 	trace := make([][]int, N+M+1)

@@ -24,6 +24,14 @@ func home(s string) string {
 	}
 }
 
+// root resolves the home directory of the root user as it differs per os (e.g. `/root` on linux, `/var/root` on darwin)
+func root(s string) string {
+	if rh, err := expandHome("~root/"); err == nil {
+		return strings.TrimSuffix(filepath.ToSlash(rh), "/") + s
+	}
+	panic("failed to resolve root home directory")
+}
+
 func parent(s string) string {
 	if s != "" {
 		return strings.TrimSuffix(filepath.ToSlash(filepath.Dir(wd(""))), "/") + "/" + s
@@ -42,10 +50,10 @@ func TestContextAbs(t *testing.T) {
 		{"", "../", parent("")},
 		{"", "../file", parent("file")},
 		{"", "~/file", home("file")},
-		{"", "~root", "/root"},
-		{"", "~root/", "/root/"},
-		{"", "~root/file", "/root/file"},
-		{"/dir", "~root/file", "/root/file"},
+		{"", "~root", root("")},
+		{"", "~root/", root("") + "/"},
+		{"", "~root/file", root("/file")},
+		{"/dir", "~root/file", root("/file")},
 		{"/", "~/file", home("file")},
 		{"/", "file", "/file"},
 		{"/dir", "file", "/dir/file"},

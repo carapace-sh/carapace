@@ -555,7 +555,7 @@ default:
 
 For elvish, messages are **not** integrated as synthetic `ERR` values. Instead, they are passed through the `Messages` field in the JSON output and displayed via `edit:notify` in the snippet.
 
-This is superior to the fallback approach (used by bash/fish/oil/powershell/tcsh/ion) because:
+This is superior to the fallback approach (used by bash/fish/oil/powershell/tcsh) because:
 
 1. **Proper formatting** — messages appear as distinct notifications above the editor, not mixed into the completion list
 2. **Styled text** — the `styled` builtin allows error styling: `(styled "error: " red)$m`

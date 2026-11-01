@@ -34,8 +34,6 @@ func DetermineShell() string {
 			return "elvish"
 		case "fish":
 			return "fish"
-		case "ion":
-			return "ion"
 		case "nu":
 			return "nushell"
 		case "oil":

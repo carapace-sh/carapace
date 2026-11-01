@@ -172,10 +172,6 @@ func TestSnippetUnsupported(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for cmd-clink")
 	}
-	_, err = Snippet("ion", []string{"test"}, "test", nil)
-	if err == nil {
-		t.Error("expected error for ion")
-	}
 	_, err = Snippet("unknown", []string{"test"}, "test", nil)
 	if err == nil {
 		t.Error("expected error for unknown shell")

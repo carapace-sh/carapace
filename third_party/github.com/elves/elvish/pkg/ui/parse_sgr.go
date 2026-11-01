@@ -52,11 +52,11 @@ func StylingFromSGR(s string) Styling {
 			consume = 3
 		case code == 38 && len(codes) >= 5 && codes[1] == 2:
 			moreStyling = Fg(trueColor{
-				uint8(codes[2]), uint8(codes[3]), uint8(codes[4])})
+				channel(codes[2]), channel(codes[3]), channel(codes[4])})
 			consume = 5
 		case code == 48 && len(codes) >= 5 && codes[1] == 2:
 			moreStyling = Bg(trueColor{
-				uint8(codes[2]), uint8(codes[3]), uint8(codes[4])})
+				channel(codes[2]), channel(codes[3]), channel(codes[4])})
 			consume = 5
 		default:
 			// Do nothing; skip this code
@@ -82,4 +82,11 @@ func getSGRCodes(s string) []int {
 		}
 	}
 	return codes
+}
+
+func channel(v int) uint8 {
+	if v < 0 || v > 255 {
+		return 0
+	}
+	return uint8(v)
 }

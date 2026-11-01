@@ -84,9 +84,9 @@ func rstripSuffix(input string) suffix {
 	// first see if we have a number at the end
 	last := strings.LastIndexFunc(remains, func(r rune) bool { return r < '0' || r > '9' })
 	if last >= 0 && last < len(remains)-1 {
-		number, err := strconv.ParseInt(remains[last+1:], 10, 64)
+		number, err := strconv.Atoi(remains[last+1:])
 		if err == nil {
-			num = int(number)
+			num = number
 			remains = remains[:last+1]
 		}
 	}

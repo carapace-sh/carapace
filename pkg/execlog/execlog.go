@@ -2,21 +2,21 @@ package execlog
 
 import (
 	"context"
+	"os/exec"
 
 	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/internal/log"
-	"github.com/carapace-sh/carapace/third_party/golang.org/x/sys/execabs"
 )
 
 type Cmd struct {
-	*execabs.Cmd
+	*exec.Cmd
 	mock []byte // if set, execution returns this output instead of running the command
 }
 
-// Command is like execabs.Command but logs args on execution.
+// Command is like exec.Command but logs args on execution.
 func Command(name string, arg ...string) *Cmd {
 	cmd := &Cmd{
-		Cmd: execabs.Command(name, arg...),
+		Cmd: exec.Command(name, arg...),
 	}
 	return cmd
 }
@@ -24,7 +24,7 @@ func Command(name string, arg ...string) *Cmd {
 // CommandContext is like Command but includes a context.
 func CommandContext(ctx context.Context, name string, arg ...string) *Cmd {
 	cmd := &Cmd{
-		Cmd: execabs.CommandContext(ctx, name, arg...),
+		Cmd: exec.CommandContext(ctx, name, arg...),
 	}
 	return cmd
 }
@@ -37,7 +37,7 @@ func CommandContext(ctx context.Context, name string, arg ...string) *Cmd {
 func Mock(output string) *Cmd {
 	// mimic `echo` semantics: a trailing newline is always present
 	return &Cmd{
-		Cmd:  execabs.Command(""),
+		Cmd:  exec.Command(""),
 		mock: []byte(output + "\n"),
 	}
 }
@@ -80,7 +80,7 @@ func (c *Cmd) Start() error {
 	return c.Cmd.Start()
 }
 
-// Command is the same as execabs.Command.
+// Command is the same as exec.Command.
 func LookPath(file string) (string, error) {
-	return execabs.LookPath(file)
+	return exec.LookPath(file)
 }

@@ -1,10 +1,9 @@
 package man
 
 import (
+	"os/exec"
 	"regexp"
 	"strings"
-
-	"github.com/carapace-sh/carapace/third_party/golang.org/x/sys/execabs"
 )
 
 // Descriptions returns manpage descriptions for commands matching given prefix.
@@ -14,7 +13,7 @@ func Descriptions(s string) (descriptions map[string]string) {
 		return
 	}
 
-	output, err := execabs.Command("man", "--names-only", "-k", "^"+s).Output()
+	output, err := exec.Command("man", "--names-only", "-k", "^"+s).Output()
 	if err != nil {
 		return
 	}

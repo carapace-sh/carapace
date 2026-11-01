@@ -72,8 +72,8 @@ func TestContextAbs(t *testing.T) {
 
 	for _, tc := range testCases {
 		// windows resolves a POSIX root relative to the current drive (e.g. `/dir` -> `D:/dir`)
-		// so the UNIX-only expectations don't apply
-		if runtime.GOOS == "windows" && strings.HasPrefix(tc.Expected, "/") {
+		// so the UNIX-only expectations don't apply; other users' home directories are not expanded either
+		if runtime.GOOS == "windows" && (strings.HasPrefix(tc.Expected, "/") || strings.HasPrefix(tc.Path, "~root")) {
 			continue
 		}
 		actual, err := Context{Dir: tc.Dir}.Abs(tc.Path)

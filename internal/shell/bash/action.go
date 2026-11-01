@@ -85,11 +85,25 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 	}
 
 	lastSegment := strings.TrimPrefix(currentWord, wordbreakPrefix) // last segment of currentWord split by COMP_WORDBREAKS
+
+	// bash replaces the current word with the longest common prefix of all candidates,
+	// so candidates that don't extend the current word would erase typed characters
+	// (e.g. `~steam/D` also matching `~steam/d1/` case-insensitively).
+	extended := make(common.RawValues, 0, len(values))
+	for _, val := range values {
+		if strings.HasPrefix(val.Value, lastSegment) {
+			extended = append(extended, val)
+		}
+	}
+	if len(extended) > 0 && len(extended) < len(values) {
+		values = extended
+	}
+
 	if len(values) > 1 && commonDisplayPrefix(values...) != "" {
-		// When all display values have the same prefix bash will insert is as partial completion (which skips prefixes/formatting).
-		if valuePrefix := commonValuePrefix(values...); lastSegment != valuePrefix {
-			// replace values with common value prefix
-			values = common.RawValuesFrom(commonValuePrefix(values...))
+		// When all display values have the same prefix bash will insert it as partial completion (which skips prefixes/formatting).
+		if valuePrefix := commonValuePrefix(values...); lastSegment != valuePrefix && strings.HasPrefix(valuePrefix, lastSegment) {
+			// replace values with common value prefix as it extends the current word
+			values = common.RawValuesFrom(valuePrefix)
 		} else {
 			// prevent insertion of partial display values by prefixing one with space
 			values[0].Display = " " + values[0].Display

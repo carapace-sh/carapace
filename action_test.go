@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -325,5 +327,101 @@ func TestActionSplitMultibytePrefix(t *testing.T) {
 	})
 	if len(invoked.action.rawValues) != 1 || invoked.action.rawValues[0].Value != "echo café | grep $HOME" {
 		t.Errorf("rawValues = %v, want [echo café | grep $HOME]", invoked.action.rawValues)
+	}
+}
+
+func TestActionFilesHomedir(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("homedir expansion is not supported on windows")
+	}
+
+	var username, userHome string
+	passwd, err := os.ReadFile("/etc/passwd")
+	if err != nil {
+		t.Skipf("user database not readable: %v", err)
+	}
+	for line := range strings.SplitSeq(string(passwd), "\n") {
+		fields := strings.Split(line, ":")
+		if len(fields) != 7 {
+			continue
+		}
+		home := filepath.ToSlash(strings.TrimSuffix(fields[5], "/"))
+		if home == "" || home == "/" {
+			continue // system entries (e.g. nobody/daemon) aren't useful for homedir completion
+		}
+		if entries, err := os.ReadDir(home); err != nil || len(entries) == 0 {
+			continue
+		}
+		username, userHome = fields[0], home
+		break
+	}
+	if username == "" {
+		t.Skip("no user with readable home directory found")
+	}
+	usernamePrefix := "~" + username + "/"
+
+	entries, err := os.ReadDir(userHome)
+	if err != nil {
+		t.Skipf("home directory not readable: %v", err)
+	}
+	vals := make([]string, 0, len(entries)*2)
+	for _, e := range entries {
+		if strings.HasPrefix(e.Name(), ".") {
+			continue // hidden files are not completed
+		}
+		info, infoErr := e.Info()
+		if infoErr != nil {
+			t.Skipf("home directory entry unreadable: %v", infoErr)
+		}
+		if info.IsDir() {
+			vals = append(vals, usernamePrefix+e.Name()+"/")
+		} else {
+			vals = append(vals, usernamePrefix+e.Name())
+		}
+	}
+
+	// path completion within `~user/`: every visible entry is provided as
+	// `~user/<name>` (with trailing slash for directories)
+	invoked := ActionFiles().Invoke(Context{Value: usernamePrefix})
+	if len(invoked.action.rawValues) == 0 {
+		t.Fatalf("%v completion returned no candidates", usernamePrefix)
+	}
+	for _, actual := range invoked.action.rawValues {
+		if !strings.HasPrefix(actual.Value, usernamePrefix) {
+			t.Errorf("candidate = %v, want prefix %v", actual.Value, usernamePrefix)
+		}
+	}
+	for _, e := range vals {
+		if !slices.ContainsFunc(invoked.action.rawValues, func(r common.RawValue) bool {
+			return r.Value == e || r.Value == e+"/"
+		}) {
+			provided := make([]string, 0, len(invoked.action.rawValues))
+			for _, r := range invoked.action.rawValues {
+				provided = append(provided, r.Value)
+			}
+			t.Errorf("%v completion missing %v\nprovided: %v", usernamePrefix, e, strings.Join(provided, " "))
+		}
+	}
+
+	// usernames: candidates are shaped `~name/`
+	users := ActionFiles().Invoke(Context{Value: "~"}).action.rawValues
+	if len(users) == 0 {
+		t.Fatal("no usernames provided")
+	}
+	for _, v := range users {
+		if !strings.HasPrefix(v.Value, "~") || !strings.HasSuffix(v.Value, "/") {
+			t.Errorf("username candidate = %v, want ~/name/", v.Value)
+		}
+	}
+
+	// full username without slash yet should still provide `~user/`
+	completed := ActionFiles().Invoke(Context{Value: "~" + username})
+	if len(completed.action.rawValues) == 0 {
+		t.Errorf("~%v completion = %v, want at least [%v/]", username, completed.action.rawValues, usernamePrefix)
+	}
+	for _, v := range completed.action.rawValues {
+		if !strings.HasPrefix(v.Value, "~"+username) {
+			t.Errorf("~%v completion candidate = %v, want prefix ~%v", username, v.Value, username)
+		}
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/env"
@@ -19,6 +20,10 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 		if len(c.Value) == 2 && util.HasVolumePrefix(c.Value) {
 			// TODO should be fixed in Abs or wherever this is happening
 			return ActionValues(c.Value + "/") // prevent `C:` -> `C:.`
+		}
+
+		if runtime.GOOS != "windows" && strings.HasPrefix(c.Value, "~") && !strings.Contains(c.Value, "/") {
+			return actionUsers() // homedir expansion: complete usernames first
 		}
 
 		abs, err := c.Abs(c.Value)
@@ -79,6 +84,24 @@ func actionPath(fileSuffixes []string, dirOnly bool) Action {
 			return ActionStyledValues(vals...).Invoke(Context{}).Prefix("./").ToA()
 		}
 		return ActionStyledValues(vals...)
+	})
+}
+
+// actionUsers completes usernames in the form `~user/` (homedir expansion).
+func actionUsers() Action {
+	return ActionCallback(func(c Context) Action {
+		passwd, err := os.ReadFile("/etc/passwd")
+		if err != nil {
+			return ActionMessage(err.Error())
+		}
+
+		vals := make([]string, 0)
+		for line := range strings.SplitSeq(string(passwd), "\n") {
+			if fields := strings.Split(line, ":"); len(fields) == 7 {
+				vals = append(vals, "~"+fields[0]+"/", fields[5])
+			}
+		}
+		return ActionValuesDescribed(vals...)
 	})
 }
 

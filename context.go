@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/carapace-sh/carapace/internal/env"
@@ -109,16 +111,23 @@ func expandHome(s string) (string, error) {
 			return zsh.NamedDirectories.Replace(s), nil
 		}
 
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", err
-		}
-		home = filepath.ToSlash(home)
-		switch s {
-		case "~":
-			s = home
-		default:
-			s = strings.Replace(s, "~/", home+"/", 1)
+		name, rest, found := strings.Cut(s, "/") // name is "~" or "~user"
+		switch {
+		case name == "~": // current user's home
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return "", err
+			}
+			return filepath.ToSlash(home) + strings.TrimPrefix(s, name), nil
+
+		case runtime.GOOS != "windows": // other user's home (~user, ~user/rest)
+			if u, err := user.Lookup(strings.TrimPrefix(name, "~")); err == nil && u.HomeDir != "" {
+				home := filepath.ToSlash(strings.TrimSuffix(u.HomeDir, "/"))
+				if !found {
+					return home, nil
+				}
+				return home + "/" + rest, nil
+			}
 		}
 	}
 	return s, nil

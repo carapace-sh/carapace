@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/carapace-sh/carapace-shlex/v2 v2.1.3 // indirect
+	github.com/carapace-sh/carapace-shlex/v2 v2.1.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 )

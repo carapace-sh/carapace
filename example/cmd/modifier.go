@@ -38,6 +38,7 @@ func init() {
 	modifierCmd.Flags().String("nospace", "", "NoSpace()")
 	modifierCmd.Flags().String("noprefix", "", "NoPrefix()")
 	modifierCmd.Flags().String("prefix", "", "Prefix()")
+	modifierCmd.Flags().String("quote", "", "Quote()")
 	modifierCmd.Flags().String("retain", "", "Retain()")
 	modifierCmd.Flags().String("shift", "", "Shift()")
 	modifierCmd.Flags().String("split", "", "Split()")
@@ -171,6 +172,10 @@ func init() {
 			}
 		}),
 		"prefix": carapace.ActionFiles().Prefix("file://"),
+		"quote": carapace.ActionValues(
+			`1 "one"`,
+			`2 "two"`,
+		).Quote(),
 		"retain": carapace.ActionValuesDescribed(
 			"1", "one",
 			"2", "two",

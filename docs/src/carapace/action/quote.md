@@ -1,6 +1,6 @@
 # Quote
 
-[`Quote`] quotes values as double-quoted string literals.
+[`Quote`] escapes values so they can be embedded in a double-quoted string literal.
 
 ```go
 carapace.ActionValues(`say "hi"`).Quote()

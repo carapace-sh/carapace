@@ -83,13 +83,15 @@ func (ia InvokedAction) Suffix(suffix string) InvokedAction {
 	return ia
 }
 
-// Quote quotes values as double-quoted string literals. Only the inserted
-// values are modified; display values are left untouched.
+// Quote escapes values so they can be embedded in a double-quoted string
+// literal. Only the inserted values are modified; display values are left
+// untouched.
 //
 //	carapace.ActionValues(`say "hi"`).Invoke(c).Quote()
 func (ia InvokedAction) Quote() InvokedAction {
 	for index, val := range ia.action.rawValues {
-		ia.action.rawValues[index].Value = fmt.Sprintf("%q", val.Value)
+		quoted := fmt.Sprintf("%q", val.Value)
+		ia.action.rawValues[index].Value = quoted[1 : len(quoted)-1]
 	}
 	ia.action.meta.Queries.Modify("quote()")
 	return ia

@@ -202,14 +202,14 @@ func TestPrefix(t *testing.T) {
 	})
 }
 
-func TestQuote(t *testing.T) {
+func TestEscape(t *testing.T) {
 	sandbox.Package(t, "github.com/carapace-sh/carapace/example")(func(s *sandbox.Sandbox) {
-		s.Run("modifier", "--quote", "").
+		s.Run("modifier", "--escape", "").
 			Expect(carapace.ActionValues(
 				`1 "one"`,
 				`2 "two"`,
-			).Quote().
-				Usage("Quote()"))
+			).Escape().
+				Usage("Escape()"))
 	})
 }
 

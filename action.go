@@ -416,12 +416,12 @@ func (a Action) Suffix(suffix string) Action {
 	})
 }
 
-// Quote escapes values so they can be embedded in a double-quoted string literal.
+// Escape escapes values so they can be embedded in a double-quoted string literal.
 //
-//	carapace.ActionValues(`say "hi"`).Quote()
-func (a Action) Quote() Action {
+//	carapace.ActionValues(`say "hi"`).Escape()
+func (a Action) Escape() Action {
 	return ActionCallback(func(c Context) Action {
-		return a.Invoke(c).Quote().ToA()
+		return a.Invoke(c).Escape().ToA()
 	})
 }
 

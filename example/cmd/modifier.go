@@ -28,6 +28,7 @@ func init() {
 	modifierCmd.Flags().String("cache-key", "", "Cache()")
 	modifierCmd.Flags().String("chdir", "", "Chdir()")
 	modifierCmd.Flags().String("chdirf", "", "ChdirF()")
+	modifierCmd.Flags().String("escape", "", "Escape()")
 	modifierCmd.Flags().String("filter", "", "Filter()")
 	modifierCmd.Flags().String("filterargs", "", "FilterArgs()")
 	modifierCmd.Flags().String("filterparts", "", "FilterParts()")
@@ -172,6 +173,10 @@ func init() {
 			}
 		}),
 		"prefix": carapace.ActionFiles().Prefix("file://"),
+		"escape": carapace.ActionValues(
+			`1 "one"`,
+			`2 "two"`,
+		).Escape(),
 		"quote": carapace.ActionValues(
 			`1 "one"`,
 			`2 "two"`,

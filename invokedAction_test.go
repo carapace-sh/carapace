@@ -39,3 +39,33 @@ func TestToMultiParts(t *testing.T) {
 
 	_test("C/d/1", `{"value":"C/d/1()2","display":"1()2","description":"withbrackets","style":"yellow"}`, "/")
 }
+
+func TestQuote(t *testing.T) {
+	c := Context{}
+	a := ActionValues(`say "hi"`, `plain`).Invoke(c).Quote()
+	got := []string{}
+	for _, v := range a.action.rawValues {
+		got = append(got, v.Value)
+	}
+	if got[0] != `"say \"hi\""` {
+		t.Errorf("Quote: expected %q, got %q", `"say \"hi\""`, got[0])
+	}
+	if got[1] != `"plain"` {
+		t.Errorf("Quote: expected %q, got %q", `"plain"`, got[1])
+	}
+}
+
+func TestEscape(t *testing.T) {
+	c := Context{}
+	a := ActionValues(`say "hi"`, `plain`).Invoke(c).Escape()
+	got := []string{}
+	for _, v := range a.action.rawValues {
+		got = append(got, v.Value)
+	}
+	if got[0] != `say \"hi\"` {
+		t.Errorf("Escape: expected %q, got %q", `say \"hi\"`, got[0])
+	}
+	if got[1] != `plain` {
+		t.Errorf("Escape: expected %q, got %q", `plain`, got[1])
+	}
+}

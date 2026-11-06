@@ -425,6 +425,16 @@ func (a Action) Quote() Action {
 	})
 }
 
+// Escape escapes values so they can be embedded in a double-quoted string
+// literal without adding surrounding quotes.
+//
+//	carapace.ActionValues(`say "hi"`).Escape()
+func (a Action) Escape() Action {
+	return ActionCallback(func(c Context) Action {
+		return a.Invoke(c).Escape().ToA()
+	})
+}
+
 // Suppress suppresses specific error messages using regular expressions.
 func (a Action) Suppress(expr ...string) Action {
 	return ActionCallback(func(c Context) Action {

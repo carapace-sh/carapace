@@ -3,7 +3,7 @@ module github.com/carapace-sh/carapace/example-nonposix
 go 1.24.0
 
 require (
-	github.com/carapace-sh/carapace v0.50.3-0.20240311124258-a5adf91d8b8f
+	github.com/carapace-sh/carapace v1.18.2-0.20261107171937-195323ce78d4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.1.0
 )

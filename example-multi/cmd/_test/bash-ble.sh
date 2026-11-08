@@ -6,6 +6,7 @@ _example-multi_completer() {
   export COMP_WORDBREAKS
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
+  export CARAPACE_COMPLINE="${compline}"
   local command="${COMP_WORDS[0]}"
 
   data=$(echo "${compline}''" | xargs example-multi "${command}" _carapace bash 2>/dev/null)

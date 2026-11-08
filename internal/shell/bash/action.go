@@ -5,7 +5,9 @@ import (
 	"os"
 	"strings"
 
+	shlex "github.com/carapace-sh/carapace-shlex/v2"
 	"github.com/carapace-sh/carapace/internal/common"
+	"github.com/carapace-sh/carapace/internal/env"
 )
 
 var sanitizer = strings.NewReplacer(
@@ -80,6 +82,9 @@ func commonValuePrefix(values ...common.RawValue) (prefix string) {
 
 // ActionRawValues formats values for bash.
 func ActionRawValues(currentWord string, meta common.Meta, values common.RawValues) string {
+	ctx := shlex.Complete(env.Compline(), shlex.Bash)
+	singleQuoted := ctx.QuotingState == shlex.QUOTING_STATE
+
 	for index, value := range values {
 		values[index].Value = strings.TrimPrefix(value.Value, wordbreakPrefix)
 	}
@@ -119,6 +124,9 @@ func ActionRawValues(currentWord string, meta common.Meta, values common.RawValu
 
 			vals[index] = sanitizer.Replace(val.Value)
 			switch {
+			case singleQuoted:
+				// Readline retains the opening single quote, so use matching quotes.
+				vals[index] = "'" + strings.ReplaceAll(vals[index], "'", `'\''`) + "'"
 			case strings.HasPrefix(vals[index], "~"): // assume homedir expansion
 				vals[index] = escapingReplacer.Replace(vals[index])
 			case requiresQuoting(vals[index]):

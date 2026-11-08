@@ -62,6 +62,7 @@ _example_completion() {
   export COMP_WORDBREAKS
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
+  export CARAPACE_COMPLINE="${compline}"
 
   data=$(echo "${compline}''" | xargs example _carapace bash 2>/dev/null)
   if [ $? -eq 1 ]; then
@@ -91,7 +92,7 @@ The snippet exports `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` so
 
 **2. Compute `compline`**
 
-`compline="${COMP_LINE:0:${COMP_POINT}}"` extracts the command line up to the cursor position.
+`compline="${COMP_LINE:0:${COMP_POINT}}"` extracts the command line up to the cursor position. The snippet exports it as `CARAPACE_COMPLINE` so the formatter can inspect the raw current word after `Patch()` unsets `COMP_*`.
 
 **3. Open-quote retry logic**
 
@@ -187,7 +188,9 @@ In both cases, `nospace` is set to `*` to prevent a trailing space after the par
 
 ### Step 4: Bash-Specific Quoting
 
-Two quoting modes, applied because the snippet uses `complete -o noquote`:
+The snippet uses `complete -o noquote`, so the formatter supplies quoting:
+
+**Single-quoted input**: When the lexer reports an open single quote in `CARAPACE_COMPLINE` (including `--flag='value`), wrap candidates in single quotes and replace each literal apostrophe with `'\''`. Readline retains the opening single quote; double-quoted candidates here would insert literal double quotes into the value. This branch also keeps a quoted leading tilde literal.
 
 **Unquoted mode** (`escapingReplacer`): Backslash-escapes special characters. Used for `~`-prefixed values and values that don't require quoting.
 
@@ -217,7 +220,7 @@ For a cross-shell comparison of nospace handling, see the **references/shell.md*
 
 ### Open-Quote Completion with Spaces
 
-There's a known issue with completing values containing spaces when inside quotes. The commented-out test in `example/main_test.go` notes this doesn't work correctly with bash.
+Words with an open single quote use matching single-quoted candidates, including spaces, apostrophes, and shell metacharacters. Unquoted and double-quoted words retain their existing formatting. `TestActionRawValuesQuoting` covers these formatter cases.
 
 ### COMP_WORDBREAKS Colon Handling
 

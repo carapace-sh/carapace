@@ -25,6 +25,11 @@ func TestFlag(t *testing.T) {
 				"--dash1",
 			))
 
+		s.Run("flag", "--", "-d").
+			Expect(carapace.ActionValues(
+				"-d1",
+			))
+
 		s.Run("flag", "--", "--").
 			Expect(carapace.ActionValues(
 				"--dash1",
@@ -44,6 +49,11 @@ func TestFlag(t *testing.T) {
 				"--dash2",
 			))
 
+		s.Run("flag", "--", "d1", "-d").
+			Expect(carapace.ActionValues(
+				"-d2",
+			))
+
 		s.Run("flag", "--", "d1", "--").
 			Expect(carapace.ActionValues(
 				"--dash2",
@@ -61,6 +71,11 @@ func TestFlag(t *testing.T) {
 			Expect(carapace.ActionValues(
 				"-dAny",
 				"--dashAny",
+			))
+
+		s.Run("flag", "--", "d1", "d2", "-d").
+			Expect(carapace.ActionValues(
+				"-dAny",
 			))
 
 		s.Run("flag", "--", "d1", "d2", "--").

@@ -1,6 +1,7 @@
 package bash
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/carapace-sh/carapace/internal/common"
@@ -47,6 +48,45 @@ func TestActionRawValuesPartialCompletion(t *testing.T) {
 			copy(values, test.values)
 			if actual := ActionRawValues(test.currentWord, common.Meta{}, values); actual != test.expected {
 				t.Errorf("expected [%v], got [%v]", test.expected, actual)
+			}
+		})
+	}
+}
+
+func TestActionRawValuesQuoting(t *testing.T) {
+	tests := []struct {
+		name     string
+		line     string
+		value    string
+		expected string
+	}{
+		{"single quote", "example 'with", "with space", `'with space'`},
+		{"single quote plain", "example 'with", "without", `'without'`},
+		{"single quote apostrophe", "example 'with", "with apostrophe's", `'with apostrophe'\''s'`},
+		{"single quote metacharacters", "example 'with", "with $HOME `id` \\ \" *;|&<>(){}[]#", "'with $HOME `id` \\ \" *;|&<>(){}[]#'"},
+		{"single quote tilde", "example '~", "~/with space", `'~/with space'`},
+		{"closed single quote", "example 'with'", "with space", `"with space"`},
+		{"attached single quote", "example --files='with", "--files=with space", `'with space'`},
+		{"unquoted", "example with", "with space", `"with space"`},
+		{"double quote", `example "with`, "with space", `"with space"`},
+		{"unquoted apostrophe", "example with", "with apostrophe's", `"with apostrophe's"`},
+		{"double quote metacharacters", `example "with`, "with $HOME `id` \\ \"", `"with \$HOME ` + "\\`id\\`" + ` \\ \""`},
+		{"unquoted tilde", "example ~", "~/with space", `~/with\ space`},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Setenv("CARAPACE_COMPLINE", test.line)
+			t.Setenv("COMP_LINE", test.line)
+			t.Setenv("COMP_POINT", strconv.Itoa(len(test.line)))
+			t.Setenv("COMP_TYPE", COMP_TYPE_NORMAL)
+			args, err := Patch([]string{"bash"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			actual := ActionRawValues(args[len(args)-1], common.Meta{}, common.RawValuesFrom(test.value))
+			if expected := "false\001" + test.expected; actual != expected {
+				t.Errorf("expected %q, got %q", expected, actual)
 			}
 		})
 	}

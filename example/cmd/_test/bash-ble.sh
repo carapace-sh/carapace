@@ -6,13 +6,12 @@ _example_completion() {
   export COMP_WORDBREAKS
 
   local nospace data compline="${COMP_LINE:0:${COMP_POINT}}"
-  export CARAPACE_COMPLINE="${compline}"
 
-  data=$(echo "${compline}''" | xargs example _carapace bash 2>/dev/null)
+  data=$(echo "${compline}''" | CARAPACE_COMPLINE="${compline}" xargs example _carapace bash 2>/dev/null)
   if [ $? -eq 1 ]; then
-    data=$(echo "${compline}'" | xargs example _carapace bash 2>/dev/null)
+    data=$(echo "${compline}'" | CARAPACE_COMPLINE="${compline}" xargs example _carapace bash 2>/dev/null)
     if [ $? -eq 1 ]; then
-    	data=$(echo "${compline}\"" | xargs example _carapace bash 2>/dev/null)
+    	data=$(echo "${compline}\"" | CARAPACE_COMPLINE="${compline}" xargs example _carapace bash 2>/dev/null)
     fi
   fi
 

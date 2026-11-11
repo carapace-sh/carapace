@@ -2,6 +2,7 @@
 /dist
 /docs/book
 /docs/src/asciinema
+/docs/theme/catppuccin.css
 /docs/src/development/vhs/*/out/*.gif
 /example/cmd/_test_files/*.txt
 /example/example

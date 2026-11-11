@@ -60,7 +60,7 @@ Each shell package has a `Snippet(cmd *cobra.Command) string` function that gene
 | **Flag merging** | Explicit only (`CARAPACE_MERGEFLAGS`) | Explicit only | Explicit only | **Implicit** (always merges) | Explicit only | Explicit only | Explicit only | Explicit only | Explicit only |
 | **Named directories** | Not supported | Not supported | Not supported | Supported via `hash -d` | Not supported | Not supported | Not supported | Not supported | Not supported |
 | **Homedir expansion (`~user`)** | Values keep `~user/` prefix (leading `~` unescaped) | Same as bash | Raw prefix pass-through | Values keep `~user/` prefix, `~` unescaped in `quoteValue` | Raw prefix pass-through (builtin truncates trailing separator at insertion) | Raw prefix pass-through | Leading `~` kept outside quotes | Raw prefix pass-through | Not supported (no `~user` expansion, pwsh expands only `~/`) |
-| **Extra env vars** | `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS` | Same as bash | `COMP_LINE`, `COMP_POINT` | `CARAPACE_COMPLINE`, `CARAPACE_ZSH_HASH_DIRS` | None | None | None | None | None |
+| **Extra env vars** | `COMP_LINE`, `COMP_POINT`, `COMP_TYPE`, `COMP_WORDBREAKS`, `CARAPACE_COMPLINE` | Same as bash | `COMP_LINE`, `COMP_POINT` | `CARAPACE_COMPLINE`, `CARAPACE_ZSH_HASH_DIRS` | None | None | None | None | None |
 
 ### Secondary Shells
 

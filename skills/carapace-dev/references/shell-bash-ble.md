@@ -55,6 +55,7 @@ Plus the regular bash snippet is prepended (for fallback).
 3. **Tab-delimited format**: Uses `cand%%$'\t'*` and `cand##*$'\t'` to split value and description on tab
 4. **Fallback**: If BLE is not attached (`${BLE_ATTACHED-}`), falls back to the regular bash completer
 5. **No COMP_TYPE/COMP_WORDBREAKS**: The BLE snippet doesn't export these — it uses `sed` + `xargs` instead of the 3-stage retry
+6. **No CARAPACE_COMPLINE**: The BLE completer doesn't pass it to `_carapace bash-ble`. Only the prepended bash fallback snippet sets it; `bash_ble.ActionRawValues()` emits unquoted values and relies on BLE to quote them at insertion time (its quote-insert system tracks the quoting context, including an open `'...'`)
 
 ## BLE Value Format
 

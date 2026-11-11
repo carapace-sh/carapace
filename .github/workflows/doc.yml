@@ -27,18 +27,6 @@ jobs:
           path: example/example
           retention-days: 1
 
-      - name: build tt
-        run: |
-          cd $(mktemp -d)
-          go install github.com/tab-dance/tabdance-test/cmd/tt@e6b0855
-          cp "$(go env GOPATH)/bin/tt" tt
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: tt
-          path: tt
-          retention-days: 1
-
 
   doubleQuote:        {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuote}}
   doubleQuoteOpen:    {needs: build, uses: ./.github/workflows/vhs-template.yml, with: {topic: doubleQuoteOpen}}

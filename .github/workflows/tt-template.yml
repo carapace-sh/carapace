@@ -11,7 +11,7 @@ jobs:
   tt:
     runs-on: ubuntu-latest
     continue-on-error: true
-    container: ghcr.io/carapace-sh/vhs
+    container: ghcr.io/carapace-sh/dev
     steps:
       - name: shallow clone
         uses: actions/checkout@v7
@@ -21,12 +21,7 @@ jobs:
           name: example
           path: /usr/local/bin/
 
-      - uses: actions/download-artifact@v8
-        with:
-          name: tt
-          path: /usr/local/bin/
-
-      - run: chmod +x /usr/local/bin/example /usr/local/bin/tt
+      - run: chmod +x /usr/local/bin/example
 
       - name: run tape tests
         run: |

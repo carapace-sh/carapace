@@ -1,0 +1,4 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /--noprefix one/
+example modifier --noprefix one
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /example\ modifier\ \-\-noprefix\ one\-\-\-/
+example modifier --noprefix one---

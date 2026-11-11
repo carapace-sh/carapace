@@ -117,3 +117,10 @@ services:
     command: bash -c "ln -s /carapace/example/example /usr/local/bin/example && ls -d */ | xargs -I'{}' bash -c \"cd {};ls *.tape | xargs -n1 vhs\""
     env_file:
       - .github/workflows/vhs.env
+
+  tt:
+    image: ghcr.io/carapace-sh/dev
+    volumes:
+      - '.:/carapace/'
+    working_dir: /carapace/docs/src/development/tt
+    command: bash -c "ln -s /carapace/example/example /usr/local/bin/example && ls -d */ | xargs -I'{}' bash -c \"cd {}; tt run . --jobs 8 --update\""

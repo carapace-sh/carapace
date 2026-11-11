@@ -1,0 +1,42 @@
+name: tt template
+
+on:
+  workflow_call:
+    inputs:
+      topic:
+        required: true
+        type: string
+
+jobs:
+  tt:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: ghcr.io/carapace-sh/dev
+    steps:
+      - name: shallow clone
+        uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: example
+          path: /usr/local/bin/
+
+      - run: chmod +x /usr/local/bin/example
+
+      - name: run tape tests
+        run: |
+          cd docs/src/development/tt/${{ inputs.topic }}
+          tt run . --jobs 8 --update
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tt-${{ inputs.topic }}
+          path: |
+            docs/src/development/tt/${{ inputs.topic }}/
+            !docs/src/development/tt/${{ inputs.topic }}/*.tape
+          retention-days: 1
+
+      - name: check
+        run: |
+          git diff
+          [ -z "$(git status --porcelain)" ] # clean workspace unless .golden files changed

@@ -2,3 +2,5 @@
 $ example modifier --nospace o
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /\$\ example\ modifier\ \-\-nospace\ 'one,'/
 $ example modifier --nospace 'one,'
+ COMPLETING argument
+one,

@@ -2,3 +2,5 @@
 $ example action embeddedP1 "embeddedP2 w"i
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /\$\ example\ action\ embeddedP1\ 'embeddedP2\ with\ space'/
 $ example action embeddedP1 'embeddedP2 with space'
+ COMPLETING argument
+embeddedP2 with space

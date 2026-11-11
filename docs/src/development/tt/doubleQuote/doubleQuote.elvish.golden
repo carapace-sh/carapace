@@ -2,5 +2,9 @@
 $ example "ac"
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /example "action"/
 $ example "action"
+ COMPLETING argument
+action (action example)
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /\$\ example\ "action"/
 $ example "action"
+ COMPLETING argument
+action (action example)

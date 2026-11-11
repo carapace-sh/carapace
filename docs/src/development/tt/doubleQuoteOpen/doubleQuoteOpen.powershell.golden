@@ -1,5 +1,5 @@
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PowerShell/
-PowerShell 7.6.6
+PowerShell 7.6.9
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
 PS> example action embeddedP1 "embeddedP2 with
 ──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PS>\ example\ action\ embeddedP1\ "embeddedP2\ with/

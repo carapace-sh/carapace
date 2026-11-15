@@ -1,0 +1,10 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /example "ac"/
+$ example "ac"
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /action example/
+$ example action
+               action
+               action example
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /action\ example/
+$ example action
+               action
+               action example

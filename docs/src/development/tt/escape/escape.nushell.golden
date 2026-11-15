@@ -1,0 +1,5 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /embeddedP2/
+$ example action embeddedP1 embeddedP2\ with\
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /NO\ RECORDS\ FOUND/
+$ | example action embeddedP1 embeddedP2\ with\
+NO RECORDS FOUND

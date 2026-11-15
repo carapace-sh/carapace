@@ -1,0 +1,6 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PowerShell/
+PowerShell 7.6.9
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /--nospace o/
+PS> example modifier --nospace o
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PS>\ example\ modifier\ \-\-nospace\ 'one,'/
+PS> example modifier --nospace 'one,'

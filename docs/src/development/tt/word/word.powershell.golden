@@ -1,0 +1,6 @@
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PowerShell/
+PowerShell 7.6.9
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /(?m)example/
+PS> example _carapace powershell | Out-String | Invoke-Expression
+──────────────────────────────────────────────────────────────────────────────── Wait+Screen /PS>\ example\ action\ ac/
+PS> example action ac

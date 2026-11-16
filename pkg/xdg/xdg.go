@@ -91,3 +91,32 @@ func DataDirs() (dirs []string, err error) {
 	}
 	return
 }
+
+// CarapacePathEntry is a resolved top-level carapace root directory with its group.
+type CarapacePathEntry struct {
+	Path  string
+	Group string // "user" or "system"
+}
+
+// CarapacePaths returns ordered carapace top-level directories using XDG:
+// user = UserConfigDir()/carapace (group "user"), then system roots from
+// DataDirs() with "carapace" appended (group "system"), in order.
+func CarapacePaths() ([]CarapacePathEntry, error) {
+	userBase, err := UserConfigDir()
+	if err != nil {
+		return nil, err
+	}
+	userBase = filepath.ToSlash(userBase)
+
+	var out []CarapacePathEntry
+	out = append(out, CarapacePathEntry{Path: filepath.ToSlash(filepath.Join(filepath.FromSlash(userBase), "carapace")), Group: "user"})
+
+	dataDirs, err := DataDirs()
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range dataDirs {
+		out = append(out, CarapacePathEntry{Path: filepath.ToSlash(filepath.Join(filepath.FromSlash(d), "carapace")), Group: "system"})
+	}
+	return out, nil
+}

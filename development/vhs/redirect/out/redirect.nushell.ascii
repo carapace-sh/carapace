@@ -1,0 +1,48 @@
+> >
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example o> /dev/null
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example o> /dev/null
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> | example o> /dev/null
+abbr                        Abbreviations related commands.
+abbr list                   List all defined abbreviations.
+alias                       Alias a command (with optional flags) to a ne...
+all                         Test if every element of the input fulfills a...
+ansi                        Output ANSI codes to change color and style o...
+ansi gradient               Add a color gradient (using ANSI color codes)...
+────────────────────────────────────────────────────────────────────────────────
+> > example o> /dev/null abbr
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
+> > example o> /dev/null abbr
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────
